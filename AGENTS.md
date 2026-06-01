@@ -33,7 +33,8 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   ├── git-flow.md       # Git flow & environments
 │   └── market-positioning.md # Target market
 ├── skills/               # Project conventions & known issues (read before coding)
-│   └── skill-setup-conventions.md  # Setup conventions & known issues
+│   ├── skill-setup-conventions.md  # Setup conventions & known issues
+│   └── skill-git-conventions.md    # Git & branch naming conventions
 └── public/
 ```
 
@@ -57,6 +58,13 @@ The system has 6 roles:
 - Barber/skinner can be edited within 3 hours of `completed_at`, no extensions
 - Warning is shown if a visit contains a haircut service (`is_haircut = true`) but has no photos
 - Username/password auth only — no email or social login
+
+## Branch Naming Convention
+
+- `feature/name` — new features, checkout from `develop`
+- `fix/description` — bug fixes, checkout from `develop`
+- `chore/description` — docs, skills, config updates, checkout from `develop`
+- Never commit directly to `main` or `staging`
 
 ## Instructions for Codex
 

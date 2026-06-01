@@ -6,6 +6,13 @@ Lưu lại các quy ước và lỗi đã gặp trong quá trình setup môi tr�
 
 ---
 
+## Node.js
+
+- **Phải dùng Node latest (v22+)** — Node v20 gây treo khi chạy `npx prisma db seed`
+- Nguyên nhân: `ts-node` không tương thích tốt với Node v20
+
+---
+
 ## Prisma
 
 - **Phải dùng Prisma v6** — version mới hơn không tương thích với Next.js + Supabase trong dự án này
@@ -25,13 +32,6 @@ datasource db {
 
 ---
 
-## Node.js
-
-- **Phải dùng Node latest (v22+)** — Node v20 gây treo khi chạy `npx prisma db seed`
-- Nguyên nhân: `ts-node` không tương thích tốt với Node v20
-
----
-
 ## Supabase
 
 - Tạo **Organization riêng** cho dự án (không dùng chung với project khác)
@@ -41,15 +41,36 @@ datasource db {
 
 ---
 
+## Setup môi trường mới (clone repo)
+
+```bash
+# 1. Clone & cài dependencies
+git clone repo-url
+cd project
+npm install
+
+# 2. Setup env
+cp .env.example .env.local
+# Điền DATABASE_URL và DIRECT_URL từ Supabase project mới
+
+# 3. Chạy migration
+npx prisma migrate deploy
+
+# 4. Seed data (tuỳ chọn)
+npx prisma db seed
+
+# 5. Chạy dev server
+npm run dev
+```
+
+---
+
 ## Các lệnh quan trọng
 
 ```bash
-# Chạy migration
-npx prisma migrate dev --name init
-
-# Chạy seed data
-npx prisma db seed
-
-# Generate Prisma client sau khi thay đổi schema
-npx prisma generate
+npx prisma migrate dev --name init   # Tạo migration mới
+npx prisma migrate deploy            # Apply migration
+npx prisma db seed                   # Seed sample data
+npx prisma generate                  # Regenerate Prisma client
+npx prisma studio                    # Mở Prisma GUI
 ```
