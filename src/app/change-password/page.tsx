@@ -6,19 +6,14 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import { authTexts } from "@/constants/texts";
-
-type ChangePasswordResponse = {
-  username?: string;
-  redirectTo?: string;
-  error?: string;
-};
+import { useChangePassword } from "@/hooks/useChangePassword";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const changePassword = useChangePassword();
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,23 +29,11 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
-      const response = await fetch("/api/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ password, confirmPassword }),
+      const result = await changePassword.mutateAsync({
+        password,
+        confirmPassword,
       });
-
-      const result = (await response.json()) as ChangePasswordResponse;
-
-      if (!response.ok || !result.username || !result.redirectTo) {
-        setError(result.error ?? authTexts.changePassword.errors.generic);
-        return;
-      }
 
       const signInResult = await signIn("credentials", {
         username: result.username,
@@ -66,10 +49,12 @@ export default function ChangePasswordPage() {
 
       router.replace(result.redirectTo);
       router.refresh();
-    } catch {
-      setError(authTexts.changePassword.errors.generic);
-    } finally {
-      setIsSubmitting(false);
+    } catch (mutationError) {
+      setError(
+        mutationError instanceof Error
+          ? mutationError.message
+          : authTexts.changePassword.errors.generic,
+      );
     }
   }
 
@@ -126,10 +111,10 @@ export default function ChangePasswordPage() {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={changePassword.isPending}
           className="mt-6 h-11 w-full rounded-md bg-zinc-950 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
         >
-          {isSubmitting
+          {changePassword.isPending
             ? authTexts.changePassword.submitting
             : authTexts.changePassword.submit}
         </button>

@@ -27,6 +27,10 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   │       ├── customers.ts
 │   │       ├── dashboard.ts
 │   │       └── index.ts
+│   ├── hooks/            # TanStack Query hooks for client-side fetching
+│   │   ├── useVisits.ts
+│   │   ├── useCustomers.ts
+│   │   └── useServices.ts
 │   ├── lib/              # Utilities, Prisma client, auth config
 │   └── types/            # TypeScript types
 ├── prisma/
@@ -41,9 +45,10 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   ├── onboarding.md     # Developer onboarding guide
 │   └── market-positioning.md # Target market
 ├── skills/               # Project conventions & known issues (read before coding)
-│   ├── skill-setup-conventions.md  # Setup conventions & known issues
-│   ├── skill-git-conventions.md    # Git & branch naming conventions
-│   └── skill-text-conventions.md  # Text & constants conventions
+│   ├── skill-setup-conventions.md          # Setup conventions & known issues
+│   ├── skill-git-conventions.md            # Git, branch & commit conventions
+│   ├── skill-text-conventions.md           # Text & constants conventions
+│   └── skill-data-fetching-conventions.md  # Data fetching conventions
 └── public/
 ```
 
@@ -68,6 +73,14 @@ The system has 6 roles:
 - Warning is shown if a visit contains a haircut service (`is_haircut = true`) but has no photos
 - Username/password auth only — no email or social login
 
+## Data Fetching Convention
+
+- **Server Components** → use `fetch` directly to leverage Next.js SSR and caching
+- **Client Components** → use TanStack Query hooks from `/src/hooks/`
+- Never use `fetch` directly in Client Components
+- Never use TanStack Query in Server Components
+- Refer to `/skills/skill-data-fetching-conventions.md` for details and examples
+
 ## Text & Constants Convention
 
 - Never hardcode text strings in components or logic
@@ -83,12 +96,32 @@ The system has 6 roles:
 - `chore/description` — docs, skills, config updates, checkout from `develop`
 - Never commit directly to `main` or `staging`
 
+## Commit Message Convention
+
+Format: `type: short description`
+
+- `feat:` — new feature
+- `fix:` — bug fix
+- `chore:` — docs, skills, config, dependencies
+- `refactor:` — code refactor
+- `style:` — UI/styling changes
+- `test:` — add or update tests
+
+## Commit & Push Workflow
+
+- **Commit only** — when asked to only commit: commit with correct message, stop. Do NOT push or create PR.
+- **Push code** — when asked to push: commit, push to current branch, create PR into `develop`
+
 ## Instructions for Codex
 
 - Always read `/skills` folder first before writing any code
 - Always refer to `/docs/data-model.md` before writing any database-related code
 - Always refer to `/docs/mvp-features.md` before implementing any feature
+- Before creating a new branch, always pull latest develop first:
+  `git checkout develop && git pull origin develop`
 - Never hardcode text in components — use `/src/constants/texts/` instead
+- Use TanStack Query for client-side fetching — never use fetch directly in Client Components
+- Use fetch directly in Server Components — never use TanStack Query in Server Components
 - Use Prisma for all database queries — never write raw SQL
 - Use shadcn/ui components where possible — do not build UI components from scratch
 - Keep API routes in `src/app/api/`
