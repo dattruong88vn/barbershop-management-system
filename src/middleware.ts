@@ -1,15 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-type UserRole =
-  | "superadmin"
-  | "owner"
-  | "manager"
-  | "receptionist"
-  | "barber"
-  | "skinner";
+import type { UserRole } from "@/types";
 
-const protectedRoutesByRole: Record<Exclude<UserRole, "superadmin">, string[]> =
+const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, "superadmin">, string[]> =
   {
     owner: [
       "/dashboard",
@@ -25,9 +19,9 @@ const protectedRoutesByRole: Record<Exclude<UserRole, "superadmin">, string[]> =
     skinner: ["/dashboard", "/visits", "/customers"],
   };
 
-const loginPath = "/login";
-const changePasswordPath = "/change-password";
-const fallbackPath = "/dashboard";
+const LOGIN_PATH = "/login";
+const CHANGE_PASSWORD_PATH = "/change-password";
+const FALLBACK_PATH = "/dashboard";
 
 function isUserRole(role: unknown): role is UserRole {
   return (
@@ -51,38 +45,40 @@ export async function middleware(request: NextRequest) {
   });
 
   if (!token) {
-    return NextResponse.redirect(new URL(loginPath, request.url));
+    return NextResponse.redirect(new URL(LOGIN_PATH, request.url));
   }
 
   const role = token.role;
 
   if (!isUserRole(role)) {
-    return NextResponse.redirect(new URL(loginPath, request.url));
+    return NextResponse.redirect(new URL(LOGIN_PATH, request.url));
   }
 
   if (token.is_first_login === true) {
-    if (matchesRoute(request.nextUrl.pathname, changePasswordPath)) {
+    if (matchesRoute(request.nextUrl.pathname, CHANGE_PASSWORD_PATH)) {
       return NextResponse.next();
     }
 
-    return NextResponse.redirect(new URL(changePasswordPath, request.url));
+    return NextResponse.redirect(new URL(CHANGE_PASSWORD_PATH, request.url));
   }
 
-  if (matchesRoute(request.nextUrl.pathname, changePasswordPath)) {
-    return NextResponse.redirect(new URL(fallbackPath, request.url));
+  if (matchesRoute(request.nextUrl.pathname, CHANGE_PASSWORD_PATH)) {
+    return NextResponse.redirect(new URL(FALLBACK_PATH, request.url));
   }
 
   if (role === "superadmin") {
     return NextResponse.next();
   }
 
-  const allowedRoutes = protectedRoutesByRole[role];
+  const allowedRoutes = PROTECTED_ROUTES_BY_ROLE[role];
 
-  if (allowedRoutes.some((route) => matchesRoute(request.nextUrl.pathname, route))) {
+  if (
+    allowedRoutes.some((route) => matchesRoute(request.nextUrl.pathname, route))
+  ) {
     return NextResponse.next();
   }
 
-  return NextResponse.redirect(new URL(fallbackPath, request.url));
+  return NextResponse.redirect(new URL(FALLBACK_PATH, request.url));
 }
 
 export const config = {

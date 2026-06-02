@@ -31,8 +31,14 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   │   ├── useVisits.ts
 │   │   ├── useCustomers.ts
 │   │   └── useServices.ts
+│   ├── types/            # TypeScript types & interfaces (no defining in components)
+│   │   ├── auth.ts
+│   │   ├── visits.ts
+│   │   ├── customers.ts
+│   │   ├── services.ts
+│   │   └── index.ts
 │   ├── lib/              # Utilities, Prisma client, auth config
-│   └── types/            # TypeScript types
+└── public/
 ├── prisma/
 │   ├── schema.prisma     # Database schema
 │   └── migrations/       # Prisma migrations
@@ -47,7 +53,9 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 ├── skills/               # Project conventions & known issues (read before coding)
 │   ├── skill-setup-conventions.md          # Setup conventions & known issues
 │   ├── skill-git-conventions.md            # Git, branch & commit conventions
+│   ├── skill-naming-conventions.md         # File, function, variable naming
 │   ├── skill-text-conventions.md           # Text & constants conventions
+│   ├── skill-types-conventions.md          # Types & interfaces conventions
 │   └── skill-data-fetching-conventions.md  # Data fetching conventions
 └── public/
 ```
@@ -73,6 +81,13 @@ The system has 6 roles:
 - Warning is shown if a visit contains a haircut service (`is_haircut = true`) but has no photos
 - Username/password auth only — no email or social login
 
+## Naming Conventions
+
+- File: Page/Layout → `kebab-case`, Component → `PascalCase`, Hook/Util/Type/Text → `camelCase`
+- Function: Component → `PascalCase`, Hook → `use` prefix, Internal handler → `handle` prefix, Exported util → starts with a verb (e.g. `formatDate`, `convertPrice`)
+- Variable: Internal → `_` prefix, Boolean → `is/has/can` prefix, Constant → `UPPER_SNAKE_CASE`
+- Refer to `/skills/skill-naming-conventions.md` for details and examples
+
 ## Data Fetching Convention
 
 - **Server Components** → use `fetch` directly to leverage Next.js SSR and caching
@@ -88,6 +103,14 @@ The system has 6 roles:
 - Each module has its own text file (e.g. `auth.ts`, `visits.ts`)
 - Import text from `@/constants/texts` in components
 - Refer to `/skills/skill-text-conventions.md` for details and examples
+
+## Types & Interfaces Convention
+
+- Never define types or interfaces inside components
+- All types must be placed in `/src/types/` and split by module
+- Import types from `@/types` in components, hooks, and API routes
+- Prisma auto-generates types from schema — only add types for things Prisma doesn't cover
+- Refer to `/skills/skill-types-conventions.md` for details and examples
 
 ## Branch Naming Convention
 
@@ -119,7 +142,9 @@ Format: `type: short description`
 - Always refer to `/docs/mvp-features.md` before implementing any feature
 - Before creating a new branch, always pull latest develop first:
   `git checkout develop && git pull origin develop`
+- Follow naming conventions in `/skills/skill-naming-conventions.md`
 - Never hardcode text in components — use `/src/constants/texts/` instead
+- Never define types/interfaces in components — use `/src/types/` instead
 - Use TanStack Query for client-side fetching — never use fetch directly in Client Components
 - Use fetch directly in Server Components — never use TanStack Query in Server Components
 - Use Prisma for all database queries — never write raw SQL

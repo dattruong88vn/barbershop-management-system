@@ -1,20 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 
 import { authTexts } from "@/constants/texts";
-
-type ChangePasswordInput = {
-  password: string;
-  confirmPassword: string;
-};
-
-export type ChangePasswordResult = {
-  username: string;
-  redirectTo: string;
-};
-
-type ChangePasswordApiResponse = Partial<ChangePasswordResult> & {
-  error?: string;
-};
+import type {
+  ChangePasswordApiResponse,
+  ChangePasswordInput,
+  ChangePasswordResult,
+} from "@/types";
 
 function isChangePasswordResult(
   response: ChangePasswordApiResponse,
