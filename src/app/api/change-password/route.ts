@@ -1,12 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import type { ChangePasswordRequestBody } from "@/types";
 
-const DEFAULT_DASHBOARD_PATH = "/dashboard";
+const DEFAULT_DASHBOARD_PATH = ROUTES.dashboard;
 
 function isChangePasswordRequestBody(
   body: unknown,

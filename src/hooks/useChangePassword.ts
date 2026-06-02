@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
+import { API_ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import type {
   ChangePasswordApiResponse,
@@ -19,7 +20,7 @@ function isChangePasswordResult(
 async function changePassword(
   input: ChangePasswordInput,
 ): Promise<ChangePasswordResult> {
-  const response = await fetch("/api/change-password", {
+  const response = await fetch(API_ROUTES.changePassword, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

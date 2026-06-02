@@ -1,27 +1,28 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import { ROUTES } from "@/constants/routes";
 import type { UserRole } from "@/types";
 
 const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, "superadmin">, string[]> =
   {
     owner: [
-      "/dashboard",
-      "/services",
-      "/combos",
-      "/staff",
-      "/branches",
-      "/reports",
+      ROUTES.dashboard,
+      ROUTES.ownerServices,
+      ROUTES.ownerCombos,
+      ROUTES.ownerStaff,
+      ROUTES.ownerBranches,
+      ROUTES.reports,
     ],
-    manager: ["/dashboard", "/reports"],
-    receptionist: ["/dashboard", "/visits", "/customers"],
-    barber: ["/dashboard", "/visits", "/customers"],
-    skinner: ["/dashboard", "/visits", "/customers"],
+    manager: [ROUTES.dashboard, ROUTES.reports],
+    receptionist: [ROUTES.dashboard, ROUTES.visits, ROUTES.customers],
+    barber: [ROUTES.dashboard, ROUTES.visits, ROUTES.customers],
+    skinner: [ROUTES.dashboard, ROUTES.visits, ROUTES.customers],
   };
 
-const LOGIN_PATH = "/login";
-const CHANGE_PASSWORD_PATH = "/change-password";
-const FALLBACK_PATH = "/dashboard";
+const LOGIN_PATH = ROUTES.login;
+const CHANGE_PASSWORD_PATH = ROUTES.changePassword;
+const FALLBACK_PATH = ROUTES.dashboard;
 
 function isUserRole(role: unknown): role is UserRole {
   return (

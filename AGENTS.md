@@ -19,8 +19,22 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 /
 ├── src/
 │   ├── app/              # Next.js App Router pages & API routes
+│   │   ├── login/
+│   │   ├── change-password/
+│   │   ├── dashboard/
+│   │   ├── visits/
+│   │   │   └── [id]/
+│   │   ├── customers/
+│   │   │   └── [id]/
+│   │   ├── reports/
+│   │   └── owner/
+│   │       ├── services/
+│   │       ├── combos/
+│   │       ├── staff/
+│   │       └── branches/
 │   ├── components/       # Reusable UI components
 │   ├── constants/
+│   │   ├── routes.ts     # All route URLs (no hardcoding in components)
 │   │   └── texts/        # All UI text strings (no hardcoding in components)
 │   │       ├── auth.ts
 │   │       ├── visits.ts
@@ -38,7 +52,6 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   │   ├── services.ts
 │   │   └── index.ts
 │   ├── lib/              # Utilities, Prisma client, auth config
-└── public/
 ├── prisma/
 │   ├── schema.prisma     # Database schema
 │   └── migrations/       # Prisma migrations
@@ -54,6 +67,7 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   ├── skill-setup-conventions.md          # Setup conventions & known issues
 │   ├── skill-git-conventions.md            # Git, branch & commit conventions
 │   ├── skill-naming-conventions.md         # File, function, variable naming
+│   ├── skill-routes-conventions.md         # Routes conventions
 │   ├── skill-text-conventions.md           # Text & constants conventions
 │   ├── skill-types-conventions.md          # Types & interfaces conventions
 │   └── skill-data-fetching-conventions.md  # Data fetching conventions
@@ -80,6 +94,13 @@ The system has 6 roles:
 - Barber/skinner can be edited within 3 hours of `completed_at`, no extensions
 - Warning is shown if a visit contains a haircut service (`is_haircut = true`) but has no photos
 - Username/password auth only — no email or social login
+
+## Routes Convention
+
+- Never hardcode URL strings in components — use `ROUTES` from `@/constants/routes`
+- Max 2 levels deep for simplicity
+- Dynamic routes use functions: `visitDetail: (id: string) => \`/visits/${id}`
+- Refer to `/skills/skill-routes-conventions.md` for details and examples
 
 ## Naming Conventions
 
@@ -143,6 +164,7 @@ Format: `type: short description`
 - Before creating a new branch, always pull latest develop first:
   `git checkout develop && git pull origin develop`
 - Follow naming conventions in `/skills/skill-naming-conventions.md`
+- Never hardcode URL strings — use `ROUTES` from `@/constants/routes`
 - Never hardcode text in components — use `/src/constants/texts/` instead
 - Never define types/interfaces in components — use `/src/types/` instead
 - Use TanStack Query for client-side fetching — never use fetch directly in Client Components

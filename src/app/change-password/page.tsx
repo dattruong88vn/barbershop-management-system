@@ -5,6 +5,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { useChangePassword } from "@/hooks/useChangePassword";
 
@@ -43,7 +44,7 @@ export default function ChangePasswordPage() {
 
       if (!signInResult?.ok) {
         setError(authTexts.changePassword.errors.changedButSignInFailed);
-        router.replace("/login");
+        router.replace(ROUTES.login);
         return;
       }
 
