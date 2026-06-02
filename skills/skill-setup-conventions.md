@@ -13,6 +13,14 @@ Lưu lại các quy ước và lỗi đã gặp trong quá trình setup môi tr�
 
 ---
 
+## Package Manager
+
+- **Dùng npm** — luôn cài thư viện trong project, không cài global
+- Khi cài thư viện mới: `npm install tên-thư-viện` trong thư mục project
+- Không dùng `-g` flag
+
+---
+
 ## Prisma
 
 - **Phải dùng Prisma v6** — version mới hơn không tương thích với Next.js + Supabase trong dự án này
