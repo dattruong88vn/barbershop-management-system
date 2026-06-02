@@ -20,6 +20,13 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 ├── src/
 │   ├── app/              # Next.js App Router pages & API routes
 │   ├── components/       # Reusable UI components
+│   ├── constants/
+│   │   └── texts/        # All UI text strings (no hardcoding in components)
+│   │       ├── auth.ts
+│   │       ├── visits.ts
+│   │       ├── customers.ts
+│   │       ├── dashboard.ts
+│   │       └── index.ts
 │   ├── lib/              # Utilities, Prisma client, auth config
 │   └── types/            # TypeScript types
 ├── prisma/
@@ -31,9 +38,12 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   ├── tech-stack.md     # Tech stack decisions
 │   ├── database.md       # Database strategy
 │   ├── git-flow.md       # Git flow & environments
+│   ├── onboarding.md     # Developer onboarding guide
 │   └── market-positioning.md # Target market
 ├── skills/               # Project conventions & known issues (read before coding)
-│   └── skill-setup-conventions.md  # Setup conventions & known issues
+│   ├── skill-setup-conventions.md  # Setup conventions & known issues
+│   ├── skill-git-conventions.md    # Git & branch naming conventions
+│   └── skill-text-conventions.md  # Text & constants conventions
 └── public/
 ```
 
@@ -58,11 +68,27 @@ The system has 6 roles:
 - Warning is shown if a visit contains a haircut service (`is_haircut = true`) but has no photos
 - Username/password auth only — no email or social login
 
+## Text & Constants Convention
+
+- Never hardcode text strings in components or logic
+- All UI text must be placed in `/src/constants/texts/`
+- Each module has its own text file (e.g. `auth.ts`, `visits.ts`)
+- Import text from `@/constants/texts` in components
+- Refer to `/skills/skill-text-conventions.md` for details and examples
+
+## Branch Naming Convention
+
+- `feature/name` — new features, checkout from `develop`
+- `fix/description` — bug fixes, checkout from `develop`
+- `chore/description` — docs, skills, config updates, checkout from `develop`
+- Never commit directly to `main` or `staging`
+
 ## Instructions for Codex
 
 - Always read `/skills` folder first before writing any code
 - Always refer to `/docs/data-model.md` before writing any database-related code
 - Always refer to `/docs/mvp-features.md` before implementing any feature
+- Never hardcode text in components — use `/src/constants/texts/` instead
 - Use Prisma for all database queries — never write raw SQL
 - Use shadcn/ui components where possible — do not build UI components from scratch
 - Keep API routes in `src/app/api/`
