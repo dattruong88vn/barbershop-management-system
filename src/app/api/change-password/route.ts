@@ -1,16 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
+import type { ChangePasswordRequestBody } from "@/types";
 
-type ChangePasswordRequestBody = {
-  password?: unknown;
-  confirmPassword?: unknown;
-};
-
-const defaultDashboardPath = "/dashboard";
+const DEFAULT_DASHBOARD_PATH = ROUTES.dashboard;
 
 function isChangePasswordRequestBody(
   body: unknown,
@@ -76,6 +73,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     username: token.username,
-    redirectTo: defaultDashboardPath,
+    redirectTo: DEFAULT_DASHBOARD_PATH,
   });
 }
