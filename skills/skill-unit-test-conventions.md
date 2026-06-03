@@ -111,10 +111,24 @@ describe("useVisits", () => {
 
 ## Workflow
 
-1. Tính năng được confirm hoàn thành
-2. Codex viết unit test cho tất cả file liên quan đến tính năng đó
+### Khi implement tính năng
+
+1. Khi nhận yêu cầu implement, Codex chỉ viết code tính năng trước
+2. Không tự động viết hoặc update unit test trong cùng lượt implement, trừ khi user yêu cầu rõ ràng
+3. Sau khi code xong, báo rõ unit test chưa được viết/cập nhật và chờ user xác nhận bước test
+
+### Khi user yêu cầu viết unit test
+
+1. Codex viết hoặc update unit test cho tất cả file liên quan đến tính năng đã được confirm
+2. Test file đặt cạnh file được test theo convention ở trên
 3. Chạy `npx vitest run` để verify tất cả test pass
-4. Commit với message: `test: add unit tests for [tên tính năng]`
+4. Nếu test runner bị lỗi môi trường, báo rõ blocker và command đã chạy
+
+### Khi user yêu cầu commit
+
+- Nếu code tính năng đã thay đổi nhưng unit test chưa được viết hoặc chưa được update, Codex phải nhắc user xác nhận trước khi commit
+- Nếu user xác nhận vẫn commit khi chưa có test, commit theo yêu cầu và ghi rõ trong final response
+- Nếu user yêu cầu commit riêng phần test, dùng message: `test: add unit tests for [tên tính năng]`
 
 ---
 
