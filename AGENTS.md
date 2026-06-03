@@ -74,7 +74,8 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   ├── skill-text-conventions.md           # Text & constants conventions
 │   ├── skill-types-conventions.md          # Types & interfaces conventions
 │   ├── skill-data-fetching-conventions.md  # Data fetching conventions
-│   └── skill-api-error-handling.md         # API client & error handling
+│   ├── skill-api-error-handling.md         # API client & error handling
+│   └── skill-unit-test-conventions.md      # Unit test conventions
 └── public/
 ```
 
@@ -98,6 +99,14 @@ The system has 6 roles:
 - Barber/skinner can be edited within 3 hours of `completed_at`, no extensions
 - Warning is shown if a visit contains a haircut service (`is_haircut = true`) but has no photos
 - Username/password auth only — no email or social login
+
+## Unit Test Convention
+
+- Testing library: Vitest + React Testing Library
+- Test file placed next to the file being tested (no separate `__tests__` folder)
+- After each feature is confirmed complete, Codex must write unit tests for all related files
+- Commit message: `test: add unit tests for [feature name]`
+- Refer to `/skills/skill-unit-test-conventions.md` for details and examples
 
 ## API Client & Error Handling
 
@@ -173,6 +182,7 @@ Format: `type: short description`
 - Always refer to `/docs/mvp-features.md` before implementing any feature
 - Before creating a new branch, always pull latest develop first:
   `git checkout develop && git pull origin develop`
+- When installing a new package, always check if `@types/package-name` exists and install it as devDependency if needed
 - Follow naming conventions in `/skills/skill-naming-conventions.md`
 - Never hardcode URL strings — use `ROUTES` from `@/constants/routes`
 - Never hardcode text in components — use `/src/constants/texts/` instead
@@ -180,6 +190,8 @@ Format: `type: short description`
 - Never use `fetch` directly — use `fetchClient` or `fetchServer` from `@/lib/`
 - Use TanStack Query for client-side fetching with `fetchClient`
 - Use `fetchServer` in Server Components
+- After each feature is confirmed complete, write unit tests for all related files
+- Run `npx vitest run` to verify all tests pass before committing
 - Use Prisma for all database queries — never write raw SQL
 - Use shadcn/ui components where possible — do not build UI components from scratch
 - Keep API routes in `src/app/api/`
