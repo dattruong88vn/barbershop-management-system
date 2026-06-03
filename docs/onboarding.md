@@ -25,7 +25,7 @@ npm install
 
 ### Bước 2 — Tạo Supabase project
 
-1. Vào [supabase.com](https://supabase.com), tạo project mới
+1. Vào [supabase.com](https://supabase.com), tạo project mới trong Organization **Barbershop**
 2. Vào **Database → Settings → Connection string**
 3. Copy **Transaction pooler** (port 6543) — dùng cho `DATABASE_URL`
 4. Copy **Session pooler** (port 5432) — dùng cho `DIRECT_URL`
@@ -68,6 +68,39 @@ npx prisma db seed
 
 ```bash
 npm run dev
+```
+
+---
+
+## Cấu trúc thư mục quan trọng
+
+```
+src/
+├── app/                  # Next.js App Router pages & API routes
+├── components/           # Reusable UI components
+├── constants/
+│   ├── routes/
+│   │   ├── appRoutes.ts  # Frontend navigation URLs
+│   │   ├── apiRoutes.ts  # API endpoint URLs
+│   │   └── index.ts
+│   └── texts/            # UI text strings
+├── hooks/                # TanStack Query hooks
+├── lib/
+│   ├── apiConfig.ts      # Default request config
+│   ├── fetchClient.ts    # Fetch wrapper cho Client Components
+│   ├── fetchServer.ts    # Fetch wrapper cho Server Components
+│   └── queryClient.ts    # TanStack Query config
+└── types/                # TypeScript types & interfaces
+```
+
+---
+
+## Chạy tests
+
+```bash
+npx vitest run          # Chạy tất cả test một lần
+npx vitest              # Watch mode
+npx vitest run --coverage  # Coverage report
 ```
 
 ---
