@@ -13,6 +13,10 @@ Quy ước xử lý API request và error tập trung trong dự án. Tham khả
 - 2 wrapper riêng biệt: `fetchClient` cho Client Component, `fetchServer` cho Server Component
 - Các default config dùng chung cho request/response đặt trong file riêng, ví dụ `src/lib/apiConfig.ts`; không khai báo trong từng hook hoặc module entity cụ thể
 - Nếu nhiều request dùng JSON body, import default headers/config dùng chung thay vì lặp object inline
+- Các helper response dùng chung đặt trong file riêng, ví dụ `src/lib/apiResponse.ts`
+- Nếu nhiều mutation trong cùng hook cần kiểm tra response data optional, tạo private function ngay trong hook module để check, throw error và return data
+- Private function trong hook dùng `hasResponseData`; không lặp block `if (!hasResponseData(...))` trong từng mutation
+- Response data key phải là private constant trong hook module, không hardcode string lặp lại trong các call
 
 ---
 
@@ -69,13 +73,35 @@ Dùng trong TanStack Query hook:
 
 ```typescript
 // src/hooks/useVisits.ts
+import { API_ROUTES } from "@/constants/routes";
+import { visitTexts } from "@/constants/texts";
+import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
 
-export function useVisits() {
-  return useQuery({
-    queryKey: ["visits"],
-    queryFn: () => fetchClient("/api/visits"),
+const VISIT_RESPONSE_DATA_KEY = "visit";
+
+function getVisitResponseData(result: VisitApiResponse): Visit {
+  if (
+    !hasResponseData<typeof VISIT_RESPONSE_DATA_KEY, Visit>(
+      result,
+      VISIT_RESPONSE_DATA_KEY,
+    )
+  ) {
+    throw new Error(result.error ?? visitTexts.errors.generic);
+  }
+
+  return result.visit;
+}
+
+async function createVisit(input: VisitFormInput) {
+  const result = await fetchClient<VisitApiResponse>(API_ROUTES.visits, {
+    method: "POST",
+    headers: DEFAULT_JSON_HEADERS,
+    body: JSON.stringify(input),
   });
+
+  return getVisitResponseData(result);
 }
 ```
 

@@ -58,6 +58,7 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   │   └── useServices.ts
 │   ├── lib/              # Utilities, Prisma client, auth config
 │   │   ├── apiConfig.ts    # Default request/response config
+│   │   ├── apiResponse.ts  # Shared response helpers
 │   │   ├── fetchClient.ts  # Fetch wrapper for Client Components
 │   │   ├── fetchServer.ts  # Fetch wrapper for Server Components
 │   │   └── queryClient.ts  # TanStack Query client config
@@ -116,8 +117,9 @@ The system has 6 roles:
 
 - Testing library: Vitest + React Testing Library
 - Test file placed next to the file being tested (no separate `__tests__` folder)
-- After each feature is confirmed complete, Codex must write unit tests for all related files
-- Commit message: `test: add unit tests for [feature name]`
+- When implementing a feature, Codex only writes feature code first unless the user explicitly asks for unit tests
+- If the user asks to commit before unit tests are written or updated, Codex must remind the user and ask for confirmation before committing
+- When user requests tests, commit message: `test: add unit tests for [feature name]`
 - Refer to `/skills/skill-unit-test-conventions.md` for details and examples
 
 ## API Client & Error Handling
@@ -126,6 +128,8 @@ The system has 6 roles:
 - Client Components → use `fetchClient` from `@/lib/fetchClient`
 - Server Components → use `fetchServer` from `@/lib/fetchServer`
 - Default config → use `DEFAULT_JSON_HEADERS` from `@/lib/apiConfig`
+- Response data guard → use `hasResponseData` from `@/lib/apiResponse`
+- Repeated response data extraction in one hook → create a private hook-module function that checks, throws, and returns data
 - Error codes: 400 → show error message, 401 → redirect login, 403 → redirect dashboard, 404 → not-found, 500 → toast error
 - Refer to `/skills/skill-api-error-handling.md` for details and examples
 
@@ -203,10 +207,13 @@ Format: `type: short description`
 - Never define types/interfaces in components — use `/src/types/` instead
 - Never use `fetch` directly — use `fetchClient` or `fetchServer` from `@/lib/`
 - Use `DEFAULT_JSON_HEADERS` from `@/lib/apiConfig` for JSON requests
+- Use `hasResponseData` from `@/lib/apiResponse` for optional response data checks; keep response data keys as private constants in hooks
+- When multiple mutations in one hook need the same response data check, use a private function inside that hook module instead of repeating `if (!hasResponseData(...))`
 - Use TanStack Query for client-side fetching with `fetchClient`
 - Use `fetchServer` in Server Components
-- After each feature is confirmed complete, write unit tests for all related files
-- Run `npx vitest run` to verify all tests pass before committing
+- Do not write or update unit tests unless the user explicitly asks for tests
+- If the user asks to commit while related unit tests are not written or updated, remind the user and ask for confirmation before committing
+- Run `npx vitest run` when writing/updating tests, or when the user asks for test verification
 - Use Prisma for all database queries — never write raw SQL
 - Use shadcn/ui components where possible — do not build UI components from scratch
 - Keep API routes in `src/app/api/`

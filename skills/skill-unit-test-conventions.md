@@ -2,7 +2,7 @@
 
 ## Mục đích
 
-Quy ước viết unit test trong dự án. Codex phải viết unit test sau khi mỗi tính năng được confirm hoàn thành.
+Quy ước viết unit test trong dự án. Codex chỉ viết hoặc update unit test khi user yêu cầu rõ ràng; khi chỉ nhận yêu cầu implement thì chỉ code tính năng trước.
 
 ---
 

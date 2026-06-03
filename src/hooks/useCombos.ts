@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_ROUTES } from "@/constants/routes";
 import { comboTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
 import type {
   Combo,
@@ -12,11 +13,19 @@ import type {
 } from "@/types";
 
 const COMBOS_QUERY_KEY = ["combos"] as const;
+const COMBO_RESPONSE_DATA_KEY = "combo";
 
-function isComboApiResponse(
-  response: ComboApiResponse,
-): response is Required<Pick<ComboApiResponse, "combo">> {
-  return typeof response.combo === "object" && response.combo !== null;
+function getComboResponseData(result: ComboApiResponse): Combo {
+  if (
+    !hasResponseData<typeof COMBO_RESPONSE_DATA_KEY, Combo>(
+      result,
+      COMBO_RESPONSE_DATA_KEY,
+    )
+  ) {
+    throw new Error(result.error ?? comboTexts.ownerCombos.errors.generic);
+  }
+
+  return result.combo;
 }
 
 async function getCombos(): Promise<Combo[]> {
@@ -32,11 +41,7 @@ async function createCombo(input: ComboFormInput): Promise<Combo> {
     body: JSON.stringify(input),
   });
 
-  if (!isComboApiResponse(result)) {
-    throw new Error(result.error ?? comboTexts.ownerCombos.errors.generic);
-  }
-
-  return result.combo;
+  return getComboResponseData(result);
 }
 
 async function updateCombo(input: ComboFormInput & { id: string }) {
@@ -54,11 +59,7 @@ async function updateCombo(input: ComboFormInput & { id: string }) {
     },
   );
 
-  if (!isComboApiResponse(result)) {
-    throw new Error(result.error ?? comboTexts.ownerCombos.errors.generic);
-  }
-
-  return result.combo;
+  return getComboResponseData(result);
 }
 
 async function deleteCombo(id: string): Promise<Combo> {
@@ -69,11 +70,7 @@ async function deleteCombo(id: string): Promise<Combo> {
     },
   );
 
-  if (!isComboApiResponse(result)) {
-    throw new Error(result.error ?? comboTexts.ownerCombos.errors.generic);
-  }
-
-  return result.combo;
+  return getComboResponseData(result);
 }
 
 export function useCombos() {

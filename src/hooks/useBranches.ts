@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_ROUTES } from "@/constants/routes";
 import { branchTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
 import type {
   Branch,
@@ -12,11 +13,19 @@ import type {
 } from "@/types";
 
 const BRANCHES_QUERY_KEY = ["branches"] as const;
+const BRANCH_RESPONSE_DATA_KEY = "branch";
 
-function isBranchApiResponse(
-  response: BranchApiResponse,
-): response is Required<Pick<BranchApiResponse, "branch">> {
-  return typeof response.branch === "object" && response.branch !== null;
+function getBranchResponseData(result: BranchApiResponse): Branch {
+  if (
+    !hasResponseData<typeof BRANCH_RESPONSE_DATA_KEY, Branch>(
+      result,
+      BRANCH_RESPONSE_DATA_KEY,
+    )
+  ) {
+    throw new Error(result.error ?? branchTexts.ownerBranches.errors.generic);
+  }
+
+  return result.branch;
 }
 
 async function getBranches(): Promise<Branch[]> {
@@ -32,11 +41,7 @@ async function createBranch(input: BranchFormInput): Promise<Branch> {
     body: JSON.stringify(input),
   });
 
-  if (!isBranchApiResponse(result)) {
-    throw new Error(result.error ?? branchTexts.ownerBranches.errors.generic);
-  }
-
-  return result.branch;
+  return getBranchResponseData(result);
 }
 
 async function updateBranch(input: BranchFormInput & { id: string }) {
@@ -52,11 +57,7 @@ async function updateBranch(input: BranchFormInput & { id: string }) {
     },
   );
 
-  if (!isBranchApiResponse(result)) {
-    throw new Error(result.error ?? branchTexts.ownerBranches.errors.generic);
-  }
-
-  return result.branch;
+  return getBranchResponseData(result);
 }
 
 async function deleteBranch(id: string): Promise<Branch> {
@@ -67,11 +68,7 @@ async function deleteBranch(id: string): Promise<Branch> {
     },
   );
 
-  if (!isBranchApiResponse(result)) {
-    throw new Error(result.error ?? branchTexts.ownerBranches.errors.generic);
-  }
-
-  return result.branch;
+  return getBranchResponseData(result);
 }
 
 export function useBranches() {
