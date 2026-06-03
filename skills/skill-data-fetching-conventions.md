@@ -50,21 +50,39 @@ src/
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { API_ROUTES } from "@/constants/routes";
+import { visitTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
 
 const VISITS_QUERY_KEY = ["visits"] as const;
+const VISIT_RESPONSE_DATA_KEY = "visit";
+
+function getVisitResponseData(result: VisitApiResponse): Visit {
+  if (
+    !hasResponseData<typeof VISIT_RESPONSE_DATA_KEY, Visit>(
+      result,
+      VISIT_RESPONSE_DATA_KEY,
+    )
+  ) {
+    throw new Error(result.error ?? visitTexts.errors.generic);
+  }
+
+  return result.visit;
+}
 
 async function getVisits() {
   return fetchClient(API_ROUTES.visits);
 }
 
 async function createVisit(input: VisitFormInput) {
-  return fetchClient(API_ROUTES.visits, {
+  const result = await fetchClient<VisitApiResponse>(API_ROUTES.visits, {
     method: "POST",
     headers: DEFAULT_JSON_HEADERS,
     body: JSON.stringify(input),
   });
+
+  return getVisitResponseData(result);
 }
 
 export function useVisits() {
@@ -114,6 +132,10 @@ export default function VisitsList() {
 - Hook duy nhất đó gom query state và các mutation function tương ứng với API
 - Các helper request nội bộ trong hook không export ra ngoài
 - Query key đặt trong hook module dưới dạng private constant và phải nhất quán, mô tả rõ data đang fetch
+- Response data key đặt trong hook module dưới dạng private constant, ví dụ `const VISIT_RESPONSE_DATA_KEY = "visit"`
+- Khi nhiều mutation trong cùng hook cần lấy response data optional, tạo private function ngay trong hook module để check, throw error và return data, ví dụ `getVisitResponseData`
+- Private function trong hook dùng `hasResponseData` từ `src/lib/apiResponse.ts`; không lặp block `if (!hasResponseData(...))` trong từng mutation
+- Không hardcode response data key string lặp lại trong `hasResponseData` calls
 
 Ví dụ return shape:
 
@@ -138,6 +160,7 @@ return {
 - Các default config dùng chung cho request/response đặt trong file riêng, ví dụ `src/lib/apiConfig.ts`
 - Không khai báo default config trong từng hook hoặc module entity cụ thể
 - Nếu nhiều request dùng JSON body, import default headers/config dùng chung thay vì lặp object inline
+- Các helper response dùng chung đặt trong file riêng, ví dụ `src/lib/apiResponse.ts`
 
 Ví dụ:
 
@@ -149,14 +172,45 @@ export const DEFAULT_JSON_HEADERS = {
 ```
 
 ```typescript
-// src/hooks/useServices.ts
-import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+// src/lib/apiResponse.ts
+export function hasResponseData<TKey extends string, TValue>(
+  response: Partial<Record<TKey, TValue>>,
+  key: TKey,
+): response is Record<TKey, TValue> {
+  return typeof response[key] === "object" && response[key] !== null;
+}
+```
 
-fetchClient(API_ROUTES.services, {
+```typescript
+// src/hooks/useServices.ts
+import { API_ROUTES } from "@/constants/routes";
+import { serviceTexts } from "@/constants/texts";
+import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+import { hasResponseData } from "@/lib/apiResponse";
+import { fetchClient } from "@/lib/fetchClient";
+
+const SERVICE_RESPONSE_DATA_KEY = "service";
+
+function getServiceResponseData(result: ServiceApiResponse): Service {
+  if (
+    !hasResponseData<typeof SERVICE_RESPONSE_DATA_KEY, Service>(
+      result,
+      SERVICE_RESPONSE_DATA_KEY,
+    )
+  ) {
+    throw new Error(result.error ?? serviceTexts.ownerServices.errors.generic);
+  }
+
+  return result.service;
+}
+
+const result = await fetchClient<ServiceApiResponse>(API_ROUTES.services, {
   method: "POST",
   headers: DEFAULT_JSON_HEADERS,
   body: JSON.stringify(input),
 });
+
+return getServiceResponseData(result);
 ```
 
 ---

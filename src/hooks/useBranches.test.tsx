@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { API_ROUTES } from "@/constants/routes";
+import { branchTexts } from "@/constants/texts";
 import type { Branch, BranchFormInput } from "@/types";
 
 const mocks = vi.hoisted(() => ({
@@ -59,8 +60,10 @@ describe("useBranches", () => {
       wrapper: createWrapper(),
     });
 
-    await vi.waitFor(() => {
-      expect(result.current.branches).toEqual([branch]);
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(result.current.branches).toEqual([branch]);
+      });
     });
     expect(mocks.fetchClient).toHaveBeenCalledWith(API_ROUTES.branches);
   });
@@ -77,7 +80,9 @@ describe("useBranches", () => {
       ...input,
     };
 
-    mocks.fetchClient.mockResolvedValue({ branch });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ branches: [] })
+      .mockResolvedValueOnce({ branch });
 
     const { result } = renderHook(() => useBranches(), {
       wrapper: createWrapper(),
@@ -97,6 +102,27 @@ describe("useBranches", () => {
     });
   });
 
+  it("should throw generic error when create branch response has no branch data", async () => {
+    const input: BranchFormInput = {
+      name: "Chi nhánh Quận 1",
+      address: "123 Lê Lợi",
+    };
+
+    mocks.fetchClient
+      .mockResolvedValueOnce({ branches: [] })
+      .mockResolvedValueOnce({});
+
+    const { result } = renderHook(() => useBranches(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await expect(result.current.createBranch(input)).rejects.toThrow(
+        branchTexts.ownerBranches.errors.generic,
+      );
+    });
+  });
+
   it("should update a branch by id", async () => {
     const input = {
       id: "branch-1",
@@ -109,7 +135,9 @@ describe("useBranches", () => {
       ...input,
     };
 
-    mocks.fetchClient.mockResolvedValue({ branch });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ branches: [] })
+      .mockResolvedValueOnce({ branch });
 
     const { result } = renderHook(() => useBranches(), {
       wrapper: createWrapper(),
@@ -144,7 +172,9 @@ describe("useBranches", () => {
       createdAt: "2026-06-03T00:00:00.000Z",
     };
 
-    mocks.fetchClient.mockResolvedValue({ branch });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ branches: [] })
+      .mockResolvedValueOnce({ branch });
 
     const { result } = renderHook(() => useBranches(), {
       wrapper: createWrapper(),

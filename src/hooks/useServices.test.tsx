@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { API_ROUTES } from "@/constants/routes";
+import { serviceTexts } from "@/constants/texts";
 import type { Service, ServiceFormInput } from "@/types";
 
 const mocks = vi.hoisted(() => ({
@@ -58,8 +59,10 @@ describe("useServices", () => {
       wrapper: createWrapper(),
     });
 
-    await vi.waitFor(() => {
-      expect(result.current.services).toEqual([service]);
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(result.current.services).toEqual([service]);
+      });
     });
     expect(mocks.fetchClient).toHaveBeenCalledWith(API_ROUTES.services);
   });
@@ -77,7 +80,9 @@ describe("useServices", () => {
       ...input,
     };
 
-    mocks.fetchClient.mockResolvedValue({ service });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ services: [] })
+      .mockResolvedValueOnce({ service });
 
     const { result } = renderHook(() => useServices(), {
       wrapper: createWrapper(),
@@ -97,6 +102,28 @@ describe("useServices", () => {
     });
   });
 
+  it("should throw generic error when create service response has no service data", async () => {
+    const input: ServiceFormInput = {
+      name: "Cắt tóc nam",
+      price: 80000,
+      isHaircut: true,
+    };
+
+    mocks.fetchClient
+      .mockResolvedValueOnce({ services: [] })
+      .mockResolvedValueOnce({});
+
+    const { result } = renderHook(() => useServices(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await expect(result.current.createService(input)).rejects.toThrow(
+        serviceTexts.ownerServices.errors.generic,
+      );
+    });
+  });
+
   it("should update a service by id", async () => {
     const input = {
       id: "service-1",
@@ -110,7 +137,9 @@ describe("useServices", () => {
       ...input,
     };
 
-    mocks.fetchClient.mockResolvedValue({ service });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ services: [] })
+      .mockResolvedValueOnce({ service });
 
     const { result } = renderHook(() => useServices(), {
       wrapper: createWrapper(),
@@ -147,7 +176,9 @@ describe("useServices", () => {
       createdAt: "2026-06-03T00:00:00.000Z",
     };
 
-    mocks.fetchClient.mockResolvedValue({ service });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ services: [] })
+      .mockResolvedValueOnce({ service });
 
     const { result } = renderHook(() => useServices(), {
       wrapper: createWrapper(),

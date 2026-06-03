@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { API_ROUTES } from "@/constants/routes";
+import { staffTexts } from "@/constants/texts";
 import type { Staff, StaffFormInput } from "@/types";
 
 const mocks = vi.hoisted(() => ({
@@ -67,8 +68,10 @@ describe("useStaff", () => {
       wrapper: createWrapper(),
     });
 
-    await vi.waitFor(() => {
-      expect(result.current.staff).toEqual([staffMember]);
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(result.current.staff).toEqual([staffMember]);
+      });
     });
     expect(mocks.fetchClient).toHaveBeenCalledWith(API_ROUTES.staff);
   });
@@ -82,7 +85,9 @@ describe("useStaff", () => {
     };
     const staffMember = createStaffMember();
 
-    mocks.fetchClient.mockResolvedValue({ staffMember });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ staff: [] })
+      .mockResolvedValueOnce({ staffMember });
 
     const { result } = renderHook(() => useStaff(), {
       wrapper: createWrapper(),
@@ -102,6 +107,29 @@ describe("useStaff", () => {
     });
   });
 
+  it("should throw generic error when create staff response has no staff member data", async () => {
+    const input: StaffFormInput = {
+      username: "barber01",
+      password: "Secret123!",
+      role: "barber",
+      branchId: "branch-1",
+    };
+
+    mocks.fetchClient
+      .mockResolvedValueOnce({ staff: [] })
+      .mockResolvedValueOnce({});
+
+    const { result } = renderHook(() => useStaff(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await expect(result.current.createStaff(input)).rejects.toThrow(
+        staffTexts.ownerStaff.errors.generic,
+      );
+    });
+  });
+
   it("should update staff by id", async () => {
     const input = {
       id: "staff-1",
@@ -115,7 +143,9 @@ describe("useStaff", () => {
       branchId: input.branchId,
     };
 
-    mocks.fetchClient.mockResolvedValue({ staffMember });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ staff: [] })
+      .mockResolvedValueOnce({ staffMember });
 
     const { result } = renderHook(() => useStaff(), {
       wrapper: createWrapper(),
@@ -146,7 +176,9 @@ describe("useStaff", () => {
   it("should delete staff by id", async () => {
     const staffMember = createStaffMember();
 
-    mocks.fetchClient.mockResolvedValue({ staffMember });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ staff: [] })
+      .mockResolvedValueOnce({ staffMember });
 
     const { result } = renderHook(() => useStaff(), {
       wrapper: createWrapper(),

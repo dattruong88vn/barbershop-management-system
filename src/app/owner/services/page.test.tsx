@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -45,6 +45,16 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
+function submitServicesForm(buttonName: string) {
+  const submitButton = screen.getByRole("button", {
+    name: buttonName,
+  });
+  const form = submitButton.closest("form");
+
+  expect(form).not.toBeNull();
+  fireEvent.submit(form as HTMLFormElement);
+}
+
 describe("OwnerServicesPage", () => {
   it("should render empty state when there are no services", () => {
     mockServiceHooks();
@@ -77,11 +87,7 @@ describe("OwnerServicesPage", () => {
     await user.click(
       screen.getByLabelText(serviceTexts.ownerServices.isHaircutLabel),
     );
-    await user.click(
-      screen.getByRole("button", {
-        name: serviceTexts.ownerServices.submitCreate,
-      }),
-    );
+    submitServicesForm(serviceTexts.ownerServices.submitCreate);
 
     await waitFor(() => {
       expect(mocks.createService).toHaveBeenCalledWith({
@@ -122,11 +128,7 @@ describe("OwnerServicesPage", () => {
     await user.click(
       screen.getByLabelText(serviceTexts.ownerServices.isHaircutLabel),
     );
-    await user.click(
-      screen.getByRole("button", {
-        name: serviceTexts.ownerServices.submitUpdate,
-      }),
-    );
+    submitServicesForm(serviceTexts.ownerServices.submitUpdate);
 
     await waitFor(() => {
       expect(mocks.updateService).toHaveBeenCalledWith({

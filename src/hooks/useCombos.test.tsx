@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { API_ROUTES } from "@/constants/routes";
+import { comboTexts } from "@/constants/texts";
 import type { Combo, ComboFormInput } from "@/types";
 
 const mocks = vi.hoisted(() => ({
@@ -70,8 +71,10 @@ describe("useCombos", () => {
       wrapper: createWrapper(),
     });
 
-    await vi.waitFor(() => {
-      expect(result.current.combos).toEqual([combo]);
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(result.current.combos).toEqual([combo]);
+      });
     });
     expect(mocks.fetchClient).toHaveBeenCalledWith(API_ROUTES.combos);
   });
@@ -85,7 +88,9 @@ describe("useCombos", () => {
     };
     const combo = createCombo();
 
-    mocks.fetchClient.mockResolvedValue({ combo });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ combos: [] })
+      .mockResolvedValueOnce({ combo });
 
     const { result } = renderHook(() => useCombos(), {
       wrapper: createWrapper(),
@@ -105,6 +110,29 @@ describe("useCombos", () => {
     });
   });
 
+  it("should throw generic error when create combo response has no combo data", async () => {
+    const input: ComboFormInput = {
+      name: "Combo cắt gội",
+      description: "Cắt tóc và gội đầu",
+      price: 120000,
+      serviceIds: ["service-1"],
+    };
+
+    mocks.fetchClient
+      .mockResolvedValueOnce({ combos: [] })
+      .mockResolvedValueOnce({});
+
+    const { result } = renderHook(() => useCombos(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await expect(result.current.createCombo(input)).rejects.toThrow(
+        comboTexts.ownerCombos.errors.generic,
+      );
+    });
+  });
+
   it("should update a combo by id", async () => {
     const input = {
       id: "combo-1",
@@ -120,7 +148,9 @@ describe("useCombos", () => {
       price: input.price,
     };
 
-    mocks.fetchClient.mockResolvedValue({ combo });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ combos: [] })
+      .mockResolvedValueOnce({ combo });
 
     const { result } = renderHook(() => useCombos(), {
       wrapper: createWrapper(),
@@ -151,7 +181,9 @@ describe("useCombos", () => {
   it("should delete a combo by id", async () => {
     const combo = createCombo();
 
-    mocks.fetchClient.mockResolvedValue({ combo });
+    mocks.fetchClient
+      .mockResolvedValueOnce({ combos: [] })
+      .mockResolvedValueOnce({ combo });
 
     const { result } = renderHook(() => useCombos(), {
       wrapper: createWrapper(),

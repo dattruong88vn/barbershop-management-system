@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_ROUTES } from "@/constants/routes";
 import { staffTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
 import type {
   Staff,
@@ -12,13 +13,19 @@ import type {
 } from "@/types";
 
 const STAFF_QUERY_KEY = ["staff"] as const;
+const STAFF_RESPONSE_DATA_KEY = "staffMember";
 
-function isStaffApiResponse(
-  response: StaffApiResponse,
-): response is Required<Pick<StaffApiResponse, "staffMember">> {
-  return (
-    typeof response.staffMember === "object" && response.staffMember !== null
-  );
+function getStaffResponseData(result: StaffApiResponse): Staff {
+  if (
+    !hasResponseData<typeof STAFF_RESPONSE_DATA_KEY, Staff>(
+      result,
+      STAFF_RESPONSE_DATA_KEY,
+    )
+  ) {
+    throw new Error(result.error ?? staffTexts.ownerStaff.errors.generic);
+  }
+
+  return result.staffMember;
 }
 
 async function getStaff(): Promise<Staff[]> {
@@ -34,11 +41,7 @@ async function createStaff(input: StaffFormInput): Promise<Staff> {
     body: JSON.stringify(input),
   });
 
-  if (!isStaffApiResponse(result)) {
-    throw new Error(result.error ?? staffTexts.ownerStaff.errors.generic);
-  }
-
-  return result.staffMember;
+  return getStaffResponseData(result);
 }
 
 async function updateStaff(input: StaffFormInput & { id: string }) {
@@ -56,11 +59,7 @@ async function updateStaff(input: StaffFormInput & { id: string }) {
     },
   );
 
-  if (!isStaffApiResponse(result)) {
-    throw new Error(result.error ?? staffTexts.ownerStaff.errors.generic);
-  }
-
-  return result.staffMember;
+  return getStaffResponseData(result);
 }
 
 async function deleteStaff(id: string): Promise<Staff> {
@@ -71,11 +70,7 @@ async function deleteStaff(id: string): Promise<Staff> {
     },
   );
 
-  if (!isStaffApiResponse(result)) {
-    throw new Error(result.error ?? staffTexts.ownerStaff.errors.generic);
-  }
-
-  return result.staffMember;
+  return getStaffResponseData(result);
 }
 
 export function useStaff() {

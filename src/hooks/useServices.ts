@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_ROUTES } from "@/constants/routes";
 import { serviceTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
+import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
 import type {
   Service,
@@ -12,11 +13,19 @@ import type {
 } from "@/types";
 
 const SERVICES_QUERY_KEY = ["services"] as const;
+const SERVICE_RESPONSE_DATA_KEY = "service";
 
-function isServiceApiResponse(
-  response: ServiceApiResponse,
-): response is Required<Pick<ServiceApiResponse, "service">> {
-  return typeof response.service === "object" && response.service !== null;
+function getServiceResponseData(result: ServiceApiResponse): Service {
+  if (
+    !hasResponseData<typeof SERVICE_RESPONSE_DATA_KEY, Service>(
+      result,
+      SERVICE_RESPONSE_DATA_KEY,
+    )
+  ) {
+    throw new Error(result.error ?? serviceTexts.ownerServices.errors.generic);
+  }
+
+  return result.service;
 }
 
 async function getServices(): Promise<Service[]> {
@@ -32,11 +41,7 @@ async function createService(input: ServiceFormInput): Promise<Service> {
     body: JSON.stringify(input),
   });
 
-  if (!isServiceApiResponse(result)) {
-    throw new Error(result.error ?? serviceTexts.ownerServices.errors.generic);
-  }
-
-  return result.service;
+  return getServiceResponseData(result);
 }
 
 async function updateService(input: ServiceFormInput & { id: string }) {
@@ -53,11 +58,7 @@ async function updateService(input: ServiceFormInput & { id: string }) {
     },
   );
 
-  if (!isServiceApiResponse(result)) {
-    throw new Error(result.error ?? serviceTexts.ownerServices.errors.generic);
-  }
-
-  return result.service;
+  return getServiceResponseData(result);
 }
 
 async function deleteService(id: string): Promise<Service> {
@@ -68,11 +69,7 @@ async function deleteService(id: string): Promise<Service> {
     },
   );
 
-  if (!isServiceApiResponse(result)) {
-    throw new Error(result.error ?? serviceTexts.ownerServices.errors.generic);
-  }
-
-  return result.service;
+  return getServiceResponseData(result);
 }
 
 export function useServices() {

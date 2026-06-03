@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -74,6 +74,16 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
+function submitCombosForm(buttonName: string) {
+  const submitButton = screen.getByRole("button", {
+    name: buttonName,
+  });
+  const form = submitButton.closest("form");
+
+  expect(form).not.toBeNull();
+  fireEvent.submit(form as HTMLFormElement);
+}
+
 describe("OwnerCombosPage", () => {
   it("should render empty state when there are no combos", () => {
     mockComboHooks();
@@ -107,12 +117,8 @@ describe("OwnerCombosPage", () => {
       screen.getByLabelText(comboTexts.ownerCombos.priceLabel),
       String(combo.price),
     );
-    await user.click(screen.getByLabelText(service.name));
-    await user.click(
-      screen.getByRole("button", {
-        name: comboTexts.ownerCombos.submitCreate,
-      }),
-    );
+    await user.click(screen.getAllByRole("checkbox")[0]);
+    submitCombosForm(comboTexts.ownerCombos.submitCreate);
 
     await waitFor(() => {
       expect(mocks.createCombo).toHaveBeenCalledWith({
@@ -152,11 +158,7 @@ describe("OwnerCombosPage", () => {
       screen.getByLabelText(comboTexts.ownerCombos.priceLabel),
       String(copiedCombo.price),
     );
-    await user.click(
-      screen.getByRole("button", {
-        name: comboTexts.ownerCombos.submitCreate,
-      }),
-    );
+    submitCombosForm(comboTexts.ownerCombos.submitCreate);
 
     await waitFor(() => {
       expect(mocks.createCombo).toHaveBeenCalledWith({
@@ -188,11 +190,7 @@ describe("OwnerCombosPage", () => {
       screen.getByLabelText(comboTexts.ownerCombos.nameLabel),
       "Combo mới",
     );
-    await user.click(
-      screen.getByRole("button", {
-        name: comboTexts.ownerCombos.submitUpdate,
-      }),
-    );
+    submitCombosForm(comboTexts.ownerCombos.submitUpdate);
 
     await waitFor(() => {
       expect(mocks.updateCombo).toHaveBeenCalledWith({

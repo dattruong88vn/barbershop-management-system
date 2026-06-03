@@ -87,6 +87,7 @@ src/
 ├── hooks/                # TanStack Query hooks
 ├── lib/
 │   ├── apiConfig.ts      # Default request config
+│   ├── apiResponse.ts    # Shared response helpers
 │   ├── fetchClient.ts    # Fetch wrapper cho Client Components
 │   ├── fetchServer.ts    # Fetch wrapper cho Server Components
 │   └── queryClient.ts    # TanStack Query config
@@ -96,6 +97,8 @@ src/
 ---
 
 ## Chạy tests
+
+Chỉ viết hoặc update unit test khi user yêu cầu rõ ràng. Nếu cần verify test sau khi viết hoặc khi được yêu cầu, dùng các lệnh sau:
 
 ```bash
 npx vitest run          # Chạy tất cả test một lần
