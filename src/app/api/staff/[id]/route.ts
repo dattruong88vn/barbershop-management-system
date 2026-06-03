@@ -1,0 +1,285 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { Prisma } from "@prisma/client";
+
+import { staffTexts } from "@/constants/texts";
+import { hashPassword } from "@/lib/password";
+import { prisma } from "@/lib/prisma";
+import type { StaffRequestBody, StaffRole, UserRole } from "@/types";
+
+type StaffRouteContext = {
+  params: Promise<{ id?: string }> | { id?: string };
+};
+
+const STAFF_ROLES: StaffRole[] = ["receptionist", "barber", "skinner"];
+const STAFF_SELECT = {
+  id: true,
+  shopId: true,
+  branchId: true,
+  username: true,
+  role: true,
+  isFirstLogin: true,
+  createdAt: true,
+  branch: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+} as const;
+
+function isStaffRequestBody(body: unknown): body is StaffRequestBody {
+  return typeof body === "object" && body !== null;
+}
+
+function isStaffRole(role: unknown): role is StaffRole {
+  return typeof role === "string" && STAFF_ROLES.includes(role as StaffRole);
+}
+
+function normalizeStaffInput(body: StaffRequestBody) {
+  return {
+    username: typeof body.username === "string" ? body.username.trim() : "",
+    password: typeof body.password === "string" ? body.password.trim() : "",
+    role: isStaffRole(body.role) ? body.role : null,
+    branchId:
+      typeof body.branchId === "string" && body.branchId.trim()
+        ? body.branchId.trim()
+        : null,
+  };
+}
+
+async function getStaffId(context: StaffRouteContext) {
+  const params = await Promise.resolve(context.params);
+  return typeof params.id === "string" ? params.id : "";
+}
+
+async function getOwnerShopId(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token?.id) {
+    return { error: staffTexts.api.errors.unauthorized, status: 401 };
+  }
+
+  if (token.role !== ("owner" satisfies UserRole) || !token.shop_id) {
+    return { error: staffTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return { shopId: token.shop_id };
+}
+
+async function findStaffMember(staffId: string, shopId: string) {
+  return prisma.user.findFirst({
+    where: {
+      id: staffId,
+      shopId,
+      role: { in: STAFF_ROLES },
+    },
+    select: STAFF_SELECT,
+  });
+}
+
+async function isBranchValid(branchId: string | null, shopId: string) {
+  if (!branchId) {
+    return true;
+  }
+
+  const branch = await prisma.branch.findFirst({
+    where: {
+      id: branchId,
+      shopId,
+    },
+    select: { id: true },
+  });
+
+  return Boolean(branch);
+}
+
+export async function GET(request: NextRequest, context: StaffRouteContext) {
+  const authResult = await getOwnerShopId(request);
+
+  if ("error" in authResult) {
+    return NextResponse.json(
+      { error: authResult.error },
+      { status: authResult.status },
+    );
+  }
+
+  const staffId = await getStaffId(context);
+
+  if (!staffId) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingStaffId },
+      { status: 400 },
+    );
+  }
+
+  const staffMember = await findStaffMember(staffId, authResult.shopId);
+
+  if (!staffMember) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.json({ staffMember });
+}
+
+export async function PATCH(request: NextRequest, context: StaffRouteContext) {
+  const authResult = await getOwnerShopId(request);
+
+  if ("error" in authResult) {
+    return NextResponse.json(
+      { error: authResult.error },
+      { status: authResult.status },
+    );
+  }
+
+  const staffId = await getStaffId(context);
+
+  if (!staffId) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingStaffId },
+      { status: 400 },
+    );
+  }
+
+  const body: unknown = await request.json().catch(() => null);
+
+  if (!isStaffRequestBody(body)) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidRequestBody },
+      { status: 400 },
+    );
+  }
+
+  const staffInput = normalizeStaffInput(body);
+
+  if (!staffInput.username) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingUsername },
+      { status: 400 },
+    );
+  }
+
+  if (!staffInput.role) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidRole },
+      { status: 400 },
+    );
+  }
+
+  if (staffInput.password && staffInput.password.length < 8) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.passwordTooShort },
+      { status: 400 },
+    );
+  }
+
+  const staffMember = await findStaffMember(staffId, authResult.shopId);
+
+  if (!staffMember) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  const isValidBranch = await isBranchValid(staffInput.branchId, authResult.shopId);
+
+  if (!isValidBranch) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidBranch },
+      { status: 400 },
+    );
+  }
+
+  const updatedPasswordData = staffInput.password
+    ? {
+        passwordHash: hashPassword(staffInput.password),
+        isFirstLogin: true,
+      }
+    : {};
+
+  try {
+    const updatedStaffMember = await prisma.user.update({
+      where: { id: staffMember.id },
+      data: {
+        username: staffInput.username,
+        role: staffInput.role,
+        branchId: staffInput.branchId,
+        ...updatedPasswordData,
+      },
+      select: STAFF_SELECT,
+    });
+
+    return NextResponse.json({ staffMember: updatedStaffMember });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json(
+        { error: staffTexts.api.errors.duplicateUsername },
+        { status: 400 },
+      );
+    }
+
+    throw error;
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: StaffRouteContext,
+) {
+  const authResult = await getOwnerShopId(request);
+
+  if ("error" in authResult) {
+    return NextResponse.json(
+      { error: authResult.error },
+      { status: authResult.status },
+    );
+  }
+
+  const staffId = await getStaffId(context);
+
+  if (!staffId) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingStaffId },
+      { status: 400 },
+    );
+  }
+
+  const staffMember = await findStaffMember(staffId, authResult.shopId);
+
+  if (!staffMember) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  try {
+    await prisma.user.delete({
+      where: { id: staffMember.id },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2003"
+    ) {
+      return NextResponse.json(
+        { error: staffTexts.api.errors.staffInUse },
+        { status: 400 },
+      );
+    }
+
+    throw error;
+  }
+
+  return NextResponse.json({ staffMember });
+}
