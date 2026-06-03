@@ -8,15 +8,19 @@ Quy ước định nghĩa và sử dụng routes trong dự án. Tham khảo fil
 
 ## Quy tắc
 
-- **Không hardcode URL string trong component** — tất cả routes phải được định nghĩa trong `/src/constants/routes.ts`
-- Import routes từ `@/constants/routes` trong components, hooks, và middleware
+- **Không hardcode URL string trong component** — tất cả routes phải được định nghĩa trong file constants
+- Tất cả route constants đặt trong folder `src/constants/routes/`
+- Tách file theo mục đích: `appRoutes.ts` cho frontend, `apiRoutes.ts` cho API endpoints
+- Export qua `src/constants/routes/index.ts` để import từ `@/constants/routes`
 
 ---
 
-## File Routes
+## ROUTES — điều hướng frontend
+
+Dùng trong `Link`, `redirect`, `router.push`:
 
 ```typescript
-// src/constants/routes.ts
+// src/constants/routes/appRoutes.ts
 export const ROUTES = {
   login: "/login",
   changePassword: "/change-password",
@@ -30,6 +34,27 @@ export const ROUTES = {
   ownerCombos: "/owner/combos",
   ownerStaff: "/owner/staff",
   ownerBranches: "/owner/branches",
+};
+```
+
+---
+
+## API_ROUTES — API endpoints
+
+Dùng trong `fetchClient`, `fetchServer`:
+
+```typescript
+// src/constants/routes/apiRoutes.ts
+export const API_ROUTES = {
+  visits: "/api/visits",
+  visitDetail: (id: string) => `/api/visits/${id}`,
+  customers: "/api/customers",
+  customerDetail: (id: string) => `/api/customers/${id}`,
+  branches: "/api/branches",
+  services: "/api/services",
+  combos: "/api/combos",
+  staff: "/api/staff",
+  reports: "/api/reports",
 };
 ```
 
@@ -49,39 +74,46 @@ src/app/
 │   ├── page.tsx
 │   └── [id]/page.tsx
 ├── reports/page.tsx
-└── owner/
-    ├── services/page.tsx
-    ├── combos/page.tsx
-    ├── staff/page.tsx
-    └── branches/page.tsx
+├── owner/
+│   ├── services/page.tsx
+│   ├── combos/page.tsx
+│   ├── staff/page.tsx
+│   └── branches/page.tsx
+└── api/
+    ├── visits/route.ts
+    ├── customers/route.ts
+    ├── branches/route.ts
+    ├── services/route.ts
+    ├── combos/route.ts
+    ├── staff/route.ts
+    └── reports/route.ts
 ```
 
-> Tên folder trong `/app` phải khớp với URL trong `ROUTES`.
+> Tên folder trong `/app` phải khớp với URL trong `ROUTES` và `API_ROUTES`.
 
 ---
 
 ## Ví dụ sử dụng
 
 ```typescript
-import { ROUTES } from "@/constants/routes"
+import { API_ROUTES, ROUTES } from "@/constants/routes"
 
-// Link
+// Frontend navigation
 <Link href={ROUTES.visits}>Danh sách visits</Link>
-
-// Dynamic route
 <Link href={ROUTES.visitDetail(visit.id)}>Chi tiết</Link>
-
-// Redirect
 redirect(ROUTES.dashboard)
 
-// Router push
-router.push(ROUTES.login)
+// API calls
+fetchClient(API_ROUTES.visits)
+fetchClient(API_ROUTES.visitDetail(id))
 ```
 
 ---
 
 ## Lưu ý
 
-- Khi thêm route mới, cập nhật `ROUTES` trong `routes.ts` và tạo folder/page tương ứng trong `/app`
-- Route động (có tham số) dùng function: `visitDetail: (id: string) => \`/visits/${id}`
+- `ROUTES` — chỉ dùng cho điều hướng, không dùng để gọi API
+- `API_ROUTES` — chỉ dùng trong `fetchClient` hoặc `fetchServer`, không dùng trong `Link` hay `redirect`
+- Khi thêm route mới, cập nhật cả `ROUTES` và `API_ROUTES` nếu cần
+- Route động dùng function: `visitDetail: (id: string) => \`/visits/${id}`
 - Tối đa 2 cấp để giữ đơn giản

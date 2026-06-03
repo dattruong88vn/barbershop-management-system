@@ -11,6 +11,8 @@ Quy ước xử lý API request và error tập trung trong dự án. Tham khả
 - Không dùng `fetch` trực tiếp trong component hay hook
 - Tất cả request đi qua wrapper function tập trung
 - 2 wrapper riêng biệt: `fetchClient` cho Client Component, `fetchServer` cho Server Component
+- Các default config dùng chung cho request/response đặt trong file riêng, ví dụ `src/lib/apiConfig.ts`; không khai báo trong từng hook hoặc module entity cụ thể
+- Nếu nhiều request dùng JSON body, import default headers/config dùng chung thay vì lặp object inline
 
 ---
 
