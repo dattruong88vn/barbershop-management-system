@@ -13,7 +13,3 @@ export const ROUTES = {
   ownerStaff: "/owner/staff",
   ownerBranches: "/owner/branches",
 } as const;
-
-export const API_ROUTES = {
-  changePassword: "/api/change-password",
-} as const;

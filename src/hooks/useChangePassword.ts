@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { API_ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
+import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
 import { fetchClient } from "@/lib/fetchClient";
 import type {
   ChangePasswordApiResponse,
@@ -25,9 +26,7 @@ async function changePassword(
     API_ROUTES.changePassword,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: DEFAULT_JSON_HEADERS,
       body: JSON.stringify(input),
     },
   );

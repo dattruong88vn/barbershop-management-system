@@ -27,14 +27,25 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   │   ├── customers/
 │   │   │   └── [id]/
 │   │   ├── reports/
-│   │   └── owner/
+│   │   ├── owner/
+│   │   │   ├── services/
+│   │   │   ├── combos/
+│   │   │   ├── staff/
+│   │   │   └── branches/
+│   │   └── api/
+│   │       ├── visits/
+│   │       ├── customers/
+│   │       ├── branches/
 │   │       ├── services/
 │   │       ├── combos/
 │   │       ├── staff/
-│   │       └── branches/
+│   │       └── reports/
 │   ├── components/       # Reusable UI components
 │   ├── constants/
-│   │   ├── routes.ts     # All route URLs (no hardcoding in components)
+│   │   ├── routes/       # Route constants
+│   │   │   ├── appRoutes.ts # Frontend navigation URLs
+│   │   │   ├── apiRoutes.ts # API endpoint URLs
+│   │   │   └── index.ts     # Export all route constants
 │   │   └── texts/        # All UI text strings (no hardcoding in components)
 │   │       ├── auth.ts
 │   │       ├── visits.ts
@@ -46,6 +57,7 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   │   ├── useCustomers.ts
 │   │   └── useServices.ts
 │   ├── lib/              # Utilities, Prisma client, auth config
+│   │   ├── apiConfig.ts    # Default request/response config
 │   │   ├── fetchClient.ts  # Fetch wrapper for Client Components
 │   │   ├── fetchServer.ts  # Fetch wrapper for Server Components
 │   │   └── queryClient.ts  # TanStack Query client config
@@ -113,14 +125,16 @@ The system has 6 roles:
 - Never use `fetch` directly in components or hooks
 - Client Components → use `fetchClient` from `@/lib/fetchClient`
 - Server Components → use `fetchServer` from `@/lib/fetchServer`
+- Default config → use `DEFAULT_JSON_HEADERS` from `@/lib/apiConfig`
 - Error codes: 400 → show error message, 401 → redirect login, 403 → redirect dashboard, 404 → not-found, 500 → toast error
 - Refer to `/skills/skill-api-error-handling.md` for details and examples
 
 ## Routes Convention
 
-- Never hardcode URL strings in components — use `ROUTES` from `@/constants/routes`
-- Max 2 levels deep for simplicity
-- Dynamic routes use functions: `visitDetail: (id: string) => \`/visits/${id}`
+- `ROUTES` — frontend navigation, use in `Link`, `redirect`, `router.push` → import from `@/constants/routes`
+- `API_ROUTES` — API endpoints, use in `fetchClient`, `fetchServer` → import from `@/constants/routes`
+- Route constants live in `/src/constants/routes/`: `appRoutes.ts`, `apiRoutes.ts`, and `index.ts`
+- Never use `ROUTES` for API calls or `API_ROUTES` for navigation
 - Refer to `/skills/skill-routes-conventions.md` for details and examples
 
 ## Naming Conventions
@@ -184,10 +198,11 @@ Format: `type: short description`
   `git checkout develop && git pull origin develop`
 - When installing a new package, always check if `@types/package-name` exists and install it as devDependency if needed
 - Follow naming conventions in `/skills/skill-naming-conventions.md`
-- Never hardcode URL strings — use `ROUTES` from `@/constants/routes`
+- Never hardcode URL strings — use `ROUTES` from `@/constants/routes` for navigation, `API_ROUTES` from `@/constants/routes` for API calls
 - Never hardcode text in components — use `/src/constants/texts/` instead
 - Never define types/interfaces in components — use `/src/types/` instead
 - Never use `fetch` directly — use `fetchClient` or `fetchServer` from `@/lib/`
+- Use `DEFAULT_JSON_HEADERS` from `@/lib/apiConfig` for JSON requests
 - Use TanStack Query for client-side fetching with `fetchClient`
 - Use `fetchServer` in Server Components
 - After each feature is confirmed complete, write unit tests for all related files
