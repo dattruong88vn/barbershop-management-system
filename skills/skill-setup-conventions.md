@@ -21,6 +21,30 @@ Lưu lại các quy ước và lỗi đã gặp trong quá trình setup môi tr�
 
 ---
 
+## Cài thư viện mới
+
+Mỗi khi cài thư viện mới, phải kiểm tra xem thư viện đó có type declarations riêng không:
+
+1. Kiểm tra xem package có built-in TypeScript support không (có `index.d.ts` trong package)
+2. Nếu không có, kiểm tra trên [npmjs.com](https://npmjs.com) xem có `@types/tên-thư-viện` không
+3. Nếu có thì cài thêm vào `devDependencies`:
+
+```bash
+npm install tên-thư-viện
+npm install --save-dev @types/tên-thư-viện
+```
+
+Ví dụ:
+
+```bash
+npm install bcrypt
+npm install --save-dev @types/bcrypt
+```
+
+> ⚠️ Không bỏ qua bước này — thiếu type declarations sẽ gây lỗi TypeScript và mất thời gian debug.
+
+---
+
 ## Prisma
 
 - **Phải dùng Prisma v6** — version mới hơn không tương thích với Next.js + Supabase trong dự án này

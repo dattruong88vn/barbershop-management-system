@@ -45,13 +45,16 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   │   ├── useVisits.ts
 │   │   ├── useCustomers.ts
 │   │   └── useServices.ts
+│   ├── lib/              # Utilities, Prisma client, auth config
+│   │   ├── fetchClient.ts  # Fetch wrapper for Client Components
+│   │   ├── fetchServer.ts  # Fetch wrapper for Server Components
+│   │   └── queryClient.ts  # TanStack Query client config
 │   ├── types/            # TypeScript types & interfaces (no defining in components)
 │   │   ├── auth.ts
 │   │   ├── visits.ts
 │   │   ├── customers.ts
 │   │   ├── services.ts
 │   │   └── index.ts
-│   ├── lib/              # Utilities, Prisma client, auth config
 ├── prisma/
 │   ├── schema.prisma     # Database schema
 │   └── migrations/       # Prisma migrations
@@ -70,7 +73,9 @@ This is a SaaS application for managing male barbershops in Vietnam. The target 
 │   ├── skill-routes-conventions.md         # Routes conventions
 │   ├── skill-text-conventions.md           # Text & constants conventions
 │   ├── skill-types-conventions.md          # Types & interfaces conventions
-│   └── skill-data-fetching-conventions.md  # Data fetching conventions
+│   ├── skill-data-fetching-conventions.md  # Data fetching conventions
+│   ├── skill-api-error-handling.md         # API client & error handling
+│   └── skill-unit-test-conventions.md      # Unit test conventions
 └── public/
 ```
 
@@ -95,6 +100,22 @@ The system has 6 roles:
 - Warning is shown if a visit contains a haircut service (`is_haircut = true`) but has no photos
 - Username/password auth only — no email or social login
 
+## Unit Test Convention
+
+- Testing library: Vitest + React Testing Library
+- Test file placed next to the file being tested (no separate `__tests__` folder)
+- After each feature is confirmed complete, Codex must write unit tests for all related files
+- Commit message: `test: add unit tests for [feature name]`
+- Refer to `/skills/skill-unit-test-conventions.md` for details and examples
+
+## API Client & Error Handling
+
+- Never use `fetch` directly in components or hooks
+- Client Components → use `fetchClient` from `@/lib/fetchClient`
+- Server Components → use `fetchServer` from `@/lib/fetchServer`
+- Error codes: 400 → show error message, 401 → redirect login, 403 → redirect dashboard, 404 → not-found, 500 → toast error
+- Refer to `/skills/skill-api-error-handling.md` for details and examples
+
 ## Routes Convention
 
 - Never hardcode URL strings in components — use `ROUTES` from `@/constants/routes`
@@ -111,10 +132,8 @@ The system has 6 roles:
 
 ## Data Fetching Convention
 
-- **Server Components** → use `fetch` directly to leverage Next.js SSR and caching
-- **Client Components** → use TanStack Query hooks from `/src/hooks/`
-- Never use `fetch` directly in Client Components
-- Never use TanStack Query in Server Components
+- **Server Components** → use `fetchServer` from `@/lib/fetchServer`
+- **Client Components** → use TanStack Query hooks from `/src/hooks/` with `fetchClient`
 - Refer to `/skills/skill-data-fetching-conventions.md` for details and examples
 
 ## Text & Constants Convention
@@ -163,12 +182,16 @@ Format: `type: short description`
 - Always refer to `/docs/mvp-features.md` before implementing any feature
 - Before creating a new branch, always pull latest develop first:
   `git checkout develop && git pull origin develop`
+- When installing a new package, always check if `@types/package-name` exists and install it as devDependency if needed
 - Follow naming conventions in `/skills/skill-naming-conventions.md`
 - Never hardcode URL strings — use `ROUTES` from `@/constants/routes`
 - Never hardcode text in components — use `/src/constants/texts/` instead
 - Never define types/interfaces in components — use `/src/types/` instead
-- Use TanStack Query for client-side fetching — never use fetch directly in Client Components
-- Use fetch directly in Server Components — never use TanStack Query in Server Components
+- Never use `fetch` directly — use `fetchClient` or `fetchServer` from `@/lib/`
+- Use TanStack Query for client-side fetching with `fetchClient`
+- Use `fetchServer` in Server Components
+- After each feature is confirmed complete, write unit tests for all related files
+- Run `npx vitest run` to verify all tests pass before committing
 - Use Prisma for all database queries — never write raw SQL
 - Use shadcn/ui components where possible — do not build UI components from scratch
 - Keep API routes in `src/app/api/`

@@ -2,6 +2,7 @@ export const ROUTES = {
   login: "/login",
   changePassword: "/change-password",
   dashboard: "/dashboard",
+  notFound: "/not-found",
   visits: "/visits",
   visitDetail: (id: string) => `/visits/${id}`,
   customers: "/customers",
