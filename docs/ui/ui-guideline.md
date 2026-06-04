@@ -1,6 +1,6 @@
 # UI Guideline
 
-## Design Principles
+## Nguyên Tắc Thiết Kế
 
 ### Mobile First
 
@@ -24,7 +24,7 @@ Mục tiêu:
 - Tạo visit < 10 giây
 - Upload ảnh < 5 giây
 
-Mọi quyết định UI phải phục vụ mục tiêu này.
+Mọi quyết định UI phải phục vụ các mục tiêu này.
 
 ---
 
@@ -81,16 +81,20 @@ Padding:
 
 ### Labels
 
-Luôn hiển thị phía trên input.
+Luôn hiển thị label phía trên input.
 
 Đúng:
 
+```text
 Tên khách hàng
 [input]
+```
 
 Sai:
 
+```text
 [input placeholder="Tên khách hàng"]
+```
 
 ---
 
@@ -108,7 +112,7 @@ Số điện thoại đã tồn tại.
 
 ### Required Fields
 
-Dùng dấu \*
+Dùng dấu `*`.
 
 Ví dụ:
 
@@ -122,9 +126,9 @@ Tên khách hàng *
 
 Search luôn nằm trên cùng màn hình.
 
-Không được đặt trong modal.
+Không đặt search trong modal.
 
-Search phải:
+Search phải có:
 
 - Auto focus trên mobile
 - Debounce 300ms
@@ -136,7 +140,7 @@ Search phải:
 
 Card là component chính của mobile.
 
-Card phải:
+Card phải có:
 
 - Border nhẹ
 - Radius 12px
@@ -148,7 +152,7 @@ Không dùng table trên mobile.
 
 ## Table Rules
 
-Chỉ dùng cho desktop.
+Chỉ dùng table cho desktop.
 
 Modules:
 
@@ -162,45 +166,45 @@ Modules:
 
 ## Status Rules
 
-Pending
+Pending:
 
-- Gray Badge
+- Gray badge
 
-In Progress
+In Progress:
 
-- Blue Badge
+- Blue badge
 
-Completed
+Completed:
 
-- Green Badge
+- Green badge
 
 ---
 
 ## Warning Rules
 
+Điều kiện:
+
+```text
 Haircut Service
-
--
-
+AND
 No Photo
-
-↓
+```
 
 Hiển thị warning.
 
-Ưu tiên màu Amber.
+Ưu tiên màu amber/gold.
 
 ---
 
 ## Dialog Rules
 
-Cho phép:
+Được phép:
 
 - Create
 - Edit
 - Confirm Delete
 
-Không cho phép:
+Không được phép:
 
 - Nested Dialog
 - Multi-step Dialog
@@ -219,30 +223,40 @@ Mọi màn hình phải có:
 
 ## Responsive Rules
 
-Mobile
+Mobile:
 
+```text
 0-767px
+```
 
-Tablet
+Tablet:
 
+```text
 768-1023px
+```
 
-Desktop
+Desktop:
 
+```text
 1024px+
+```
 
 ---
 
 ## Accessibility
 
-Touch Target
+Touch target:
 
-> = 44px
+```text
+>= 44px
+```
 
-Text
+Text:
 
-> = 14px
+```text
+>= 14px
+```
 
-Interactive Components
+Interactive components:
 
-Keyboard Accessible
+- Keyboard accessible

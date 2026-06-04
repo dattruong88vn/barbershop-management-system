@@ -6,7 +6,7 @@
 
 Route: `/login`
 
-Features:
+Tính năng:
 
 - Username
 - Password
@@ -16,42 +16,42 @@ Features:
 
 Route: `/change-password`
 
-Features:
+Tính năng:
 
 - New Password
 - Confirm Password
 - Validation
-- Redirect After Success
+- Redirect sau khi thành công
 
 ---
 
-## Staff Area
+## Khu Vực Staff
 
 ### Customer Search
 
 Route: `/customers`
 
-Features:
+Tính năng:
 
-- Search by name
-- Search by phone
-- Customer list
-- Create customer
-- Open customer detail
-- Quick create visit
+- Search theo tên
+- Search theo số điện thoại
+- Danh sách khách hàng
+- Tạo khách hàng
+- Mở customer detail
+- Tạo visit nhanh
 
 ### Customer Create
 
-Features:
+Tính năng:
 
 - Name
 - Phone
 
 Validation:
 
-- Required name
-- Required phone
-- Unique phone per shop
+- Name bắt buộc
+- Phone bắt buộc
+- Phone unique theo shop
 
 ### Customer Detail
 
@@ -64,7 +64,7 @@ Sections:
 - Visit History
 - Suggestions
 
-Actions:
+Hành động:
 
 - Create Visit
 
@@ -72,9 +72,9 @@ Actions:
 
 Route: TBD
 
-Note:
+Ghi chú:
 
-- Must align with `ROUTES` constants before implementation.
+- Phải align với hằng số `ROUTES` trước khi implement.
 
 Sections:
 
@@ -85,7 +85,7 @@ Sections:
 - Skinner
 - Total Price
 
-Actions:
+Hành động:
 
 - Save Visit
 
@@ -95,9 +95,9 @@ Route: `/visits/:id`
 
 API:
 
-- Requires `GET /api/visits/:id` for standalone visit detail loading.
-- Current backend has `GET /api/visits`, `POST /api/visits`, and `PATCH /api/visits/:id`.
-- If `GET /api/visits/:id` is not implemented, backend must be added before implementing this screen as a standalone route.
+- Cần `GET /api/visits/:id` để load standalone visit detail.
+- Backend hiện có `GET /api/visits`, `POST /api/visits`, và `PATCH /api/visits/:id`.
+- Nếu chưa implement `GET /api/visits/:id`, phải thêm backend trước khi build màn hình này như một standalone route.
 
 Sections:
 
@@ -108,7 +108,7 @@ Sections:
 - Skinner
 - Photos
 
-Actions:
+Hành động:
 
 - Upload Photo
 - Edit Barber
@@ -116,20 +116,20 @@ Actions:
 
 Warning:
 
-- Haircut service without photo
+- Haircut service chưa có photo
 
 ---
 
-## Owner Area
+## Khu Vực Owner
 
 ### Dashboard
 
 Route: `/dashboard`
 
-Backend Status:
+Trạng thái backend:
 
-- Depends on report/dashboard APIs.
-- Current UI may use placeholder or mock data until backend APIs are implemented.
+- Phụ thuộc report/dashboard APIs.
+- UI hiện tại có thể dùng placeholder hoặc mock data cho đến khi backend APIs được implement.
 
 Widgets:
 
@@ -178,12 +178,12 @@ Charts:
 
 Route: `/reports`
 
-Backend Status:
+Trạng thái backend:
 
-- Report API is not implemented yet.
-- This screen should remain placeholder/mock until backend support exists.
+- Report API chưa được implement.
+- Màn hình này nên giữ placeholder/mock cho đến khi có backend support.
 
-Features:
+Tính năng:
 
 - Revenue
 - Branch Analytics
@@ -197,7 +197,7 @@ Features:
 
 ### Landing
 
-Actions:
+Hành động:
 
 - Quản trị hệ thống
 - Xem theo tiệm

@@ -2,19 +2,19 @@
 
 ## Dashboard
 
-Backend Status:
+Trạng thái backend:
 
-- Depends on report/dashboard APIs.
-- Current UI may use placeholder or mock data until backend APIs are implemented.
+- Phụ thuộc report/dashboard APIs.
+- UI hiện tại có thể dùng placeholder hoặc mock data cho đến khi backend APIs được implement.
 
-Widgets:
+Khối số liệu:
 
 - Revenue
 - Total Visits
 - New Customers
 - Returning Customers
 
-Charts:
+Biểu đồ:
 
 - Revenue Trend
 - Top Barbers
@@ -38,7 +38,7 @@ Search
 Table
 ```
 
-Columns:
+Cột:
 
 - Name
 - Price
@@ -55,7 +55,7 @@ Fields:
 - Price
 - Is Haircut
 
-Actions:
+Hành động:
 
 - Save
 - Cancel
@@ -64,7 +64,7 @@ Actions:
 
 ## Combos
 
-Columns:
+Cột:
 
 - Name
 - Price
@@ -86,7 +86,7 @@ Fields:
 
 ## Staff
 
-Columns:
+Cột:
 
 - Username
 - Role
@@ -109,7 +109,7 @@ Fields:
 
 ## Branches
 
-Columns:
+Cột:
 
 - Name
 - Address
@@ -128,27 +128,27 @@ Fields:
 
 ## Reports
 
-Backend Status:
+Trạng thái backend:
 
-- Report API is not implemented yet.
-- This screen should remain placeholder/mock until backend support exists.
+- Report API chưa được implement.
+- Màn hình này nên giữ placeholder/mock cho đến khi có backend support.
 
-Filters:
+Bộ lọc:
 
 - Date Range
 - Branch
 
-Widgets:
+Khối số liệu:
 
 - Revenue
 - Visits
 
-Charts:
+Biểu đồ:
 
 - Revenue by Month
 - Revenue by Branch
 
-Tables:
+Bảng:
 
 - Top Barbers
 - Top Skinners

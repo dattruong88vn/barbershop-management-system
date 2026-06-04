@@ -7,6 +7,7 @@ export const ROUTES = {
   visitDetail: (id: string) => `/visits/${id}`,
   customers: "/customers",
   customerDetail: (id: string) => `/customers/${id}`,
+  customerCreateVisit: (id: string) => `/customers/${id}#create-visit`,
   reports: "/reports",
   ownerServices: "/owner/services",
   ownerCombos: "/owner/combos",

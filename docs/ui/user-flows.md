@@ -1,106 +1,106 @@
 # User Flows
 
-## Login Flow
+## Luồng Đăng Nhập
 
 ```text
-Login
+Đăng nhập
     ↓
-Authenticate
+Xác thực
     ↓
 isFirstLogin?
-    ├─ Yes → Change Password
-    └─ No  → Dashboard / Customers
+    ├─ Có    → Đổi mật khẩu
+    └─ Không → Dashboard / Customers
 ```
 
 ---
 
-## Customer Search Flow
+## Luồng Tìm Khách
 
 ```text
 Customer Search
     ↓
-Search Name / Phone
+Tìm theo tên / số điện thoại
     ↓
-Customer Found?
-    ├─ Yes → Customer Detail
-    └─ No  → Create Customer
+Tìm thấy khách?
+    ├─ Có    → Customer Detail
+    └─ Không → Tạo khách hàng
 ```
 
 ---
 
-## Create Customer Flow
+## Luồng Tạo Khách Hàng
 
 ```text
 Customer Search
     ↓
-Create Customer
+Tạo khách hàng
     ↓
-Save Success
+Lưu thành công
     ↓
 Customer Detail
 ```
 
 ---
 
-## Create Visit Flow
+## Luồng Tạo Visit
 
 ```text
 Customer Detail
     ↓
-Create Visit
+Tạo visit
     ↓
-Select Services
+Chọn services
     ↓
-Select Combos
+Chọn combos
     ↓
-Select Barber (Optional)
+Chọn barber (không bắt buộc)
     ↓
-Select Skinner (Optional)
+Chọn skinner (không bắt buộc)
     ↓
-Review Total Price
+Kiểm tra tổng tiền
     ↓
-Create Visit
+Tạo visit
     ↓
 Visit Detail
 ```
 
 ---
 
-## Upload Hair Photo Flow
+## Luồng Upload Hair Photo
 
-Backend Status:
+Backend status:
 
-- Photo upload API is not available yet.
-- Implement this flow only after backend/R2 upload support exists.
+- Photo upload API chưa có.
+- Chỉ implement flow này sau khi có backend/R2 upload support.
 
 ```text
 Visit Detail
     ↓
-Upload Photo
+Upload photo
     ↓
-Take Photo / Select Photo
+Chụp ảnh / chọn ảnh
     ↓
 Preview
     ↓
 Upload
     ↓
-Visit Detail Refresh
+Refresh Visit Detail
 ```
 
 ---
 
-## Update Barber/Skinner Flow
+## Luồng Cập Nhật Barber/Skinner
 
 ```text
 Visit Detail
     ↓
-Completed?
-    ├─ No → Hidden
-    └─ Yes
+Đã completed?
+    ├─ Không → Ẩn action
+    └─ Có
           ↓
-Within 3 Hours?
-          ├─ No → Read Only
-          └─ Yes
+Trong vòng 3 giờ?
+          ├─ Không → Chỉ xem
+          └─ Có
                 ↓
                 Edit
                 ↓
@@ -109,7 +109,7 @@ Within 3 Hours?
 
 ---
 
-## Service Management Flow
+## Luồng Quản Lý Service
 
 ```text
 Services List
@@ -118,44 +118,44 @@ Create/Edit
     ↓
 Save
     ↓
-Refresh List
+Refresh list
 ```
 
 ---
 
-## Combo Management Flow
+## Luồng Quản Lý Combo
 
 ```text
 Combos List
     ↓
 Create/Edit
     ↓
-Select Services
+Chọn services
     ↓
 Save
     ↓
-Refresh List
+Refresh list
 ```
 
 ---
 
-## Staff Management Flow
+## Luồng Quản Lý Staff
 
 ```text
 Staff List
     ↓
 Create/Edit
     ↓
-Assign Role
+Gán role
     ↓
-Assign Branch
+Gán branch
     ↓
 Save
 ```
 
 ---
 
-## Branch Management Flow
+## Luồng Quản Lý Branch
 
 ```text
 Branches List
@@ -167,52 +167,52 @@ Save
 
 ---
 
-## Report Flow
+## Luồng Report
 
-Backend Status:
+Backend status:
 
-- Report API is not implemented yet.
-- Keep Reports as placeholder/mock until backend support exists.
+- Report API chưa được implement.
+- Giữ Reports ở dạng placeholder/mock cho đến khi có backend support.
 
 ```text
 Reports
     ↓
-Select Date Range
+Chọn date range
     ↓
-Select Branch
+Chọn branch
     ↓
-Load Data
+Load data
     ↓
-Charts + Tables
+Charts + tables
 ```
 
 ---
 
-## Trial Warning Flow
+## Luồng Trial Warning
 
-Backend Status:
+Backend status:
 
-- Requires session/API data for `trialExpiresAt` and shop `status`.
-- This data is not confirmed available in the current UI/session contract.
+- Cần session/API data cho `trialExpiresAt` và shop `status`.
+- Data này chưa được xác nhận có trong UI/session contract hiện tại.
 
 ```text
-Login Success
+Login success
     ↓
-Trial <= 7 Days?
-    ├─ No
-    └─ Yes
+Trial <= 7 ngày?
+    ├─ Không
+    └─ Có
           ↓
-          Warning Modal
+          Warning modal
           ↓
-          Continue
+          Tiếp tục
 ```
 
 ---
 
-## Superadmin Flow
+## Luồng Superadmin
 
 ```text
-Login
+Đăng nhập
     ↓
 Landing
 
@@ -220,7 +220,7 @@ Landing
 └─ Xem theo tiệm
 
       ↓
-      Chọn Tiệm
+      Chọn tiệm
       ↓
-      Owner Experience
+      Owner experience
 ```

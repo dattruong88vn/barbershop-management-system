@@ -32,7 +32,7 @@ Copy this structure when starting a new date section:
 - None
 
 ### API Changes
-- None
+- Updated change password redirect handling so staff roles continue to Customer Search after first-login password change.
 
 ### UI Changes
 - Updated UI documentation to mark the Create Visit route as TBD until aligned with `ROUTES`.
@@ -40,11 +40,27 @@ Copy this structure when starting a new date section:
 - Removed the standalone Photos bottom navigation assumption for MVP and documented photos as part of Customer Detail and Visit Detail.
 - Added `skills/skill-ui-conventions.md` to UI context routing in `KB_INDEX.md`.
 - Clarified manager navigation scope, report/dashboard placeholder status, pending photo upload API, and pending trial warning session/API support.
+- Built the Customer Search page with debounced name/phone search, clear search, loading skeletons, customer cards, create customer flow, and customer detail/create visit actions.
+- Built the Login page for the existing NextAuth Credentials login flow.
+- Linked the Customer Search quick create visit action directly to the create visit section on Customer Detail.
+- Refined the Change Password page with app-owned validation and Vietnamese error copy.
+- Added the BarberOS dark/gold UI component spec and aligned UI token/rule docs to use it as the styling source of truth.
+- Added the Auth screen UI spec for Login and Change Password, including current redirect and first-login contract notes.
+- Translated all `docs/ui` documentation prose to Vietnamese while preserving route, API, token, role, and component identifiers.
+- Rebuilt Login and Change Password UI with the shared auth layout, BarberOS dark/gold tokens, shadcn `Button`/`Input`, and lucide icons.
+
+### Test Changes
+- Added Login page unit tests and updated Change Password page tests for the rebuilt Auth UI behavior.
 
 ### Refactoring
 - Made `AGENTS.md` more concise and moved routing responsibility to `KB_INDEX.md`.
 - Improved `KB_INDEX.md` usage guidance and common task context loading.
 - Reorganized `CHANGELOG_AI.md` instructions and reusable template.
+- Moved Login and Change Password into an auth route group and shared their form shell UI.
+- Updated `KB_INDEX.md` so UI feature work loads `docs/ui/component-spec.md` and the new auth route group.
+- Updated `AGENTS.md` so UI work also loads the shared component spec.
+- Linked Auth UI context in `AGENTS.md`, `KB_INDEX.md`, and `docs/ui/page-specifications.md`.
+- Added shared auth password-field UI and aligned global Tailwind theme variables with BarberOS design tokens.
 
 ### Breaking Changes
 - None

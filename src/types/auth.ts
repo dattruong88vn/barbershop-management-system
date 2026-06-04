@@ -1,4 +1,8 @@
-import type { ReactNode } from "react";
+import type {
+  ChangeEventHandler,
+  FormEventHandler,
+  ReactNode,
+} from "react";
 
 export type UserRole =
   | "superadmin"
@@ -38,4 +42,26 @@ export type ChangePasswordApiResponse = Partial<ChangePasswordResult> & {
 
 export type ProvidersProps = {
   children: ReactNode;
+};
+
+export type AuthFormShellProps = {
+  children: ReactNode;
+  description: string;
+  onSubmit: FormEventHandler<HTMLFormElement>;
+  title: string;
+};
+
+export type PasswordFieldProps = {
+  autoComplete: string;
+  error?: string;
+  hidePasswordLabel: string;
+  label: string;
+  minLength?: number;
+  name: string;
+  onBlur?: () => void;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  placeholder?: string;
+  required?: boolean;
+  showPasswordLabel: string;
+  value: string;
 };

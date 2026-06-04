@@ -2,7 +2,7 @@
 
 ## Customer Search
 
-Purpose:
+Mục đích:
 
 Tìm khách nhanh nhất có thể.
 
@@ -18,7 +18,7 @@ Customer List
 Bottom Navigation
 ```
 
-Customer Card:
+Customer card:
 
 ```text
 Tên khách
@@ -73,11 +73,11 @@ Total Price
 [Create Visit]
 ```
 
-Rules:
+Quy tắc:
 
-- Multi-select services
-- Multi-select combos
-- Tổng tiền update realtime
+- Multi-select services.
+- Multi-select combos.
+- Tổng tiền update realtime.
 
 ---
 
@@ -113,20 +113,20 @@ Actions:
 
 ## Photos
 
-MVP Decision:
+Quyết định MVP:
 
-- No standalone Photos screen.
-- No Photos item in bottom navigation.
-- Hair photos are shown and uploaded from Customer Detail and Visit Detail only.
+- Không có Photos screen độc lập.
+- Không có Photos item trong bottom navigation.
+- Hair photos chỉ được hiển thị và upload từ Customer Detail và Visit Detail.
 
 ---
 
 ## Upload Photo
 
-Backend Status:
+Backend status:
 
-- Photo upload API is not available yet.
-- Cloudflare R2 upload support must exist before implementing this flow.
+- Photo upload API chưa có.
+- Phải có Cloudflare R2 upload support trước khi implement flow này.
 
 Flow:
 
@@ -162,11 +162,11 @@ Logout
 
 ## Trial Warning
 
-Backend Status:
+Backend status:
 
-- Requires session/API data for `trialExpiresAt` and shop `status`.
-- This data is not confirmed available in the current UI/session contract.
-- Implement only after backend/session support is available.
+- Cần session/API data cho `trialExpiresAt` và shop `status`.
+- Data này chưa được xác nhận có trong UI/session contract hiện tại.
+- Chỉ implement sau khi có backend/session support.
 
 Điều kiện:
 
@@ -180,6 +180,4 @@ Hiển thị:
 
 Vị trí:
 
-Center Modal
-
-Khi Login thành công.
+Center modal sau khi login thành công.

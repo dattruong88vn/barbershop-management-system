@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 
 const mocks = vi.hoisted(() => ({
@@ -25,7 +26,7 @@ vi.mock("next/navigation", () => ({
   useRouter: mocks.useRouter,
 }));
 
-import ChangePasswordPage from "@/app/change-password/page";
+import ChangePasswordPage from "@/app/(auth)/change-password/page";
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -58,6 +59,23 @@ describe("ChangePasswordPage", () => {
     expect(mocks.mutateAsync).not.toHaveBeenCalled();
   });
 
+  it("should keep submit disabled when the form is invalid", async () => {
+    mocks.useRouter.mockReturnValue({
+      replace: mocks.replace,
+      refresh: mocks.refresh,
+    });
+    mocks.useChangePassword.mockReturnValue({
+      mutateAsync: mocks.mutateAsync,
+      isPending: false,
+    });
+
+    render(<ChangePasswordPage />);
+
+    expect(
+      screen.getByRole("button", { name: authTexts.changePassword.submit }),
+    ).toBeDisabled();
+  });
+
   it("should show a validation error when passwords do not match", async () => {
     const _user = userEvent.setup();
 
@@ -80,9 +98,6 @@ describe("ChangePasswordPage", () => {
       screen.getByLabelText(authTexts.changePassword.confirmPasswordLabel),
       "Secret456!",
     );
-    await _user.click(
-      screen.getByRole("button", { name: authTexts.changePassword.submit }),
-    );
 
     expect(
       await screen.findByText(
@@ -102,7 +117,7 @@ describe("ChangePasswordPage", () => {
     mocks.useChangePassword.mockReturnValue({
       mutateAsync: mocks.mutateAsync.mockResolvedValue({
         username: "dat",
-        redirectTo: "/dashboard",
+        redirectTo: ROUTES.customers,
       }),
       isPending: false,
     });
@@ -132,8 +147,45 @@ describe("ChangePasswordPage", () => {
         password: "Secret123!",
         redirect: false,
       });
-      expect(mocks.replace).toHaveBeenCalledWith("/dashboard");
+      expect(mocks.replace).toHaveBeenCalledWith(ROUTES.dashboard);
       expect(mocks.refresh).toHaveBeenCalled();
     });
+  });
+
+  it("should toggle password visibility", async () => {
+    const _user = userEvent.setup();
+
+    mocks.useRouter.mockReturnValue({
+      replace: mocks.replace,
+      refresh: mocks.refresh,
+    });
+    mocks.useChangePassword.mockReturnValue({
+      mutateAsync: mocks.mutateAsync,
+      isPending: false,
+    });
+
+    render(<ChangePasswordPage />);
+
+    const passwordInput = screen.getByLabelText(
+      authTexts.changePassword.newPasswordLabel,
+    );
+
+    expect(passwordInput).toHaveAttribute("type", "password");
+
+    await _user.click(
+      screen.getAllByRole("button", {
+        name: authTexts.changePassword.showPassword,
+      })[0],
+    );
+
+    expect(passwordInput).toHaveAttribute("type", "text");
+
+    await _user.click(
+      screen.getAllByRole("button", {
+        name: authTexts.changePassword.hidePassword,
+      })[0],
+    );
+
+    expect(passwordInput).toHaveAttribute("type", "password");
   });
 });

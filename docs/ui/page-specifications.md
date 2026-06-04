@@ -2,184 +2,169 @@
 
 ## Login
 
-Route
+Spec chi tiết:
 
-/login
+- `docs/ui/auth-screens.md`
 
-API
+Route:
 
-POST /api/auth/[...nextauth]
+- `/login`
 
-States
+API:
 
-Loading
+- `POST /api/auth/[...nextauth]`
 
-- Disable submit button
+Trạng thái:
 
-Error
-
-- Invalid username/password
-
-Success
-
-- Redirect
+- Loading: disable submit button.
+- Error: username/password không hợp lệ.
+- Success: redirect.
+- Nếu `is_first_login = true`, redirect về `/change-password`.
+- Nếu không, dùng callback/default route đã resolve.
 
 ---
 
 ## Change Password
 
-Route
+Spec chi tiết:
 
-/change-password
+- `docs/ui/auth-screens.md`
 
-API
+Route:
 
-POST /api/change-password
+- `/change-password`
 
-States
+API:
 
-Loading
+- `POST /api/change-password`
 
-- Disable submit button
+Trạng thái:
 
-Validation
-
-- Password mismatch
-
-Success
-
-- Redirect
+- Loading: disable submit button.
+- Validation: password mismatch.
+- Success: redirect theo `redirectTo` do `POST /api/change-password` trả về.
+- Implementation hiện tại redirect staff roles về `/customers`, các role khác về `/dashboard`.
 
 ---
 
 ## Customer Search
 
-Route
+Route:
 
-/customers
+- `/customers`
 
-API
+API:
 
-GET /api/customers?search=
+- `GET /api/customers?search=`
 
-States
+Trạng thái:
 
-Loading
+- Loading: skeleton cards.
+- Empty: không tìm thấy khách hàng.
+- Error: không load được customers.
 
-- Skeleton cards
+Hành động:
 
-Empty
-
-- No customers found
-
-Error
-
-- Failed to load customers
-
-Actions
-
-- Open customer
-- Create customer
+- Open customer.
+- Create customer.
 
 ---
 
 ## Customer Create
 
-API
+API:
 
-POST /api/customers
+- `POST /api/customers`
 
-Validation
+Validation:
 
-- Name required
-- Phone required
-- Phone unique
+- Name bắt buộc.
+- Phone bắt buộc.
+- Phone unique.
 
-Success
+Thành công:
 
-- Navigate to Customer Detail
+- Navigate đến Customer Detail.
 
 ---
 
 ## Customer Detail
 
-Route
+Route:
 
-/customers/:id
+- `/customers/:id`
 
-API
+API:
 
-GET /api/customers/:id/visits
+- `GET /api/customers/:id/visits`
 
-Sections
+Sections:
 
 - Customer Info
 - Hair Photos
 - Suggestions
 - Visit History
 
-States
+Trạng thái:
 
-Loading
-Empty
-Error
+- Loading
+- Empty
+- Error
 
 ---
 
 ## Create Visit
 
-Route
+Route:
 
-TBD
+- TBD
 
-Route Note
+Ghi chú route:
 
-- Must align with `ROUTES` constants before implementation.
+- Phải align với hằng số `ROUTES` trước khi implement.
 
-API
+API:
 
-GET /api/visits
+- `GET /api/visits`
+- `POST /api/visits`
 
-POST /api/visits
-
-Data Required
+Data bắt buộc:
 
 - Services
 - Combos
 - Barbers
 - Skinners
 
-Validation
+Validation:
 
-- At least one service or combo
+- Phải chọn ít nhất một service hoặc combo.
 
-Success
+Thành công:
 
-- Navigate to Visit Detail
+- Navigate đến Visit Detail.
 
 ---
 
 ## Visit Detail
 
-Route
+Route:
 
-/visits/:id
+- `/visits/:id`
 
-API
+API:
 
-GET /api/visits/:id
+- `GET /api/visits/:id`
+- `PATCH /api/visits/:id`
 
-PATCH /api/visits/:id
+Trạng thái backend:
 
-Backend Status
+- `GET /api/visits/:id` là bắt buộc để load standalone Visit Detail.
+- Backend hiện có `GET /api/visits`, `POST /api/visits`, và `PATCH /api/visits/:id`.
+- Nếu chưa có `GET /api/visits/:id`, phải implement backend trước khi build màn hình này như một standalone route.
+- Photo upload API chưa có.
+- Action Upload Photo phải chờ backend/R2 upload support.
 
-- `GET /api/visits/:id` is required for standalone Visit Detail loading.
-- Current backend has `GET /api/visits`, `POST /api/visits`, and `PATCH /api/visits/:id`.
-- If `GET /api/visits/:id` is not implemented, backend must be added before this screen is implemented as a standalone route.
-- Photo upload API is not available yet.
-- Upload Photo action must wait for backend/R2 upload support before implementation.
-
-Sections
+Sections:
 
 - Visit Info
 - Status
@@ -189,197 +174,194 @@ Sections
 - Skinner
 - Photos
 
-Rules
+Quy tắc:
 
-- Edit barber/skinner only within 3 hours
+- Chỉ được edit barber/skinner trong vòng 3 giờ.
 
-Warning
+Warning:
 
-Display warning when:
+Hiển thị warning khi:
 
+```text
 Haircut Service
 AND
 No Photo
+```
 
 ---
 
 ## Services List
 
-Route
+Route:
 
-/owner/services
+- `/owner/services`
 
-API
+API:
 
-GET /api/services
+- `GET /api/services`
 
-States
+Trạng thái:
 
-Loading
-Empty
-Error
+- Loading
+- Empty
+- Error
 
-Actions
+Hành động:
 
-Create
-Edit
-Delete
+- Create
+- Edit
+- Delete
 
 ---
 
 ## Service Form
 
-API
+API:
 
-POST /api/services
+- `POST /api/services`
+- `PATCH /api/services/:id`
 
-PATCH /api/services/:id
-
-Fields
+Fields:
 
 - Name
 - Price
 - Is Haircut
 
-Validation
+Validation:
 
-- Required name
-- Required price
+- Name bắt buộc.
+- Price bắt buộc.
 
 ---
 
 ## Combos List
 
-Route
+Route:
 
-/owner/combos
+- `/owner/combos`
 
-API
+API:
 
-GET /api/combos
+- `GET /api/combos`
 
-Actions
+Hành động:
 
-Create
-Edit
-Delete
+- Create
+- Edit
+- Delete
 
 ---
 
 ## Combo Form
 
-API
+API:
 
-POST /api/combos
+- `POST /api/combos`
+- `PATCH /api/combos/:id`
 
-PATCH /api/combos/:id
-
-Fields
+Fields:
 
 - Name
 - Description
 - Price
 - Services
 
-Validation
+Validation:
 
-- At least one service
+- Phải chọn ít nhất một service.
 
 ---
 
 ## Staff List
 
-Route
+Route:
 
-/owner/staff
+- `/owner/staff`
 
-API
+API:
 
-GET /api/staff
+- `GET /api/staff`
 
-Actions
+Hành động:
 
-Create
-Edit
-Delete
+- Create
+- Edit
+- Delete
 
 ---
 
 ## Staff Form
 
-API
+API:
 
-POST /api/staff
+- `POST /api/staff`
+- `PATCH /api/staff/:id`
 
-PATCH /api/staff/:id
-
-Fields
+Fields:
 
 - Username
 - Password
 - Role
 - Branch
 
-Validation
+Validation:
 
-- Password >= 8 chars
+- Password >= 8 ký tự.
 
 ---
 
 ## Branch List
 
-Route
+Route:
 
-/owner/branches
+- `/owner/branches`
 
-API
+API:
 
-GET /api/branches
+- `GET /api/branches`
 
-Actions
+Hành động:
 
-Create
-Edit
-Delete
+- Create
+- Edit
+- Delete
 
 ---
 
 ## Branch Form
 
-API
+API:
 
-POST /api/branches
+- `POST /api/branches`
+- `PATCH /api/branches/:id`
 
-PATCH /api/branches/:id
-
-Fields
+Fields:
 
 - Name
 - Address
 
-Validation
+Validation:
 
-- Required name
+- Name bắt buộc.
 
 ---
 
 ## Reports
 
-Route
+Route:
 
-/reports
+- `/reports`
 
-Backend Status
+Trạng thái backend:
 
-Not Implemented Yet
+- Chưa implement.
+- Report API chưa có.
 
-- Report API is not available yet.
+UI hiện tại:
 
-Current UI
+- Placeholder.
 
-Placeholder
-
-Future Widgets
+Widgets tương lai:
 
 - Revenue
 - Revenue by Branch
@@ -392,29 +374,28 @@ Future Widgets
 
 ## Dashboard
 
-Route
+Route:
 
-/dashboard
+- `/dashboard`
 
-Backend Status
+Trạng thái backend:
 
-Depends on report APIs
+- Phụ thuộc report APIs.
+- Dashboard API chưa có.
+- Chỉ dùng placeholder hoặc mock data cho đến khi có backend support.
 
-- Dashboard API is not available yet.
-- Use placeholder or mock data only until backend support exists.
+UI hiện tại:
 
-Current UI
+- Cho phép mock data.
 
-Mock Data Allowed
-
-Widgets
+Widgets:
 
 - Revenue
 - Visits
 - New Customers
 - Returning Customers
 
-Charts
+Charts:
 
 - Revenue Trend
 - Top Employees
@@ -424,33 +405,33 @@ Charts
 
 ## Superadmin Landing
 
-Route
+Route:
 
-/superadmin
+- `/superadmin`
 
-Actions
+Hành động:
 
 - Quản trị hệ thống
 - Xem theo tiệm
 
-Future Scope
+Phạm vi tương lai:
 
-Pending Backend Implementation
+- Chờ backend implementation.
 
 ---
 
 ## Trial Warning
 
-Backend Status
+Trạng thái backend:
 
-- Trial warning requires session/API data for `trialExpiresAt` and shop `status`.
-- This data is not confirmed available in the current UI/session contract.
-- Implement only after backend/session support is available.
+- Trial warning cần session/API data cho `trialExpiresAt` và shop `status`.
+- Data này chưa được xác nhận có trong UI/session contract hiện tại.
+- Chỉ implement sau khi có backend/session support.
 
-Condition
+Điều kiện:
 
-- Show warning when trial has 7 days or fewer remaining.
+- Hiển thị warning khi trial còn 7 ngày hoặc ít hơn.
 
-Display
+Hiển thị:
 
-- Center modal after successful login.
+- Center modal sau khi login thành công.
