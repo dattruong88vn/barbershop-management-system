@@ -18,6 +18,7 @@ const CUSTOMER_VISITS_SELECT = {
       id: true,
       createdAt: true,
       completedAt: true,
+      lastUpdatedBy: true,
       status: true,
       totalPrice: true,
       barber: {
@@ -80,6 +81,7 @@ function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
     id: visit.id,
     createdAt: visit.createdAt.toISOString(),
     completedAt: visit.completedAt?.toISOString() ?? null,
+    lastUpdatedBy: visit.lastUpdatedBy,
     status: visit.status,
     totalPrice: Number(visit.totalPrice.toString()),
     barber: visit.barber,

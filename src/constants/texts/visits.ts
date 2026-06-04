@@ -7,9 +7,12 @@ export const visitTexts = {
       invalidRequestBody: "Dữ liệu gửi lên không hợp lệ",
       invalidStaff: "Nhân viên không thuộc tiệm của bạn",
       invalidServices: "Dịch vụ không thuộc tiệm của bạn",
+      lockedStaffEdit: "Đã hết thời gian chỉnh sửa barber/skinner",
       missingBranch: "Tài khoản chưa được phân công chi nhánh",
       missingCustomer: "Vui lòng chọn khách hàng",
       missingItems: "Vui lòng chọn ít nhất một dịch vụ hoặc combo",
+      notCompleted: "Chỉ chỉnh sửa barber/skinner sau khi visit hoàn thành",
+      notFound: "Không tìm thấy visit",
       unauthorized: "Vui lòng đăng nhập để tiếp tục",
     },
   },
@@ -30,6 +33,20 @@ export const visitTexts = {
     errors: {
       generic: "Có lỗi xảy ra, vui lòng thử lại",
       missingItems: "Vui lòng chọn ít nhất một dịch vụ hoặc combo",
+    },
+  },
+  staffEdit: {
+    title: "Chỉnh sửa nhân sự",
+    remainingPrefix: "Còn",
+    remainingSuffix: "để chỉnh sửa",
+    hourUnit: "giờ",
+    minuteUnit: "phút",
+    locked: "Đã hết thời gian chỉnh sửa",
+    submit: "Lưu nhân sự",
+    saving: "Đang lưu...",
+    success: "Đã cập nhật nhân sự",
+    errors: {
+      generic: "Có lỗi xảy ra, vui lòng thử lại",
     },
   },
 };

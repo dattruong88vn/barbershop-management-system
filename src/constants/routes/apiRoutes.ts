@@ -12,4 +12,5 @@ export const API_ROUTES = {
   staff: "/api/staff",
   staffDetail: (id: string) => `/api/staff/${id}`,
   visits: "/api/visits",
+  visitDetail: (id: string) => `/api/visits/${id}`,
 } as const;

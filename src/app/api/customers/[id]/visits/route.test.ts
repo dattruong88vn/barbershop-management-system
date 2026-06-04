@@ -47,6 +47,7 @@ function createCustomerWithVisits() {
         id: "visit-2",
         createdAt: new Date("2026-06-03T02:00:00.000Z"),
         completedAt: new Date("2026-06-03T03:00:00.000Z"),
+        lastUpdatedBy: "user-1",
         status: "completed",
         totalPrice: { toString: () => "150000" },
         barber: {
@@ -91,6 +92,7 @@ function createCustomerWithVisits() {
         id: "visit-1",
         createdAt: new Date("2026-06-02T02:00:00.000Z"),
         completedAt: null,
+        lastUpdatedBy: null,
         status: "pending",
         totalPrice: { toString: () => "0" },
         barber: null,
@@ -192,6 +194,7 @@ describe("GET /api/customers/[id]/visits", () => {
           id: "visit-2",
           createdAt: "2026-06-03T02:00:00.000Z",
           completedAt: "2026-06-03T03:00:00.000Z",
+          lastUpdatedBy: "user-1",
           status: "completed",
           totalPrice: 150000,
           barber: {
@@ -230,6 +233,7 @@ describe("GET /api/customers/[id]/visits", () => {
           id: "visit-1",
           createdAt: "2026-06-02T02:00:00.000Z",
           completedAt: null,
+          lastUpdatedBy: null,
           status: "pending",
           totalPrice: 0,
           barber: null,

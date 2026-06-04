@@ -11,6 +11,7 @@ import type {
   VisitCreateInput,
   VisitCreateOptions,
   VisitCreateOptionsApiResponse,
+  VisitStaffUpdateInput,
 } from "@/types";
 
 const VISIT_OPTIONS_QUERY_KEY = ["visit-options"] as const;
@@ -44,6 +45,24 @@ async function createVisit(input: VisitCreateInput): Promise<CustomerVisit> {
   return getVisitResponseData(result);
 }
 
+async function updateVisitStaff(
+  input: VisitStaffUpdateInput,
+): Promise<CustomerVisit> {
+  const result = await fetchClient<VisitApiResponse>(
+    API_ROUTES.visitDetail(input.visitId),
+    {
+      method: "PATCH",
+      headers: DEFAULT_JSON_HEADERS,
+      body: JSON.stringify({
+        barberId: input.barberId,
+        skinnerId: input.skinnerId,
+      }),
+    },
+  );
+
+  return getVisitResponseData(result);
+}
+
 export function useVisits() {
   const queryClient = useQueryClient();
   const visitOptionsQuery = useQuery({
@@ -58,6 +77,13 @@ export function useVisits() {
         queryKey: [...CUSTOMER_VISITS_QUERY_KEY, input.customerId],
       }),
   });
+  const updateVisitStaffMutation = useMutation({
+    mutationFn: updateVisitStaff,
+    onSuccess: (_visit, input) =>
+      queryClient.invalidateQueries({
+        queryKey: [...CUSTOMER_VISITS_QUERY_KEY, input.customerId],
+      }),
+  });
 
   return {
     barbers: visitOptionsQuery.data?.barbers ?? [],
@@ -65,8 +91,10 @@ export function useVisits() {
     error: visitOptionsQuery.error,
     isCreating: createVisitMutation.isPending,
     isLoadingOptions: visitOptionsQuery.isLoading,
+    isUpdatingStaff: updateVisitStaffMutation.isPending,
     services: visitOptionsQuery.data?.services ?? [],
     skinners: visitOptionsQuery.data?.skinners ?? [],
     createVisit: createVisitMutation.mutateAsync,
+    updateVisitStaff: updateVisitStaffMutation.mutateAsync,
   };
 }
