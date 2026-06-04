@@ -21,6 +21,12 @@ vi.mock("@/lib/prisma", () => ({
 
 import { authOptions } from "@/lib/auth";
 
+type AuthCallbacks = NonNullable<typeof authOptions.callbacks>;
+type JwtCallbackParams = Parameters<NonNullable<AuthCallbacks["jwt"]>>[0];
+type SessionCallbackParams = Parameters<
+  NonNullable<AuthCallbacks["session"]>
+>[0];
+
 type CredentialsProvider = {
   options: {
     authorize: (credentials?: {
@@ -113,19 +119,21 @@ describe("authOptions", () => {
       mocks.findFirst.mockResolvedValue(_user);
       mocks.verifyPassword.mockReturnValue(true);
 
-      await expect(
-        authorize({
-          username: "dat",
-          password: "Secret123!",
-        }),
-      ).resolves.toEqual<AuthUserFields>({
+      const expectedUser = {
         id: "user-1",
         role: "owner",
         shop_id: "shop-1",
         branch_id: "branch-1",
         username: "dat",
         is_first_login: false,
-      });
+      } satisfies AuthUserFields;
+
+      await expect(
+        authorize({
+          username: "dat",
+          password: "Secret123!",
+        }),
+      ).resolves.toEqual(expectedUser);
     });
   });
 
@@ -148,7 +156,8 @@ describe("authOptions", () => {
           username: "dat",
           is_first_login: true,
         } as AuthUserFields,
-      });
+        account: null,
+      } as JwtCallbackParams);
 
       expect(_token).toEqual({
         id: "user-1",
@@ -176,7 +185,9 @@ describe("authOptions", () => {
             is_first_login: true,
           },
         },
-      });
+        user: undefined,
+        account: null,
+      } as unknown as JwtCallbackParams);
 
       expect(_token?.is_first_login).toBe(true);
     });
@@ -198,7 +209,8 @@ describe("authOptions", () => {
           username: "dat",
           is_first_login: false,
         },
-      });
+        user: undefined,
+      } as unknown as SessionCallbackParams);
 
       expect(_session?.user).toEqual({
         name: "Dat",

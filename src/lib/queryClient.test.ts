@@ -14,7 +14,6 @@ describe("createQueryClient", () => {
     _queryClient.getQueryCache().config.onError?.(
       new Error(commonTexts.api.errors.serverError),
       null as never,
-      _queryClient,
     );
 
     expect(_dispatchSpy).toHaveBeenCalledTimes(1);
@@ -31,7 +30,6 @@ describe("createQueryClient", () => {
     _queryClient.getQueryCache().config.onError?.(
       new Error("Network error"),
       null as never,
-      _queryClient,
     );
 
     expect(_dispatchSpy).not.toHaveBeenCalled();

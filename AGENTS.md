@@ -119,6 +119,7 @@ The system has 6 roles:
 - Test file placed next to the file being tested (no separate `__tests__` folder)
 - When implementing a feature, Codex only writes feature code first unless the user explicitly asks for unit tests
 - If the user asks to commit before unit tests are written or updated, Codex must remind the user and ask for confirmation before committing
+- When writing/updating tests, run only the new or updated test files with `npx vitest run path/to/file.test.ts`; do not run the full project test suite unless explicitly requested or shared behavior has a large blast radius
 - When user requests tests, commit message: `test: add unit tests for [feature name]`
 - Refer to `/skills/skill-unit-test-conventions.md` for details and examples
 
@@ -213,7 +214,7 @@ Format: `type: short description`
 - Use `fetchServer` in Server Components
 - Do not write or update unit tests unless the user explicitly asks for tests
 - If the user asks to commit while related unit tests are not written or updated, remind the user and ask for confirmation before committing
-- Run `npx vitest run` when writing/updating tests, or when the user asks for test verification
+- Run targeted Vitest commands for only the new or updated test files when writing/updating tests, for example `npx vitest run src/hooks/useCustomers.test.tsx`; run the full `npx vitest run` only when explicitly requested or when shared behavior has a large blast radius
 - Use Prisma for all database queries — never write raw SQL
 - Use shadcn/ui components where possible — do not build UI components from scratch
 - Keep API routes in `src/app/api/`

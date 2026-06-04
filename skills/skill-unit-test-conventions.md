@@ -121,8 +121,16 @@ describe("useVisits", () => {
 
 1. Codex viết hoặc update unit test cho tất cả file liên quan đến tính năng đã được confirm
 2. Test file đặt cạnh file được test theo convention ở trên
-3. Chạy `npx vitest run` để verify tất cả test pass
+3. Chạy Vitest targeted cho **những test file mới tạo hoặc vừa update**, không chạy toàn bộ test suite của project nếu user không yêu cầu
 4. Nếu test runner bị lỗi môi trường, báo rõ blocker và command đã chạy
+
+Ví dụ:
+
+```bash
+npx vitest run src/app/api/customers/route.test.ts src/hooks/useCustomers.test.tsx src/app/customers/page.test.tsx
+```
+
+> Chỉ chạy `npx vitest run` toàn bộ project khi user yêu cầu rõ ràng, khi thay đổi chạm vào shared behavior có blast radius lớn, hoặc trước release/merge nếu cần kiểm tra tổng thể.
 
 ### Khi user yêu cầu commit
 
@@ -135,7 +143,8 @@ describe("useVisits", () => {
 ## Lệnh thường dùng
 
 ```bash
-npx vitest run          # Chạy tất cả test một lần
-npx vitest              # Chạy test ở watch mode
-npx vitest run --coverage  # Chạy test với coverage report
+npx vitest run path/to/file.test.ts  # Chạy targeted test file mới/sửa
+npx vitest              # Watch mode
+npx vitest run          # Chạy tất cả test khi được yêu cầu rõ ràng
+npx vitest run --coverage  # Coverage report khi được yêu cầu
 ```
