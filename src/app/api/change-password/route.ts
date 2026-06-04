@@ -5,14 +5,23 @@ import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
-import type { ChangePasswordRequestBody } from "@/types";
+import type { ChangePasswordRequestBody, UserRole } from "@/types";
 
 const DEFAULT_DASHBOARD_PATH = ROUTES.dashboard;
+const STAFF_ROLES: UserRole[] = ["receptionist", "barber", "skinner"];
 
 function isChangePasswordRequestBody(
   body: unknown,
 ): body is ChangePasswordRequestBody {
   return typeof body === "object" && body !== null;
+}
+
+function getChangePasswordRedirectPath(role: unknown): string {
+  if (typeof role === "string" && STAFF_ROLES.includes(role as UserRole)) {
+    return ROUTES.customers;
+  }
+
+  return DEFAULT_DASHBOARD_PATH;
 }
 
 export async function POST(request: NextRequest) {
@@ -73,6 +82,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     username: token.username,
-    redirectTo: DEFAULT_DASHBOARD_PATH,
+    redirectTo: getChangePasswordRedirectPath(token.role),
   });
 }

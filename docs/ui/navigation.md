@@ -4,56 +4,52 @@
 
 Roles:
 
-- receptionist
-- barber
-- skinner
+- `receptionist`
+- `barber`
+- `skinner`
 
-Bottom Navigation
+Bottom navigation:
 
 1. Customers
 2. Visits
 3. Create Visit
 4. Account
 
-Note:
+Ghi chú:
 
-- Do not include a standalone Photos menu in MVP.
-- Hair photos are handled inside Customer Detail and Visit Detail.
+- MVP không có menu Photos độc lập.
+- Hair photos được xử lý trong Customer Detail và Visit Detail.
 
 ---
 
 ## Desktop Navigation
 
-Owner Role:
+Owner role:
 
 - `owner`
 
-Sidebar
+Sidebar:
 
-Dashboard
+- Dashboard
+- Services
+- Combos
+- Staff
+- Branches
+- Reports
+- Account
 
-Services
-Combos
-
-Staff
-Branches
-
-Reports
-
-Account
-
-Manager Role:
+Manager role:
 
 - `manager`
-- MVP business scope is branch-level reporting.
-- Manager navigation must not assume access to Services, Combos, Staff, or Branches unless backend permissions are implemented.
-- Recommended manager sidebar for now: Dashboard, Reports, Account.
+- MVP business scope là branch-level reporting.
+- Manager navigation không được giả định có quyền vào Services, Combos, Staff hoặc Branches nếu backend permissions chưa implement.
+- Sidebar manager đề xuất hiện tại: Dashboard, Reports, Account.
 
 ---
 
 ## Superadmin Navigation
 
-Landing Page
+Landing page.
 
 Buttons:
 

@@ -62,11 +62,13 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 - docs/ui/screen-map.md
 - docs/ui/navigation.md
+- docs/ui/component-spec.md
 - docs/ui/design-tokens.md
 - docs/ui/component-rules.md
 - docs/ui/ui-guideline.md
 - docs/ui/mobile-screens.md
 - docs/ui/desktop-screens.md
+- docs/ui/auth-screens.md
 - docs/ui/user-flows.md
 - docs/ui/page-specifications.md
 
@@ -134,7 +136,8 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 ### UI
 
-- src/app/change-password
+- docs/ui/auth-screens.md
+- src/app/(auth)
 - src/constants/texts/auth.ts
 - src/constants/routes/appRoutes.ts
 - src/constants/routes/apiRoutes.ts
@@ -152,7 +155,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 - src/app/api/auth
 - src/app/api/change-password
-- src/app/change-password
+- src/app/(auth)
 - src/lib/auth.ts
 - src/lib/password.ts
 - src/middleware.ts
@@ -587,7 +590,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 For common tasks:
 
 - Add new feature
-  - Load first: AGENTS.md, KB_INDEX.md, docs/mvp-features.md, docs/market-positioning.md, docs/data-model.md, docs/tech-stack.md, docs/ui/screen-map.md, docs/ui/navigation.md, docs/ui/design-tokens.md, docs/ui/component-rules.md, docs/ui/ui-guideline.md
+  - Load first: AGENTS.md, KB_INDEX.md, docs/mvp-features.md, docs/market-positioning.md, docs/data-model.md, docs/tech-stack.md, docs/ui/screen-map.md, docs/ui/navigation.md, docs/ui/component-spec.md, docs/ui/design-tokens.md, docs/ui/component-rules.md, docs/ui/ui-guideline.md, docs/ui/auth-screens.md
 
 - Then load the target module section from this file, plus relevant skills: skills/skill-naming-conventions.md, skills/skill-routes-conventions.md, skills/skill-text-conventions.md, skills/skill-types-conventions.md, skills/skill-data-fetching-conventions.md, skills/skill-api-error-handling.md
 - After completion: update CHANGELOG_AI.md

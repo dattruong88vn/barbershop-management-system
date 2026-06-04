@@ -1,50 +1,52 @@
 # Component Rules
 
-## Buttons
+`docs/ui/component-spec.md` là nguồn chuẩn cho visual style, token, state và variant của component.
 
-Variants
+File này mô tả quy tắc hành vi và cách dùng component theo màn hình. Nếu chi tiết styling khác nhau, luôn theo `docs/ui/component-spec.md`.
+
+## Button
+
+Dùng các variant trong `docs/ui/component-spec.md`:
 
 - Primary
 - Secondary
-- Destructive
+- Ghost
+- Danger
 
-Rules
+Quy tắc:
 
-- One primary action per section
-- Avoid more than 2 primary buttons
+- Mỗi section chỉ nên có một primary action.
+- Tránh dùng hơn hai primary button trong cùng một view.
+- Button loading giữ nguyên text, có spinner bên trái, và disable click.
 
----
+## Form
 
-## Forms
-
-Use
+Dùng:
 
 - React Hook Form
 - Zod
 
-Rules
+Quy tắc:
 
-- Labels above fields
-- Inline validation
-- Required fields marked
+- Label nằm phía trên field.
+- Field bắt buộc phải được đánh dấu.
+- Inline validation hiển thị dưới field liên quan.
+- Password input có toggle show/hide.
+- Search input có icon search.
 
----
+## Table
 
-## Tables
+Chỉ dùng trên desktop.
 
-Desktop Only
-
-Features
+Tính năng kỳ vọng:
 
 - Search
 - Sort
 - Pagination
 
----
-
 ## Customer Card
 
-Fields
+Fields:
 
 - Avatar
 - Name
@@ -52,130 +54,100 @@ Fields
 - Last Visit
 - Last Barber
 
-Actions
+Hành động:
 
 - View Detail
 - Create Visit
 
----
-
 ## Visit Card
 
-Fields
+Fields:
 
 - Customer
 - Services
 - Status
 - Created Time
 
-Actions
+Hành động:
 
 - Open Detail
 
----
-
 ## Haircut Warning
 
-Condition
+Điều kiện:
 
-Visit contains haircut service
+- Visit có dịch vụ haircut.
+- Chưa upload photo.
 
-AND
+Hiển thị:
 
-No photo uploaded
+- Dùng inline warning alert với `AlertTriangle` từ `lucide-react`.
+- Text: `Chưa upload ảnh kiểu tóc`
 
-Display
-
-⚠ Chưa upload ảnh kiểu tóc
-
-Locations
+Vị trí:
 
 - Visit List
 - Visit Detail
 - Dashboard
 
----
-
 ## Service Card
 
-Fields
+Fields:
 
 - Name
 - Price
 - Haircut Badge
 
-Haircut Badge
-
-Display when
-
-isHaircut = true
-
----
+Haircut badge hiển thị khi `isHaircut = true`.
 
 ## Combo Card
 
-Fields
+Fields:
 
 - Name
 - Description
 - Price
 - Included Services
 
----
+## Empty State
 
-## Empty States
+Mỗi màn hình phải có:
 
-Every screen must have:
+- Loading state
+- Empty state
+- Error state
 
-- Empty State
-- Loading State
-- Error State
-
----
+Theo style empty state trong `docs/ui/component-spec.md`.
 
 ## Dialog Rules
 
-Allowed
+Được phép:
 
 - Create
 - Edit
 - Confirm Delete
 
-Forbidden
+Không được phép:
 
-- Nested Dialog
-- Dialog inside Dialog
-
----
+- Nested dialog
+- Dialog bên trong dialog
 
 ## Mobile Rules
 
-Touch Target
-
-Minimum 44px
-
-Primary CTA
-
-Sticky Bottom
-
-Search
-
-Always Visible
-
----
+- Touch target tối thiểu 44px.
+- Primary CTA nên sticky bottom khi đó là hành động chính của workflow mobile.
+- Search luôn hiển thị trên các màn hình search/list.
 
 ## Responsive Rules
 
-Mobile
+- Mobile: 0-767px
+- Tablet: 768-1023px
+- Desktop: từ 1024px trở lên
+- Bắt buộc thiết kế mobile first.
 
-0-767px
+## Role-Based Navigation
 
-Tablet
-
-768-1023px
-
-Desktop
-
-1024px+
-
-Mobile First Required
+- Owner, manager và superadmin dùng desktop sidebar.
+- Barber, skinner và receptionist dùng mobile bottom navigation cho các workflow mobile được hỗ trợ.
+- Receptionist có thể dùng tablet top navigation ở nơi đã document.
+- Owner và manager thấy thông báo chỉ hỗ trợ desktop trên màn hình dưới 1024px.

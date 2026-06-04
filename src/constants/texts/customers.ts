@@ -42,6 +42,7 @@ export const customerTexts = {
     searchLabel: "Tên hoặc số điện thoại",
     searchPlaceholder: "Nhập tên hoặc SĐT khách",
     searchButton: "Tìm khách",
+    clearSearch: "Xoá tìm kiếm",
     loading: "Đang tìm khách hàng...",
     emptyBeforeSearch: "Nhập tên hoặc số điện thoại để bắt đầu tra cứu.",
     emptyAfterSearch: "Không tìm thấy khách hàng phù hợp.",
@@ -66,6 +67,8 @@ export const customerTexts = {
     noPhotos: "Không có ảnh",
     createdAtLabel: "Ngày tạo",
     visitedAtLabel: "Ngày ghé",
+    viewDetail: "Xem",
+    createVisit: "Tạo Visit",
     errors: {
       generic: "Có lỗi xảy ra, vui lòng thử lại",
       duplicatePhone: "Số điện thoại đã tồn tại trong tiệm",
