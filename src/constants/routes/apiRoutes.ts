@@ -4,6 +4,8 @@ export const API_ROUTES = {
   changePassword: "/api/change-password",
   combos: "/api/combos",
   comboDetail: (id: string) => `/api/combos/${id}`,
+  customers: "/api/customers",
+  customerDetail: (id: string) => `/api/customers/${id}`,
   services: "/api/services",
   serviceDetail: (id: string) => `/api/services/${id}`,
   staff: "/api/staff",

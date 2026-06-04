@@ -23,7 +23,19 @@ cd project
 npm install
 ```
 
-### Bước 2 — Tạo Supabase project
+### Bước 2 — Tạo branch làm việc
+
+Luôn pull `develop` mới nhất trước khi tạo branch.
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/ten-tinh-nang
+```
+
+Dùng `feature/*` cho tính năng mới, `fix/*` cho bug fix, và `chore/*` cho docs, config hoặc maintenance.
+
+### Bước 3 — Tạo Supabase project
 
 1. Vào [supabase.com](https://supabase.com), tạo project mới trong Organization **Barbershop**
 2. Vào **Database → Settings → Connection string**
@@ -32,7 +44,7 @@ npm install
 
 > ⚠️ Không dùng Direct connection string — phải dùng pooler khi có Prisma
 
-### Bước 3 — Setup biến môi trường
+### Bước 4 — Setup biến môi trường
 
 ```bash
 cp .env.example .env.local
@@ -40,7 +52,7 @@ cp .env.example .env.local
 
 Điền đầy đủ các giá trị trong `.env.local`.
 
-### Bước 4 — Cấu hình Prisma schema
+### Bước 5 — Cấu hình Prisma schema
 
 Đảm bảo `prisma/schema.prisma` có đúng cấu hình:
 
@@ -52,23 +64,95 @@ datasource db {
 }
 ```
 
-### Bước 5 — Chạy migration
+### Bước 6 — Chạy migration
 
 ```bash
 npx prisma migrate deploy
 ```
 
-### Bước 6 — Seed data mẫu (tuỳ chọn)
+### Bước 7 — Seed data mẫu (tuỳ chọn)
 
 ```bash
 npx prisma db seed
 ```
 
-### Bước 7 — Chạy dev server
+### Bước 8 — Chạy dev server
 
 ```bash
 npm run dev
 ```
+
+Mở [http://localhost:3000](http://localhost:3000). Nếu port `3000` đang được dùng, Next.js sẽ in URL localhost khác trong terminal.
+
+---
+
+## Start source code hằng ngày
+
+Dùng phần này khi project đã được clone và `.env.local` đã có sẵn.
+
+### 1. Tạo branch làm việc
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/ten-tinh-nang
+```
+
+Đổi prefix branch theo loại công việc: `feature/*`, `fix/*`, hoặc `chore/*`.
+
+### 2. Kiểm tra Node.js
+
+```bash
+node -v
+```
+
+Phải dùng Node.js v22 trở lên.
+
+### 3. Cài hoặc cập nhật dependencies
+
+```bash
+npm install
+```
+
+Nếu gặp lỗi thiếu native package như `lightningcss.darwin-arm64.node`, cài lại dependencies:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### 4. Kiểm tra biến môi trường
+
+File `.env.local` cần có tối thiểu:
+
+```bash
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
+```
+
+`DATABASE_URL` dùng Supabase Transaction pooler port `6543`. `DIRECT_URL` dùng Supabase Session pooler port `5432`.
+
+### 5. Generate Prisma client
+
+```bash
+npx prisma generate
+```
+
+### 6. Apply migration
+
+```bash
+npx prisma migrate deploy
+```
+
+### 7. Chạy source code
+
+```bash
+npm run dev
+```
+
+Mở [http://localhost:3000](http://localhost:3000).
 
 ---
 
@@ -98,12 +182,17 @@ src/
 
 ## Chạy tests
 
-Chỉ viết hoặc update unit test khi user yêu cầu rõ ràng. Nếu cần verify test sau khi viết hoặc khi được yêu cầu, dùng các lệnh sau:
+Chỉ viết hoặc update unit test khi user yêu cầu rõ ràng. Khi verify test sau khi viết hoặc sửa, chỉ chạy những test file mới tạo hoặc vừa update, không chạy toàn bộ test suite nếu không được yêu cầu.
 
 ```bash
-npx vitest run          # Chạy tất cả test một lần
-npx vitest              # Watch mode
-npx vitest run --coverage  # Coverage report
+npx vitest run src/app/api/customers/route.test.ts
+npx vitest run src/hooks/useCustomers.test.tsx src/app/customers/page.test.tsx
+```
+
+Chỉ chạy toàn bộ project khi user yêu cầu rõ ràng hoặc khi thay đổi chạm vào shared behavior lớn:
+
+```bash
+npx vitest run
 ```
 
 ---
