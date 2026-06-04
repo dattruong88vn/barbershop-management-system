@@ -6,6 +6,7 @@ export const API_ROUTES = {
   comboDetail: (id: string) => `/api/combos/${id}`,
   customers: "/api/customers",
   customerDetail: (id: string) => `/api/customers/${id}`,
+  customerVisits: (id: string) => `/api/customers/${id}/visits`,
   services: "/api/services",
   serviceDetail: (id: string) => `/api/services/${id}`,
   staff: "/api/staff",

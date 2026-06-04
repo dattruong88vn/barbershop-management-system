@@ -1,13 +1,22 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { ROUTES } from "@/constants/routes";
-import { customerTexts } from "@/constants/texts";
+const mocks = vi.hoisted(() => ({
+  CustomerVisitHistory: vi.fn(
+    ({ customerId }: { customerId: string }) => (
+      <div>{`customer-history-${customerId}`}</div>
+    ),
+  ),
+}));
+
+vi.mock("@/app/customers/[id]/CustomerVisitHistory", () => ({
+  default: mocks.CustomerVisitHistory,
+}));
 
 import CustomerDetailPage from "@/app/customers/[id]/page";
 
 describe("CustomerDetailPage", () => {
-  it("should render customer id and link back to lookup page", async () => {
+  it("should render customer visit history for route customer id", async () => {
     const customerId = "customer-1";
     const page = await CustomerDetailPage({
       params: Promise.resolve({ id: customerId }),
@@ -15,16 +24,10 @@ describe("CustomerDetailPage", () => {
 
     render(page);
 
-    expect(
-      screen.getByRole("heading", {
-        name: customerTexts.detail.title,
-      }),
-    ).toBeInTheDocument();
-    expect(screen.getByText(customerId)).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", {
-        name: customerTexts.detail.backToLookup,
-      }),
-    ).toHaveAttribute("href", ROUTES.customers);
+    expect(screen.getByText("customer-history-customer-1")).toBeInTheDocument();
+    expect(mocks.CustomerVisitHistory).toHaveBeenCalledWith(
+      { customerId },
+      undefined,
+    );
   });
 });
