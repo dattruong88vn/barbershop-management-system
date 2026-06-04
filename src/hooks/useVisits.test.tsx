@@ -6,7 +6,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { API_ROUTES } from "@/constants/routes";
 import { visitTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
-import type { CustomerVisit, VisitCreateInput, VisitCreateOptions } from "@/types";
+import type {
+  CustomerVisit,
+  VisitCreateInput,
+  VisitCreateOptions,
+  VisitStaffUpdateInput,
+} from "@/types";
 
 const mocks = vi.hoisted(() => ({
   fetchClient: vi.fn(),
@@ -77,6 +82,7 @@ function createVisit(): CustomerVisit {
     id: "visit-1",
     createdAt: "2026-06-04T01:00:00.000Z",
     completedAt: null,
+    lastUpdatedBy: null,
     status: "pending",
     totalPrice: 150000,
     barber: {
@@ -170,5 +176,40 @@ describe("useVisits", () => {
         visitTexts.create.errors.generic,
       );
     });
+  });
+
+  it("should update visit staff and return updated data", async () => {
+    const visit = createVisit();
+    const input: VisitStaffUpdateInput = {
+      visitId: "visit-1",
+      customerId: "customer-1",
+      barberId: "barber-1",
+      skinnerId: null,
+    };
+
+    mocks.fetchClient
+      .mockResolvedValueOnce(createVisitOptions())
+      .mockResolvedValueOnce({ visit });
+
+    const { result } = renderHook(() => useVisits(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      const mutationResult = await result.current.updateVisitStaff(input);
+      expect(mutationResult).toEqual(visit);
+    });
+
+    expect(mocks.fetchClient).toHaveBeenCalledWith(
+      API_ROUTES.visitDetail("visit-1"),
+      {
+        method: "PATCH",
+        headers: DEFAULT_JSON_HEADERS,
+        body: JSON.stringify({
+          barberId: "barber-1",
+          skinnerId: null,
+        }),
+      },
+    );
   });
 });

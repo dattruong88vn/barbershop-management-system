@@ -69,6 +69,7 @@ function createVisitRecord() {
     id: "visit-1",
     createdAt: new Date("2026-06-04T01:00:00.000Z"),
     completedAt: null,
+    lastUpdatedBy: "user-1",
     status: "pending",
     totalPrice: { toString: () => "150000" },
     barber: {
@@ -371,6 +372,7 @@ describe("POST /api/visits", () => {
         id: "visit-1",
         createdAt: "2026-06-04T01:00:00.000Z",
         completedAt: null,
+        lastUpdatedBy: "user-1",
         status: "pending",
         totalPrice: 150000,
         barber: {

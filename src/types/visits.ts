@@ -40,6 +40,18 @@ export type VisitRequestBody = {
   skinnerId?: unknown;
 };
 
+export type VisitStaffUpdateInput = {
+  visitId: string;
+  customerId: string;
+  barberId: string | null;
+  skinnerId: string | null;
+};
+
+export type VisitStaffUpdateRequestBody = {
+  barberId?: unknown;
+  skinnerId?: unknown;
+};
+
 export type VisitApiResponse = {
   visit?: CustomerVisit;
   error?: string;

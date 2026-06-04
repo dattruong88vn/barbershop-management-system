@@ -79,6 +79,7 @@ export type CustomerVisit = {
   id: string;
   createdAt: string;
   completedAt: string | null;
+  lastUpdatedBy: string | null;
   status: CustomerVisitStatus;
   totalPrice: number;
   services: CustomerVisitService[];
@@ -116,4 +117,5 @@ export type CustomerVisitHistoryProps = {
 
 export type CustomerVisitCardProps = {
   visit: CustomerVisit;
+  customerId: string;
 };

@@ -1,12 +1,15 @@
 import { render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ROUTES } from "@/constants/routes";
-import { customerTexts } from "@/constants/texts";
+import { customerTexts, visitTexts } from "@/constants/texts";
 import type { CustomerVisit, CustomerVisitHistoryCustomer } from "@/types";
 
 const mocks = vi.hoisted(() => ({
   useCustomerVisits: vi.fn(),
+  useVisits: vi.fn(),
+  updateVisitStaff: vi.fn(),
   VisitCreateForm: vi.fn(({ customerId }: { customerId: string }) => (
     <div>{`visit-form-${customerId}`}</div>
   )),
@@ -14,6 +17,10 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/hooks/useCustomerVisits", () => ({
   useCustomerVisits: mocks.useCustomerVisits,
+}));
+
+vi.mock("@/hooks/useVisits", () => ({
+  useVisits: mocks.useVisits,
 }));
 
 vi.mock("@/app/customers/[id]/VisitCreateForm", () => ({
@@ -33,6 +40,7 @@ const visit: CustomerVisit = {
   id: "visit-1",
   createdAt: "2026-06-03T02:00:00.000Z",
   completedAt: "2026-06-03T03:00:00.000Z",
+  lastUpdatedBy: null,
   status: "completed",
   totalPrice: 150000,
   barber: {
@@ -73,6 +81,38 @@ afterEach(() => {
 });
 
 describe("CustomerVisitHistory", () => {
+  beforeEach(() => {
+    mocks.useVisits.mockReturnValue({
+      barbers: [
+        {
+          id: "barber-1",
+          username: "barber01",
+          role: "barber",
+        },
+        {
+          id: "barber-2",
+          username: "barber02",
+          role: "barber",
+        },
+      ],
+      error: null,
+      isUpdatingStaff: false,
+      skinners: [
+        {
+          id: "skinner-1",
+          username: "skinner01",
+          role: "skinner",
+        },
+        {
+          id: "skinner-2",
+          username: "skinner02",
+          role: "skinner",
+        },
+      ],
+      updateVisitStaff: mocks.updateVisitStaff,
+    });
+  });
+
   it("should render customer info, visit history, photos, and suggestions", () => {
     mocks.useCustomerVisits.mockReturnValue({
       customer,
@@ -91,8 +131,8 @@ describe("CustomerVisitHistory", () => {
     expect(screen.getByText(customer.name)).toBeInTheDocument();
     expect(screen.getByText(customer.phone)).toBeInTheDocument();
     expect(screen.getAllByText("Cắt tóc nam, Combo gội đầu")).toHaveLength(2);
-    expect(screen.getAllByText("barber01")).toHaveLength(2);
-    expect(screen.getAllByText("skinner01")).toHaveLength(2);
+    expect(screen.getAllByText("barber01")).toHaveLength(3);
+    expect(screen.getAllByText("skinner01")).toHaveLength(3);
     expect(screen.getByText(`visit-form-${customer.id}`)).toBeInTheDocument();
     expect(mocks.VisitCreateForm).toHaveBeenCalledWith(
       {
@@ -150,5 +190,72 @@ describe("CustomerVisitHistory", () => {
       0,
     );
     expect(screen.getByText("Không tải được lịch sử")).toBeInTheDocument();
+  });
+
+  it("should show remaining edit time and update staff for completed visits", async () => {
+    const user = userEvent.setup();
+    const recentVisit = {
+      ...visit,
+      completedAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+    };
+
+    mocks.updateVisitStaff.mockResolvedValue(recentVisit);
+    mocks.useCustomerVisits.mockReturnValue({
+      customer,
+      error: null,
+      isLoading: false,
+      suggestions: null,
+      visits: [recentVisit],
+    });
+
+    render(<CustomerVisitHistory customerId={customer.id} />);
+
+    expect(
+      screen.getByText("Còn 1 giờ 30 phút để chỉnh sửa"),
+    ).toBeInTheDocument();
+
+    await user.selectOptions(
+      screen.getByLabelText(visitTexts.create.barberLabel),
+      "barber-2",
+    );
+    await user.selectOptions(
+      screen.getByLabelText(visitTexts.create.skinnerLabel),
+      "skinner-2",
+    );
+    await user.click(
+      screen.getByRole("button", { name: visitTexts.staffEdit.submit }),
+    );
+
+    expect(mocks.updateVisitStaff).toHaveBeenCalledWith({
+      visitId: visit.id,
+      customerId: customer.id,
+      barberId: "barber-2",
+      skinnerId: "skinner-2",
+    });
+    expect(screen.getByText(visitTexts.staffEdit.success)).toBeInTheDocument();
+  });
+
+  it("should lock staff edit fields after three hours", () => {
+    const lockedVisit = {
+      ...visit,
+      completedAt: new Date(Date.now() - 181 * 60 * 1000).toISOString(),
+    };
+
+    mocks.useCustomerVisits.mockReturnValue({
+      customer,
+      error: null,
+      isLoading: false,
+      suggestions: null,
+      visits: [lockedVisit],
+    });
+
+    render(<CustomerVisitHistory customerId={customer.id} />);
+
+    expect(screen.getByText(visitTexts.staffEdit.locked)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: visitTexts.staffEdit.submit }),
+    ).toBeDisabled();
+    expect(screen.getByLabelText(visitTexts.create.barberLabel)).toBeDisabled();
+    expect(screen.getByLabelText(visitTexts.create.skinnerLabel)).toBeDisabled();
   });
 });
