@@ -4,6 +4,7 @@
 
 import Link from "next/link";
 
+import VisitCreateForm from "@/app/customers/[id]/VisitCreateForm";
 import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import { useCustomerVisits } from "@/hooks/useCustomerVisits";
@@ -11,6 +12,7 @@ import type {
   CustomerVisitCardProps,
   CustomerVisitHistoryProps,
   CustomerVisitService,
+  CustomerVisitSuggestion,
 } from "@/types";
 
 const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
@@ -30,6 +32,18 @@ function formatServices(services: CustomerVisitService[]) {
   }
 
   return services.map((service) => service.name).join(", ");
+}
+
+function getSuggestionsKey(suggestions: CustomerVisitSuggestion | null) {
+  if (!suggestions) {
+    return "no-suggestions";
+  }
+
+  return [
+    ...suggestions.services.map((service) => `${service.type}:${service.itemId}`),
+    suggestions.barber?.id ?? "no-barber",
+    suggestions.skinner?.id ?? "no-skinner",
+  ].join("|");
 }
 
 function CustomerVisitCard({ visit }: CustomerVisitCardProps) {
@@ -191,6 +205,12 @@ export default function CustomerVisitHistory({
               </p>
             )}
           </section>
+
+          <VisitCreateForm
+            key={getSuggestionsKey(suggestions)}
+            customerId={customerId}
+            suggestions={suggestions}
+          />
         </section>
 
         <section className="rounded-lg border border-zinc-200 bg-white shadow-sm">

@@ -1,0 +1,62 @@
+import type { CustomerVisit } from "./customers";
+import type { StaffRole } from "./staff";
+
+export type VisitCreateItem = {
+  id: string;
+  name: string;
+  price: number;
+};
+
+export type VisitCreateStaff = {
+  id: string;
+  username: string;
+  role: StaffRole;
+};
+
+export type VisitCreateOptions = {
+  services: VisitCreateItem[];
+  combos: VisitCreateItem[];
+  barbers: VisitCreateStaff[];
+  skinners: VisitCreateStaff[];
+};
+
+export type VisitCreateOptionsApiResponse = VisitCreateOptions & {
+  error?: string;
+};
+
+export type VisitCreateInput = {
+  customerId: string;
+  serviceIds: string[];
+  comboIds: string[];
+  barberId: string | null;
+  skinnerId: string | null;
+};
+
+export type VisitRequestBody = {
+  customerId?: unknown;
+  serviceIds?: unknown;
+  comboIds?: unknown;
+  barberId?: unknown;
+  skinnerId?: unknown;
+};
+
+export type VisitApiResponse = {
+  visit?: CustomerVisit;
+  error?: string;
+};
+
+export type VisitCreateFormProps = {
+  customerId: string;
+  suggestions: {
+    services: Array<{
+      itemId: string | null;
+      type: "service" | "combo";
+    }>;
+    barber: {
+      id: string;
+    } | null;
+    skinner: {
+      id: string;
+    } | null;
+  } | null;
+};

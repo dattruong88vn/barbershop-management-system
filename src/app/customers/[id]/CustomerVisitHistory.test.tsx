@@ -7,10 +7,17 @@ import type { CustomerVisit, CustomerVisitHistoryCustomer } from "@/types";
 
 const mocks = vi.hoisted(() => ({
   useCustomerVisits: vi.fn(),
+  VisitCreateForm: vi.fn(({ customerId }: { customerId: string }) => (
+    <div>{`visit-form-${customerId}`}</div>
+  )),
 }));
 
 vi.mock("@/hooks/useCustomerVisits", () => ({
   useCustomerVisits: mocks.useCustomerVisits,
+}));
+
+vi.mock("@/app/customers/[id]/VisitCreateForm", () => ({
+  default: mocks.VisitCreateForm,
 }));
 
 import CustomerVisitHistory from "@/app/customers/[id]/CustomerVisitHistory";
@@ -86,6 +93,18 @@ describe("CustomerVisitHistory", () => {
     expect(screen.getAllByText("Cắt tóc nam, Combo gội đầu")).toHaveLength(2);
     expect(screen.getAllByText("barber01")).toHaveLength(2);
     expect(screen.getAllByText("skinner01")).toHaveLength(2);
+    expect(screen.getByText(`visit-form-${customer.id}`)).toBeInTheDocument();
+    expect(mocks.VisitCreateForm).toHaveBeenCalledWith(
+      {
+        customerId: customer.id,
+        suggestions: {
+          services: visit.services,
+          barber: visit.barber,
+          skinner: visit.skinner,
+        },
+      },
+      undefined,
+    );
     expect(screen.getByText(/150.000/)).toBeInTheDocument();
     expect(
       screen.getByRole("img", {

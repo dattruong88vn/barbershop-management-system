@@ -1,0 +1,35 @@
+export const visitTexts = {
+  api: {
+    errors: {
+      forbidden: "Bạn không có quyền tạo visit",
+      invalidCombos: "Combo không thuộc tiệm của bạn",
+      invalidCustomer: "Khách hàng không thuộc tiệm của bạn",
+      invalidRequestBody: "Dữ liệu gửi lên không hợp lệ",
+      invalidStaff: "Nhân viên không thuộc tiệm của bạn",
+      invalidServices: "Dịch vụ không thuộc tiệm của bạn",
+      missingBranch: "Tài khoản chưa được phân công chi nhánh",
+      missingCustomer: "Vui lòng chọn khách hàng",
+      missingItems: "Vui lòng chọn ít nhất một dịch vụ hoặc combo",
+      unauthorized: "Vui lòng đăng nhập để tiếp tục",
+    },
+  },
+  create: {
+    title: "Tạo visit mới",
+    description: "Chọn dịch vụ, combo và nhân sự phục vụ khách.",
+    servicesLabel: "Dịch vụ lẻ",
+    combosLabel: "Combo",
+    barberLabel: "Thợ cắt",
+    skinnerLabel: "Skinner",
+    noStaffOption: "Chọn sau",
+    totalPriceLabel: "Tổng tiền",
+    submit: "Tạo visit pending",
+    creating: "Đang tạo visit...",
+    loadingOptions: "Đang tải dữ liệu tạo visit...",
+    emptyServices: "Chưa có dịch vụ nào.",
+    emptyCombos: "Chưa có combo nào.",
+    errors: {
+      generic: "Có lỗi xảy ra, vui lòng thử lại",
+      missingItems: "Vui lòng chọn ít nhất một dịch vụ hoặc combo",
+    },
+  },
+};
