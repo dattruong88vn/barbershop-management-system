@@ -35,7 +35,11 @@ Copy this structure when starting a new date section:
 - None
 
 ### UI Changes
-- None
+- Updated UI documentation to mark the Create Visit route as TBD until aligned with `ROUTES`.
+- Clarified that standalone Visit Detail requires `GET /api/visits/:id` or backend implementation before UI work.
+- Removed the standalone Photos bottom navigation assumption for MVP and documented photos as part of Customer Detail and Visit Detail.
+- Added `skills/skill-ui-conventions.md` to UI context routing in `KB_INDEX.md`.
+- Clarified manager navigation scope, report/dashboard placeholder status, pending photo upload API, and pending trial warning session/API support.
 
 ### Refactoring
 - Made `AGENTS.md` more concise and moved routing responsibility to `KB_INDEX.md`.

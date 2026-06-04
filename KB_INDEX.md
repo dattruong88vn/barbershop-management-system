@@ -16,6 +16,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Project Overview & Agent Conventions
 
 ### Business
+
 - README.md
 - AGENTS.md
 - CLAUDE.md
@@ -25,12 +26,14 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - docs/rules.md
 
 ### Database
+
 - docs/database.md
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - docs/tech-stack.md
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
@@ -40,6 +43,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - src/lib/fetchServer.ts
 
 ### Workflow
+
 - CHANGELOG_AI.md
 - docs/onboarding.md
 - docs/git-flow.md
@@ -48,14 +52,37 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
+# Product Context
+
 - docs/mvp-features.md
 - docs/market-positioning.md
+
+# UI Documentation
+
+- docs/ui/screen-map.md
+- docs/ui/navigation.md
+- docs/ui/design-tokens.md
+- docs/ui/component-rules.md
+- docs/ui/ui-guideline.md
+- docs/ui/mobile-screens.md
+- docs/ui/desktop-screens.md
+- docs/ui/user-flows.md
+- docs/ui/page-specifications.md
+
+# Conventions
+
 - skills/skill-text-conventions.md
+- skills/skill-ui-conventions.md
+
+# Global UI Files
+
 - src/app/globals.css
 - src/app/layout.tsx
 - src/app/providers.tsx
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-git-conventions.md
@@ -63,10 +90,12 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-routes-conventions.md
 - skills/skill-setup-conventions.md
 - skills/skill-text-conventions.md
+- skills/skill-ui-conventions.md
 - skills/skill-types-conventions.md
 - skills/skill-unit-test-conventions.md
 
 ### Source Code
+
 - src/app
 - src/constants
 - src/hooks
@@ -77,16 +106,19 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Authentication & Access Control
 
 ### Business
+
 - docs/mvp-features.md
 - docs/tech-stack.md
 - docs/data-model.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - src/app/api/auth/[...nextauth]/route.ts
 - src/app/api/change-password/route.ts
 - src/lib/auth.ts
@@ -94,18 +126,21 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - src/middleware.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/app/change-password
 - src/constants/texts/auth.ts
 - src/constants/routes/appRoutes.ts
 - src/constants/routes/apiRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -114,6 +149,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-unit-test-conventions.md
 
 ### Source Code
+
 - src/app/api/auth
 - src/app/api/change-password
 - src/app/change-password
@@ -127,32 +163,38 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Customers
 
 ### Business
+
 - docs/mvp-features.md
 - docs/data-model.md
 - docs/market-positioning.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - src/app/api/customers/route.ts
 - src/app/api/customers/[id]/visits/route.ts
 - src/constants/routes/apiRoutes.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-api-error-handling.md
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/app/customers
 - src/constants/texts/customers.ts
 - src/constants/routes/appRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -160,6 +202,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - src/app/customers
 - src/app/api/customers
 - src/hooks/useCustomers.ts
@@ -170,33 +213,39 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Visits & Haircut Photos
 
 ### Business
+
 - docs/mvp-features.md
 - docs/data-model.md
 - docs/tech-stack.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - src/app/api/visits/route.ts
 - src/app/api/visits/[id]/route.ts
 - src/app/api/customers/[id]/visits/route.ts
 - src/constants/routes/apiRoutes.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-api-error-handling.md
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/app/customers/[id]
 - src/constants/texts/visits.ts
 - src/constants/routes/appRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -204,6 +253,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - src/app/api/visits
 - src/app/api/customers/[id]/visits
 - src/app/customers/[id]
@@ -215,31 +265,37 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Owner Services
 
 ### Business
+
 - docs/mvp-features.md
 - docs/data-model.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - src/app/api/services/route.ts
 - src/app/api/services/[id]/route.ts
 - src/constants/routes/apiRoutes.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-api-error-handling.md
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/app/owner/services
 - src/constants/texts/services.ts
 - src/constants/routes/appRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -247,6 +303,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - src/app/owner/services
 - src/app/api/services
 - src/hooks/useServices.ts
@@ -256,31 +313,37 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Owner Combos
 
 ### Business
+
 - docs/mvp-features.md
 - docs/data-model.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - src/app/api/combos/route.ts
 - src/app/api/combos/[id]/route.ts
 - src/constants/routes/apiRoutes.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-api-error-handling.md
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/app/owner/combos
 - src/constants/texts/combos.ts
 - src/constants/routes/appRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -288,6 +351,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - src/app/owner/combos
 - src/app/api/combos
 - src/hooks/useCombos.ts
@@ -297,31 +361,37 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Owner Staff
 
 ### Business
+
 - docs/mvp-features.md
 - docs/data-model.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - src/app/api/staff/route.ts
 - src/app/api/staff/[id]/route.ts
 - src/constants/routes/apiRoutes.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-api-error-handling.md
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/app/owner/staff
 - src/constants/texts/staff.ts
 - src/constants/routes/appRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -329,6 +399,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - src/app/owner/staff
 - src/app/api/staff
 - src/hooks/useStaff.ts
@@ -338,31 +409,37 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Owner Branches
 
 ### Business
+
 - docs/mvp-features.md
 - docs/data-model.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 - prisma/migrations/20260601000000_init/migration.sql
 
 ### API
+
 - src/app/api/branches/route.ts
 - src/app/api/branches/[id]/route.ts
 - src/constants/routes/apiRoutes.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-api-error-handling.md
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/app/owner/branches
 - src/constants/texts/branches.ts
 - src/constants/routes/appRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -370,6 +447,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - src/app/owner/branches
 - src/app/api/branches
 - src/hooks/useBranches.ts
@@ -379,25 +457,31 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ## Reports
 
 ### Business
+
 - docs/mvp-features.md
 - docs/data-model.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 
 ### API
+
 - src/constants/routes/apiRoutes.ts
 
 ### Workflow
+
 - docs/onboarding.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-api-error-handling.md
 
 ### UI
+
 - src/constants/routes/appRoutes.ts
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -405,50 +489,61 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - None currently identified
 
 ## Trial, Billing & Plans
 
 ### Business
+
 - docs/mvp-features.md
 - docs/database.md
 - docs/market-positioning.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 
 ### API
+
 - None currently identified
 
 ### Workflow
+
 - docs/onboarding.md
 - docs/git-flow.md
 
 ### UI
+
 - None currently identified
 
 ### Skills
+
 - skills/skill-naming-conventions.md
 - skills/skill-text-conventions.md
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - prisma/schema.prisma
 
 ## Shared Routes, Texts, Types & API Utilities
 
 ### Business
+
 - AGENTS.md
 - KB_INDEX.md
 - CHANGELOG_AI.md
 - docs/onboarding.md
 
 ### Database
+
 - docs/data-model.md
 - prisma/schema.prisma
 
 ### API
+
 - src/constants/routes/apiRoutes.ts
 - src/lib/apiConfig.ts
 - src/lib/apiResponse.ts
@@ -457,6 +552,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - src/lib/queryClient.ts
 
 ### Workflow
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -465,11 +561,13 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-unit-test-conventions.md
 
 ### UI
+
 - src/constants/routes/appRoutes.ts
 - src/constants/texts/common.ts
 - src/app/providers.tsx
 
 ### Skills
+
 - skills/skill-api-error-handling.md
 - skills/skill-data-fetching-conventions.md
 - skills/skill-routes-conventions.md
@@ -477,6 +575,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - skills/skill-types-conventions.md
 
 ### Source Code
+
 - src/constants/routes
 - src/constants/texts
 - src/hooks
@@ -488,9 +587,10 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 For common tasks:
 
 - Add new feature
-  - Load first: AGENTS.md, KB_INDEX.md, docs/mvp-features.md, docs/market-positioning.md, docs/data-model.md, docs/tech-stack.md
-  - Then load the target module section from this file, plus relevant skills: skills/skill-naming-conventions.md, skills/skill-routes-conventions.md, skills/skill-text-conventions.md, skills/skill-types-conventions.md, skills/skill-data-fetching-conventions.md, skills/skill-api-error-handling.md
-  - After completion: update CHANGELOG_AI.md
+  - Load first: AGENTS.md, KB_INDEX.md, docs/mvp-features.md, docs/market-positioning.md, docs/data-model.md, docs/tech-stack.md, docs/ui/screen-map.md, docs/ui/navigation.md, docs/ui/design-tokens.md, docs/ui/component-rules.md, docs/ui/ui-guideline.md
+
+- Then load the target module section from this file, plus relevant skills: skills/skill-naming-conventions.md, skills/skill-routes-conventions.md, skills/skill-text-conventions.md, skills/skill-types-conventions.md, skills/skill-data-fetching-conventions.md, skills/skill-api-error-handling.md
+- After completion: update CHANGELOG_AI.md
 
 - Fix bug
   - Load first: AGENTS.md, KB_INDEX.md, docs/mvp-features.md, docs/data-model.md, skills/skill-unit-test-conventions.md
