@@ -1,12 +1,19 @@
 export const customerTexts = {
   api: {
     errors: {
+      duplicatePhone: "Số điện thoại đã tồn tại trong tiệm",
       forbidden: "Bạn không có quyền tra cứu khách hàng",
       invalidRequestBody: "Dữ liệu gửi lên không hợp lệ",
       missingName: "Vui lòng nhập tên khách hàng",
       missingPhone: "Vui lòng nhập số điện thoại",
       unauthorized: "Vui lòng đăng nhập để tiếp tục",
     },
+  },
+  detail: {
+    title: "Chi tiết khách hàng",
+    description: "Thông tin chi tiết của khách hàng trong tiệm.",
+    idLabel: "Mã khách hàng",
+    backToLookup: "Quay lại tra cứu",
   },
   lookup: {
     title: "Tra cứu khách hàng",
@@ -40,6 +47,7 @@ export const customerTexts = {
     visitedAtLabel: "Ngày ghé",
     errors: {
       generic: "Có lỗi xảy ra, vui lòng thử lại",
+      duplicatePhone: "Số điện thoại đã tồn tại trong tiệm",
       missingName: "Vui lòng nhập tên khách hàng",
       missingPhone: "Vui lòng nhập số điện thoại",
       missingSearch: "Vui lòng nhập tên hoặc số điện thoại",

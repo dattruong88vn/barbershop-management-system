@@ -4,7 +4,9 @@
 
 import type { SyntheticEvent } from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
+import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import { useCustomers } from "@/hooks/useCustomers";
 
@@ -14,6 +16,7 @@ const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
 });
 
 export default function CustomersPage() {
+  const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
   const [newCustomerName, setNewCustomerName] = useState("");
@@ -76,9 +79,7 @@ export default function CustomersPage() {
     try {
       const customer = await createCustomer(customerInput);
 
-      setSearchInput(customer.phone);
-      setActiveSearch(customer.phone);
-      resetCreateForm();
+      router.push(ROUTES.customerDetail(customer.id));
     } catch (mutationError) {
       setError(
         mutationError instanceof Error

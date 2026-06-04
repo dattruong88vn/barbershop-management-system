@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import { customerTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
@@ -201,17 +201,46 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const customer = await prisma.customer.create({
-    data: {
+  const existingCustomer = await prisma.customer.findFirst({
+    where: {
       shopId: authResult.shopId,
-      name: customerInput.name,
       phone: customerInput.phone,
     },
-    select: CUSTOMER_SELECT,
+    select: { id: true },
   });
 
-  return NextResponse.json(
-    { customer: formatCustomerResponse(customer) },
-    { status: 201 },
-  );
+  if (existingCustomer) {
+    return NextResponse.json(
+      { error: customerTexts.api.errors.duplicatePhone },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const customer = await prisma.customer.create({
+      data: {
+        shopId: authResult.shopId,
+        name: customerInput.name,
+        phone: customerInput.phone,
+      },
+      select: CUSTOMER_SELECT,
+    });
+
+    return NextResponse.json(
+      { customer: formatCustomerResponse(customer) },
+      { status: 201 },
+    );
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json(
+        { error: customerTexts.api.errors.duplicatePhone },
+        { status: 400 },
+      );
+    }
+
+    throw error;
+  }
 }

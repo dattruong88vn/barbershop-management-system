@@ -166,7 +166,7 @@ CREATE UNIQUE INDEX "combo_services_combo_id_service_id_key" ON "combo_services"
 CREATE INDEX "customers_shop_id_idx" ON "customers"("shop_id");
 
 -- CreateIndex
-CREATE INDEX "customers_shop_id_phone_idx" ON "customers"("shop_id", "phone");
+CREATE UNIQUE INDEX "customers_shop_id_phone_key" ON "customers"("shop_id", "phone");
 
 -- CreateIndex
 CREATE INDEX "visits_shop_id_idx" ON "visits"("shop_id");

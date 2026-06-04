@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { Prisma } from "@prisma/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { customerTexts } from "@/constants/texts";
@@ -7,6 +8,7 @@ import type { CustomerFormInput } from "@/types";
 const mocks = vi.hoisted(() => ({
   getToken: vi.fn(),
   prismaCreate: vi.fn(),
+  prismaFindFirst: vi.fn(),
   prismaFindMany: vi.fn(),
 }));
 
@@ -18,6 +20,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     customer: {
       create: mocks.prismaCreate,
+      findFirst: mocks.prismaFindFirst,
       findMany: mocks.prismaFindMany,
     },
   },
@@ -235,6 +238,26 @@ describe("POST /api/customers", () => {
     });
   });
 
+  it("should return 400 when customer phone is missing", async () => {
+    mocks.getToken.mockResolvedValue({
+      id: "user-1",
+      role: "receptionist",
+      shop_id: "shop-1",
+    });
+
+    const response = await POST(
+      createPostRequest({
+        name: "Nguyễn Văn Nam",
+        phone: "",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: customerTexts.api.errors.missingPhone,
+    });
+  });
+
   it("should create customer with session shop id", async () => {
     const customer = {
       ...createCustomer(),
@@ -247,6 +270,7 @@ describe("POST /api/customers", () => {
       shop_id: "shop-1",
     });
     mocks.prismaCreate.mockResolvedValue(customer);
+    mocks.prismaFindFirst.mockResolvedValue(null);
 
     const response = await POST(
       createPostRequest({
@@ -256,6 +280,13 @@ describe("POST /api/customers", () => {
     );
 
     expect(response.status).toBe(201);
+    expect(mocks.prismaFindFirst).toHaveBeenCalledWith({
+      where: {
+        shopId: "shop-1",
+        phone: "0901234567",
+      },
+      select: { id: true },
+    });
     expect(mocks.prismaCreate).toHaveBeenCalledWith({
       data: {
         shopId: "shop-1",
@@ -273,6 +304,55 @@ describe("POST /api/customers", () => {
         createdAt: customer.createdAt.toISOString(),
         lastVisit: null,
       },
+    });
+  });
+
+  it("should return 400 when phone already exists in the same shop", async () => {
+    mocks.getToken.mockResolvedValue({
+      id: "user-1",
+      role: "receptionist",
+      shop_id: "shop-1",
+    });
+    mocks.prismaFindFirst.mockResolvedValue({ id: "customer-1" });
+
+    const response = await POST(
+      createPostRequest({
+        name: "Nguyễn Văn Nam",
+        phone: "0901234567",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(mocks.prismaCreate).not.toHaveBeenCalled();
+    await expect(response.json()).resolves.toEqual({
+      error: customerTexts.api.errors.duplicatePhone,
+    });
+  });
+
+  it("should return 400 when database unique constraint rejects duplicate phone", async () => {
+    mocks.getToken.mockResolvedValue({
+      id: "user-1",
+      role: "receptionist",
+      shop_id: "shop-1",
+    });
+    mocks.prismaFindFirst.mockResolvedValue(null);
+    mocks.prismaCreate.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
+        clientVersion: "6.19.3",
+        code: "P2002",
+      }),
+    );
+
+    const response = await POST(
+      createPostRequest({
+        name: "Nguyễn Văn Nam",
+        phone: "0901234567",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: customerTexts.api.errors.duplicatePhone,
     });
   });
 });

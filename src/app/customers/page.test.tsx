@@ -2,12 +2,20 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import type { Customer } from "@/types";
 
 const mocks = vi.hoisted(() => ({
   createCustomer: vi.fn(),
+  routerPush: vi.fn(),
   useCustomers: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: mocks.routerPush,
+  }),
 }));
 
 vi.mock("@/hooks/useCustomers", () => ({
@@ -140,7 +148,7 @@ describe("CustomersPage", () => {
     ).toHaveAttribute("src", "https://example.com/photo.jpg");
   });
 
-  it("should show create customer form when search has no results", async () => {
+  it("should create customer and redirect to customer detail page", async () => {
     const user = userEvent.setup();
     mockCustomerHook();
     mocks.createCustomer.mockResolvedValue({
@@ -171,6 +179,9 @@ describe("CustomersPage", () => {
         name: customer.name,
         phone: customer.phone,
       });
+      expect(mocks.routerPush).toHaveBeenCalledWith(
+        ROUTES.customerDetail(customer.id),
+      );
     });
   });
 });
