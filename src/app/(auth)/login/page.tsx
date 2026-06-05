@@ -2,7 +2,6 @@
 
 import { Suspense, type SyntheticEvent } from "react";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -69,7 +68,7 @@ function LoginForm() {
         <div>
           <label
             htmlFor="username"
-            className="mb-1.5 block text-[13px] font-normal text-text-secondary"
+            className="mb-1.5 block text-label-14 text-gray-900"
           >
             {authTexts.login.usernameLabel}
           </label>
@@ -83,7 +82,7 @@ function LoginForm() {
             placeholder={authTexts.login.usernamePlaceholder}
             required
             onChange={(event) => setUsername(event.target.value)}
-            className="h-10 border-dark-600 bg-dark-400 px-3 text-[13px] text-text-primary shadow-none placeholder:text-text-muted focus-visible:border-gold-muted focus-visible:ring-0"
+            className="h-10 border-gray-400 bg-gray-100 px-3 text-label-14 text-gray-1000 shadow-none placeholder:text-gray-700 focus-visible:border-gray-600 focus-visible:ring-gray-600/20"
           />
         </div>
 
@@ -93,7 +92,6 @@ function LoginForm() {
           value={password}
           autoComplete="current-password"
           placeholder={authTexts.login.passwordPlaceholder}
-          required
           showPasswordLabel={authTexts.login.showPassword}
           hidePasswordLabel={authTexts.login.hidePassword}
           onChange={(event) => setPassword(event.target.value)}
@@ -102,16 +100,23 @@ function LoginForm() {
 
       <Button
         type="submit"
+        variant="primary"
+        size="lg"
         disabled={isSubmitting}
-        className="mt-6 h-10 w-full bg-gold px-5 text-sm font-medium text-dark-100 hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-40"
+        loading={isSubmitting}
+        className="mt-6 w-full disabled:cursor-not-allowed"
       >
-        {isSubmitting ? (
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-        ) : null}
         {authTexts.login.submit}
       </Button>
 
-      {error ? <p className="mt-3 text-[13px] text-danger">{error}</p> : null}
+      {error ? (
+        <div
+          role="alert"
+          className="mt-3 rounded-md border border-red-900/30 bg-red-100 px-3 py-2 text-copy-13 text-red-900"
+        >
+          {error}
+        </div>
+      ) : null}
     </AuthFormShell>
   );
 }

@@ -50,7 +50,7 @@ function createRequest(body?: Partial<ComboFormInput> | string): NextRequest {
 
 function createContext(id = "combo-1") {
   return {
-    params: { id },
+    params: Promise.resolve({ id }),
   };
 }
 

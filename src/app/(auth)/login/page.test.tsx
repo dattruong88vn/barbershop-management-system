@@ -55,6 +55,17 @@ describe("LoginPage", () => {
     expect(mocks.signIn).not.toHaveBeenCalled();
   });
 
+  it("should render login fields without a required password marker", () => {
+    setupNavigation();
+
+    render(<LoginPage />);
+
+    const passwordInput = screen.getByLabelText(authTexts.login.passwordLabel);
+
+    expect(passwordInput).toBeInTheDocument();
+    expect(screen.queryByText("_")).not.toBeInTheDocument();
+  });
+
   it("should show an error when sign in fails", async () => {
     const user = userEvent.setup();
     setupNavigation();
@@ -77,6 +88,9 @@ describe("LoginPage", () => {
     expect(
       await screen.findByText(authTexts.login.errors.invalidCredentials),
     ).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      authTexts.login.errors.invalidCredentials,
+    );
     expect(mocks.replace).not.toHaveBeenCalled();
   });
 

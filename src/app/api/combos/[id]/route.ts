@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import type { ComboRequestBody, UserRole } from "@/types";
 
 type ComboRouteContext = {
-  params: Promise<{ id?: string }> | { id?: string };
+  params: Promise<{ id?: string }>;
 };
 
 const COMBO_SELECT = {
@@ -85,7 +85,7 @@ function formatComboResponse(combo: {
 }
 
 async function getComboId(context: ComboRouteContext) {
-  const params = await Promise.resolve(context.params);
+  const params = await context.params;
   return typeof params.id === "string" ? params.id : "";
 }
 

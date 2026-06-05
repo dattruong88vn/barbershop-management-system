@@ -5,9 +5,17 @@ import { authTexts } from "@/constants/texts";
 import { verifyPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+const SESSION_UPDATE_AGE_SECONDS = 60 * 60 * 24;
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
+    maxAge: SESSION_MAX_AGE_SECONDS,
+    updateAge: SESSION_UPDATE_AGE_SECONDS,
+  },
+  jwt: {
+    maxAge: SESSION_MAX_AGE_SECONDS,
   },
   providers: [
     CredentialsProvider({

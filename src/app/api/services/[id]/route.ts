@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import type { ServiceRequestBody, UserRole } from "@/types";
 
 type ServiceRouteContext = {
-  params: Promise<{ id?: string }> | { id?: string };
+  params: Promise<{ id?: string }>;
 };
 
 const SERVICE_SELECT = {
@@ -51,7 +51,7 @@ function formatServiceResponse(service: {
 }
 
 async function getServiceId(context: ServiceRouteContext) {
-  const params = await Promise.resolve(context.params);
+  const params = await context.params;
   return typeof params.id === "string" ? params.id : "";
 }
 

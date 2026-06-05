@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 import type { StaffRequestBody, StaffRole, UserRole } from "@/types";
 
 type StaffRouteContext = {
-  params: Promise<{ id?: string }> | { id?: string };
+  params: Promise<{ id?: string }>;
 };
 
 const STAFF_ROLES: StaffRole[] = ["receptionist", "barber", "skinner"];
@@ -49,7 +49,7 @@ function normalizeStaffInput(body: StaffRequestBody) {
 }
 
 async function getStaffId(context: StaffRouteContext) {
-  const params = await Promise.resolve(context.params);
+  const params = await context.params;
   return typeof params.id === "string" ? params.id : "";
 }
 

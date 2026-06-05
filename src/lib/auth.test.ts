@@ -52,6 +52,17 @@ afterEach(() => {
 });
 
 describe("authOptions", () => {
+  describe("session", () => {
+    it("should keep jwt sessions for 30 days", () => {
+      const thirtyDaysInSeconds = 60 * 60 * 24 * 30;
+
+      expect(authOptions.session?.strategy).toBe("jwt");
+      expect(authOptions.session?.maxAge).toBe(thirtyDaysInSeconds);
+      expect(authOptions.session?.updateAge).toBe(60 * 60 * 24);
+      expect(authOptions.jwt?.maxAge).toBe(thirtyDaysInSeconds);
+    });
+  });
+
   describe("authorize", () => {
     it("should return null when username or password is missing", async () => {
       await expect(authorize()).resolves.toBeNull();

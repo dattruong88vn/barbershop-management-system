@@ -12,12 +12,12 @@ export default function AuthFormShell({
     <form
       onSubmit={onSubmit}
       noValidate
-      className="w-full max-w-sm rounded-xl border border-dark-500 bg-dark-300 p-8"
+      className="material-base w-full max-w-sm p-8"
     >
       <div className="mb-6">
-        <h1 className="text-lg font-medium text-text-primary">{title}</h1>
+        <h1 className="text-heading-20 text-gray-1000">{title}</h1>
         {description ? (
-          <p className="mt-2 text-[13px] leading-5 text-text-muted">
+          <p className="mt-2 text-copy-13 text-gray-700">
             {description}
           </p>
         ) : null}

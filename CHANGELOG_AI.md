@@ -69,3 +69,39 @@ Copy this structure when starting a new date section:
 - Created `KB_INDEX.md` for AI agent context discovery.
 - Created `CHANGELOG_AI.md` as the reusable changelog for human and AI-assisted changes.
 - Reviewed `AGENTS.md`, `KB_INDEX.md`, and `CHANGELOG_AI.md` together for missing sections, duplication, contradictions, and organization.
+
+## 2026-06-05
+
+### Business Changes
+- Added persistent login behavior so authenticated users can return without logging in again during the session lifetime.
+
+### Database Changes
+- None
+
+### API Changes
+- Set NextAuth JWT session lifetime to 30 days with daily session refresh.
+- Updated dynamic owner resource API route context types for Next.js 16 route handler type-checking.
+
+### UI Changes
+- Rebuilt Login and Change Password auth UI against the updated Geist-style component spec and auth screen spec.
+- Added Geist-style global tokens and utilities for auth surfaces, typography, status colors, and `material-base`.
+- Updated auth layout, form shell, password field, inline error alerts, and primary auth buttons to use the updated design tokens.
+- Added a shared `Button` loading prop and fixed primary button contrast across light/dark token modes.
+- Redirected already-authenticated users away from `/login` to the dashboard.
+
+### Test Changes
+- Verified Login and Change Password page behavior with their existing focused Vitest files.
+- Verified persistent auth middleware/session changes with focused auth, middleware, and login tests.
+- Verified owner dynamic resource route handlers with focused branch, service, combo, and staff route tests.
+- Added unit coverage for persistent session max age, authenticated `/login` redirects, unauthenticated login access, auth inline alert rendering, login required-marker behavior, change-password required markers, and button loading state.
+
+### Refactoring
+- Kept auth error and label copy in `src/constants/texts/auth.ts` and preserved shared auth component structure.
+
+### Breaking Changes
+- None
+
+### Notes
+- Created branch `feature/auth-design-system-ui` from the latest `develop`.
+- `next build --webpack` passes after aligning dynamic route handler context types with Next.js 16.
+- Browser verified `/login` on the running localhost server; `/change-password` returned 404 on that server, likely because the server was started before the new auth route group was available and needs a restart.

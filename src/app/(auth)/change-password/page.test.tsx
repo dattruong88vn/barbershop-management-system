@@ -76,6 +76,45 @@ describe("ChangePasswordPage", () => {
     ).toBeDisabled();
   });
 
+  it("should mark both password fields as required", async () => {
+    mocks.useRouter.mockReturnValue({
+      replace: mocks.replace,
+      refresh: mocks.refresh,
+    });
+    mocks.useChangePassword.mockReturnValue({
+      mutateAsync: mocks.mutateAsync,
+      isPending: false,
+    });
+
+    render(<ChangePasswordPage />);
+
+    expect(
+      screen.getByLabelText(authTexts.changePassword.newPasswordLabel),
+    ).toBeRequired();
+    expect(
+      screen.getByLabelText(authTexts.changePassword.confirmPasswordLabel),
+    ).toBeRequired();
+    expect(screen.getAllByText("_")).toHaveLength(2);
+  });
+
+  it("should show loading state while submitting", () => {
+    mocks.useRouter.mockReturnValue({
+      replace: mocks.replace,
+      refresh: mocks.refresh,
+    });
+    mocks.useChangePassword.mockReturnValue({
+      mutateAsync: mocks.mutateAsync,
+      isPending: true,
+    });
+
+    render(<ChangePasswordPage />);
+
+    expect(
+      screen.getByRole("button", { name: authTexts.changePassword.submit }),
+    ).toBeDisabled();
+    expect(document.querySelector(".animate-spin")).not.toBeNull();
+  });
+
   it("should show a validation error when passwords do not match", async () => {
     const _user = userEvent.setup();
 

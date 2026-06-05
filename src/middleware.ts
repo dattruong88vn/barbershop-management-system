@@ -46,6 +46,10 @@ export async function middleware(request: NextRequest) {
   });
 
   if (!token) {
+    if (matchesRoute(request.nextUrl.pathname, LOGIN_PATH)) {
+      return NextResponse.next();
+    }
+
     return NextResponse.redirect(new URL(LOGIN_PATH, request.url));
   }
 
@@ -53,6 +57,10 @@ export async function middleware(request: NextRequest) {
 
   if (!isUserRole(role)) {
     return NextResponse.redirect(new URL(LOGIN_PATH, request.url));
+  }
+
+  if (matchesRoute(request.nextUrl.pathname, LOGIN_PATH)) {
+    return NextResponse.redirect(new URL(FALLBACK_PATH, request.url));
   }
 
   if (token.is_first_login === true) {
@@ -83,5 +91,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|login|.*\\..*).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };

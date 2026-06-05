@@ -1,285 +1,329 @@
 # UI Component Spec
 
-Đây là nguồn chuẩn cho design system và style component dùng chung của Barber Shop SaaS.
+Đây là design system và component spec cho toàn bộ giao diện Barber Shop SaaS.
+Tất cả màn hình phải tham khảo file này trước khi build — không tự định nghĩa lại style.
 
-Tất cả màn hình UI phải đọc file này trước khi implement. Không tự định nghĩa lại visual style trong page component.
+**Design system tham khảo:** [Vercel Geist](https://vercel.com/geist/introduction)
+**Theme:** Light + Dark — tự đổi theo `prefers-color-scheme` của hệ thống
+**Font:** Geist Sans (heading, body), Geist Mono (code, số)
 
-## 1. Design Tokens
+---
 
-### Dark Scale
+## 1. Setup
 
-| Token | Hex | Cách dùng |
-| --- | --- | --- |
-| `dark-100` | `#0A0A0A` | Nền sâu nhất, sidebar |
-| `dark-200` | `#111111` | Nền chính của page |
-| `dark-300` | `#1A1A1A` | Card, panel |
-| `dark-400` | `#222222` | Nền input, metric card |
-| `dark-500` | `#2E2E2E` | Border mặc định |
-| `dark-600` | `#3D3D3D` | Border input, divider |
+### Font
 
-### Gold Accent
+```typescript
+// src/app/layout.tsx
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+```
 
-| Token | Hex | Cách dùng |
-| --- | --- | --- |
-| `gold-bg` | `#2A2010` | Nền badge gold, highlight nhẹ |
-| `gold-muted` | `#8B6F35` | Border accent, focus ring |
-| `gold` | `#C9A84C` | Primary button, icon active, accent |
-| `gold-light` | `#E8C97A` | Trạng thái hover của gold |
-| `gold-pale` | `#F5E9C4` | Text trên nền gold tối |
+### Theme
 
-### Màu Chữ
+Dùng `class="dark"` trên `<html>` theo system preference. Không build toggle theme trong MVP.
 
-| Token | Hex | Cách dùng |
-| --- | --- | --- |
-| `text-primary` | `#F5F0E8` | Heading, nội dung chính |
-| `text-secondary` | `#A89B80` | Label, subtext |
-| `text-muted` | `#6B6055` | Caption, placeholder, hint |
+```typescript
+// src/app/layout.tsx — detect system preference
+<html className={resolvedTheme}>
+```
 
-### Màu Trạng Thái
+Tất cả màu dùng CSS variables của Geist — tự động đổi giữa light/dark.
 
-| Token | Text | Background | Border | Cách dùng |
-| --- | --- | --- | --- | --- |
-| `success` | `#60B060` | `#0A1A0A` | `#3A6A3A` | Hoàn tất, active |
-| `info` | `#4A9EE0` | `#0A1828` | `#185FA5` | Đang xử lý, thông tin |
-| `warning` | `#C9A84C` | `#2A2010` | `#8B6F35` | Pending, cảnh báo trial |
-| `danger` | `#E24B4A` | `#1A0A0A` | `#793030` | Lỗi, xóa |
+---
 
-## 2. Typography
+## 2. Design Tokens
 
-Dùng system font stack mặc định của Tailwind (`font-sans`). Không import custom font.
+Không hardcode hex. Dùng CSS variables của Geist — chúng tự adapt theo theme.
 
-| Tên | Size | Weight | Màu | Cách dùng |
-| --- | --- | --- | --- | --- |
-| `heading-1` | 22px | 500 | `text-primary` | Tên trang, brand |
-| `heading-2` | 18px | 500 | `text-primary` | Tiêu đề card, section |
-| `heading-3` | 15px | 500 | `gold` | Tiêu đề phụ, label nổi bật |
-| `body` | 14px | 400 | `text-secondary` | Nội dung chính |
-| `small` | 13px | 400 | `text-secondary` | Label input, text button |
-| `caption` | 12px | 400 | `text-muted` | Timestamp, hint, helper text |
-| `micro` | 11px | 400 | `text-muted` | Text badge, tag |
+### Màu nền
 
-## 3. Button
+| Token               | Dùng cho                            |
+| ------------------- | ----------------------------------- |
+| `bg-background-100` | Nền trang chính                     |
+| `bg-background-200` | Nền thứ cấp, subtle differentiation |
+| `bg-gray-100`       | Component background mặc định       |
+| `bg-gray-200`       | Hover background                    |
+| `bg-gray-300`       | Active background                   |
+| `bg-gray-700`       | High contrast background            |
+| `bg-gray-800`       | Hover high contrast                 |
+
+### Màu border
+
+| Token             | Dùng cho              |
+| ----------------- | --------------------- |
+| `border-gray-400` | Border mặc định       |
+| `border-gray-500` | Hover border          |
+| `border-gray-600` | Active border / focus |
+
+### Màu chữ
+
+| Token            | Dùng cho                         |
+| ---------------- | -------------------------------- |
+| `text-gray-1000` | Primary text                     |
+| `text-gray-900`  | Secondary text, labels           |
+| `text-gray-700`  | Muted text, placeholder, caption |
+
+### Màu trạng thái
+
+| Token                             | Dùng cho              |
+| --------------------------------- | --------------------- |
+| `text-blue-900` / `bg-blue-100`   | Info, in_progress     |
+| `text-green-900` / `bg-green-100` | Success, completed    |
+| `text-amber-900` / `bg-amber-100` | Warning, pending      |
+| `text-red-900` / `bg-red-100`     | Error, danger, delete |
+
+---
+
+## 3. Typography
+
+Font: **Geist Sans** cho tất cả text UI. **Geist Mono** cho số liệu, code, timestamp.
+Dùng Tailwind class từ Geist typography system.
+
+| Tên             | Class             | Dùng cho                               |
+| --------------- | ----------------- | -------------------------------------- |
+| `heading-1`     | `text-heading-32` | Tên trang lớn                          |
+| `heading-2`     | `text-heading-24` | Tiêu đề card, section                  |
+| `heading-3`     | `text-heading-20` | Sub-heading                            |
+| `heading-4`     | `text-heading-16` | Tiêu đề nhỏ, label nổi bật             |
+| `label-default` | `text-label-14`   | Label input, menu item, nội dung chính |
+| `label-sm`      | `text-label-13`   | Secondary label, badge text            |
+| `label-xs`      | `text-label-12`   | Caption, hint, timestamp               |
+| `body`          | `text-copy-14`    | Nội dung nhiều dòng                    |
+| `body-sm`       | `text-copy-13`    | Nội dung phụ, space-constrained        |
+| `button`        | `text-button-14`  | Button text                            |
+| `button-sm`     | `text-button-12`  | Button nhỏ                             |
+
+---
+
+## 4. Button
+
+Tham khảo: [Geist Button](https://vercel.com/geist/button)
 
 ### Variants
 
-| Variant | Background | Text | Border | Cách dùng |
-| --- | --- | --- | --- | --- |
-| Primary | `#C9A84C` | `#0A0A0A` | none | Hành động chính: xác nhận, lưu, đăng nhập, tạo mới |
-| Secondary | transparent | `#C9A84C` | `0.5px solid #8B6F35` | Hành động phụ: chỉnh sửa, xem chi tiết |
-| Ghost | `#222222` | `#A89B80` | `0.5px solid #3D3D3D` | Hủy, đóng, hành động trung tính |
-| Danger | transparent | `#E24B4A` | `0.5px solid #793030` | Xóa, hủy thao tác không thể hoàn tác |
+| Variant             | Dùng cho                                |
+| ------------------- | --------------------------------------- |
+| `primary` (default) | Hành động chính: Lưu, Xác nhận, Tạo mới |
+| `secondary`         | Hành động phụ: Chỉnh sửa, Xem thêm      |
+| `error`             | Hành động huỷ không thể hoàn tác: Xoá   |
+| `ghost` (nếu có)    | Hủy, thoát, trung tính                  |
 
 ### Sizes
 
-| Size | Height | Padding | Font size |
-| --- | --- | --- | --- |
-| `sm` | 32px | `px-3` | 12px |
-| `md` | 40px | `px-5` | 13px |
-| `lg` | 48px | `px-6` | 15px |
-| `full` | 40px | `w-full` | 13px |
+| Size               | Dùng cho               |
+| ------------------ | ---------------------- |
+| `large`            | CTA nổi bật            |
+| `medium` (default) | Hầu hết các trường hợp |
+| `small`            | Trong bảng, compact UI |
 
-### Trạng Thái
+### Quy tắc
 
-- Hover: Primary dùng `gold-light`; các variant khác sáng hơn nhẹ.
-- Disabled: `opacity-40`, `cursor-not-allowed`.
-- Loading: spinner icon size 16px nằm bên trái text không đổi; disable click.
+- Loading state: dùng prop `loading` — không tự thêm spinner
+- Disabled: chỉ khi action thực sự không khả dụng — kèm Tooltip giải thích
+- Label: Title Case, mô tả action + đối tượng: "Tạo Visit", "Xoá Nhân Viên"
+- Full width: thêm `className="w-full"` khi dùng trong form card
+- Dùng `ButtonLink` cho navigation, `Button` cho action thay đổi state
 
-## 4. Input
+---
 
-### Base
+## 5. Input
 
-- Background: `#222222`
-- Border: `0.5px solid #3D3D3D`
-- Radius: `rounded-md`
-- Padding: `px-3 py-2`, height khoảng 40px
-- Font size: 13px
-- Text color: `text-primary`
-- Placeholder color: `text-muted`
-
-### Trạng Thái
-
-- Focus: border `#8B6F35`; không outline, không ring.
-- Error: border `#793030`.
+Tham khảo: [Geist Input](https://vercel.com/geist/input)
 
 ### Variants
 
-- Text input: tên, số điện thoại, từ khóa search.
-- Password input: eye toggle bên phải, dùng lucide `Eye` / `EyeOff`, size 16px, `text-muted`.
-- Search input: icon search bên trái, dùng lucide `Search`, size 16px, `text-muted`.
+**Text input** — tên, số điện thoại, tìm kiếm thông thường
 
-### Label Và Helper Text
+**Password input**
 
-- Label: 13px, `text-secondary`, margin bottom 6px.
-- Field bắt buộc: thêm `*` màu danger.
-- Helper/error text: 12px, nằm dưới input.
-- Helper color: `text-muted`.
-- Error color: `#E24B4A`.
+- Có icon toggle show/hide bên phải
+- Icon: `Eye` / `EyeOff` từ geist icons hoặc lucide-react, size 16px
 
-## 5. Badge
+**Search input**
 
-### Role Badges
+- Prefix icon kính lúp bên trái
 
-| Role | Text | Background | Border |
-| --- | --- | --- | --- |
-| `superadmin` | `#A89B80` | `#2E2E2E` | `#3D3D3D` |
-| `owner` | `#C9A84C` | `#2A2010` | `#8B6F35` |
-| `manager` | `#A070E0` | `#1A1030` | `#5A3A8A` |
-| `receptionist` | `#4A9EE0` | `#0A1828` | `#185FA5` |
-| `barber` | `#A89B80` | `#2E2E2E` | `#3D3D3D` |
-| `skinner` | `#60B060` | `#0A1A0A` | `#3A6A3A` |
+### Label
 
-### Badge Trạng Thái Visit
+- Dùng `text-label-14`, màu `text-gray-900`
+- Bắt buộc (`*`): thêm dấu `*` màu `text-red-900` sau label text
 
-| Status | Text | Background | Dot |
-| --- | --- | --- | --- |
-| `pending` | `#C9A84C` | `#2A2010` | `#C9A84C` |
-| `in_progress` | `#4A9EE0` | `#0A1828` | `#4A9EE0` |
-| `completed` | `#60B060` | `#0A1A0A` | `#60B060` |
+### Helper / Error text
 
-Style chung: `px-3 py-1`, `rounded-full`, 11px, font weight 500, border `0.5px`. Status badge có dot 6px trước text.
+- Helper: `text-copy-13`, màu `text-gray-700`
+- Error: `text-copy-13`, màu `text-red-900` — hiện khi blur hoặc submit
 
-## 6. Card
+---
 
-### Default Card
+## 6. Badge
 
-- Background: `#1A1A1A`
-- Border: `0.5px solid #2E2E2E`
-- Radius: `rounded-xl`
-- Padding: `p-5`
-- Dùng cho container nội dung thông thường, form và list.
+Tham khảo: [Geist Badge](https://vercel.com/geist/badge)
 
-### Accent Card
+### Role badges
 
-- Background: `#1A1A1A`
-- Border: `0.5px solid #8B6F35`
-- Radius: `rounded-xl`
-- Padding: `p-5`
-- Dùng cho thông tin quan trọng, warning hoặc visit cần chú ý.
+| Role           | Variant                                 |
+| -------------- | --------------------------------------- |
+| `superadmin`   | `gray`                                  |
+| `owner`        | `gray` (hoặc `purple` nếu Geist hỗ trợ) |
+| `manager`      | `blue`                                  |
+| `receptionist` | `gray`                                  |
+| `barber`       | `gray`                                  |
+| `skinner`      | `teal` (nếu có) hoặc `blue`             |
 
-### Metric Card
+### Visit status badges
 
-- Background: `#222222`
-- Radius: `rounded-lg`
-- Padding: `p-4`
-- Label: 12px, `text-muted`
-- Value: 22px, weight 500, `text-primary`
-- Sub/trend: 11px, gold nếu trend tốt, danger nếu trend xấu.
+| Status        | Variant | Label          |
+| ------------- | ------- | -------------- |
+| `pending`     | `amber` | Chờ xử lý      |
+| `in_progress` | `blue`  | Đang thực hiện |
+| `completed`   | `green` | Hoàn thành     |
 
-## 7. Avatar
+---
 
-- Size mặc định: 36px
-- Small: 28px
-- Large: 44px
-- Radius: `rounded-full`
-- Border: `1.5px solid [role border color]`
-- Background và text color theo role badge.
-- Text: hai chữ cái viết tắt, 13px, weight 500.
+## 7. Card / Surface
 
-## 8. Alert Và Toast
+Tham khảo: [Geist Materials](https://vercel.com/geist/materials)
 
-### Toast
+| Loại            | Class            | Dùng cho                              |
+| --------------- | ---------------- | ------------------------------------- |
+| Default card    | `material-base`  | Container nội dung thông thường, form |
+| Elevated card   | `material-small` | Card nổi nhẹ                          |
+| Modal / Dialog  | `material-modal` | Overlay content                       |
+| Menu / Dropdown | `material-menu`  | Dropdown, popover                     |
 
-Vị trí: góc phải dưới; tự dismiss sau 3 giây.
+**Metric card** (dashboard):
 
-| Type | Icon | Border left | Text |
-| --- | --- | --- | --- |
-| success | `CheckCircle` | `#60B060` | Thao tác thành công |
-| error | `XCircle` | `#E24B4A` | Có lỗi xảy ra |
-| warning | `AlertTriangle` | `#C9A84C` | Cảnh báo |
+- Dùng `material-base`
+- Cấu trúc: Label (`text-label-12`) → Value (`text-heading-24`) → Trend (`text-label-13`)
 
-Style chung: background `#1A1A1A`, border `0.5px solid #2E2E2E`, border left `3px solid [type color]`, `rounded-lg`, `p-4`, min width 280px.
+---
 
-### Inline Alert
+## 8. Avatar
 
-Dùng cùng màu với toast, full width, cho form hoặc page header. Style: `rounded-lg`, `px-4 py-3`, 13px.
+Tham khảo: [Geist Avatar](https://vercel.com/geist/avatar)
 
-## 9. Modal Và Dialog
+- Hiển thị 2 chữ cái viết tắt (VD: "TN")
+- Size: `small` (28px), `medium` (36px, default), `large` (44px)
+- Màu: dùng variant mặc định của Geist — không custom theo role ở MVP
 
-- Backdrop: `rgba(0,0,0,0.7)`
-- Background: `#1A1A1A`
-- Border: `0.5px solid #2E2E2E`
-- Radius: `rounded-xl`
-- Padding: `p-6`
-- Width: mặc định `max-w-md`, loại large dùng `max-w-lg`.
+---
 
-Cấu trúc:
+## 9. Alert / Toast
 
-```text
-[Title]           [X button]
------------------------------
+Tham khảo: [Geist Toast](https://vercel.com/geist/toast)
+
+| Type    | Dùng cho                                  |
+| ------- | ----------------------------------------- |
+| success | Thao tác thành công                       |
+| error   | Có lỗi xảy ra                             |
+| warning | Cảnh báo (trial sắp hết, ảnh chưa upload) |
+
+**Toast:** Góc phải dưới, tự dismiss sau 3 giây.
+
+**Inline Alert:** Full-width trong page/form, dùng [Geist Note](https://vercel.com/geist/note).
+
+---
+
+## 10. Modal / Dialog
+
+Tham khảo: [Geist Modal](https://vercel.com/geist/modal)
+
+Dùng `material-modal`. Cấu trúc chuẩn:
+
+```
+[Title]                    [X]
+────────────────────────────
 [Content / form]
 
-[Ghost button]  [Primary button]
+            [Secondary]  [Primary]
 ```
 
-Quy tắc:
+- Close khi click backdrop hoặc Escape — trừ modal bắt buộc (VD: trial expired)
+- Action buttons: align right, Secondary trước Primary sau
 
-- Title dùng `heading-2`.
-- X button dùng lucide `X`, `text-muted`, hover `text-primary`.
-- Actions căn phải; Ghost trước Primary.
-- Đóng khi click backdrop hoặc nhấn Escape, trừ modal bắt buộc.
+---
 
-## 10. Thông Báo Chỉ Hỗ Trợ Desktop
+## 11. Desktop-only Notice
 
-Hiển thị khi `owner` hoặc `manager` truy cập page chỉ hỗ trợ desktop trên màn hình dưới 1024px.
+Hiển thị khi `owner`, `manager`, hoặc `superadmin` truy cập trên màn hình < 1024px.
 
-- Layout: full screen, căn giữa dọc và ngang.
-- Background: `#111111`.
-- Icon: lucide `Monitor`, size 48px, gold.
-- Heading: "Vui lòng dùng máy tính", `heading-2`.
-- Body: "Trang này chỉ hỗ trợ màn hình desktop (từ 1024px trở lên).", body text, `text-muted`.
-- Không có button và không có link.
+```
+Layout: flex column, căn giữa toàn màn hình
+Background: bg-background-100
+```
 
-## 11. Navigation
+**Nội dung:**
 
-### Sidebar
+- Icon: `Monitor` từ lucide-react, size 48px, màu `text-gray-700`
+- Heading: "Vui lòng dùng máy tính" — `text-heading-24`
+- Body: "Trang này chỉ hỗ trợ màn hình desktop (từ 1024px trở lên)." — `text-copy-14`, màu `text-gray-700`
+- Không có button, không có link
 
-Chỉ dùng desktop cho owner, manager, superadmin.
+---
 
-- Width: 220px khi expanded.
-- Background: `#0A0A0A`.
-- Border right: `0.5px solid #2E2E2E`.
-- Padding: `p-3`.
-- Brand: dot vàng 8px + "BarberOS", 14px, weight 500.
-- Nav item: `px-3 py-2`, `rounded-md`, 13px, `text-muted`, `gap-2`, lucide icon size 16px.
-- Active: text gold, background `gold-bg`.
+## 12. Navigation
 
-### Bottom Nav
+### Sidebar (Desktop — owner, manager, superadmin)
 
-Chỉ dùng mobile cho barber, skinner, receptionist.
+```
+Width: 220px
+Background: bg-background-100
+Border-right: border-gray-400
+Padding: p-3
+```
 
-- Fixed bottom.
-- Background: `#0A0A0A`.
-- Border top: `0.5px solid #2E2E2E`.
-- Height: 56px.
-- Tối đa 4 tab.
-- Active: icon và label gold.
-- Inactive: icon và label `text-muted`.
-- Label: 11px.
+**Brand area:**
 
-### Top Nav
+- Logo + Text "BarberOS", `text-label-16` strong
+- Divider bên dưới
 
-Navigation tablet cho receptionist.
+**Nav item:**
 
-- Background: `#0A0A0A`.
-- Border bottom: `0.5px solid #2E2E2E`.
-- Height: 52px.
-- Padding: `px-4`.
-- Tab active: text gold và border bottom `2px solid gold`.
-- Tab inactive: `text-muted`.
+- `text-label-14`, màu `text-gray-900` (default), `text-gray-1000` (active)
+- Active: background `bg-gray-200`, border-left `2px solid` `border-gray-1000`
+- Icon: lucide-react, size 16px
 
-## 12. Empty State
+### Bottom Nav (Mobile — barber, skinner, receptionist)
 
-- Layout: flex column, căn giữa, `gap-3`.
-- Padding: `py-16`.
-- Icon: lucide, size 40px, `text-muted`.
-- Text: 14px, `text-muted`.
-- Button tùy chọn: variant Secondary.
+```
+Position: fixed bottom
+Background: bg-background-100
+Border-top: border-gray-400
+Height: 56px
+```
 
-## Quy Tắc Chung
+- Tối đa 4 tab
+- Label: `text-label-12`
+- Active: màu `text-gray-1000` / Inactive: `text-gray-700`
 
-- Không dùng trắng thuần `#FFFFFF`; dùng `text-primary` (`#F5F0E8`) cho text sáng.
-- Không dùng border radius lớn hơn `rounded-xl`, trừ badge và avatar dùng `rounded-full`.
-- Không dùng shadow lớn; dark UI tách surface bằng border.
-- Icon library: chỉ dùng `lucide-react`. Không mix nhiều icon library.
-- Spacing: dùng Tailwind spacing scale. Không hardcode px trong `className`.
+### Top Nav (Tablet — receptionist)
+
+```
+Background: bg-background-100
+Border-bottom: border-gray-400
+Height: 52px
+```
+
+Dùng [Geist Tabs](https://vercel.com/geist/tabs).
+
+---
+
+## 13. Empty State
+
+Tham khảo: [Geist Empty State](https://vercel.com/geist/empty-state)
+
+- Icon: lucide-react, size 40px, màu `text-gray-700`
+- Text: `text-copy-14`, màu `text-gray-700`
+- Button (tuỳ): `secondary` button bên dưới
+
+---
+
+## Quy tắc chung
+
+- **Không hardcode màu hex** — chỉ dùng CSS variables / Tailwind classes của Geist
+- **Không mix icon library** — chỉ dùng `lucide-react`
+- **Không hardcode px trong className** — dùng Tailwind spacing scale
+- **Border radius:** Theo Geist materials — `6px` (base/small), `12px` (medium/large/modal)
+- **Theme:** Không build toggle, chỉ follow system preference
+- **Font:** Geist Sans cho UI, Geist Mono cho số liệu và timestamp
