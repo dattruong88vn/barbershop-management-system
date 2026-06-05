@@ -5,8 +5,9 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import AuthFormShell from "@/app/(auth)/AuthFormShell";
 import { PasswordField } from "@/components/auth/PasswordField";
+import { AuthFormShell } from "@/components/design-system/AuthFormShell";
+import { InlineAlert } from "@/components/design-system/InlineAlert";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
@@ -79,7 +80,7 @@ export default function ChangePasswordPage() {
         return;
       }
 
-      router.replace(ROUTES.dashboard);
+      router.replace(result.redirectTo);
       router.refresh();
     } catch (mutationError) {
       setServerError(
@@ -138,12 +139,7 @@ export default function ChangePasswordPage() {
       </Button>
 
       {serverError ? (
-        <div
-          role="alert"
-          className="mt-3 rounded-md border border-red-900/30 bg-red-100 px-3 py-2 text-copy-13 text-red-900"
-        >
-          {serverError}
-        </div>
+        <InlineAlert className="mt-3">{serverError}</InlineAlert>
       ) : null}
     </AuthFormShell>
   );

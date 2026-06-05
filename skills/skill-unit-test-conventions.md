@@ -115,14 +115,16 @@ describe("useVisits", () => {
 
 1. Khi nhận yêu cầu implement, Codex chỉ viết code tính năng trước
 2. Không tự động viết hoặc update unit test trong cùng lượt implement, trừ khi user yêu cầu rõ ràng
-3. Sau khi code xong, báo rõ unit test chưa được viết/cập nhật và chờ user xác nhận bước test
+3. Không tự động chạy unit test hoặc ESLint sau khi implement
+4. Sau khi code xong, báo rõ unit test chưa được viết/cập nhật nếu có liên quan và chờ user yêu cầu commit hoặc test
 
 ### Khi user yêu cầu viết unit test
 
 1. Codex viết hoặc update unit test cho tất cả file liên quan đến tính năng đã được confirm
 2. Test file đặt cạnh file được test theo convention ở trên
-3. Chạy Vitest targeted cho **những test file mới tạo hoặc vừa update**, không chạy toàn bộ test suite của project nếu user không yêu cầu
-4. Nếu test runner bị lỗi môi trường, báo rõ blocker và command đã chạy
+3. Không tự động chạy Vitest sau khi viết test, trừ khi user đồng thời yêu cầu commit code hoặc yêu cầu chạy test rõ ràng
+4. Khi user yêu cầu commit code, chạy Vitest targeted cho **những test file mới tạo hoặc vừa update**, không chạy toàn bộ test suite của project nếu user không yêu cầu
+5. Nếu test runner bị lỗi môi trường, báo rõ blocker và command đã chạy
 
 Ví dụ:
 
@@ -130,12 +132,13 @@ Ví dụ:
 npx vitest run src/app/api/customers/route.test.ts src/hooks/useCustomers.test.tsx src/app/customers/page.test.tsx
 ```
 
-> Chỉ chạy `npx vitest run` toàn bộ project khi user yêu cầu rõ ràng, khi thay đổi chạm vào shared behavior có blast radius lớn, hoặc trước release/merge nếu cần kiểm tra tổng thể.
+> Chỉ chạy `npx vitest run` toàn bộ project khi user yêu cầu rõ ràng.
 
 ### Khi user yêu cầu commit
 
 - Nếu code tính năng đã thay đổi nhưng unit test chưa được viết hoặc chưa được update, Codex phải nhắc user xác nhận trước khi commit
-- Nếu user xác nhận vẫn commit khi chưa có test, commit theo yêu cầu và ghi rõ trong final response
+- Nếu user xác nhận vẫn commit khi chưa có test, chạy ESLint và checks phù hợp rồi commit theo yêu cầu, ghi rõ trong final response
+- Trước khi commit, chạy ESLint và targeted Vitest cho các test file mới/sửa
 - Nếu user yêu cầu commit riêng phần test, dùng message: `test: add unit tests for [tên tính năng]`
 
 ---

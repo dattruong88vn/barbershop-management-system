@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -70,17 +70,8 @@ function mockCustomerHook(customers: Customer[] = []) {
   });
 }
 
-function submitFormByButton(buttonName: string) {
-  const submitButton = screen.getByRole("button", {
-    name: buttonName,
-  });
-  const form = submitButton.closest("form");
-
-  expect(form).not.toBeNull();
-  fireEvent.submit(form as HTMLFormElement);
-}
-
 afterEach(() => {
+  window.localStorage.clear();
   vi.clearAllMocks();
 });
 
@@ -92,7 +83,7 @@ describe("CustomersPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: customerTexts.lookup.title,
+        name: customerTexts.lookup.titleMobile,
       }),
     ).toBeInTheDocument();
     expect(
@@ -110,14 +101,13 @@ describe("CustomersPage", () => {
       screen.getByLabelText(customerTexts.lookup.searchLabel),
       "Nam",
     );
-    submitFormByButton(customerTexts.lookup.searchButton);
 
     await waitFor(() => {
       expect(mocks.useCustomers).toHaveBeenLastCalledWith("Nam");
     });
   });
 
-  it("should render customer info with last visit details and photos", async () => {
+  it("should render customer info and navigate when a card is clicked", async () => {
     const user = userEvent.setup();
 
     mocks.useCustomers.mockImplementation((searchTerm: string) => ({
@@ -134,18 +124,15 @@ describe("CustomersPage", () => {
       screen.getByLabelText(customerTexts.lookup.searchLabel),
       "Nam",
     );
-    submitFormByButton(customerTexts.lookup.searchButton);
 
     expect(await screen.findByText(customer.name)).toBeInTheDocument();
     expect(screen.getByText(customer.phone)).toBeInTheDocument();
-    expect(screen.getByText("Cắt tóc nam")).toBeInTheDocument();
-    expect(screen.getByText("barber01")).toBeInTheDocument();
-    expect(screen.getByText("skinner01")).toBeInTheDocument();
-    expect(
-      screen.getByRole("img", {
-        name: customerTexts.lookup.photosLabel,
-      }),
-    ).toHaveAttribute("src", "https://example.com/photo.jpg");
+
+    await user.click(screen.getByRole("button", { name: /Nguyễn Văn Nam/i }));
+
+    expect(mocks.routerPush).toHaveBeenCalledWith(
+      ROUTES.customerDetail(customer.id),
+    );
   });
 
   it("should create customer and redirect to customer detail page", async () => {
@@ -162,26 +149,35 @@ describe("CustomersPage", () => {
       screen.getByLabelText(customerTexts.lookup.searchLabel),
       customer.phone,
     );
-    submitFormByButton(customerTexts.lookup.searchButton);
+    await waitFor(() => {
+      expect(screen.getByText(customerTexts.lookup.emptyAfterSearch)).toBeInTheDocument();
+    });
     await user.click(
-      screen.getByRole("button", {
+      screen.getAllByRole("button", {
         name: customerTexts.lookup.createOption,
-      }),
+      })[0],
     );
     await user.type(
       screen.getByLabelText(customerTexts.lookup.nameLabel),
       customer.name,
     );
-    submitFormByButton(customerTexts.lookup.submitCreate);
+    await user.click(
+      screen.getByRole("button", { name: customerTexts.lookup.submitCreate }),
+    );
 
     await waitFor(() => {
       expect(mocks.createCustomer).toHaveBeenCalledWith({
         name: customer.name,
         phone: customer.phone,
       });
-      expect(mocks.routerPush).toHaveBeenCalledWith(
-        ROUTES.customerDetail(customer.id),
-      );
     });
+    await waitFor(
+      () => {
+        expect(mocks.routerPush).toHaveBeenCalledWith(
+          ROUTES.customerDetail(customer.id),
+        );
+      },
+      { timeout: 2000 },
+    );
   });
 });

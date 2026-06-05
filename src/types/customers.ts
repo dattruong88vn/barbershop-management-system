@@ -1,3 +1,10 @@
+import type {
+  ChangeEventHandler,
+  FormEventHandler,
+  ReactNode,
+} from "react";
+import type { LucideIcon } from "lucide-react";
+
 export type CustomerLastVisitService = {
   id: string;
   name: string;
@@ -118,4 +125,56 @@ export type CustomerVisitHistoryProps = {
 export type CustomerVisitCardProps = {
   visit: CustomerVisit;
   customerId: string;
+};
+
+export type CustomerEmptyStateProps = {
+  action?: ReactNode;
+  icon: LucideIcon;
+  text: string;
+};
+
+export type CustomerAvatarProps = {
+  customer: Customer;
+};
+
+export type CustomerCardLookupProps = {
+  customer: Customer;
+};
+
+export type CustomerSearchFormProps = {
+  onClearSearch: () => void;
+  onCreateCustomer: () => void;
+  onSearch: FormEventHandler<HTMLFormElement>;
+  onSearchInputChange: ChangeEventHandler<HTMLInputElement>;
+  searchInput: string;
+};
+
+export type RecentCustomerSearchesProps = {
+  onSelectSearch: (search: string) => void;
+  searches: string[];
+};
+
+export type CustomerSearchResultsProps = {
+  customers: Customer[];
+  customersError: unknown;
+  defaultEmptyStateText: string;
+  hasNoResults: boolean;
+  hasSearched: boolean;
+  isLoading: boolean;
+  onCreateCustomer: () => void;
+};
+
+export type CustomerMobileActionsProps = {
+  onCreateCustomer: () => void;
+};
+
+export type CreateCustomerModalProps = {
+  error: string;
+  isCreating: boolean;
+  name: string;
+  onClose: () => void;
+  onNameChange: ChangeEventHandler<HTMLInputElement>;
+  onPhoneChange: ChangeEventHandler<HTMLInputElement>;
+  onSubmit: FormEventHandler<HTMLFormElement>;
+  phone: string;
 };

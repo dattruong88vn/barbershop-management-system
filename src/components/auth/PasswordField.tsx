@@ -34,7 +34,7 @@ export function PasswordField({
         </label>
         {required ? (
           <span aria-hidden="true" className="text-red-900">
-            _
+            *
           </span>
         ) : null}
       </div>

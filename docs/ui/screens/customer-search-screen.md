@@ -168,7 +168,7 @@ Số điện thoại *
 **Button "Tạo khách"** — `primary`, submit form
 
 - Loading state khi đang gọi API
-- Sau khi tạo thành công → đóng modal → navigate đến `ROUTES.customerDetail(id)` của khách vừa tạo
+- Sau khi tạo thành công → đóng modal → hiển thị success Toast title "Tạo khách thành công", description "[Tên khách] đã được thêm vào hệ thống." → chờ khoảng 1 giây để user đọc toast → navigate đến `ROUTES.customerDetail(id)` của khách vừa tạo
 
 ---
 

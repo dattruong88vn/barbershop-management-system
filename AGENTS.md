@@ -65,9 +65,10 @@ Always read `skills/` conventions before writing code. For feature work, also re
 - Testing stack: Vitest and React Testing Library.
 - Test files live next to the file under test.
 - Do not add or update unit tests unless the user explicitly asks for tests.
-- When tests are requested, run only the new or updated test files, for example `npx vitest run src/hooks/useCustomers.test.tsx`.
-- Run the full test suite only when explicitly requested or when shared behavior has a large blast radius.
-- If the user asks to commit related code before tests are written or updated, remind them and ask for confirmation before committing.
+- Do not run tests or ESLint after implementation unless the user asks to commit code.
+- When the user asks to commit code, run ESLint and only the new or updated test files before committing, for example `npx vitest run src/hooks/useCustomers.test.tsx`.
+- Run the full test suite only when explicitly requested.
+- If the user asks to commit related code before tests are written or updated, remind them and ask for confirmation before running checks and committing.
 
 ## Git Rules
 
