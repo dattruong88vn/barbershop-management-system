@@ -46,7 +46,7 @@ function createRequest(body?: Partial<ServiceFormInput> | string): NextRequest {
 
 function createContext(id = "service-1") {
   return {
-    params: { id },
+    params: Promise.resolve({ id }),
   };
 }
 

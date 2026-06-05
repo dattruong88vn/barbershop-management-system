@@ -46,7 +46,7 @@ function createRequest(body?: Partial<BranchFormInput> | string): NextRequest {
 
 function createContext(id = "branch-1") {
   return {
-    params: { id },
+    params: Promise.resolve({ id }),
   };
 }
 

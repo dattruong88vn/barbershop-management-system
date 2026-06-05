@@ -33,6 +33,29 @@ describe("middleware", () => {
     );
   });
 
+  it("should allow unauthenticated users to access login", async () => {
+    mocks.getToken.mockResolvedValue(null);
+
+    const _response = await middleware(createRequest(ROUTES.login));
+
+    expect(_response.status).toBe(200);
+    expect(_response.headers.get("location")).toBeNull();
+  });
+
+  it("should redirect authenticated users away from login", async () => {
+    mocks.getToken.mockResolvedValue({
+      role: "owner",
+      is_first_login: false,
+    });
+
+    const _response = await middleware(createRequest(ROUTES.login));
+
+    expect(_response.status).toBe(307);
+    expect(_response.headers.get("location")).toBe(
+      `http://localhost${ROUTES.dashboard}`,
+    );
+  });
+
   it("should force first login users to change password", async () => {
     mocks.getToken.mockResolvedValue({
       role: "owner",
