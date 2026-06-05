@@ -73,22 +73,24 @@ Copy this structure when starting a new date section:
 ## 2026-06-05
 
 ### Business Changes
-- None
+- Added persistent login behavior so authenticated users can return without logging in again during the session lifetime.
 
 ### Database Changes
 - None
 
 ### API Changes
-- None
+- Set NextAuth JWT session lifetime to 30 days with daily session refresh.
 
 ### UI Changes
 - Rebuilt Login and Change Password auth UI against the updated Geist-style component spec and auth screen spec.
 - Added Geist-style global tokens and utilities for auth surfaces, typography, status colors, and `material-base`.
 - Updated auth layout, form shell, password field, inline error alerts, and primary auth buttons to use the updated design tokens.
 - Added a shared `Button` loading prop and fixed primary button contrast across light/dark token modes.
+- Redirected already-authenticated users away from `/login` to the dashboard.
 
 ### Test Changes
 - Verified Login and Change Password page behavior with their existing focused Vitest files.
+- Verified persistent auth middleware/session changes with focused auth, middleware, and login tests.
 
 ### Refactoring
 - Kept auth error and label copy in `src/constants/texts/auth.ts` and preserved shared auth component structure.
