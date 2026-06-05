@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 import { ROUTES } from "@/constants/routes";
+import { getPostAuthRedirectPath } from "@/lib/authRedirect";
 import type { UserRole } from "@/types";
 
 const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, "superadmin">, string[]> =
@@ -15,14 +16,13 @@ const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, "superadmin">, string[]
       ROUTES.reports,
     ],
     manager: [ROUTES.dashboard, ROUTES.reports],
-    receptionist: [ROUTES.dashboard, ROUTES.visits, ROUTES.customers],
-    barber: [ROUTES.dashboard, ROUTES.visits, ROUTES.customers],
-    skinner: [ROUTES.dashboard, ROUTES.visits, ROUTES.customers],
+    receptionist: [ROUTES.visits, ROUTES.customers],
+    barber: [ROUTES.visits, ROUTES.customers],
+    skinner: [ROUTES.visits, ROUTES.customers],
   };
 
 const LOGIN_PATH = ROUTES.login;
 const CHANGE_PASSWORD_PATH = ROUTES.changePassword;
-const FALLBACK_PATH = ROUTES.dashboard;
 
 function isUserRole(role: unknown): role is UserRole {
   return (
@@ -60,7 +60,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if (matchesRoute(request.nextUrl.pathname, LOGIN_PATH)) {
-    return NextResponse.redirect(new URL(FALLBACK_PATH, request.url));
+    return NextResponse.redirect(
+      new URL(getPostAuthRedirectPath(role), request.url),
+    );
   }
 
   if (token.is_first_login === true) {
@@ -72,7 +74,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if (matchesRoute(request.nextUrl.pathname, CHANGE_PASSWORD_PATH)) {
-    return NextResponse.redirect(new URL(FALLBACK_PATH, request.url));
+    return NextResponse.redirect(
+      new URL(getPostAuthRedirectPath(role), request.url),
+    );
   }
 
   if (role === "superadmin") {
@@ -87,7 +91,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return NextResponse.redirect(new URL(FALLBACK_PATH, request.url));
+  return NextResponse.redirect(
+    new URL(getPostAuthRedirectPath(role), request.url),
+  );
 }
 
 export const config = {

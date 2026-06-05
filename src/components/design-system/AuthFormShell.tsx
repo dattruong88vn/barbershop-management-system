@@ -2,7 +2,7 @@
 
 import type { AuthFormShellProps } from "@/types";
 
-export default function AuthFormShell({
+export function AuthFormShell({
   children,
   description,
   onSubmit,
@@ -17,9 +17,7 @@ export default function AuthFormShell({
       <div className="mb-6">
         <h1 className="text-heading-20 text-gray-1000">{title}</h1>
         {description ? (
-          <p className="mt-2 text-copy-13 text-gray-700">
-            {description}
-          </p>
+          <p className="mt-2 text-copy-13 text-gray-700">{description}</p>
         ) : null}
       </div>
 

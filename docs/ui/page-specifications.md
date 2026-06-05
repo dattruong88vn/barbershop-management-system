@@ -4,7 +4,7 @@
 
 Spec chi tiết:
 
-- `docs/ui/auth-screens.md`
+- `docs/ui/screens/auth-screens.md`
 
 Route:
 
@@ -28,7 +28,7 @@ Trạng thái:
 
 Spec chi tiết:
 
-- `docs/ui/auth-screens.md`
+- `docs/ui/screens/auth-screens.md`
 
 Route:
 
@@ -48,6 +48,10 @@ Trạng thái:
 ---
 
 ## Customer Search
+
+Spec chi tiết:
+
+- `docs/ui/screens/customer-search-screen.md`
 
 Route:
 

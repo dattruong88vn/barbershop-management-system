@@ -131,10 +131,11 @@ describe("POST /api/change-password", () => {
     });
   });
 
-  it("should update the user password and return redirect payload", async () => {
+  it("should update owner password and return dashboard redirect payload", async () => {
     mocks.getToken.mockResolvedValue({
       id: "user-1",
       username: "dat",
+      role: "owner",
     });
     mocks.prismaUpdate.mockResolvedValue({ id: "user-1" });
 
@@ -157,6 +158,28 @@ describe("POST /api/change-password", () => {
     await expect(_response.json()).resolves.toEqual({
       username: "dat",
       redirectTo: ROUTES.dashboard,
+    });
+  });
+
+  it("should update staff password and return customers redirect payload", async () => {
+    mocks.getToken.mockResolvedValue({
+      id: "user-1",
+      username: "dat",
+      role: "receptionist",
+    });
+    mocks.prismaUpdate.mockResolvedValue({ id: "user-1" });
+
+    const _response = await POST(
+      createRequest({
+        password: "Secret123!",
+        confirmPassword: "Secret123!",
+      }),
+    );
+
+    expect(_response.status).toBe(200);
+    await expect(_response.json()).resolves.toEqual({
+      username: "dat",
+      redirectTo: ROUTES.customers,
     });
   });
 });

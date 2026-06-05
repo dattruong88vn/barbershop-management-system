@@ -1,27 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
+import { getPostAuthRedirectPath } from "@/lib/authRedirect";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
-import type { ChangePasswordRequestBody, UserRole } from "@/types";
-
-const DEFAULT_DASHBOARD_PATH = ROUTES.dashboard;
-const STAFF_ROLES: UserRole[] = ["receptionist", "barber", "skinner"];
+import type { ChangePasswordRequestBody } from "@/types";
 
 function isChangePasswordRequestBody(
   body: unknown,
 ): body is ChangePasswordRequestBody {
   return typeof body === "object" && body !== null;
-}
-
-function getChangePasswordRedirectPath(role: unknown): string {
-  if (typeof role === "string" && STAFF_ROLES.includes(role as UserRole)) {
-    return ROUTES.customers;
-  }
-
-  return DEFAULT_DASHBOARD_PATH;
 }
 
 export async function POST(request: NextRequest) {
@@ -82,6 +71,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     username: token.username,
-    redirectTo: getChangePasswordRedirectPath(token.role),
+    redirectTo: getPostAuthRedirectPath(token.role),
   });
 }

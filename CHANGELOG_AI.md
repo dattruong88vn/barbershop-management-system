@@ -88,15 +88,27 @@ Copy this structure when starting a new date section:
 - Updated auth layout, form shell, password field, inline error alerts, and primary auth buttons to use the updated design tokens.
 - Added a shared `Button` loading prop and fixed primary button contrast across light/dark token modes.
 - Redirected already-authenticated users away from `/login` to the dashboard.
+- Moved UI screen documents into `docs/ui/screens/` and added the Customer Search screen spec to UI context routing.
+- Added the `/dashboard` page with a Dashboard heading and role-based post-auth redirects for owner/manager vs staff users.
+- Rebuilt the Customer Search page to match the new screen spec with responsive header/navigation, realtime search, recent searches, customer cards, empty states, and create-customer modal.
+- Added a Geist-style success toast after creating a customer, delayed navigation so the toast is readable, and documented the create-customer success behavior.
+- Extracted Login, Change Password, and Customer Search UI pieces into shared design-system and customer components.
 
 ### Test Changes
 - Verified Login and Change Password page behavior with their existing focused Vitest files.
 - Verified persistent auth middleware/session changes with focused auth, middleware, and login tests.
 - Verified owner dynamic resource route handlers with focused branch, service, combo, and staff route tests.
 - Added unit coverage for persistent session max age, authenticated `/login` redirects, unauthenticated login access, auth inline alert rendering, login required-marker behavior, change-password required markers, and button loading state.
+- Added unit coverage for the Dashboard page, shared post-auth redirect helper, login redirects by role, change-password redirects by role, and middleware staff dashboard fallback.
+- Updated Customer Search page tests for realtime search, card navigation, and create-customer modal behavior.
+- Added focused unit coverage for extracted design-system components, customer UI components, app toast provider behavior, and customer display helpers.
 
 ### Refactoring
 - Kept auth error and label copy in `src/constants/texts/auth.ts` and preserved shared auth component structure.
+- Updated AGENTS, KB index, UI conventions, and page specifications to point at the new `docs/ui/screens/` document structure.
+- Updated agent testing workflow so tests and ESLint run only when committing code or when explicitly requested.
+- Moved toast presentation styles into a design-system component so app providers only handle toast state and events.
+- Moved customer display helpers and page-level UI sections out of the Customer Search page to keep page logic focused on state and handlers.
 
 ### Breaking Changes
 - None

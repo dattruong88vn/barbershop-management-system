@@ -1,6 +1,7 @@
 import type {
   ChangeEventHandler,
   FormEventHandler,
+  InputHTMLAttributes,
   ReactNode,
 } from "react";
 
@@ -63,5 +64,25 @@ export type PasswordFieldProps = {
   placeholder?: string;
   required?: boolean;
   showPasswordLabel: string;
+  value: string;
+};
+
+export type InlineAlertProps = {
+  children?: ReactNode;
+  className?: string;
+};
+
+export type FormTextFieldProps = {
+  autoComplete?: string;
+  autoFocus?: boolean;
+  className?: string;
+  error?: string;
+  id: string;
+  label: string;
+  name?: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  placeholder?: string;
+  required?: boolean;
+  type?: InputHTMLAttributes<HTMLInputElement>["type"];
   value: string;
 };

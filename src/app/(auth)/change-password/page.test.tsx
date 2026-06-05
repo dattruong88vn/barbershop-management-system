@@ -94,7 +94,7 @@ describe("ChangePasswordPage", () => {
     expect(
       screen.getByLabelText(authTexts.changePassword.confirmPasswordLabel),
     ).toBeRequired();
-    expect(screen.getAllByText("_")).toHaveLength(2);
+    expect(screen.getAllByText("*")).toHaveLength(2);
   });
 
   it("should show loading state while submitting", () => {
@@ -186,7 +186,7 @@ describe("ChangePasswordPage", () => {
         password: "Secret123!",
         redirect: false,
       });
-      expect(mocks.replace).toHaveBeenCalledWith(ROUTES.dashboard);
+      expect(mocks.replace).toHaveBeenCalledWith(ROUTES.customers);
       expect(mocks.refresh).toHaveBeenCalled();
     });
   });

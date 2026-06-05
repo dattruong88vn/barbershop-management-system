@@ -30,7 +30,7 @@ Before changing code, load context in this order:
 3. The target module section in `KB_INDEX.md`
 4. Relevant files from `docs/`, `skills/`, `src/`, and `prisma/` listed for that module
 
-Always read `skills/` conventions before writing code. For feature work, also read `docs/mvp-features.md`. For database-related work, also read `docs/data-model.md` and `docs/database.md`. For UI work, also read: `docs/ui/screen-map.md`, `docs/ui/navigation.md`, `docs/ui/component-spec.md`, `docs/ui/design-tokens.md`, `docs/ui/component-rules.md`, `docs/ui/ui-guideline.md`, `docs/ui/mobile-screens.md`, `docs/ui/desktop-screens.md`, `docs/ui/auth-screens.md`, `docs/ui/user-flows.md`, `docs/ui/page-specifications.md`.
+Always read `skills/` conventions before writing code. For feature work, also read `docs/mvp-features.md`. For database-related work, also read `docs/data-model.md` and `docs/database.md`. For UI work, also read: `docs/ui/screens/screen-map.md`, `docs/ui/navigation.md`, `docs/ui/component-spec.md`, `docs/ui/design-tokens.md`, `docs/ui/component-rules.md`, `docs/ui/ui-guideline.md`, `docs/ui/screens/mobile-screens.md`, `docs/ui/screens/desktop-screens.md`, `docs/ui/screens/auth-screens.md`, `docs/ui/screens/customer-search-screen.md`, `docs/ui/user-flows.md`, `docs/ui/page-specifications.md`.
 
 ## Key Business Rules
 
@@ -65,9 +65,10 @@ Always read `skills/` conventions before writing code. For feature work, also re
 - Testing stack: Vitest and React Testing Library.
 - Test files live next to the file under test.
 - Do not add or update unit tests unless the user explicitly asks for tests.
-- When tests are requested, run only the new or updated test files, for example `npx vitest run src/hooks/useCustomers.test.tsx`.
-- Run the full test suite only when explicitly requested or when shared behavior has a large blast radius.
-- If the user asks to commit related code before tests are written or updated, remind them and ask for confirmation before committing.
+- Do not run tests or ESLint after implementation unless the user asks to commit code.
+- When the user asks to commit code, run ESLint and only the new or updated test files before committing, for example `npx vitest run src/hooks/useCustomers.test.tsx`.
+- Run the full test suite only when explicitly requested.
+- If the user asks to commit related code before tests are written or updated, remind them and ask for confirmation before running checks and committing.
 
 ## Git Rules
 

@@ -6,6 +6,7 @@ import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 
 const mocks = vi.hoisted(() => ({
+  getSession: vi.fn(),
   replace: vi.fn(),
   refresh: vi.fn(),
   signIn: vi.fn(),
@@ -14,6 +15,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next-auth/react", () => ({
+  getSession: mocks.getSession,
   signIn: mocks.signIn,
 }));
 
@@ -63,7 +65,7 @@ describe("LoginPage", () => {
     const passwordInput = screen.getByLabelText(authTexts.login.passwordLabel);
 
     expect(passwordInput).toBeInTheDocument();
-    expect(screen.queryByText("_")).not.toBeInTheDocument();
+    expect(screen.queryByText("*")).toBeInTheDocument();
   });
 
   it("should show an error when sign in fails", async () => {
@@ -98,6 +100,11 @@ describe("LoginPage", () => {
     const user = userEvent.setup();
     setupNavigation();
     mocks.signIn.mockResolvedValue({ ok: true });
+    mocks.getSession.mockResolvedValue({
+      user: {
+        role: "owner",
+      },
+    });
 
     render(<LoginPage />);
 
@@ -124,10 +131,44 @@ describe("LoginPage", () => {
     });
   });
 
+  it("should redirect staff roles to customers after sign in", async () => {
+    const user = userEvent.setup();
+    setupNavigation();
+    mocks.signIn.mockResolvedValue({ ok: true });
+    mocks.getSession.mockResolvedValue({
+      user: {
+        role: "barber",
+      },
+    });
+
+    render(<LoginPage />);
+
+    await user.type(
+      screen.getByLabelText(authTexts.login.usernameLabel),
+      "barber.demo",
+    );
+    await user.type(
+      screen.getByLabelText(authTexts.login.passwordLabel),
+      "password123",
+    );
+    await user.click(
+      screen.getByRole("button", { name: authTexts.login.submit }),
+    );
+
+    await waitFor(() => {
+      expect(mocks.replace).toHaveBeenCalledWith(ROUTES.customers);
+    });
+  });
+
   it("should use callbackUrl when it is provided", async () => {
     const user = userEvent.setup();
     setupNavigation(ROUTES.customers);
     mocks.signIn.mockResolvedValue({ ok: true });
+    mocks.getSession.mockResolvedValue({
+      user: {
+        role: "owner",
+      },
+    });
 
     render(<LoginPage />);
 

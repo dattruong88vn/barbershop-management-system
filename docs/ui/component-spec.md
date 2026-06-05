@@ -221,6 +221,13 @@ Tham khảo: [Geist Toast](https://vercel.com/geist/toast)
 
 **Toast:** Góc phải dưới, tự dismiss sau 3 giây.
 
+- Surface: dark `bg-gray-200` theo theme, border `border-gray-500`, radius `rounded-md`, shadow nhẹ
+- Layout: icon variant bên trái, title `text-label-14`, description `text-copy-13`, close icon `X` bên phải
+- Accent: border-left 4px theo variant
+  - success: `CheckCircle2`, `border-l-green-900`, icon `text-green-900`
+  - error: `XCircle`, `border-l-red-900`, icon `text-red-900`
+  - warning: `AlertTriangle`, `border-l-amber-900`, icon `text-amber-900`
+
 **Inline Alert:** Full-width trong page/form, dùng [Geist Note](https://vercel.com/geist/note).
 
 ---

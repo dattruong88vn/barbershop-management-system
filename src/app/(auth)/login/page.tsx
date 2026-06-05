@@ -2,15 +2,16 @@
 
 import { Suspense, type SyntheticEvent } from "react";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import AuthFormShell from "@/app/(auth)/AuthFormShell";
 import { PasswordField } from "@/components/auth/PasswordField";
+import { AuthFormShell } from "@/components/design-system/AuthFormShell";
+import { FormTextField } from "@/components/design-system/FormTextField";
+import { InlineAlert } from "@/components/design-system/InlineAlert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
+import { getPostAuthRedirectPath } from "@/lib/authRedirect";
 
 function LoginForm() {
   const router = useRouter();
@@ -19,7 +20,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const callbackUrl = searchParams.get("callbackUrl") ?? ROUTES.dashboard;
+  const callbackUrl = searchParams.get("callbackUrl");
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,7 +50,11 @@ function LoginForm() {
         return;
       }
 
-      router.replace(callbackUrl);
+      const session = await getSession();
+      const redirectPath =
+        callbackUrl ?? getPostAuthRedirectPath(session?.user.role);
+
+      router.replace(redirectPath);
       router.refresh();
     } catch {
       setError(authTexts.login.errors.generic);
@@ -65,26 +70,18 @@ function LoginForm() {
       onSubmit={handleSubmit}
     >
       <div className="space-y-4">
-        <div>
-          <label
-            htmlFor="username"
-            className="mb-1.5 block text-label-14 text-gray-900"
-          >
-            {authTexts.login.usernameLabel}
-          </label>
-          <Input
-            id="username"
-            name="username"
-            type="text"
-            value={username}
-            autoComplete="username"
-            autoFocus
-            placeholder={authTexts.login.usernamePlaceholder}
-            required
-            onChange={(event) => setUsername(event.target.value)}
-            className="h-10 border-gray-400 bg-gray-100 px-3 text-label-14 text-gray-1000 shadow-none placeholder:text-gray-700 focus-visible:border-gray-600 focus-visible:ring-gray-600/20"
-          />
-        </div>
+        <FormTextField
+          id="username"
+          name="username"
+          type="text"
+          value={username}
+          autoComplete="username"
+          autoFocus
+          label={authTexts.login.usernameLabel}
+          placeholder={authTexts.login.usernamePlaceholder}
+          required
+          onChange={(event) => setUsername(event.target.value)}
+        />
 
         <PasswordField
           name="password"
@@ -109,14 +106,7 @@ function LoginForm() {
         {authTexts.login.submit}
       </Button>
 
-      {error ? (
-        <div
-          role="alert"
-          className="mt-3 rounded-md border border-red-900/30 bg-red-100 px-3 py-2 text-copy-13 text-red-900"
-        >
-          {error}
-        </div>
-      ) : null}
+      {error ? <InlineAlert className="mt-3">{error}</InlineAlert> : null}
     </AuthFormShell>
   );
 }

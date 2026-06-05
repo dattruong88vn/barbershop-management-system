@@ -3,17 +3,19 @@
 import { useEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
+import { Toast } from "@/components/design-system/Toast";
 import {
   API_SERVER_ERROR_EVENT,
   createQueryClient,
 } from "@/lib/queryClient";
+import { APP_TOAST_EVENT, type AppToast } from "@/lib/toast";
 import type { ProvidersProps } from "@/types";
 
 const TOAST_VISIBLE_MS = 3000;
 
 export function Providers({ children }: ProvidersProps) {
   const [queryClient] = useState(() => createQueryClient());
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<AppToast | null>(null);
 
   useEffect(() => {
     function handleApiServerError(event: Event) {
@@ -21,42 +23,50 @@ export function Providers({ children }: ProvidersProps) {
         return;
       }
 
-      setToastMessage(event.detail);
+      setToast({
+        message: event.detail,
+        type: "error",
+      });
+    }
+
+    function handleAppToast(event: Event) {
+      if (
+        !(event instanceof CustomEvent) ||
+        typeof event.detail?.message !== "string"
+      ) {
+        return;
+      }
+
+      setToast(event.detail as AppToast);
     }
 
     window.addEventListener(API_SERVER_ERROR_EVENT, handleApiServerError);
+    window.addEventListener(APP_TOAST_EVENT, handleAppToast);
 
     return () => {
       window.removeEventListener(API_SERVER_ERROR_EVENT, handleApiServerError);
+      window.removeEventListener(APP_TOAST_EVENT, handleAppToast);
     };
   }, []);
 
   useEffect(() => {
-    if (!toastMessage) {
+    if (!toast) {
       return;
     }
 
     const _timeoutId = window.setTimeout(() => {
-      setToastMessage(null);
+      setToast(null);
     }, TOAST_VISIBLE_MS);
 
     return () => {
       window.clearTimeout(_timeoutId);
     };
-  }, [toastMessage]);
+  }, [toast]);
 
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {toastMessage ? (
-        <div
-          aria-live="polite"
-          className="fixed bottom-4 right-4 z-50 max-w-80 rounded-md bg-neutral-950 px-4 py-3 text-sm text-white shadow-lg"
-          role="status"
-        >
-          {toastMessage}
-        </div>
-      ) : null}
+      {toast ? <Toast toast={toast} onClose={() => setToast(null)} /> : null}
     </QueryClientProvider>
   );
 }

@@ -42,7 +42,7 @@ describe("middleware", () => {
     expect(_response.headers.get("location")).toBeNull();
   });
 
-  it("should redirect authenticated users away from login", async () => {
+  it("should redirect authenticated owner users away from login to dashboard", async () => {
     mocks.getToken.mockResolvedValue({
       role: "owner",
       is_first_login: false,
@@ -53,6 +53,20 @@ describe("middleware", () => {
     expect(_response.status).toBe(307);
     expect(_response.headers.get("location")).toBe(
       `http://localhost${ROUTES.dashboard}`,
+    );
+  });
+
+  it("should redirect authenticated staff users away from login to customers", async () => {
+    mocks.getToken.mockResolvedValue({
+      role: "barber",
+      is_first_login: false,
+    });
+
+    const _response = await middleware(createRequest(ROUTES.login));
+
+    expect(_response.status).toBe(307);
+    expect(_response.headers.get("location")).toBe(
+      `http://localhost${ROUTES.customers}`,
     );
   });
 
@@ -105,6 +119,20 @@ describe("middleware", () => {
     expect(_response.status).toBe(307);
     expect(_response.headers.get("location")).toBe(
       `http://localhost${ROUTES.dashboard}`,
+    );
+  });
+
+  it("should redirect staff users away from dashboard to customers", async () => {
+    mocks.getToken.mockResolvedValue({
+      role: "receptionist",
+      is_first_login: false,
+    });
+
+    const _response = await middleware(createRequest(ROUTES.dashboard));
+
+    expect(_response.status).toBe(307);
+    expect(_response.headers.get("location")).toBe(
+      `http://localhost${ROUTES.customers}`,
     );
   });
 });
