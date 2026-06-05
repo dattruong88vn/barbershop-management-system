@@ -69,3 +69,34 @@ Copy this structure when starting a new date section:
 - Created `KB_INDEX.md` for AI agent context discovery.
 - Created `CHANGELOG_AI.md` as the reusable changelog for human and AI-assisted changes.
 - Reviewed `AGENTS.md`, `KB_INDEX.md`, and `CHANGELOG_AI.md` together for missing sections, duplication, contradictions, and organization.
+
+## 2026-06-05
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Rebuilt Login and Change Password auth UI against the updated Geist-style component spec and auth screen spec.
+- Added Geist-style global tokens and utilities for auth surfaces, typography, status colors, and `material-base`.
+- Updated auth layout, form shell, password field, inline error alerts, and primary auth buttons to use the updated design tokens.
+- Added a shared `Button` loading prop and fixed primary button contrast across light/dark token modes.
+
+### Test Changes
+- Verified Login and Change Password page behavior with their existing focused Vitest files.
+
+### Refactoring
+- Kept auth error and label copy in `src/constants/texts/auth.ts` and preserved shared auth component structure.
+
+### Breaking Changes
+- None
+
+### Notes
+- Created branch `feature/auth-design-system-ui` from the latest `develop`.
+- `next build --webpack` compiled successfully, then failed type-checking on an unrelated existing `src/app/api/branches/[id]/route.ts` route context type.
+- Browser verified `/login` on the running localhost server; `/change-password` returned 404 on that server, likely because the server was started before the new auth route group was available and needs a restart.

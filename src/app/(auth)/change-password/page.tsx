@@ -2,7 +2,6 @@
 
 import type { SyntheticEvent } from "react";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -129,17 +128,22 @@ export default function ChangePasswordPage() {
 
       <Button
         type="submit"
+        variant="primary"
+        size="lg"
         disabled={!isFormValid || changePassword.isPending}
-        className="mt-6 h-10 w-full bg-gold px-5 text-sm font-medium text-dark-100 hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-40"
+        loading={changePassword.isPending}
+        className="mt-6 w-full disabled:cursor-not-allowed"
       >
-        {changePassword.isPending ? (
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-        ) : null}
         {authTexts.changePassword.submit}
       </Button>
 
       {serverError ? (
-        <p className="mt-3 text-[13px] text-danger">{serverError}</p>
+        <div
+          role="alert"
+          className="mt-3 rounded-md border border-red-900/30 bg-red-100 px-3 py-2 text-copy-13 text-red-900"
+        >
+          {serverError}
+        </div>
       ) : null}
     </AuthFormShell>
   );
