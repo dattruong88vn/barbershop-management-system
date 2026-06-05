@@ -6,13 +6,14 @@ This document defines mandatory UI implementation rules for all frontend work.
 
 Always read this file together with:
 
-- docs/ui/screen-map.md
+- docs/ui/screens/screen-map.md
 - docs/ui/navigation.md
 - docs/ui/design-tokens.md
 - docs/ui/component-rules.md
 - docs/ui/ui-guideline.md
-- docs/ui/mobile-screens.md
-- docs/ui/desktop-screens.md
+- docs/ui/screens/mobile-screens.md
+- docs/ui/screens/desktop-screens.md
+- docs/ui/screens/customer-search-screen.md
 - docs/ui/user-flows.md
 - docs/ui/page-specifications.md
 
@@ -166,9 +167,9 @@ Do not add menu items or navigation flows that are not documented.
 
 Follow:
 
-docs/ui/mobile-screens.md
+docs/ui/screens/mobile-screens.md
 
-docs/ui/desktop-screens.md
+docs/ui/screens/desktop-screens.md
 
 Do not invent additional sections unless required by business rules.
 

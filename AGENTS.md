@@ -30,7 +30,7 @@ Before changing code, load context in this order:
 3. The target module section in `KB_INDEX.md`
 4. Relevant files from `docs/`, `skills/`, `src/`, and `prisma/` listed for that module
 
-Always read `skills/` conventions before writing code. For feature work, also read `docs/mvp-features.md`. For database-related work, also read `docs/data-model.md` and `docs/database.md`. For UI work, also read: `docs/ui/screen-map.md`, `docs/ui/navigation.md`, `docs/ui/component-spec.md`, `docs/ui/design-tokens.md`, `docs/ui/component-rules.md`, `docs/ui/ui-guideline.md`, `docs/ui/mobile-screens.md`, `docs/ui/desktop-screens.md`, `docs/ui/auth-screens.md`, `docs/ui/user-flows.md`, `docs/ui/page-specifications.md`.
+Always read `skills/` conventions before writing code. For feature work, also read `docs/mvp-features.md`. For database-related work, also read `docs/data-model.md` and `docs/database.md`. For UI work, also read: `docs/ui/screens/screen-map.md`, `docs/ui/navigation.md`, `docs/ui/component-spec.md`, `docs/ui/design-tokens.md`, `docs/ui/component-rules.md`, `docs/ui/ui-guideline.md`, `docs/ui/screens/mobile-screens.md`, `docs/ui/screens/desktop-screens.md`, `docs/ui/screens/auth-screens.md`, `docs/ui/screens/customer-search-screen.md`, `docs/ui/user-flows.md`, `docs/ui/page-specifications.md`.
 
 ## Key Business Rules
 

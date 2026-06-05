@@ -88,6 +88,7 @@ Copy this structure when starting a new date section:
 - Updated auth layout, form shell, password field, inline error alerts, and primary auth buttons to use the updated design tokens.
 - Added a shared `Button` loading prop and fixed primary button contrast across light/dark token modes.
 - Redirected already-authenticated users away from `/login` to the dashboard.
+- Moved UI screen documents into `docs/ui/screens/` and added the Customer Search screen spec to UI context routing.
 
 ### Test Changes
 - Verified Login and Change Password page behavior with their existing focused Vitest files.
@@ -97,6 +98,7 @@ Copy this structure when starting a new date section:
 
 ### Refactoring
 - Kept auth error and label copy in `src/constants/texts/auth.ts` and preserved shared auth component structure.
+- Updated AGENTS, KB index, UI conventions, and page specifications to point at the new `docs/ui/screens/` document structure.
 
 ### Breaking Changes
 - None
