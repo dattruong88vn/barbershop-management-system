@@ -199,6 +199,7 @@ async function validateStaff(
     where: {
       id: { in: staffIds },
       shopId,
+      status: "active",
       OR: roleFilters,
     },
     select: { id: true },
@@ -240,6 +241,7 @@ export async function GET(request: NextRequest) {
       where: {
         shopId: authResult.shopId,
         role: "barber",
+        status: "active",
       },
       orderBy: { username: "asc" },
       select: {
@@ -252,6 +254,7 @@ export async function GET(request: NextRequest) {
       where: {
         shopId: authResult.shopId,
         role: "skinner",
+        status: "active",
       },
       orderBy: { username: "asc" },
       select: {

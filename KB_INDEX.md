@@ -70,6 +70,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - docs/ui/screens/desktop-screens.md
 - docs/ui/screens/auth-screens.md
 - docs/ui/screens/customer-search-screen.md
+- docs/ui/screens/customer-profile-screen.md
 - docs/ui/user-flows.md
 - docs/ui/page-specifications.md
 
@@ -194,6 +195,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ### UI
 
 - docs/ui/screens/customer-search-screen.md
+- docs/ui/screens/customer-profile-screen.md
 - src/app/customers
 - src/constants/texts/customers.ts
 - src/constants/routes/appRoutes.ts

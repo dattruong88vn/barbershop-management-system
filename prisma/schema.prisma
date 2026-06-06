@@ -28,6 +28,11 @@ enum UserRole {
   skinner
 }
 
+enum UserStatus {
+  active
+  inactive
+}
+
 enum VisitStatus {
   pending
   in_progress
@@ -78,6 +83,7 @@ model User {
   username      String
   passwordHash  String   @map("password_hash")
   role          UserRole
+  status        UserStatus @default(active)
   isFirstLogin  Boolean  @default(true) @map("is_first_login")
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 

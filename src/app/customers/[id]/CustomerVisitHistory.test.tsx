@@ -1,30 +1,18 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ROUTES } from "@/constants/routes";
-import { customerTexts, visitTexts } from "@/constants/texts";
+import { customerTexts } from "@/constants/texts";
 import type { CustomerVisit, CustomerVisitHistoryCustomer } from "@/types";
 
 const mocks = vi.hoisted(() => ({
   useCustomerVisits: vi.fn(),
-  useVisits: vi.fn(),
-  updateVisitStaff: vi.fn(),
-  VisitCreateForm: vi.fn(({ customerId }: { customerId: string }) => (
-    <div>{`visit-form-${customerId}`}</div>
-  )),
+  updateCustomer: vi.fn(),
 }));
 
 vi.mock("@/hooks/useCustomerVisits", () => ({
   useCustomerVisits: mocks.useCustomerVisits,
-}));
-
-vi.mock("@/hooks/useVisits", () => ({
-  useVisits: mocks.useVisits,
-}));
-
-vi.mock("@/app/customers/[id]/VisitCreateForm", () => ({
-  default: mocks.VisitCreateForm,
 }));
 
 import CustomerVisitHistory from "@/app/customers/[id]/CustomerVisitHistory";
@@ -82,35 +70,7 @@ afterEach(() => {
 
 describe("CustomerVisitHistory", () => {
   beforeEach(() => {
-    mocks.useVisits.mockReturnValue({
-      barbers: [
-        {
-          id: "barber-1",
-          username: "barber01",
-          role: "barber",
-        },
-        {
-          id: "barber-2",
-          username: "barber02",
-          role: "barber",
-        },
-      ],
-      error: null,
-      isUpdatingStaff: false,
-      skinners: [
-        {
-          id: "skinner-1",
-          username: "skinner01",
-          role: "skinner",
-        },
-        {
-          id: "skinner-2",
-          username: "skinner02",
-          role: "skinner",
-        },
-      ],
-      updateVisitStaff: mocks.updateVisitStaff,
-    });
+    mocks.updateCustomer.mockResolvedValue(customer);
   });
 
   it("should render customer info, visit history, photos, and suggestions", () => {
@@ -118,44 +78,40 @@ describe("CustomerVisitHistory", () => {
       customer,
       error: null,
       isLoading: false,
+      isUpdatingCustomer: false,
       suggestions: {
         services: visit.services,
         barber: visit.barber,
         skinner: visit.skinner,
       },
+      updateCustomer: mocks.updateCustomer,
       visits: [visit],
     });
 
     render(<CustomerVisitHistory customerId={customer.id} />);
 
-    expect(screen.getByText(customer.name)).toBeInTheDocument();
+    expect(screen.getAllByText(customer.name).length).toBeGreaterThan(0);
     expect(screen.getByText(customer.phone)).toBeInTheDocument();
-    expect(screen.getAllByText("Cắt tóc nam, Combo gội đầu")).toHaveLength(2);
-    expect(screen.getAllByText("barber01")).toHaveLength(3);
-    expect(screen.getAllByText("skinner01")).toHaveLength(3);
-    expect(screen.getByText(`visit-form-${customer.id}`)).toBeInTheDocument();
-    expect(mocks.VisitCreateForm).toHaveBeenCalledWith(
-      {
-        customerId: customer.id,
-        suggestions: {
-          services: visit.services,
-          barber: visit.barber,
-          skinner: visit.skinner,
-        },
-      },
-      undefined,
-    );
+    expect(screen.getAllByText("Cắt tóc nam + Combo gội đầu")).toHaveLength(2);
+    expect(screen.getByText("Barber: barber01")).toBeInTheDocument();
+    expect(screen.getByText("Skinner: skinner01")).toBeInTheDocument();
     expect(screen.getByText(/150.000/)).toBeInTheDocument();
+    expect(
+      screen.getByText(customerTexts.detail.statusCompleted),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
         name: customerTexts.detail.photosLabel,
       }),
     ).toHaveAttribute("src", "https://example.com/photo.jpg");
     expect(
-      screen.getByRole("link", {
+      screen.getAllByRole("link", {
         name: customerTexts.detail.backToLookup,
-      }),
+      })[0],
     ).toHaveAttribute("href", ROUTES.customers);
+    expect(
+      screen.getByRole("link", { name: customerTexts.detail.createVisit }),
+    ).toHaveAttribute("href", ROUTES.customerCreateVisit(customer.id));
   });
 
   it("should render empty states when customer has no visits", () => {
@@ -163,16 +119,19 @@ describe("CustomerVisitHistory", () => {
       customer,
       error: null,
       isLoading: false,
+      isUpdatingCustomer: false,
       suggestions: null,
+      updateCustomer: mocks.updateCustomer,
       visits: [],
     });
 
     render(<CustomerVisitHistory customerId={customer.id} />);
 
     expect(
-      screen.getByText(customerTexts.detail.emptySuggestions),
-    ).toBeInTheDocument();
+      screen.queryByText(customerTexts.detail.emptySuggestions),
+    ).not.toBeInTheDocument();
     expect(screen.getByText(customerTexts.detail.emptyVisits)).toBeInTheDocument();
+    expect(screen.getByText(customerTexts.detail.noPhotos)).toBeInTheDocument();
   });
 
   it("should render loading and error states", () => {
@@ -180,7 +139,9 @@ describe("CustomerVisitHistory", () => {
       customer: null,
       error: new Error("Không tải được lịch sử"),
       isLoading: true,
+      isUpdatingCustomer: false,
       suggestions: null,
+      updateCustomer: mocks.updateCustomer,
       visits: [],
     });
 
@@ -192,70 +153,78 @@ describe("CustomerVisitHistory", () => {
     expect(screen.getByText("Không tải được lịch sử")).toBeInTheDocument();
   });
 
-  it("should show remaining edit time and update staff for completed visits", async () => {
+  it("should update customer info from the edit modal", async () => {
     const user = userEvent.setup();
-    const recentVisit = {
-      ...visit,
-      completedAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+    const updatedCustomer = {
+      ...customer,
+      name: "Nguyễn Văn An",
+      phone: "0912345678",
     };
-
-    mocks.updateVisitStaff.mockResolvedValue(recentVisit);
+    mocks.updateCustomer.mockResolvedValue(updatedCustomer);
     mocks.useCustomerVisits.mockReturnValue({
       customer,
       error: null,
       isLoading: false,
+      isUpdatingCustomer: false,
       suggestions: null,
-      visits: [recentVisit],
+      updateCustomer: mocks.updateCustomer,
+      visits: [visit],
     });
 
     render(<CustomerVisitHistory customerId={customer.id} />);
 
-    expect(
-      screen.getByText("Còn 1 giờ 30 phút để chỉnh sửa"),
-    ).toBeInTheDocument();
-
-    await user.selectOptions(
-      screen.getByLabelText(visitTexts.create.barberLabel),
-      "barber-2",
+    await user.click(
+      screen.getByRole("button", { name: customerTexts.detail.edit }),
     );
-    await user.selectOptions(
-      screen.getByLabelText(visitTexts.create.skinnerLabel),
-      "skinner-2",
+    await user.clear(screen.getByLabelText(customerTexts.lookup.nameLabel));
+    await user.type(
+      screen.getByLabelText(customerTexts.lookup.nameLabel),
+      updatedCustomer.name,
+    );
+    await user.clear(screen.getByLabelText(customerTexts.lookup.phoneLabel));
+    await user.type(
+      screen.getByLabelText(customerTexts.lookup.phoneLabel),
+      updatedCustomer.phone,
     );
     await user.click(
-      screen.getByRole("button", { name: visitTexts.staffEdit.submit }),
+      screen.getByRole("button", { name: customerTexts.detail.submitUpdate }),
     );
 
-    expect(mocks.updateVisitStaff).toHaveBeenCalledWith({
-      visitId: visit.id,
-      customerId: customer.id,
-      barberId: "barber-2",
-      skinnerId: "skinner-2",
+    await waitFor(() => {
+      expect(mocks.updateCustomer).toHaveBeenCalledWith({
+        id: customer.id,
+        name: updatedCustomer.name,
+        phone: updatedCustomer.phone,
+      });
     });
-    expect(screen.getByText(visitTexts.staffEdit.success)).toBeInTheDocument();
   });
 
-  it("should lock staff edit fields after three hours", () => {
-    const lockedVisit = {
-      ...visit,
-      completedAt: new Date(Date.now() - 181 * 60 * 1000).toISOString(),
-    };
-
+  it("should validate customer update form", async () => {
+    const user = userEvent.setup();
     mocks.useCustomerVisits.mockReturnValue({
       customer,
       error: null,
       isLoading: false,
+      isUpdatingCustomer: false,
       suggestions: null,
-      visits: [lockedVisit],
+      updateCustomer: mocks.updateCustomer,
+      visits: [visit],
     });
 
     render(<CustomerVisitHistory customerId={customer.id} />);
 
-    expect(screen.getByText(visitTexts.staffEdit.locked)).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: customerTexts.detail.edit }),
+    );
+    await user.clear(screen.getByLabelText(customerTexts.lookup.phoneLabel));
+    await user.type(screen.getByLabelText(customerTexts.lookup.phoneLabel), "123");
+    await user.click(
+      screen.getByRole("button", { name: customerTexts.detail.submitUpdate }),
+    );
+
     expect(
-      screen.getByRole("button", { name: visitTexts.staffEdit.submit }),
-    ).toBeDisabled();
-    expect(screen.getByLabelText(visitTexts.create.barberLabel)).toBeDisabled();
-    expect(screen.getByLabelText(visitTexts.create.skinnerLabel)).toBeDisabled();
+      screen.getByText(customerTexts.detail.errors.invalidPhone),
+    ).toBeInTheDocument();
+    expect(mocks.updateCustomer).not.toHaveBeenCalled();
   });
 });

@@ -192,7 +192,8 @@ No Photo
 
 Hiển thị warning.
 
-Ưu tiên màu amber/gold.
+Ưu tiên status token warning: `text-amber-900`, `bg-amber-100`, `border-amber-900/30`.
+Không dùng gold brand cho warning UI.
 
 ---
 

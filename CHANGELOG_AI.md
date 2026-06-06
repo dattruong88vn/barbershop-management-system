@@ -29,7 +29,7 @@ Copy this structure when starting a new date section:
 - Optimized AI agent documentation for Claude Code, OpenAI Codex, Cursor, and GitHub Copilot.
 
 ### Database Changes
-- None
+- Added `users.status` with `active`/`inactive` values so staff can be deactivated without deleting historical visit data.
 
 ### API Changes
 - Updated change password redirect handling so staff roles continue to Customer Search after first-login password change.
@@ -81,6 +81,9 @@ Copy this structure when starting a new date section:
 ### API Changes
 - Set NextAuth JWT session lifetime to 30 days with daily session refresh.
 - Updated dynamic owner resource API route context types for Next.js 16 route handler type-checking.
+- Filtered inactive staff from staff lists, visit create options, visit staff assignment, and credentials login.
+- Changed staff deletion behavior to mark staff inactive instead of hard-deleting the user record.
+- Kept inactive historical staff visible in visit history while omitting them from new-visit staff suggestions.
 
 ### UI Changes
 - Rebuilt Login and Change Password auth UI against the updated Geist-style component spec and auth screen spec.
@@ -117,3 +120,29 @@ Copy this structure when starting a new date section:
 - Created branch `feature/auth-design-system-ui` from the latest `develop`.
 - `next build --webpack` passes after aligning dynamic route handler context types with Next.js 16.
 - Browser verified `/login` on the running localhost server; `/change-password` returned 404 on that server, likely because the server was started before the new auth route group was available and needs a restart.
+
+## 2026-06-06
+
+### Business Changes
+- Added Customer Profile screen documentation routing for the customer detail workflow.
+
+### Database Changes
+- None
+
+### API Changes
+- Added customer profile update support for editing customer name and phone from the Customer Profile screen.
+
+### UI Changes
+- Rebuilt Customer Profile UI from the new screen spec with responsive header/actions, metrics, suggestions, recent photos, completed visit history, edit modal, lightbox, and toast feedback.
+- Fixed `Button asChild` rendering so Customer Profile action links do not crash Radix Slot at runtime.
+- Refined the Customer Profile screen to match the provided desktop/tablet and mobile references, including the framed surface, compact mobile metrics, in-panel bottom navigation, and darker theme-safe surfaces.
+
+### Refactoring
+- Linked the Customer Profile screen spec from AGENTS, KB index, screen map, and page specifications.
+- Clarified UI token documentation so Geist neutral/status colors are the default design language and gold is only a limited legacy/brand accent.
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because checks are only run on explicit request or commit.

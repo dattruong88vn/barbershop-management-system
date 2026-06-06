@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
   getToken: vi.fn(),
   hashPassword: vi.fn((password: string) => `hashed:${password}`),
   prismaBranchFindFirst: vi.fn(),
-  prismaUserDelete: vi.fn(),
   prismaUserFindFirst: vi.fn(),
   prismaUserUpdate: vi.fn(),
 }));
@@ -27,7 +26,6 @@ vi.mock("@/lib/prisma", () => ({
       findFirst: mocks.prismaBranchFindFirst,
     },
     user: {
-      delete: mocks.prismaUserDelete,
       findFirst: mocks.prismaUserFindFirst,
       update: mocks.prismaUserUpdate,
     },
@@ -66,6 +64,7 @@ function createStaffMember() {
     branchId: "branch-1",
     username: "barber01",
     role: "barber",
+    status: "active",
     isFirstLogin: true,
     createdAt: new Date("2026-06-03T00:00:00.000Z"),
     branch: {
@@ -142,6 +141,7 @@ describe("PATCH /api/staff/[id]", () => {
         branchId: true,
         username: true,
         role: true,
+        status: true,
         isFirstLogin: true,
         createdAt: true,
       }),
@@ -156,8 +156,12 @@ describe("PATCH /api/staff/[id]", () => {
 });
 
 describe("DELETE /api/staff/[id]", () => {
-  it("should delete staff scoped to session shop", async () => {
+  it("should mark staff inactive scoped to session shop", async () => {
     const staffMember = createStaffMember();
+    const inactiveStaffMember = {
+      ...staffMember,
+      status: "inactive",
+    };
 
     mocks.getToken.mockResolvedValue({
       id: "owner-1",
@@ -165,18 +169,29 @@ describe("DELETE /api/staff/[id]", () => {
       shop_id: "shop-1",
     });
     mocks.prismaUserFindFirst.mockResolvedValue(staffMember);
-    mocks.prismaUserDelete.mockResolvedValue(staffMember);
+    mocks.prismaUserUpdate.mockResolvedValue(inactiveStaffMember);
 
     const response = await DELETE(createRequest(), createContext());
 
     expect(response.status).toBe(200);
-    expect(mocks.prismaUserDelete).toHaveBeenCalledWith({
+    expect(mocks.prismaUserUpdate).toHaveBeenCalledWith({
       where: { id: "staff-1" },
+      data: { status: "inactive" },
+      select: expect.objectContaining({
+        id: true,
+        shopId: true,
+        branchId: true,
+        username: true,
+        role: true,
+        status: true,
+        isFirstLogin: true,
+        createdAt: true,
+      }),
     });
     await expect(response.json()).resolves.toEqual({
       staffMember: {
-        ...staffMember,
-        createdAt: staffMember.createdAt.toISOString(),
+        ...inactiveStaffMember,
+        createdAt: inactiveStaffMember.createdAt.toISOString(),
       },
     });
   });

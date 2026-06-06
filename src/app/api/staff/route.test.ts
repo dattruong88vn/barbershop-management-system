@@ -54,6 +54,7 @@ function createStaffMember() {
     branchId: "branch-1",
     username: "barber01",
     role: "barber",
+    status: "active",
     isFirstLogin: true,
     createdAt: new Date("2026-06-03T00:00:00.000Z"),
     branch: {
@@ -96,6 +97,7 @@ describe("GET /api/staff", () => {
       where: {
         shopId: "shop-1",
         role: { in: ["receptionist", "barber", "skinner"] },
+        status: "active",
       },
       orderBy: { createdAt: "desc" },
       select: expect.objectContaining({
@@ -104,6 +106,7 @@ describe("GET /api/staff", () => {
         branchId: true,
         username: true,
         role: true,
+        status: true,
         isFirstLogin: true,
         createdAt: true,
       }),
@@ -193,6 +196,7 @@ describe("POST /api/staff", () => {
         username: "barber01",
         passwordHash: "hashed:Secret123!",
         role: "barber",
+        status: "active",
         isFirstLogin: true,
       },
       select: expect.objectContaining({
@@ -201,6 +205,7 @@ describe("POST /api/staff", () => {
         branchId: true,
         username: true,
         role: true,
+        status: true,
         isFirstLogin: true,
         createdAt: true,
       }),

@@ -53,10 +53,12 @@ function createCustomerWithVisits() {
         barber: {
           id: "barber-1",
           username: "barber01",
+          status: "active",
         },
         skinner: {
           id: "skinner-1",
           username: "skinner01",
+          status: "active",
         },
         visitPhotos: [
           {
@@ -263,6 +265,44 @@ describe("GET /api/customers/[id]/visits", () => {
           id: "barber-1",
           username: "barber01",
         },
+        skinner: {
+          id: "skinner-1",
+          username: "skinner01",
+        },
+      },
+    });
+  });
+
+  it("should keep inactive staff in history but omit them from suggestions", async () => {
+    const customer = createCustomerWithVisits();
+    customer.visits[0].barber = {
+      id: "barber-1",
+      username: "barber01",
+      status: "inactive",
+    };
+
+    mocks.getToken.mockResolvedValue({
+      id: "user-1",
+      role: "barber",
+      shop_id: "shop-1",
+    });
+    mocks.prismaFindFirst.mockResolvedValue(customer);
+
+    const response = await GET(createRequest(), createRouteContext());
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      visits: [
+        {
+          barber: {
+            id: "barber-1",
+            username: "barber01",
+          },
+        },
+        expect.any(Object),
+      ],
+      suggestions: {
+        barber: null,
         skinner: {
           id: "skinner-1",
           username: "skinner01",

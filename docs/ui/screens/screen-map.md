@@ -57,16 +57,23 @@ Validation:
 
 Route: `/customers/:id`
 
+Spec chi tiết:
+
+- `docs/ui/screens/customer-profile-screen.md`
+
 Sections:
 
-- Customer Information
-- Hair Photos
-- Visit History
+- Profile header
+- Metrics
 - Suggestions
+- Recent hair photos
+- Completed visit history
+- Edit customer modal
 
 Hành động:
 
 - Create Visit
+- Edit customer info
 
 ### Create Visit
 

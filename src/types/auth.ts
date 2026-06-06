@@ -13,6 +13,8 @@ export type UserRole =
   | "barber"
   | "skinner";
 
+export type UserStatus = "active" | "inactive";
+
 export type AuthUserFields = {
   id: string;
   role: UserRole;

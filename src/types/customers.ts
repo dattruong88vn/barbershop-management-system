@@ -108,6 +108,12 @@ export type CustomerVisitHistoryCustomer = {
   createdAt: string;
 };
 
+export type CustomerUpdateInput = {
+  id: string;
+  name: string;
+  phone: string;
+};
+
 export type CustomerVisitHistory = {
   customer: CustomerVisitHistoryCustomer;
   visits: CustomerVisit[];
@@ -115,6 +121,11 @@ export type CustomerVisitHistory = {
 };
 
 export type CustomerVisitHistoryApiResponse = CustomerVisitHistory & {
+  error?: string;
+};
+
+export type CustomerUpdateApiResponse = {
+  customer?: CustomerVisitHistoryCustomer;
   error?: string;
 };
 
