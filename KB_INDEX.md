@@ -60,17 +60,12 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 # UI Documentation
 
-- docs/ui/screens/screen-map.md
+- docs/SCREENS.md
 - docs/ui/navigation.md
 - docs/ui/component-spec.md
 - docs/ui/design-tokens.md
 - docs/ui/component-rules.md
 - docs/ui/ui-guideline.md
-- docs/ui/screens/mobile-screens.md
-- docs/ui/screens/desktop-screens.md
-- docs/ui/screens/auth-screens.md
-- docs/ui/screens/customer-search-screen.md
-- docs/ui/screens/customer-profile-screen.md
 - docs/ui/user-flows.md
 - docs/ui/page-specifications.md
 
@@ -84,6 +79,8 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - src/app/globals.css
 - src/app/layout.tsx
 - src/app/providers.tsx
+- src/components/design-system
+- src/components/ui
 
 ### Skills
 
@@ -138,7 +135,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 ### UI
 
-- docs/ui/screens/auth-screens.md
+- docs/SCREENS.md
 - src/app/(auth)
 - src/constants/texts/auth.ts
 - src/constants/routes/appRoutes.ts
@@ -194,9 +191,10 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 ### UI
 
-- docs/ui/screens/customer-search-screen.md
-- docs/ui/screens/customer-profile-screen.md
+- docs/SCREENS.md
 - src/app/customers
+- src/components/customers
+- src/components/customers/search
 - src/constants/texts/customers.ts
 - src/constants/routes/appRoutes.ts
 
@@ -211,6 +209,9 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ### Source Code
 
 - src/app/customers
+- src/components/customers
+- src/components/customers/search
+- src/components/customers/profile
 - src/app/api/customers
 - src/hooks/useCustomers.ts
 - src/hooks/useCustomerVisits.ts
@@ -248,6 +249,8 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 ### UI
 
 - src/app/customers/[id]
+- src/components/customers/profile
+- src/components/customers
 - src/constants/texts/visits.ts
 - src/constants/routes/appRoutes.ts
 
@@ -264,6 +267,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 - src/app/api/visits
 - src/app/api/customers/[id]/visits
 - src/app/customers/[id]
+- src/components/customers/profile
 - src/hooks/useVisits.ts
 - src/hooks/useCustomerVisits.ts
 - src/types/visits.ts
@@ -594,7 +598,7 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 For common tasks:
 
 - Add new feature
-  - Load first: AGENTS.md, KB_INDEX.md, docs/mvp-features.md, docs/market-positioning.md, docs/data-model.md, docs/tech-stack.md, docs/ui/screens/screen-map.md, docs/ui/navigation.md, docs/ui/component-spec.md, docs/ui/design-tokens.md, docs/ui/component-rules.md, docs/ui/ui-guideline.md, and the relevant file under docs/ui/screens/
+  - Load first: AGENTS.md, KB_INDEX.md, docs/mvp-features.md, docs/market-positioning.md, docs/data-model.md, docs/tech-stack.md, docs/SCREENS.md, docs/ui/navigation.md, docs/ui/component-spec.md, docs/ui/design-tokens.md, docs/ui/component-rules.md, and docs/ui/ui-guideline.md.
 
 - Then load the target module section from this file, plus relevant skills: skills/skill-naming-conventions.md, skills/skill-routes-conventions.md, skills/skill-text-conventions.md, skills/skill-types-conventions.md, skills/skill-data-fetching-conventions.md, skills/skill-api-error-handling.md
 - After completion: update CHANGELOG_AI.md

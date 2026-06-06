@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -15,7 +16,7 @@ vi.mock("@/hooks/useCustomerVisits", () => ({
   useCustomerVisits: mocks.useCustomerVisits,
 }));
 
-import CustomerVisitHistory from "@/app/customers/[id]/CustomerVisitHistory";
+import CustomerDetailPage from "@/app/customers/[id]/page";
 
 const customer: CustomerVisitHistoryCustomer = {
   id: "customer-1",
@@ -68,10 +69,18 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("CustomerVisitHistory", () => {
+describe("CustomerDetailPage behavior", () => {
   beforeEach(() => {
     mocks.updateCustomer.mockResolvedValue(customer);
   });
+
+  function renderCustomerDetailPage(customerId: string) {
+    return render(
+      <Suspense fallback={null}>
+        <CustomerDetailPage params={Promise.resolve({ id: customerId })} />
+      </Suspense>,
+    );
+  }
 
   it("should render customer info, visit history, photos, and suggestions", () => {
     mocks.useCustomerVisits.mockReturnValue({
@@ -88,7 +97,7 @@ describe("CustomerVisitHistory", () => {
       visits: [visit],
     });
 
-    render(<CustomerVisitHistory customerId={customer.id} />);
+    renderCustomerDetailPage(customer.id);
 
     expect(screen.getAllByText(customer.name).length).toBeGreaterThan(0);
     expect(screen.getByText(customer.phone)).toBeInTheDocument();
@@ -125,7 +134,7 @@ describe("CustomerVisitHistory", () => {
       visits: [],
     });
 
-    render(<CustomerVisitHistory customerId={customer.id} />);
+    renderCustomerDetailPage(customer.id);
 
     expect(
       screen.queryByText(customerTexts.detail.emptySuggestions),
@@ -145,7 +154,7 @@ describe("CustomerVisitHistory", () => {
       visits: [],
     });
 
-    render(<CustomerVisitHistory customerId={customer.id} />);
+    renderCustomerDetailPage(customer.id);
 
     expect(screen.getAllByText(customerTexts.detail.loading).length).toBeGreaterThan(
       0,
@@ -171,7 +180,7 @@ describe("CustomerVisitHistory", () => {
       visits: [visit],
     });
 
-    render(<CustomerVisitHistory customerId={customer.id} />);
+    renderCustomerDetailPage(customer.id);
 
     await user.click(
       screen.getByRole("button", { name: customerTexts.detail.edit }),
@@ -211,7 +220,7 @@ describe("CustomerVisitHistory", () => {
       visits: [visit],
     });
 
-    render(<CustomerVisitHistory customerId={customer.id} />);
+    renderCustomerDetailPage(customer.id);
 
     await user.click(
       screen.getByRole("button", { name: customerTexts.detail.edit }),

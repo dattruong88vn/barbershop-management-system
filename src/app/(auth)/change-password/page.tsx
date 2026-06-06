@@ -5,9 +5,9 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import { PasswordField } from "@/components/auth/PasswordField";
 import { AuthFormShell } from "@/components/design-system/AuthFormShell";
 import { InlineAlert } from "@/components/design-system/InlineAlert";
+import { PasswordField } from "@/components/design-system/PasswordField";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
@@ -104,6 +104,7 @@ export default function ChangePasswordPage() {
           value={password}
           autoComplete="new-password"
           minLength={8}
+          placeholder={authTexts.changePassword.passwordPlaceholder}
           required
           error={passwordError}
           showPasswordLabel={authTexts.changePassword.showPassword}
@@ -118,6 +119,7 @@ export default function ChangePasswordPage() {
           value={confirmPassword}
           autoComplete="new-password"
           minLength={8}
+          placeholder={authTexts.changePassword.confirmPasswordPlaceholder}
           required
           error={confirmPasswordError}
           showPasswordLabel={authTexts.changePassword.showPassword}
@@ -127,13 +129,19 @@ export default function ChangePasswordPage() {
         />
       </div>
 
+      <div className="rounded-lg border border-amber-900/30 bg-amber-100 px-3 py-2">
+        <p className="text-xs text-amber-900">
+          {authTexts.changePassword.passwordHint}
+        </p>
+      </div>
+
       <Button
         type="submit"
         variant="primary"
         size="lg"
         disabled={!isFormValid || changePassword.isPending}
         loading={changePassword.isPending}
-        className="mt-6 w-full disabled:cursor-not-allowed"
+        className="h-10 w-full rounded-lg disabled:cursor-not-allowed"
       >
         {authTexts.changePassword.submit}
       </Button>

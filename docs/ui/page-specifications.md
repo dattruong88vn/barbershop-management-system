@@ -4,7 +4,7 @@
 
 Spec chi tiết:
 
-- `docs/ui/screens/auth-screens.md`
+- `docs/SCREENS.md`
 
 Route:
 
@@ -28,7 +28,7 @@ Trạng thái:
 
 Spec chi tiết:
 
-- `docs/ui/screens/auth-screens.md`
+- `docs/SCREENS.md`
 
 Route:
 
@@ -51,7 +51,7 @@ Trạng thái:
 
 Spec chi tiết:
 
-- `docs/ui/screens/customer-search-screen.md`
+- `docs/SCREENS.md`
 
 Route:
 
@@ -96,7 +96,7 @@ Thành công:
 
 Spec chi tiết:
 
-- `docs/ui/screens/customer-profile-screen.md`
+- `docs/SCREENS.md`
 
 Route:
 

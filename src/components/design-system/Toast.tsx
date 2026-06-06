@@ -29,7 +29,7 @@ export function Toast({ onClose, toast }: ToastProps) {
   return (
     <div
       aria-live="polite"
-      className={`fixed bottom-4 right-4 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] gap-3 rounded-md border border-gray-500 border-l-4 bg-gray-200 px-4 py-3 text-gray-1000 shadow-lg ${toastVariant.accent}`}
+      className={`fixed bottom-4 right-4 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] gap-3 rounded-xl border border-border border-l-4 bg-background px-4 py-3 text-foreground shadow-lg ${toastVariant.accent}`}
       role="status"
     >
       <Icon
@@ -37,9 +37,9 @@ export function Toast({ onClose, toast }: ToastProps) {
         aria-hidden="true"
       />
       <div className="min-w-0 flex-1">
-        <p className="text-label-14 text-gray-1000">{toast.message}</p>
+        <p className="text-sm font-medium text-foreground">{toast.message}</p>
         {toast.description ? (
-          <p className="mt-0.5 text-copy-13 text-gray-800">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {toast.description}
           </p>
         ) : null}
@@ -47,7 +47,7 @@ export function Toast({ onClose, toast }: ToastProps) {
       <button
         type="button"
         onClick={onClose}
-        className="flex size-6 shrink-0 items-center justify-center rounded-md text-gray-700 hover:bg-gray-300 hover:text-gray-1000"
+        className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
         aria-label="Đóng thông báo"
       >
         <X className="size-4" aria-hidden="true" />

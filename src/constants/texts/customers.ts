@@ -117,6 +117,7 @@ export const customerTexts = {
       `${name} đã được thêm vào hệ thống.`,
     visitCount: "1 lần ghé",
     modalClose: "Đóng",
+    currentUserInitials: "QL",
     navToday: "Hôm nay",
     navSearch: "Tìm",
     navCreate: "Tạo",

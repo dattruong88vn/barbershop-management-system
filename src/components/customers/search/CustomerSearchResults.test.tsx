@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { CustomerSearchResults } from "@/components/customers/CustomerSearchResults";
+import { CustomerSearchResults } from "./CustomerSearchResults";
 import { customerTexts } from "@/constants/texts";
 import type { Customer } from "@/types";
 

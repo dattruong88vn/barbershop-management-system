@@ -17,19 +17,19 @@ export function CreateCustomerModal({
   phone,
 }: CreateCustomerModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-gray-1000/40 p-0 md:items-center md:justify-center md:p-6">
+    <div className="fixed inset-0 z-50 flex items-end bg-foreground/40 p-0 md:items-center md:justify-center md:p-6">
       <form
         onSubmit={onSubmit}
-        className="material-base w-full rounded-b-none p-5 md:max-w-md md:rounded-lg"
+        className="w-full rounded-t-xl border border-border bg-background p-5 md:max-w-md md:rounded-xl"
       >
-        <div className="flex items-center justify-between border-b border-gray-400 pb-4">
-          <h2 className="text-heading-20 text-gray-1000">
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <h2 className="text-base font-semibold text-foreground">
             {customerTexts.lookup.createTitle}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="flex size-9 items-center justify-center rounded-md text-gray-700 hover:bg-gray-200"
+            className="flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label={customerTexts.lookup.modalClose}
           >
             <X className="size-4" aria-hidden="true" />

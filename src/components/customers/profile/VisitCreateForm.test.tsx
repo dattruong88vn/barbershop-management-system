@@ -14,7 +14,7 @@ vi.mock("@/hooks/useVisits", () => ({
   useVisits: mocks.useVisits,
 }));
 
-import VisitCreateForm from "@/app/customers/[id]/VisitCreateForm";
+import VisitCreateForm from "./VisitCreateForm";
 
 const suggestions: VisitCreateFormProps["suggestions"] = {
   services: [

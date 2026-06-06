@@ -1,33 +1,38 @@
-import { render, screen } from "@testing-library/react";
+import { Suspense } from "react";
+import { render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  CustomerVisitHistory: vi.fn(
-    ({ customerId }: { customerId: string }) => (
-      <div>{`customer-history-${customerId}`}</div>
-    ),
-  ),
+  useCustomerVisits: vi.fn(),
 }));
 
-vi.mock("@/app/customers/[id]/CustomerVisitHistory", () => ({
-  default: mocks.CustomerVisitHistory,
+vi.mock("@/hooks/useCustomerVisits", () => ({
+  useCustomerVisits: mocks.useCustomerVisits,
 }));
 
 import CustomerDetailPage from "@/app/customers/[id]/page";
 
 describe("CustomerDetailPage", () => {
-  it("should render customer visit history for route customer id", async () => {
+  it("should load customer visit history for route customer id", async () => {
     const customerId = "customer-1";
-    const page = await CustomerDetailPage({
-      params: Promise.resolve({ id: customerId }),
+    mocks.useCustomerVisits.mockReturnValue({
+      customer: null,
+      error: null,
+      isLoading: false,
+      isUpdatingCustomer: false,
+      suggestions: null,
+      updateCustomer: vi.fn(),
+      visits: [],
     });
 
-    render(page);
-
-    expect(screen.getByText("customer-history-customer-1")).toBeInTheDocument();
-    expect(mocks.CustomerVisitHistory).toHaveBeenCalledWith(
-      { customerId },
-      undefined,
+    render(
+      <Suspense fallback={null}>
+        <CustomerDetailPage params={Promise.resolve({ id: customerId })} />
+      </Suspense>,
     );
+
+    await waitFor(() => {
+      expect(mocks.useCustomerVisits).toHaveBeenCalledWith(customerId);
+    });
   });
 });

@@ -9,4 +9,10 @@ export const commonTexts = {
       unauthorized: "Unauthorized",
     },
   },
+  navigation: {
+    create: "Tạo",
+    reports: "Báo cáo",
+    search: "Tìm",
+    today: "Hôm nay",
+  },
 };

@@ -5,10 +5,10 @@ import { useState } from "react";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { PasswordField } from "@/components/auth/PasswordField";
 import { AuthFormShell } from "@/components/design-system/AuthFormShell";
 import { FormTextField } from "@/components/design-system/FormTextField";
 import { InlineAlert } from "@/components/design-system/InlineAlert";
+import { PasswordField } from "@/components/design-system/PasswordField";
 import { Button } from "@/components/ui/button";
 import { authTexts } from "@/constants/texts";
 import { getPostAuthRedirectPath } from "@/lib/authRedirect";
@@ -101,12 +101,16 @@ function LoginForm() {
         size="lg"
         disabled={isSubmitting}
         loading={isSubmitting}
-        className="mt-6 w-full disabled:cursor-not-allowed"
+        className="h-10 w-full rounded-lg disabled:cursor-not-allowed"
       >
         {authTexts.login.submit}
       </Button>
 
       {error ? <InlineAlert className="mt-3">{error}</InlineAlert> : null}
+
+      <p className="text-center text-xs text-muted-foreground">
+        {authTexts.login.supportText}
+      </p>
     </AuthFormShell>
   );
 }

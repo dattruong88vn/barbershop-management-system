@@ -13,7 +13,7 @@ export function RecentCustomerSearches({
 
   return (
     <section className="mt-6">
-      <p className="text-label-12 uppercase text-gray-700">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {customerTexts.lookup.recentSearches}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -22,7 +22,7 @@ export function RecentCustomerSearches({
             key={search}
             type="button"
             onClick={() => onSelectSearch(search)}
-            className="inline-flex h-8 items-center gap-1 rounded-full border border-gray-400 bg-gray-100 px-3 text-label-12 text-gray-900"
+            className="inline-flex h-8 items-center gap-1 rounded-full border border-border bg-background px-3 text-xs text-foreground transition hover:bg-muted"
           >
             <Clock className="size-3.5" aria-hidden="true" />
             {search}
