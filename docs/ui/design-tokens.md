@@ -6,51 +6,50 @@ File này chỉ là mục lục nhanh. Nếu thiếu giá trị hoặc có đi�
 
 ## Theme
 
-- UI sản phẩm dùng dark theme với điểm nhấn gold.
-- Không dùng trắng thuần (`#FFFFFF`) cho text hoặc background UI.
+- UI sản phẩm dùng Geist-style light/dark theme, tự đổi theo `prefers-color-scheme`.
+- Neutral/gray là nền tảng chính cho layout, surface, border và text.
+- Gold không phải màu chủ đạo của UI. Chỉ dùng gold như accent rất hạn chế khi có yêu cầu riêng về brand hoặc marketing surface.
+- Không dùng trắng thuần (`#FFFFFF`) làm background chủ đạo của UI. Nếu cần màu sáng, dùng token Geist tương ứng như `bg-gray-100`, `bg-background-100`, `text-gray-1000`.
 - Dùng system font stack mặc định của Tailwind (`font-sans`). Không import custom font.
 
 ## Màu Sắc
 
-### Dark Scale
+### Geist Neutral Scale
 
-- `dark-100`: `#0A0A0A`
-- `dark-200`: `#111111`
-- `dark-300`: `#1A1A1A`
-- `dark-400`: `#222222`
-- `dark-500`: `#2E2E2E`
-- `dark-600`: `#3D3D3D`
+Luôn ưu tiên các token trong `docs/ui/component-spec.md`:
 
-### Gold Accent
+- Background: `bg-background-100`, `bg-background-200`, `bg-gray-100`, `bg-gray-200`, `bg-gray-300`
+- Border: `border-gray-400`, `border-gray-500`, `border-gray-600`
+- Text: `text-gray-1000`, `text-gray-900`, `text-gray-700`
 
-- `gold-bg`: `#2A2010`
-- `gold-muted`: `#8B6F35`
-- `gold`: `#C9A84C`
-- `gold-light`: `#E8C97A`
-- `gold-pale`: `#F5E9C4`
+Không dùng trực tiếp `dark-*`, `text-primary`, `text-secondary`, hoặc `text-muted` cho màn hình app mới nếu token Geist đã đáp ứng được.
 
-### Text
+### Status Colors
 
-- `text-primary`: `#F5F0E8`
-- `text-secondary`: `#A89B80`
-- `text-muted`: `#6B6055`
+Status color phải theo mục trạng thái trong `component-spec.md`:
 
-### Trạng Thái
+- Success / completed: `text-green-900`, `bg-green-100`
+- Info / in_progress: `text-blue-900`, `bg-blue-100`
+- Warning / pending / missing photo: `text-amber-900`, `bg-amber-100`
+- Error / danger: `text-red-900`, `bg-red-100`
 
-- Success: text `#60B060`, background `#0A1A0A`, border `#3A6A3A`
-- Info: text `#4A9EE0`, background `#0A1828`, border `#185FA5`
-- Warning: text `#C9A84C`, background `#2A2010`, border `#8B6F35`
-- Danger: text `#E24B4A`, background `#1A0A0A`, border `#793030`
+`amber` là warning/status color, không phải brand gold.
+
+### Legacy Gold Accent
+
+Các biến `gold-*` hiện vẫn tồn tại trong `globals.css` để tránh phá vỡ code cũ, nhưng không dùng làm mặc định cho app surface, heading, button, badge hoặc warning mới.
+
+Nếu cần dùng gold, giới hạn ở các trường hợp:
+
+- Brand highlight nhỏ
+- Illustration/marketing surface
+- Asset hoặc motif có yêu cầu rõ ràng từ design
 
 ## Typography
 
-- `heading-1`: 22px, weight 500, `text-primary`
-- `heading-2`: 18px, weight 500, `text-primary`
-- `heading-3`: 15px, weight 500, `gold`
-- `body`: 14px, weight 400, `text-secondary`
-- `small`: 13px, weight 400, `text-secondary`
-- `caption`: 12px, weight 400, `text-muted`
-- `micro`: 11px, weight 400, `text-muted`
+- Heading chính: dùng Geist typography class (`text-heading-*`) với `text-gray-1000`.
+- Label/body phụ: dùng `text-label-*` hoặc `text-copy-*` với `text-gray-900` / `text-gray-700`.
+- Không dùng gold cho heading mặc định.
 
 ## Bo Góc Và Spacing
 

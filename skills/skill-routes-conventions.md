@@ -62,6 +62,24 @@ export const API_ROUTES = {
 
 ## App Router Folder Structure
 
+`src/app/` chỉ chứa route files. Không đặt component module hoặc reusable component trong route folder.
+
+Route folder chỉ nên có các file route chuẩn:
+
+- `page.tsx`
+- `layout.tsx`
+- `loading.tsx`
+- `error.tsx`
+- `not-found.tsx`
+- `route.ts` cho API route
+- test cạnh route file khi cần
+
+Nếu UI route cần component phụ:
+
+- Route-only orchestration đặt trực tiếp trong `page.tsx`.
+- Component theo module đặt trong `src/components/<module>/`.
+- Component dùng chung toàn app đặt trong `src/components/design-system/`.
+
 ```
 src/app/
 ├── login/page.tsx

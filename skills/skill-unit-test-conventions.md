@@ -17,6 +17,15 @@ Quy ước viết unit test trong dự án. Codex chỉ viết hoặc update uni
 
 File test đặt **ngay cạnh file cần test**, không tạo thư mục `__tests__` riêng:
 
+`src/app/` route folders chỉ chứa route files và route tests. Không đặt component test trong `src/app/` nếu component đã được move ra `src/components`.
+
+Test placement theo ownership:
+
+- Route/page behavior: đặt cạnh `page.tsx`, ví dụ `page.test.tsx` hoặc `page.behavior.test.tsx`.
+- Module component: đặt cạnh component trong `src/components/<module>/`.
+- App-wide design-system component: đặt cạnh component trong `src/components/design-system/`.
+- Helper/lib function: đặt cạnh file helper trong `src/lib/`.
+
 ```
 src/
 ├── app/

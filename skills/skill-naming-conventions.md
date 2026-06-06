@@ -17,6 +17,14 @@ Quy ước đặt tên file, function, variable trong dự án. Tham khảo file
 | Types             | `camelCase`               | `visits.ts`                |
 | Constants / texts | `camelCase`               | `visits.ts`                |
 
+`src/app/` route folders are reserved for route files only. Do not create PascalCase component files such as `CustomerVisitHistory.tsx` or `VisitCreateForm.tsx` inside `src/app/`.
+
+Place component files by ownership:
+
+- Route-only orchestration: keep directly in `page.tsx`.
+- Module component: `src/components/<module>/ComponentName.tsx`.
+- App-wide reusable component: `src/components/design-system/ComponentName.tsx`.
+
 ---
 
 ## Function Naming

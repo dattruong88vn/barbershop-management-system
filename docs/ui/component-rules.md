@@ -4,6 +4,28 @@
 
 File này mô tả quy tắc hành vi và cách dùng component theo màn hình. Nếu chi tiết styling khác nhau, luôn theo `docs/ui/component-spec.md`.
 
+## Component Placement
+
+Ưu tiên viết component tái sử dụng vào:
+
+- `src/components/design-system/`
+
+Component trong folder module chỉ dùng khi component có đặc điểm cụ thể của module như layout composition, data shape, hoặc behavior riêng.
+
+Component module phải kế thừa/compose từ design-system primitives/components, không tự định nghĩa lại visual base.
+
+Với module có nhiều page, phân loại component theo page folder:
+
+- Component dùng chung trong cả module đặt ở root module, ví dụ `src/components/customers/CustomerAvatar.tsx`.
+- Component chỉ phục vụ Customer Search đặt trong `src/components/customers/search/`.
+- Component chỉ phục vụ Customer Profile/Customer Detail đặt trong `src/components/customers/profile/`.
+- Không đặt page-specific component ở root module nếu component chỉ dùng cho một page.
+
+Ví dụ:
+
+- `Skeleton` primitive nằm trong `src/components/design-system/`.
+- Skeleton riêng của Customer Profile có thể nằm trong customer module nếu nó chỉ mô tả bố cục từng vùng của màn đó, nhưng phải dùng `Skeleton` primitive.
+
 ## Button
 
 Dùng các variant trong `docs/ui/component-spec.md`:

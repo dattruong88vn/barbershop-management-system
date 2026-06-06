@@ -6,14 +6,11 @@ This document defines mandatory UI implementation rules for all frontend work.
 
 Always read this file together with:
 
-- docs/ui/screens/screen-map.md
+- docs/SCREENS.md
 - docs/ui/navigation.md
 - docs/ui/design-tokens.md
 - docs/ui/component-rules.md
 - docs/ui/ui-guideline.md
-- docs/ui/screens/mobile-screens.md
-- docs/ui/screens/desktop-screens.md
-- docs/ui/screens/customer-search-screen.md
 - docs/ui/user-flows.md
 - docs/ui/page-specifications.md
 
@@ -104,6 +101,54 @@ Use:
 
 Use existing reusable components whenever possible.
 
+### Component Placement
+
+The `src/app/` tree is for route files only. Do not put reusable or module components inside route folders.
+
+Allowed route files include:
+
+- `page.tsx`
+- `layout.tsx`
+- `loading.tsx`
+- `error.tsx`
+- `not-found.tsx`
+- route tests next to the route file when needed
+
+If a route needs UI composition, choose one of these placements:
+
+- Put route-only orchestration directly inside `page.tsx`.
+- Put module components in `src/components/<module>/`.
+- Put app-wide reusable components in `src/components/design-system/`.
+
+Default to putting reusable UI primitives and shared components in:
+
+- `src/components/design-system/`
+
+Module-specific components can live in the module folder only when they include module-specific composition, data shape, or behavior.
+
+Module components must compose or extend design-system components instead of redefining base visuals.
+
+For modules with multiple pages, split module components by ownership:
+
+- Module-shared components stay at `src/components/<module>/`.
+- Page-specific components go into `src/components/<module>/<page>/`.
+- For customers, use `src/components/customers/` for shared customer components, `src/components/customers/search/` for Customer Search page components, and `src/components/customers/profile/` for Customer Profile/Detail page components.
+
+Before creating, moving, or extracting any component or helper function, classify its ownership:
+
+- App-wide reusable: put UI components in `src/components/design-system/`; put shared pure helper functions in `src/lib/`; put shared types in `src/types/`; put shared text in `src/constants/texts/common.ts` or another appropriate shared text file.
+- Module reusable: put module components in `src/components/<module>/`; put module helper functions in a clearly named module lib file only when they depend on that module's data shape or business language.
+- Screen-local only: keep inside the screen/component file only when it is small, not reused, and tightly coupled to that screen's state or event handling.
+
+Do not leave app-wide wrappers or helper functions inside a module file just because the first use case came from that module. If a component/function can naturally be reused by multiple modules or screens, move it to the shared location immediately and let the module pass its own copy, route, active state, or behavior through props.
+
+Examples:
+
+- Use `src/components/design-system/Skeleton.tsx` for the shared skeleton primitive.
+- Put a customer-only profile skeleton composition near the customer module if it combines customer-specific sections, but build it from `Skeleton`.
+- Put app-wide mobile bottom navigation in the design system, while each screen passes active item and actions through props.
+- Put customer visit date, money, and photo-warning display helpers in `src/lib/` when they can be reused by search, profile, visit detail, or reporting screens.
+
 Prefer:
 
 - Card
@@ -167,9 +212,7 @@ Do not add menu items or navigation flows that are not documented.
 
 Follow:
 
-docs/ui/screens/mobile-screens.md
-
-docs/ui/screens/desktop-screens.md
+docs/SCREENS.md
 
 Do not invent additional sections unless required by business rules.
 
@@ -223,7 +266,7 @@ Read:
 1. AGENTS.md
 2. KB_INDEX.md
 3. This file
-4. page-specifications.md
-5. Relevant screen specification files
+4. docs/SCREENS.md
+5. page-specifications.md
 
 Only then start implementation.

@@ -3,6 +3,8 @@
 import type { SyntheticEvent } from "react";
 import { useMemo, useState } from "react";
 
+import { InlineAlert } from "@/components/design-system/InlineAlert";
+import { Button } from "@/components/ui/button";
 import { visitTexts } from "@/constants/texts";
 import { useVisits } from "@/hooks/useVisits";
 import type { VisitCreateFormProps, VisitCreateItem } from "@/types";
@@ -105,30 +107,32 @@ export default function VisitCreateForm({
   return (
     <section
       id="create-visit"
-      className="mt-4 scroll-mt-6 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+      className="mt-4 scroll-mt-6 rounded-xl border border-border bg-background p-5"
     >
-      <h2 className="text-base font-semibold">{visitTexts.create.title}</h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-600">
+      <h2 className="text-base font-semibold text-foreground">
+        {visitTexts.create.title}
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
         {visitTexts.create.description}
       </p>
 
       {isLoadingOptions ? (
-        <p className="mt-4 text-sm text-zinc-600">
+        <p className="mt-4 text-sm text-muted-foreground">
           {visitTexts.create.loadingOptions}
         </p>
       ) : null}
 
       {optionsError ? (
-        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <InlineAlert className="mt-4">
           {optionsError instanceof Error
             ? optionsError.message
             : visitTexts.create.errors.generic}
-        </p>
+        </InlineAlert>
       ) : null}
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-5">
         <fieldset>
-          <legend className="text-sm font-medium text-zinc-800">
+          <legend className="text-sm font-medium text-foreground">
             {visitTexts.create.servicesLabel}
           </legend>
           {services.length ? (
@@ -136,7 +140,7 @@ export default function VisitCreateForm({
               {services.map((service) => (
                 <label
                   key={service.id}
-                  className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 text-sm"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-sm"
                 >
                   <span className="flex items-center gap-3">
                     <input
@@ -147,25 +151,25 @@ export default function VisitCreateForm({
                           toggleId(currentIds, service.id),
                         )
                       }
-                      className="h-4 w-4 rounded border-zinc-300"
+                      className="h-4 w-4 rounded border-border"
                     />
                     <span>{service.name}</span>
                   </span>
-                  <span className="font-medium text-zinc-700">
+                  <span className="font-medium text-muted-foreground">
                     {PRICE_FORMATTER.format(service.price)}
                   </span>
                 </label>
               ))}
             </div>
           ) : (
-            <p className="mt-2 text-sm text-zinc-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               {visitTexts.create.emptyServices}
             </p>
           )}
         </fieldset>
 
         <fieldset>
-          <legend className="text-sm font-medium text-zinc-800">
+          <legend className="text-sm font-medium text-foreground">
             {visitTexts.create.combosLabel}
           </legend>
           {combos.length ? (
@@ -173,7 +177,7 @@ export default function VisitCreateForm({
               {combos.map((combo) => (
                 <label
                   key={combo.id}
-                  className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 text-sm"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-sm"
                 >
                   <span className="flex items-center gap-3">
                     <input
@@ -184,31 +188,31 @@ export default function VisitCreateForm({
                           toggleId(currentIds, combo.id),
                         )
                       }
-                      className="h-4 w-4 rounded border-zinc-300"
+                      className="h-4 w-4 rounded border-border"
                     />
                     <span>{combo.name}</span>
                   </span>
-                  <span className="font-medium text-zinc-700">
+                  <span className="font-medium text-muted-foreground">
                     {PRICE_FORMATTER.format(combo.price)}
                   </span>
                 </label>
               ))}
             </div>
           ) : (
-            <p className="mt-2 text-sm text-zinc-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               {visitTexts.create.emptyCombos}
             </p>
           )}
         </fieldset>
 
         <label className="block">
-          <span className="text-sm font-medium text-zinc-800">
+          <span className="text-sm font-medium text-foreground">
             {visitTexts.create.barberLabel}
           </span>
           <select
             value={barberId}
             onChange={(event) => setBarberId(event.target.value)}
-            className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+            className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-ring"
           >
             <option value="">{visitTexts.create.noStaffOption}</option>
             {barbers.map((barber) => (
@@ -220,13 +224,13 @@ export default function VisitCreateForm({
         </label>
 
         <label className="block">
-          <span className="text-sm font-medium text-zinc-800">
+          <span className="text-sm font-medium text-foreground">
             {visitTexts.create.skinnerLabel}
           </span>
           <select
             value={skinnerId}
             onChange={(event) => setSkinnerId(event.target.value)}
-            className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+            className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-ring"
           >
             <option value="">{visitTexts.create.noStaffOption}</option>
             {skinners.map((skinner) => (
@@ -237,24 +241,21 @@ export default function VisitCreateForm({
           </select>
         </label>
 
-        <p className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-800">
+        <p className="rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground">
           <span>{visitTexts.create.totalPriceLabel}</span>
           <span className="ml-2">{PRICE_FORMATTER.format(totalPrice)}</span>
         </p>
 
-        {error ? (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </p>
-        ) : null}
+        {error ? <InlineAlert>{error}</InlineAlert> : null}
 
-        <button
+        <Button
           type="submit"
           disabled={isCreating}
-          className="h-11 w-full rounded-md bg-zinc-950 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
+          variant="primary"
+          className="h-11 w-full rounded-lg disabled:cursor-not-allowed"
         >
           {isCreating ? visitTexts.create.creating : visitTexts.create.submit}
-        </button>
+        </Button>
       </form>
     </section>
   );

@@ -170,6 +170,7 @@ describe("GET /api/visits", () => {
       where: {
         shopId: "shop-1",
         role: "barber",
+        status: "active",
       },
       orderBy: { username: "asc" },
       select: {
@@ -295,6 +296,7 @@ describe("POST /api/visits", () => {
       where: {
         id: { in: ["barber-1"] },
         shopId: "shop-1",
+        status: "active",
         OR: [{ id: "barber-1", role: "barber" }],
       },
       select: { id: true },

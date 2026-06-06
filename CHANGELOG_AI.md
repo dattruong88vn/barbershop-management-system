@@ -29,7 +29,7 @@ Copy this structure when starting a new date section:
 - Optimized AI agent documentation for Claude Code, OpenAI Codex, Cursor, and GitHub Copilot.
 
 ### Database Changes
-- None
+- Added `users.status` with `active`/`inactive` values so staff can be deactivated without deleting historical visit data.
 
 ### API Changes
 - Updated change password redirect handling so staff roles continue to Customer Search after first-login password change.
@@ -81,6 +81,9 @@ Copy this structure when starting a new date section:
 ### API Changes
 - Set NextAuth JWT session lifetime to 30 days with daily session refresh.
 - Updated dynamic owner resource API route context types for Next.js 16 route handler type-checking.
+- Filtered inactive staff from staff lists, visit create options, visit staff assignment, and credentials login.
+- Changed staff deletion behavior to mark staff inactive instead of hard-deleting the user record.
+- Kept inactive historical staff visible in visit history while omitting them from new-visit staff suggestions.
 
 ### UI Changes
 - Rebuilt Login and Change Password auth UI against the updated Geist-style component spec and auth screen spec.
@@ -117,3 +120,66 @@ Copy this structure when starting a new date section:
 - Created branch `feature/auth-design-system-ui` from the latest `develop`.
 - `next build --webpack` passes after aligning dynamic route handler context types with Next.js 16.
 - Browser verified `/login` on the running localhost server; `/change-password` returned 404 on that server, likely because the server was started before the new auth route group was available and needs a restart.
+
+## 2026-06-06
+
+### Business Changes
+- Added Customer Profile screen documentation routing for the customer detail workflow.
+
+### Database Changes
+- None
+
+### API Changes
+- Added customer profile update support for editing customer name and phone from the Customer Profile screen.
+
+### UI Changes
+- Rebuilt Customer Profile UI from the new screen spec with responsive header/actions, metrics, suggestions, recent photos, completed visit history, edit modal, lightbox, and toast feedback.
+- Fixed `Button asChild` rendering so Customer Profile action links do not crash Radix Slot at runtime.
+- Refined the Customer Profile screen to match the provided desktop/tablet and mobile references, including the framed surface, compact mobile metrics, in-panel bottom navigation, and darker theme-safe surfaces.
+- Imported the v0 consolidated screen specification into `docs/SCREENS.md`.
+- Imported v0 design preview components into `src/components/design` and supporting mock data into `src/lib/design-data.ts`.
+- Added a local `Badge` UI primitive so imported design preview wrappers compile without adding a new dependency.
+- Updated Login and Change Password to match the v0 neutral auth card direction with compact brand, bordered form surface, password guidance, and support text.
+- Updated Customer Search to use the v0-style desktop sidebar shell, mobile header, neutral search surface, grouped result list, and bottom navigation create action.
+- Updated Customer Profile surfaces, chips, photo grid, visit rows, edit modal, lightbox, and mobile bottom navigation to align with the imported v0 UI direction.
+- Fixed Customer Profile mobile bottom navigation so it stays pinned to the bottom of the viewport.
+- Fixed Customer Search mobile header so it remains visible while scrolling.
+- Fixed Customer Search mobile layout so only the content area scrolls above the fixed bottom navigation.
+- Replaced the Customer Profile name fallback so the customer ID is not shown while profile data is loading.
+- Added a shared design-system `Skeleton` primitive and used skeleton loading regions for Customer Profile.
+- Updated shared customer/auth field, alert, modal, avatar, skeleton, recent-search, and toast styling away from the older `material-base`/gray utility treatment.
+- Moved the shared password field into `src/components/design-system/PasswordField.tsx`.
+- Added a shared `EmptyState` design-system component and updated Customer Search to compose it.
+- Moved Customer Profile skeleton composition into the customer module while keeping primitive skeleton visuals in the design system.
+- Updated the Customer Profile create-visit form to compose shared `Button` and `InlineAlert` components and use design tokens.
+- Fixed Customer Search hydration by loading recent searches from `localStorage` only after mount.
+
+### Refactoring
+- Linked the Customer Profile screen spec from AGENTS, KB index, and page specifications.
+- Split Customer Profile rendering into internal section components inside `CustomerVisitHistory.tsx` to keep the exported component focused on state and orchestration.
+- Moved Customer Profile visit display helpers into `src/lib/customerVisitDisplay.ts` for reuse outside the screen component.
+- Moved Customer Profile section components into `src/components/customers/CustomerVisitHistorySections.tsx` so the route component only manages state and orchestration.
+- Added reusable design-system `MobileBottomNavigation` and `ImageLightbox` components, then composed them from the customer module.
+- Moved app-wide mobile bottom navigation configuration into `src/components/design-system/AppMobileBottomNav.tsx` and reused it from Customer Search and Customer Profile.
+- Clarified UI token documentation so Geist neutral/status colors are the default design language and gold is only a limited legacy/brand accent.
+- Updated `AGENTS.md` from the v0 project to include `docs/SCREENS.md` as the consolidated UI spec entry point.
+- Added `docs/SCREENS.md` to the UI documentation routing in `KB_INDEX.md`.
+- Added missing auth/customer UI strings to constants for the updated screens.
+- Removed the older per-screen UI spec files under `docs/ui/screens/` and updated agent/UI routing to use `docs/SCREENS.md` as the single screen-spec source.
+- Added component placement rules requiring reusable UI primitives/components to live in `src/components/design-system/`, with module components composing from design-system primitives.
+- Updated UI skill conventions to require ownership classification for app-wide, module-level, and screen-local components/functions before creating or extracting them.
+- Updated UI skill conventions so `src/app/` route folders only contain route files, with route-only orchestration kept in `page.tsx` and components moved to `src/components`.
+- Added the `src/app/` route-file-only rule to route, naming, and unit-test skill conventions so component and test placement stays consistent.
+- Reorganized customer module components so shared components stay at `src/components/customers/`, Customer Search components live in `src/components/customers/search/`, and Customer Profile components live in `src/components/customers/profile/`.
+- Documented customer component folder ownership in AGENTS, KB index, UI component rules/spec, and UI skill conventions.
+- Removed unused v0 design preview artifacts from `src/components/design/` and `src/lib/design-data.ts`.
+- Inlined the Customer Detail route orchestration into `src/app/customers/[id]/page.tsx` and removed the separate app-folder `CustomerVisitHistory` component.
+- Moved `VisitCreateForm` from the app route folder into `src/components/customers/VisitCreateForm.tsx`.
+- Moved the Visit Create form test next to its component and renamed the customer detail behavior test away from the removed component name.
+- Removed the old `src/components/auth` folder after moving its reusable field into the design system.
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because checks are only run on explicit request or commit.

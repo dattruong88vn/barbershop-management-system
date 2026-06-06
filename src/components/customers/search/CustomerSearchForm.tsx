@@ -13,7 +13,7 @@ export function CustomerSearchForm({
   searchInput,
 }: CustomerSearchFormProps) {
   return (
-    <section className="pt-3 md:pt-8">
+    <section>
       <form onSubmit={onSearch} className="flex gap-3">
         <label className="sr-only" htmlFor="customer-search">
           {customerTexts.lookup.searchLabel}
@@ -30,7 +30,7 @@ export function CustomerSearchForm({
             placeholder=""
             autoFocus
             onChange={onSearchInputChange}
-            className="h-11 border-gray-400 bg-gray-100 pl-9 pr-10 text-label-14 text-gray-1000 shadow-none focus-visible:border-gray-600 focus-visible:ring-gray-600/20"
+            className="h-11 rounded-xl border-border bg-background pl-9 pr-10 text-sm text-foreground shadow-none focus-visible:border-ring focus-visible:ring-ring/20"
           />
           <span className="pointer-events-none absolute left-9 top-1/2 hidden -translate-y-1/2 text-label-14 text-gray-700 md:inline">
             {searchInput ? "" : customerTexts.lookup.searchPlaceholder}
@@ -42,7 +42,7 @@ export function CustomerSearchForm({
             <button
               type="button"
               onClick={onClearSearch}
-              className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-gray-700 hover:bg-gray-200"
+              className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
               aria-label={customerTexts.lookup.clearSearch}
             >
               <X className="size-4" aria-hidden="true" />
@@ -54,7 +54,7 @@ export function CustomerSearchForm({
           variant="primary"
           size="lg"
           onClick={onCreateCustomer}
-          className="hidden md:inline-flex"
+          className="hidden h-11 rounded-xl md:inline-flex"
         >
           <UserPlus className="size-4" aria-hidden="true" />
           {customerTexts.lookup.createOption}

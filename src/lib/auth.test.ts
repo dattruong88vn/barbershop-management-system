@@ -79,7 +79,7 @@ describe("authOptions", () => {
         }),
       ).resolves.toBeNull();
       expect(mocks.findFirst).toHaveBeenCalledWith({
-        where: { username: "dat" },
+        where: { username: "dat", status: "active" },
         select: {
           id: true,
           role: true,

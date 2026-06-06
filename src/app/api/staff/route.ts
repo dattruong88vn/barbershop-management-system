@@ -14,6 +14,7 @@ const STAFF_SELECT = {
   branchId: true,
   username: true,
   role: true,
+  status: true,
   isFirstLogin: true,
   createdAt: true,
   branch: {
@@ -91,6 +92,7 @@ export async function GET(request: NextRequest) {
     where: {
       shopId: authResult.shopId,
       role: { in: STAFF_ROLES },
+      status: "active",
     },
     orderBy: { createdAt: "desc" },
     select: STAFF_SELECT,
@@ -165,6 +167,7 @@ export async function POST(request: NextRequest) {
         username: staffInput.username,
         passwordHash: hashPassword(staffInput.password),
         role: staffInput.role,
+        status: "active",
         isFirstLogin: true,
       },
       select: STAFF_SELECT,

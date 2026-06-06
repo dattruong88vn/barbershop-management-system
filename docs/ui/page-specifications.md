@@ -4,7 +4,7 @@
 
 Spec chi tiết:
 
-- `docs/ui/screens/auth-screens.md`
+- `docs/SCREENS.md`
 
 Route:
 
@@ -28,7 +28,7 @@ Trạng thái:
 
 Spec chi tiết:
 
-- `docs/ui/screens/auth-screens.md`
+- `docs/SCREENS.md`
 
 Route:
 
@@ -51,7 +51,7 @@ Trạng thái:
 
 Spec chi tiết:
 
-- `docs/ui/screens/customer-search-screen.md`
+- `docs/SCREENS.md`
 
 Route:
 
@@ -94,6 +94,10 @@ Thành công:
 
 ## Customer Detail
 
+Spec chi tiết:
+
+- `docs/SCREENS.md`
+
 Route:
 
 - `/customers/:id`
@@ -101,19 +105,29 @@ Route:
 API:
 
 - `GET /api/customers/:id/visits`
+- `PATCH /api/customers/:id`
 
 Sections:
 
-- Customer Info
-- Hair Photos
-- Suggestions
-- Visit History
+- Header / Breadcrumb
+- Profile header
+- Metric cards
+- Suggestions from last visit
+- Recent hair photos
+- Completed visit history
+- Edit customer modal
 
 Trạng thái:
 
 - Loading
 - Empty
 - Error
+
+Quy tắc:
+
+- Visit history chỉ hiển thị visit `completed`.
+- Chu kỳ ghé tính từ khoảng cách trung bình giữa các visit completed.
+- Sửa SĐT khách không ảnh hưởng lịch sử visit vì visit liên kết bằng `customer_id`.
 
 ---
 

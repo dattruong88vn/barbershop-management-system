@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { CustomerCard } from "@/components/customers/CustomerCard";
+import { CustomerCard } from "./CustomerCard";
 import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import type { Customer } from "@/types";

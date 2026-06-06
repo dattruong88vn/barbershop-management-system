@@ -45,6 +45,7 @@ function createStaffMember(): Staff {
     branchId: "branch-1",
     username: "barber01",
     role: "barber",
+    status: "active",
     isFirstLogin: true,
     createdAt: "2026-06-03T00:00:00.000Z",
     branch: {
@@ -173,7 +174,7 @@ describe("useStaff", () => {
     );
   });
 
-  it("should delete staff by id", async () => {
+  it("should mark staff inactive by id", async () => {
     const staffMember = createStaffMember();
 
     mocks.fetchClient

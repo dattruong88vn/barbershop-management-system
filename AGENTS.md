@@ -30,7 +30,9 @@ Before changing code, load context in this order:
 3. The target module section in `KB_INDEX.md`
 4. Relevant files from `docs/`, `skills/`, `src/`, and `prisma/` listed for that module
 
-Always read `skills/` conventions before writing code. For feature work, also read `docs/mvp-features.md`. For database-related work, also read `docs/data-model.md` and `docs/database.md`. For UI work, also read: `docs/ui/screens/screen-map.md`, `docs/ui/navigation.md`, `docs/ui/component-spec.md`, `docs/ui/design-tokens.md`, `docs/ui/component-rules.md`, `docs/ui/ui-guideline.md`, `docs/ui/screens/mobile-screens.md`, `docs/ui/screens/desktop-screens.md`, `docs/ui/screens/auth-screens.md`, `docs/ui/screens/customer-search-screen.md`, `docs/ui/user-flows.md`, `docs/ui/page-specifications.md`.
+Always read `skills/` conventions before writing code. For feature work, also read `docs/mvp-features.md`. For database-related work, also read `docs/data-model.md` and `docs/database.md`. For UI work, also read: `docs/SCREENS.md` (consolidated screen spec), `docs/ui/navigation.md`, `docs/ui/component-spec.md`, `docs/ui/design-tokens.md`, `docs/ui/component-rules.md`, `docs/ui/ui-guideline.md`, `docs/ui/user-flows.md`, `docs/ui/page-specifications.md`.
+
+`docs/SCREENS.md` is the per-screen implementation spec (route, roles, sections, fields, actions, states, responsive priority) and is the recommended entry point for any screen work. It maps 1:1 to a visual responsive preview built in v0; treat that preview as reference layout only and do not copy preview code into the repo, since it does not follow the `ROUTES` / `fetchClient` / `texts` conventions below.
 
 ## Key Business Rules
 
@@ -56,6 +58,9 @@ Always read `skills/` conventions before writing code. For feature work, also re
 - Use `ROUTES` for frontend navigation and `API_ROUTES` for API calls.
 - Do not hardcode UI text in components. Put UI strings in `src/constants/texts/`.
 - Do not define shared types/interfaces inside components. Put them in `src/types/`.
+- Prefer putting reusable UI primitives and shared components in `src/components/design-system/`.
+- Module-specific components may live in the module folder only when they contain module-specific composition or behavior, and they must build on design-system primitives/components instead of redefining the visual base.
+- For modules with multiple pages, keep module-shared components at `src/components/<module>/` root and put page-specific components in subfolders such as `src/components/customers/search/` and `src/components/customers/profile/`.
 - Use strict TypeScript. Do not introduce `any`.
 - Use shadcn/ui components where possible.
 - Keep changes scoped to the requested module and existing project patterns.

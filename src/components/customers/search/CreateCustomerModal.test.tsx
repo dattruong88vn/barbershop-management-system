@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type { FormEvent } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { CreateCustomerModal } from "@/components/customers/CreateCustomerModal";
+import { CreateCustomerModal } from "./CreateCustomerModal";
 import { customerTexts } from "@/constants/texts";
 
 describe("CreateCustomerModal", () => {

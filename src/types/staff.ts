@@ -1,5 +1,7 @@
 export type StaffRole = "receptionist" | "barber" | "skinner";
 
+export type StaffStatus = "active" | "inactive";
+
 export type StaffBranch = {
   id: string;
   name: string;
@@ -11,6 +13,7 @@ export type Staff = {
   branchId: string | null;
   username: string;
   role: StaffRole;
+  status: StaffStatus;
   isFirstLogin: boolean;
   createdAt: string;
   branch: StaffBranch | null;

@@ -166,6 +166,7 @@ async function validateStaff(
     where: {
       id: { in: staffIds },
       shopId,
+      status: "active",
       OR: roleFilters,
     },
     select: { id: true },

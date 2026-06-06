@@ -18,6 +18,7 @@ const STAFF_SELECT = {
   branchId: true,
   username: true,
   role: true,
+  status: true,
   isFirstLogin: true,
   createdAt: true,
   branch: {
@@ -76,6 +77,7 @@ async function findStaffMember(staffId: string, shopId: string) {
       id: staffId,
       shopId,
       role: { in: STAFF_ROLES },
+      status: "active",
     },
     select: STAFF_SELECT,
   });
@@ -263,23 +265,11 @@ export async function DELETE(
     );
   }
 
-  try {
-    await prisma.user.delete({
-      where: { id: staffMember.id },
-    });
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2003"
-    ) {
-      return NextResponse.json(
-        { error: staffTexts.api.errors.staffInUse },
-        { status: 400 },
-      );
-    }
+  const inactiveStaffMember = await prisma.user.update({
+    where: { id: staffMember.id },
+    data: { status: "inactive" },
+    select: STAFF_SELECT,
+  });
 
-    throw error;
-  }
-
-  return NextResponse.json({ staffMember });
+  return NextResponse.json({ staffMember: inactiveStaffMember });
 }

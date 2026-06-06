@@ -171,6 +171,7 @@ async function main() {
         branchId: user.branchId,
         username: user.username,
         role: user.role,
+        status: "active",
       },
       create: {
         id: user.id,
@@ -179,6 +180,7 @@ async function main() {
         username: user.username,
         passwordHash: defaultPasswordHash,
         role: user.role,
+        status: "active",
         isFirstLogin: true,
       },
     });

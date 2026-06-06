@@ -43,6 +43,7 @@ const staffMember: Staff = {
   branchId: branch.id,
   username: "barber01",
   role: "barber",
+  status: "active",
   isFirstLogin: true,
   createdAt: "2026-06-03T00:00:00.000Z",
   branch: {
@@ -163,7 +164,7 @@ describe("OwnerStaffPage", () => {
     });
   });
 
-  it("should delete staff after confirmation", async () => {
+  it("should mark staff inactive after confirmation", async () => {
     const user = userEvent.setup();
     mockStaffHooks([staffMember]);
     mocks.deleteStaff.mockResolvedValue(staffMember);

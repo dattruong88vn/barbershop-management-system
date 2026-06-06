@@ -176,6 +176,7 @@ describe("PATCH /api/visits/[id]", () => {
       where: {
         id: { in: ["barber-1", "skinner-1"] },
         shopId: "shop-1",
+        status: "active",
         OR: [
           { id: "barber-1", role: "barber" },
           { id: "skinner-1", role: "skinner" },

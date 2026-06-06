@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const user = await prisma.user.findFirst({
-          where: { username },
+          where: { username, status: "active" },
           select: {
             id: true,
             role: true,

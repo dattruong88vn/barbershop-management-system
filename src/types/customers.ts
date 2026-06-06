@@ -1,9 +1,7 @@
 import type {
   ChangeEventHandler,
   FormEventHandler,
-  ReactNode,
 } from "react";
-import type { LucideIcon } from "lucide-react";
 
 export type CustomerLastVisitService = {
   id: string;
@@ -108,6 +106,12 @@ export type CustomerVisitHistoryCustomer = {
   createdAt: string;
 };
 
+export type CustomerUpdateInput = {
+  id: string;
+  name: string;
+  phone: string;
+};
+
 export type CustomerVisitHistory = {
   customer: CustomerVisitHistoryCustomer;
   visits: CustomerVisit[];
@@ -118,19 +122,25 @@ export type CustomerVisitHistoryApiResponse = CustomerVisitHistory & {
   error?: string;
 };
 
+export type CustomerUpdateApiResponse = {
+  customer?: CustomerVisitHistoryCustomer;
+  error?: string;
+};
+
 export type CustomerVisitHistoryProps = {
   customerId: string;
+};
+
+export type CustomerProfileMetric = {
+  desktopLabel: string;
+  mobileLabel: string;
+  value: string;
+  mobileValue?: string;
 };
 
 export type CustomerVisitCardProps = {
   visit: CustomerVisit;
   customerId: string;
-};
-
-export type CustomerEmptyStateProps = {
-  action?: ReactNode;
-  icon: LucideIcon;
-  text: string;
 };
 
 export type CustomerAvatarProps = {
@@ -165,6 +175,10 @@ export type CustomerSearchResultsProps = {
 };
 
 export type CustomerMobileActionsProps = {
+  onCreateCustomer: () => void;
+};
+
+export type CustomerMobileHeaderProps = {
   onCreateCustomer: () => void;
 };
 

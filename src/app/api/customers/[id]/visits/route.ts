@@ -25,12 +25,14 @@ const CUSTOMER_VISITS_SELECT = {
         select: {
           id: true,
           username: true,
+          status: true,
         },
       },
       skinner: {
         select: {
           id: true,
           username: true,
+          status: true,
         },
       },
       visitPhotos: {
@@ -69,12 +71,22 @@ type CustomerVisitsRecord = Prisma.CustomerGetPayload<{
 }>;
 
 type CustomerVisitRecord = CustomerVisitsRecord["visits"][number];
+type CustomerVisitStaffRecord = CustomerVisitRecord["barber"];
 
 type CustomerVisitsRouteContext = {
   params: Promise<{
     id: string;
   }>;
 };
+
+function formatVisitStaff(staff: CustomerVisitStaffRecord) {
+  return staff
+    ? {
+        id: staff.id,
+        username: staff.username,
+      }
+    : null;
+}
 
 function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
   return {
@@ -84,8 +96,8 @@ function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
     lastUpdatedBy: visit.lastUpdatedBy,
     status: visit.status,
     totalPrice: Number(visit.totalPrice.toString()),
-    barber: visit.barber,
-    skinner: visit.skinner,
+    barber: formatVisitStaff(visit.barber),
+    skinner: formatVisitStaff(visit.skinner),
     photos: visit.visitPhotos.map((photo) => ({
       id: photo.id,
       photoUrl: photo.photoUrl,
@@ -102,6 +114,10 @@ function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
       price: Number(visitService.price.toString()),
     })),
   };
+}
+
+function getActiveVisitStaffSuggestion(staff: CustomerVisitStaffRecord) {
+  return staff?.status === "active" ? formatVisitStaff(staff) : null;
 }
 
 async function getStaffShopId(request: NextRequest) {
@@ -156,6 +172,7 @@ export async function GET(
 
   const visits = customer.visits.map(formatCustomerVisit);
   const lastVisit = visits[0] ?? null;
+  const lastVisitRecord = customer.visits[0] ?? null;
 
   return NextResponse.json({
     customer: {
@@ -168,8 +185,12 @@ export async function GET(
     suggestions: lastVisit
       ? {
           services: lastVisit.services,
-          barber: lastVisit.barber,
-          skinner: lastVisit.skinner,
+          barber: getActiveVisitStaffSuggestion(
+            lastVisitRecord?.barber ?? null,
+          ),
+          skinner: getActiveVisitStaffSuggestion(
+            lastVisitRecord?.skinner ?? null,
+          ),
         }
       : null,
   });

@@ -19,7 +19,7 @@ export function FormTextField({
   return (
     <div>
       <div className="mb-1.5 flex items-baseline gap-1">
-        <label htmlFor={id} className="text-label-14 text-gray-900">
+        <label htmlFor={id} className="text-xs font-medium text-foreground">
           {label}
         </label>
         {required ? (
@@ -40,12 +40,12 @@ export function FormTextField({
         aria-invalid={Boolean(error)}
         onChange={onChange}
         className={cn(
-          "h-10 border-gray-400 bg-gray-100 px-3 text-label-14 text-gray-1000 shadow-none placeholder:text-gray-700 focus-visible:border-gray-600 focus-visible:ring-gray-600/20",
+          "h-10 rounded-lg border-border bg-background px-3 text-sm text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/20",
           error ? "border-red-900 focus-visible:border-red-900" : null,
           className,
         )}
       />
-      {error ? <p className="mt-1.5 text-copy-13 text-red-900">{error}</p> : null}
+      {error ? <p className="mt-1.5 text-xs text-red-900">{error}</p> : null}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import { SearchX, Users } from "lucide-react";
 
-import { CustomerCard } from "@/components/customers/CustomerCard";
-import { CustomerEmptyState } from "@/components/customers/CustomerEmptyState";
-import { CustomerSearchSkeleton } from "@/components/customers/CustomerSearchSkeleton";
+import { CustomerCard } from "./CustomerCard";
+import { CustomerSearchSkeleton } from "./CustomerSearchSkeleton";
+import { EmptyState } from "@/components/design-system/EmptyState";
 import { InlineAlert } from "@/components/design-system/InlineAlert";
 import { Button } from "@/components/ui/button";
 import { customerTexts } from "@/constants/texts";
@@ -20,7 +20,7 @@ export function CustomerSearchResults({
   return (
     <section className="mt-6 flex-1">
       {hasSearched ? (
-        <p className="mb-3 text-label-12 uppercase text-gray-700">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {customerTexts.lookup.resultsLabel(customers.length)}
         </p>
       ) : null}
@@ -36,11 +36,11 @@ export function CustomerSearchResults({
       ) : null}
 
       {!hasSearched && defaultEmptyStateText ? (
-        <CustomerEmptyState icon={Users} text={defaultEmptyStateText} />
+        <EmptyState icon={Users} text={defaultEmptyStateText} />
       ) : null}
 
       {hasNoResults ? (
-        <CustomerEmptyState
+        <EmptyState
           icon={SearchX}
           text={customerTexts.lookup.emptyAfterSearch}
           action={
@@ -52,7 +52,7 @@ export function CustomerSearchResults({
       ) : null}
 
       {!isLoading && customers.length ? (
-        <div className="space-y-3">
+        <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
           {customers.map((customer) => (
             <CustomerCard key={customer.id} customer={customer} />
           ))}

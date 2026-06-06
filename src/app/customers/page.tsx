@@ -1,56 +1,108 @@
 "use client";
 
 import type { SyntheticEvent } from "react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useRouter } from "next/navigation";
 
-import { CreateCustomerModal } from "@/components/customers/CreateCustomerModal";
+import { CreateCustomerModal } from "@/components/customers/search/CreateCustomerModal";
 import {
   CustomerDesktopNav,
   CustomerMobileHeader,
-} from "@/components/customers/CustomerSearchHeader";
-import { CustomerMobileActions } from "@/components/customers/CustomerMobileActions";
-import { CustomerSearchForm } from "@/components/customers/CustomerSearchForm";
-import { CustomerSearchResults } from "@/components/customers/CustomerSearchResults";
-import { RecentCustomerSearches } from "@/components/customers/RecentCustomerSearches";
+} from "@/components/customers/search/CustomerSearchHeader";
+import { CustomerMobileActions } from "@/components/customers/search/CustomerMobileActions";
+import { CustomerSearchForm } from "@/components/customers/search/CustomerSearchForm";
+import { CustomerSearchResults } from "@/components/customers/search/CustomerSearchResults";
+import { RecentCustomerSearches } from "@/components/customers/search/RecentCustomerSearches";
 import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import { useCustomers } from "@/hooks/useCustomers";
 import { dispatchAppToast } from "@/lib/toast";
 
 const RECENT_SEARCHES_KEY = "barberos:recent-customer-searches";
+const RECENT_SEARCHES_EVENT = "barberos:recent-customer-searches-updated";
 const SEARCH_DEBOUNCE_MS = 300;
 const MAX_RECENT_SEARCHES = 5;
 const CREATE_SUCCESS_REDIRECT_DELAY_MS = 1000;
 const PHONE_REGEX = /^0\d{9}$/;
+const EMPTY_RECENT_SEARCHES: string[] = [];
+let recentSearchesSnapshot: string[] = EMPTY_RECENT_SEARCHES;
+let recentSearchesSnapshotValue: string | null = null;
 
 function getStoredRecentSearches() {
   if (typeof window === "undefined") {
-    return [];
+    return EMPTY_RECENT_SEARCHES;
   }
 
   const storedSearches = window.localStorage.getItem(RECENT_SEARCHES_KEY);
 
+  if (storedSearches === recentSearchesSnapshotValue) {
+    return recentSearchesSnapshot;
+  }
+
+  recentSearchesSnapshotValue = storedSearches;
+
   if (!storedSearches) {
-    return [];
+    recentSearchesSnapshot = EMPTY_RECENT_SEARCHES;
+    return recentSearchesSnapshot;
   }
 
   try {
     const parsedSearches: unknown = JSON.parse(storedSearches);
 
-    return Array.isArray(parsedSearches)
+    recentSearchesSnapshot = Array.isArray(parsedSearches)
       ? parsedSearches.filter((item): item is string => typeof item === "string")
       : [];
+    return recentSearchesSnapshot;
   } catch {
-    return [];
+    recentSearchesSnapshot = EMPTY_RECENT_SEARCHES;
+    return recentSearchesSnapshot;
   }
+}
+
+function subscribeToRecentSearches(onStoreChange: () => void) {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  function handleStorage(event: StorageEvent) {
+    if (event.key === RECENT_SEARCHES_KEY) {
+      onStoreChange();
+    }
+  }
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(RECENT_SEARCHES_EVENT, onStoreChange);
+
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(RECENT_SEARCHES_EVENT, onStoreChange);
+  };
+}
+
+function getEmptyRecentSearches() {
+  return EMPTY_RECENT_SEARCHES;
+}
+
+function writeStoredRecentSearches(searches: string[]) {
+  window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+  window.dispatchEvent(new Event(RECENT_SEARCHES_EVENT));
 }
 
 export default function CustomersPage() {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
-  const [recentSearches, setRecentSearches] = useState(getStoredRecentSearches);
+  const recentSearches = useSyncExternalStore(
+    subscribeToRecentSearches,
+    getStoredRecentSearches,
+    getEmptyRecentSearches,
+  );
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newCustomerName, setNewCustomerName] = useState("");
   const [newCustomerPhone, setNewCustomerPhone] = useState("");
@@ -79,25 +131,18 @@ export default function CustomersPage() {
     [shouldShowRecentSearches],
   );
 
-  function rememberRecentSearch(search: string) {
+  const rememberRecentSearch = useCallback((search: string) => {
     if (!search) {
       return;
     }
 
-    setRecentSearches((currentSearches) => {
-      const nextSearches = [
-        search,
-        ...currentSearches.filter((item) => item !== search),
-      ].slice(0, MAX_RECENT_SEARCHES);
+    const nextSearches = [
+      search,
+      ...recentSearches.filter((item) => item !== search),
+    ].slice(0, MAX_RECENT_SEARCHES);
 
-      window.localStorage.setItem(
-        RECENT_SEARCHES_KEY,
-        JSON.stringify(nextSearches),
-      );
-
-      return nextSearches;
-    });
-  }
+    writeStoredRecentSearches(nextSearches);
+  }, [recentSearches]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -107,7 +152,7 @@ export default function CustomersPage() {
     }, SEARCH_DEBOUNCE_MS);
 
     return () => window.clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [rememberRecentSearch, searchTerm]);
 
   function openCreateCustomerModal(prefillPhone = searchTerm) {
     setError("");
@@ -187,35 +232,46 @@ export default function CustomersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background-100 pb-20 text-gray-1000">
-      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 pb-6 pt-4 md:px-6 md:pt-0">
-        <CustomerMobileHeader />
-        <CustomerDesktopNav />
+    <main className="flex h-dvh overflow-hidden bg-muted/30 text-foreground md:min-h-screen md:overflow-visible">
+      <CustomerDesktopNav />
 
-        <CustomerSearchForm
-          searchInput={searchInput}
-          onSearch={handleSearch}
-          onSearchInputChange={(event) => setSearchInput(event.target.value)}
-          onClearSearch={handleClearSearch}
-          onCreateCustomer={() => openCreateCustomerModal()}
-        />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col md:min-h-screen">
+        <CustomerMobileHeader onCreateCustomer={() => openCreateCustomerModal()} />
+        <header className="hidden h-14 items-center justify-between border-b border-border bg-background px-5 md:flex">
+          <h1 className="text-sm font-semibold text-foreground">
+            {customerTexts.lookup.title}
+          </h1>
+          <div className="flex size-8 items-center justify-center rounded-full border border-border bg-muted text-xs font-medium text-foreground">
+            {customerTexts.lookup.currentUserInitials}
+          </div>
+        </header>
 
-        {shouldShowRecentSearches ? (
-          <RecentCustomerSearches
-            searches={recentSearches}
-            onSelectSearch={handleRecentSearch}
+        <div className="mx-auto mb-14 min-h-0 w-full max-w-3xl flex-1 overflow-y-auto px-4 py-4 md:mb-0 md:overflow-visible md:px-5 md:py-5">
+          <CustomerSearchForm
+            searchInput={searchInput}
+            onSearch={handleSearch}
+            onSearchInputChange={(event) => setSearchInput(event.target.value)}
+            onClearSearch={handleClearSearch}
+            onCreateCustomer={() => openCreateCustomerModal()}
           />
-        ) : null}
 
-        <CustomerSearchResults
-          customers={customers}
-          customersError={customersError}
-          defaultEmptyStateText={defaultEmptyStateText}
-          hasNoResults={hasNoResults}
-          hasSearched={hasSearched}
-          isLoading={isLoading}
-          onCreateCustomer={() => openCreateCustomerModal()}
-        />
+          {shouldShowRecentSearches ? (
+            <RecentCustomerSearches
+              searches={recentSearches}
+              onSelectSearch={handleRecentSearch}
+            />
+          ) : null}
+
+          <CustomerSearchResults
+            customers={customers}
+            customersError={customersError}
+            defaultEmptyStateText={defaultEmptyStateText}
+            hasNoResults={hasNoResults}
+            hasSearched={hasSearched}
+            isLoading={isLoading}
+            onCreateCustomer={() => openCreateCustomerModal()}
+          />
+        </div>
       </div>
 
       <CustomerMobileActions onCreateCustomer={() => openCreateCustomerModal()} />
