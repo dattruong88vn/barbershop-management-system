@@ -71,7 +71,7 @@ function createVisitRecord() {
     completedAt: null,
     lastUpdatedBy: "user-1",
     status: "pending",
-    totalPrice: { toString: () => "150000" },
+    totalPrice: { toString: () => "100000" },
     barber: {
       id: "barber-1",
       username: "barber01",
@@ -91,16 +91,6 @@ function createVisitRecord() {
           name: "Cắt tóc nam",
         },
         combo: null,
-      },
-      {
-        id: "visit-service-2",
-        serviceId: null,
-        comboId: "combo-1",
-        price: { toString: () => "50000" },
-        service: null,
-        combo: {
-          name: "Combo gội đầu",
-        },
       },
     ],
   };
@@ -245,6 +235,24 @@ describe("POST /api/visits", () => {
     });
   });
 
+  it("should return 400 when services and combos are selected together", async () => {
+    mocks.getToken.mockResolvedValue(createStaffToken());
+
+    const response = await POST(
+      createPostRequest({
+        customerId: "customer-1",
+        serviceIds: ["service-1"],
+        comboIds: ["combo-1"],
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(mocks.prismaCustomerFindFirst).not.toHaveBeenCalled();
+    await expect(response.json()).resolves.toEqual({
+      error: visitTexts.api.errors.mixedItems,
+    });
+  });
+
   it("should return 400 when customer is outside session shop", async () => {
     mocks.getToken.mockResolvedValue(createStaffToken());
     mocks.prismaCustomerFindFirst.mockResolvedValue(null);
@@ -306,7 +314,7 @@ describe("POST /api/visits", () => {
     });
   });
 
-  it("should create a pending visit from selected services and combos", async () => {
+  it("should create a pending visit from selected services", async () => {
     mocks.getToken.mockResolvedValue(createStaffToken("skinner"));
     mocks.prismaCustomerFindFirst.mockResolvedValue({ id: "customer-1" });
     mocks.prismaServiceFindMany.mockResolvedValue([
@@ -315,12 +323,7 @@ describe("POST /api/visits", () => {
         price: { toString: () => "100000" },
       },
     ]);
-    mocks.prismaComboFindMany.mockResolvedValue([
-      {
-        id: "combo-1",
-        price: { toString: () => "50000" },
-      },
-    ]);
+    mocks.prismaComboFindMany.mockResolvedValue([]);
     mocks.prismaUserFindMany.mockResolvedValue([
       {
         id: "barber-1",
@@ -335,7 +338,7 @@ describe("POST /api/visits", () => {
       createPostRequest({
         customerId: "customer-1",
         serviceIds: ["service-1"],
-        comboIds: ["combo-1"],
+        comboIds: [],
         barberId: "barber-1",
         skinnerId: "skinner-1",
       }),
@@ -350,7 +353,7 @@ describe("POST /api/visits", () => {
         barberId: "barber-1",
         skinnerId: "skinner-1",
         status: "pending",
-        totalPrice: 150000,
+        totalPrice: 100000,
         createdBy: "user-1",
         visitServices: {
           create: [
@@ -358,11 +361,6 @@ describe("POST /api/visits", () => {
               shopId: "shop-1",
               serviceId: "service-1",
               price: 100000,
-            },
-            {
-              shopId: "shop-1",
-              comboId: "combo-1",
-              price: 50000,
             },
           ],
         },
@@ -376,7 +374,7 @@ describe("POST /api/visits", () => {
         completedAt: null,
         lastUpdatedBy: "user-1",
         status: "pending",
-        totalPrice: 150000,
+        totalPrice: 100000,
         barber: {
           id: "barber-1",
           username: "barber01",
@@ -393,13 +391,6 @@ describe("POST /api/visits", () => {
             name: "Cắt tóc nam",
             type: "service",
             price: 100000,
-          },
-          {
-            id: "visit-service-2",
-            itemId: "combo-1",
-            name: "Combo gội đầu",
-            type: "combo",
-            price: 50000,
           },
         ],
       },

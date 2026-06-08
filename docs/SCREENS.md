@@ -15,8 +15,10 @@
 Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 - Điều hướng dùng hằng số `ROUTES`; gọi API dùng `API_ROUTES`. Không hardcode path.
+- Điều hướng client phải dùng Next navigation (`router.push`, `router.replace`, `redirect`, hoặc `Link`). Tuyệt đối không dùng `window.location`, `window.location.href`, hoặc `window.location.assign`.
 - Client Component / hook dùng `fetchClient` từ `@/lib/fetchClient`. Server Component dùng `fetchServer` từ `@/lib/fetchServer`. Không gọi `fetch` trực tiếp.
 - Mọi chuỗi UI đặt trong `src/constants/texts/`. Không hardcode text trong component.
+- Mọi thao tác thành công phải hiển thị success toast; nếu có điều hướng sau thành công, toast phải được dispatch trước khi điều hướng bằng app router.
 - Type/interface dùng chung đặt trong `src/types/`. Không định nghĩa trong component.
 - Dùng shadcn/ui khi có thể. TypeScript strict, không dùng `any`.
 - Mỗi bảng thuộc tenant phải enforce `shop_id`.
@@ -96,14 +98,14 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 6. Create Visit
 
-- **Route:** TBD — phải align với hằng số `ROUTES` trước khi implement
+- **Route:** `/visits/create`
 - **Roles:** receptionist, barber, skinner, manager, owner
 - **Ưu tiên:** responsive (nhân viên dùng mobile)
 - **Sections:** Customer, Services, Combos, Barber, Skinner, Total Price
 - **Actions:** Save Visit
-- **Data:** chọn dịch vụ lẻ và combo, gán barber/skinner, tạm tính tổng tiền
+- **Data:** chọn dịch vụ lẻ hoặc combo, gán barber/skinner, tạm tính tổng tiền
 - **States:** new visit → tạo ở trạng thái `pending`
-- **Business:** total price = tổng dịch vụ lẻ + combo
+- **Business:** chọn combo sẽ bỏ chọn toàn bộ dịch vụ lẻ; chọn dịch vụ lẻ sẽ bỏ chọn toàn bộ combo. Total price = tổng nhóm đang được chọn.
 
 ## 7. Visit Detail
 
@@ -111,9 +113,9 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Roles:** như Create Visit
 - **Ưu tiên:** responsive
 - **Sections:** Visit Information, Services, Combos, Barber, Skinner, Photos
-- **Actions:** Upload Photo, Edit Barber, Edit Skinner
+- **Actions:** Upload Photo (chỉ role `barber`), Edit Barber, Edit Skinner
 - **Warning:** dịch vụ haircut (`is_haircut = true`) chưa có ảnh → hiển thị cảnh báo
-- **Business:** edit barber/skinner chỉ trong 3 giờ sau `completed_at`; ngoài cửa sổ này khoá chỉnh sửa và hiển thị thông báo
+- **Business:** edit barber/skinner chỉ trong 3 giờ sau `completed_at`; ngoài cửa sổ này khoá chỉnh sửa và hiển thị thông báo. Chỉ role `barber` được upload ảnh kiểu tóc.
 - **States:** pending, in_progress, completed; locked (quá 3h)
 - **API:** cần `GET /api/visits/:id` để load standalone. Hiện có `GET /api/visits`, `POST /api/visits`, `PATCH /api/visits/:id`. Nếu chưa có `GET /api/visits/:id`, phải thêm backend trước khi build route này.
 

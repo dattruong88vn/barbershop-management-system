@@ -51,7 +51,10 @@ Tạo visit
     ↓
 Chọn services
     ↓
-Chọn combos
+Hoặc chọn combos
+    ↓
+Nếu chọn combos → uncheck services
+Nếu chọn services → uncheck combos
     ↓
 Chọn barber (không bắt buộc)
     ↓
@@ -72,9 +75,15 @@ Backend status:
 
 - Photo upload API chưa có.
 - Chỉ implement flow này sau khi có backend/R2 upload support.
+- Chỉ role `barber` được thực hiện flow upload ảnh.
+- Role khác chỉ xem ảnh/cảnh báo ảnh và không thấy action upload.
 
 ```text
 Visit Detail
+    ↓
+isBarber?
+    ├─ Không → Ẩn action upload
+    └─ Có
     ↓
 Upload photo
     ↓

@@ -1,15 +1,64 @@
-import { CalendarClock, Home, Plus, Scissors, Search, UserPlus } from "lucide-react";
+import Link from "next/link";
+import {
+  CalendarClock,
+  Home,
+  type LucideIcon,
+  Plus,
+  Scissors,
+  Search,
+  UserPlus,
+} from "lucide-react";
 
+import { ROUTES } from "@/constants/routes";
 import { authTexts, customerTexts } from "@/constants/texts";
 import { cn } from "@/lib/utils";
 import type { CustomerMobileHeaderProps } from "@/types";
 
 const DESKTOP_NAV_ITEMS = [
-  { icon: Home, label: customerTexts.lookup.navToday },
-  { icon: Search, label: customerTexts.lookup.titleDesktop, active: true },
-  { icon: Plus, label: customerTexts.lookup.navCreate },
-  { icon: CalendarClock, label: customerTexts.lookup.navReports },
+  { href: ROUTES.visits, icon: Home, label: customerTexts.lookup.navToday },
+  {
+    active: true,
+    href: ROUTES.customers,
+    icon: Search,
+    label: customerTexts.lookup.titleDesktop,
+  },
+  {
+    href: ROUTES.createVisit,
+    icon: Plus,
+    label: customerTexts.lookup.navCreate,
+  },
+  {
+    href: ROUTES.reports,
+    icon: CalendarClock,
+    label: customerTexts.lookup.navReports,
+  },
 ];
+
+function CustomerDesktopNavItem({
+  active,
+  href,
+  icon: Icon,
+  label,
+}: {
+  active?: boolean;
+  href: string;
+  icon: LucideIcon;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-muted hover:text-foreground",
+        active ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
+      )}
+    >
+      <Icon className="size-4" aria-hidden="true" />
+      {label}
+    </Link>
+  );
+}
 
 export function CustomerMobileHeader({
   onCreateCustomer,
@@ -44,19 +93,14 @@ export function CustomerDesktopNav() {
         </span>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">
-        {DESKTOP_NAV_ITEMS.map(({ active, icon: Icon, label }) => (
-          <div
+        {DESKTOP_NAV_ITEMS.map(({ active, href, icon: Icon, label }) => (
+          <CustomerDesktopNavItem
             key={label}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm",
-              active
-                ? "bg-muted font-medium text-foreground"
-                : "text-muted-foreground",
-            )}
-          >
-            <Icon className="size-4" aria-hidden="true" />
-            {label}
-          </div>
+            active={active}
+            href={href}
+            icon={Icon}
+            label={label}
+          />
         ))}
       </nav>
     </aside>

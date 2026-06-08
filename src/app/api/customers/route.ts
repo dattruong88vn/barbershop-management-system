@@ -6,7 +6,13 @@ import { customerTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
 import type { CustomerRequestBody, UserRole } from "@/types";
 
-const STAFF_ROLES: UserRole[] = ["receptionist", "barber", "skinner"];
+const CUSTOMER_ACCESS_ROLES: UserRole[] = [
+  "owner",
+  "manager",
+  "receptionist",
+  "barber",
+  "skinner",
+];
 const CUSTOMER_SELECT = {
   id: true,
   shopId: true,
@@ -123,7 +129,7 @@ async function getStaffShopId(request: NextRequest) {
 
   if (
     typeof token.role !== "string" ||
-    !STAFF_ROLES.includes(token.role as UserRole) ||
+    !CUSTOMER_ACCESS_ROLES.includes(token.role as UserRole) ||
     !token.shop_id
   ) {
     return { error: customerTexts.api.errors.forbidden, status: 403 };

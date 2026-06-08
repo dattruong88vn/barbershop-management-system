@@ -174,10 +174,6 @@ export type CustomerSearchResultsProps = {
   onCreateCustomer: () => void;
 };
 
-export type CustomerMobileActionsProps = {
-  onCreateCustomer: () => void;
-};
-
 export type CustomerMobileHeaderProps = {
   onCreateCustomer: () => void;
 };

@@ -2,12 +2,19 @@
 
 import type { SyntheticEvent } from "react";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { InlineAlert } from "@/components/design-system/InlineAlert";
 import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/constants/routes";
 import { visitTexts } from "@/constants/texts";
 import { useVisits } from "@/hooks/useVisits";
+import { dispatchAppToast } from "@/lib/toast";
 import type { VisitCreateFormProps, VisitCreateItem } from "@/types";
+import {
+  VisitCreateItemSelector,
+  VisitCreateStaffSelect,
+} from "./VisitCreateFormFields";
 
 const PRICE_FORMATTER = new Intl.NumberFormat("vi-VN", {
   currency: "VND",
@@ -52,11 +59,13 @@ export default function VisitCreateForm({
   customerId,
   suggestions,
 }: VisitCreateFormProps) {
+  const router = useRouter();
+  const suggestedComboIds = getSuggestedIds(suggestions, "combo");
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(() =>
-    getSuggestedIds(suggestions, "service"),
+    suggestedComboIds.length ? [] : getSuggestedIds(suggestions, "service"),
   );
-  const [selectedComboIds, setSelectedComboIds] = useState<string[]>(() =>
-    getSuggestedIds(suggestions, "combo"),
+  const [selectedComboIds, setSelectedComboIds] = useState<string[]>(
+    suggestedComboIds,
   );
   const [barberId, setBarberId] = useState(suggestions?.barber?.id ?? "");
   const [skinnerId, setSkinnerId] = useState(suggestions?.skinner?.id ?? "");
@@ -87,14 +96,27 @@ export default function VisitCreateForm({
       return;
     }
 
+    if (selectedServiceIds.length && selectedComboIds.length) {
+      setError(visitTexts.create.errors.mixedItems);
+      return;
+    }
+
     try {
-      await createVisit({
+      const visit = await createVisit({
         customerId,
         serviceIds: selectedServiceIds,
         comboIds: selectedComboIds,
         barberId: barberId || null,
         skinnerId: skinnerId || null,
       });
+      if (visit.id) {
+        dispatchAppToast({
+          description: visitTexts.create.successDescription,
+          message: visitTexts.create.success,
+          type: "success",
+        });
+        router.push(ROUTES.visitDetail(visit.id));
+      }
     } catch (mutationError) {
       setError(
         mutationError instanceof Error
@@ -131,115 +153,45 @@ export default function VisitCreateForm({
       ) : null}
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-5">
-        <fieldset>
-          <legend className="text-sm font-medium text-foreground">
-            {visitTexts.create.servicesLabel}
-          </legend>
-          {services.length ? (
-            <div className="mt-2 space-y-2">
-              {services.map((service) => (
-                <label
-                  key={service.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                >
-                  <span className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedServiceIds.includes(service.id)}
-                      onChange={() =>
-                        setSelectedServiceIds((currentIds) =>
-                          toggleId(currentIds, service.id),
-                        )
-                      }
-                      className="h-4 w-4 rounded border-border"
-                    />
-                    <span>{service.name}</span>
-                  </span>
-                  <span className="font-medium text-muted-foreground">
-                    {PRICE_FORMATTER.format(service.price)}
-                  </span>
-                </label>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {visitTexts.create.emptyServices}
-            </p>
-          )}
-        </fieldset>
+        <VisitCreateItemSelector
+          emptyText={visitTexts.create.emptyServices}
+          items={services}
+          label={visitTexts.create.servicesLabel}
+          selectedIds={selectedServiceIds}
+          onToggleItem={(serviceId) => {
+            setSelectedComboIds([]);
+            setSelectedServiceIds((currentIds) =>
+              toggleId(currentIds, serviceId),
+            );
+          }}
+        />
 
-        <fieldset>
-          <legend className="text-sm font-medium text-foreground">
-            {visitTexts.create.combosLabel}
-          </legend>
-          {combos.length ? (
-            <div className="mt-2 space-y-2">
-              {combos.map((combo) => (
-                <label
-                  key={combo.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                >
-                  <span className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedComboIds.includes(combo.id)}
-                      onChange={() =>
-                        setSelectedComboIds((currentIds) =>
-                          toggleId(currentIds, combo.id),
-                        )
-                      }
-                      className="h-4 w-4 rounded border-border"
-                    />
-                    <span>{combo.name}</span>
-                  </span>
-                  <span className="font-medium text-muted-foreground">
-                    {PRICE_FORMATTER.format(combo.price)}
-                  </span>
-                </label>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {visitTexts.create.emptyCombos}
-            </p>
-          )}
-        </fieldset>
+        <VisitCreateItemSelector
+          emptyText={visitTexts.create.emptyCombos}
+          items={combos}
+          label={visitTexts.create.combosLabel}
+          selectedIds={selectedComboIds}
+          onToggleItem={(comboId) => {
+            setSelectedServiceIds([]);
+            setSelectedComboIds((currentIds) => toggleId(currentIds, comboId));
+          }}
+        />
 
-        <label className="block">
-          <span className="text-sm font-medium text-foreground">
-            {visitTexts.create.barberLabel}
-          </span>
-          <select
-            value={barberId}
-            onChange={(event) => setBarberId(event.target.value)}
-            className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-ring"
-          >
-            <option value="">{visitTexts.create.noStaffOption}</option>
-            {barbers.map((barber) => (
-              <option key={barber.id} value={barber.id}>
-                {barber.username}
-              </option>
-            ))}
-          </select>
-        </label>
+        <VisitCreateStaffSelect
+          label={visitTexts.create.barberLabel}
+          noStaffOption={visitTexts.create.noStaffOption}
+          staff={barbers}
+          value={barberId}
+          onChange={(event) => setBarberId(event.target.value)}
+        />
 
-        <label className="block">
-          <span className="text-sm font-medium text-foreground">
-            {visitTexts.create.skinnerLabel}
-          </span>
-          <select
-            value={skinnerId}
-            onChange={(event) => setSkinnerId(event.target.value)}
-            className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-ring"
-          >
-            <option value="">{visitTexts.create.noStaffOption}</option>
-            {skinners.map((skinner) => (
-              <option key={skinner.id} value={skinner.id}>
-                {skinner.username}
-              </option>
-            ))}
-          </select>
-        </label>
+        <VisitCreateStaffSelect
+          label={visitTexts.create.skinnerLabel}
+          noStaffOption={visitTexts.create.noStaffOption}
+          staff={skinners}
+          value={skinnerId}
+          onChange={(event) => setSkinnerId(event.target.value)}
+        />
 
         <p className="rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground">
           <span>{visitTexts.create.totalPriceLabel}</span>

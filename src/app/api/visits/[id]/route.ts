@@ -10,7 +10,13 @@ import type {
   VisitStaffUpdateRequestBody,
 } from "@/types";
 
-const STAFF_ROLES: UserRole[] = ["receptionist", "barber", "skinner"];
+const VISIT_DETAIL_ROLES: UserRole[] = [
+  "owner",
+  "manager",
+  "receptionist",
+  "barber",
+  "skinner",
+];
 const STAFF_EDIT_WINDOW_MS = 3 * 60 * 60 * 1000;
 const VISIT_SELECT = {
   id: true,
@@ -64,7 +70,7 @@ type VisitRecord = Prisma.VisitGetPayload<{
   select: typeof VISIT_SELECT;
 }>;
 
-type VisitPatchRouteContext = {
+type VisitRouteContext = {
   params: Promise<{
     id: string;
   }>;
@@ -130,7 +136,7 @@ async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
 
   if (
     typeof token.role !== "string" ||
-    !STAFF_ROLES.includes(token.role as UserRole) ||
+    !VISIT_DETAIL_ROLES.includes(token.role as UserRole) ||
     !token.shop_id
   ) {
     return { error: visitTexts.api.errors.forbidden, status: 403 };
@@ -175,9 +181,38 @@ async function validateStaff(
   return staff.length === staffIds.length;
 }
 
+export async function GET(request: NextRequest, context: VisitRouteContext) {
+  const authResult = await getStaffAuth(request);
+
+  if ("error" in authResult) {
+    return NextResponse.json(
+      { error: authResult.error },
+      { status: authResult.status },
+    );
+  }
+
+  const { id } = await context.params;
+  const visit = await prisma.visit.findFirst({
+    where: {
+      id,
+      shopId: authResult.shopId,
+    },
+    select: VISIT_SELECT,
+  });
+
+  if (!visit) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.json({ visit: formatVisitResponse(visit) });
+}
+
 export async function PATCH(
   request: NextRequest,
-  context: VisitPatchRouteContext,
+  context: VisitRouteContext,
 ) {
   const authResult = await getStaffAuth(request);
 

@@ -14,6 +14,12 @@ Component trong folder module chỉ dùng khi component có đặc điểm cụ 
 
 Component module phải kế thừa/compose từ design-system primitives/components, không tự định nghĩa lại visual base.
 
+Component size:
+
+- Tách component màn hình/module lớn thành child components theo section, panel, list, row và form field.
+- Route/view component chỉ nên quản lý orchestration, state wiring và layout cấp cao.
+- Không để một file component mới chứa toàn bộ header, form, list, sidebar, modal/lightbox và row rendering nếu các phần đó có thể tách theo ownership rõ ràng.
+
 Với module có nhiều page, phân loại component theo page folder:
 
 - Component dùng chung trong cả module đặt ở root module, ví dụ `src/components/customers/CustomerAvatar.tsx`.
@@ -40,6 +46,11 @@ Quy tắc:
 - Mỗi section chỉ nên có một primary action.
 - Tránh dùng hơn hai primary button trong cùng một view.
 - Button loading giữ nguyên text, có spinner bên trái, và disable click.
+
+## Success Feedback
+
+- Mọi thao tác người dùng hoàn tất thành công phải hiển thị success toast.
+- Nếu thao tác thành công điều hướng sang màn hình khác, dispatch toast trước khi điều hướng bằng app router để toast không bị mất do full page reload.
 
 ## Form
 
@@ -111,6 +122,11 @@ Vị trí:
 - Visit List
 - Visit Detail
 - Dashboard
+
+Upload permission:
+
+- Chỉ role `barber` được thấy và dùng action upload ảnh kiểu tóc.
+- Các role khác chỉ được xem ảnh/cảnh báo ảnh.
 
 ## Service Card
 

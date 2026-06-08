@@ -114,7 +114,7 @@ describe("GET /api/customers", () => {
   it("should return 403 when role is not allowed", async () => {
     mocks.getToken.mockResolvedValue({
       id: "user-1",
-      role: "owner",
+      role: "superadmin",
       shop_id: "shop-1",
     });
 
@@ -124,6 +124,20 @@ describe("GET /api/customers", () => {
     await expect(response.json()).resolves.toEqual({
       error: customerTexts.api.errors.forbidden,
     });
+  });
+
+  it("should allow owner and manager customer search", async () => {
+    mocks.getToken.mockResolvedValue({
+      id: "user-1",
+      role: "owner",
+      shop_id: "shop-1",
+    });
+    mocks.prismaFindMany.mockResolvedValue([]);
+
+    const response = await GET(createGetRequest("Nam"));
+
+    expect(response.status).toBe(200);
+    expect(mocks.prismaFindMany).toHaveBeenCalled();
   });
 
   it("should return empty customers when search term is missing", async () => {

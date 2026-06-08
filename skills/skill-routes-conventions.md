@@ -9,6 +9,7 @@ Quy ước định nghĩa và sử dụng routes trong dự án. Tham khảo fil
 ## Quy tắc
 
 - **Không hardcode URL string trong component** — tất cả routes phải được định nghĩa trong file constants
+- **Không dùng `window.location`, `window.location.href`, hoặc `window.location.assign` để điều hướng** — dùng `Link`, `router.push`, `router.replace`, hoặc `redirect` của Next.
 - Tất cả route constants đặt trong folder `src/constants/routes/`
 - Tách file theo mục đích: `appRoutes.ts` cho frontend, `apiRoutes.ts` cho API endpoints
 - Export qua `src/constants/routes/index.ts` để import từ `@/constants/routes`

@@ -120,7 +120,7 @@ describe("CustomerDetailPage behavior", () => {
     ).toHaveAttribute("href", ROUTES.customers);
     expect(
       screen.getByRole("link", { name: customerTexts.detail.createVisit }),
-    ).toHaveAttribute("href", ROUTES.customerCreateVisit(customer.id));
+    ).toHaveAttribute("href", ROUTES.createVisitForCustomer(customer));
   });
 
   it("should render empty states when customer has no visits", () => {

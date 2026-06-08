@@ -42,8 +42,10 @@ Always read `skills/` conventions before writing code. For feature work, also re
 - Roles are `superadmin`, `owner`, `manager`, `receptionist`, `barber`, and `skinner`.
 - Auth is username/password only. Do not add email or social login unless explicitly requested.
 - Visit statuses are `pending`, `in_progress`, and `completed`.
+- A visit can use either service items or combo items, not both. In Create Visit UI, selecting a combo clears selected services; selecting a service clears selected combos.
 - Barber/skinner assignment can be edited only within 3 hours after `completed_at`; do not extend this window.
 - Show a warning when a visit includes a haircut service (`is_haircut = true`) and has no photos.
+- Only the `barber` role can upload haircut photos. Other roles may view photo warnings/photos but must not upload photos.
 
 ## Coding Rules
 
@@ -56,13 +58,16 @@ Always read `skills/` conventions before writing code. For feature work, also re
 - Use `DEFAULT_JSON_HEADERS` from `@/lib/apiConfig` for JSON requests.
 - Use `hasResponseData` from `@/lib/apiResponse` for optional response data guards.
 - Use `ROUTES` for frontend navigation and `API_ROUTES` for API calls.
+- All client navigation must go through Next navigation (`router.push`, `router.replace`, `redirect`, or `Link`). Never use `window.location`, `window.location.href`, or `window.location.assign`.
 - Do not hardcode UI text in components. Put UI strings in `src/constants/texts/`.
 - Do not define shared types/interfaces inside components. Put them in `src/types/`.
 - Prefer putting reusable UI primitives and shared components in `src/components/design-system/`.
 - Module-specific components may live in the module folder only when they contain module-specific composition or behavior, and they must build on design-system primitives/components instead of redefining the visual base.
+- Split large screen/module components into focused child components for sections, panels, lists, rows, and form fields. Route/view components should orchestrate layout and state, not contain every UI block inline.
 - For modules with multiple pages, keep module-shared components at `src/components/<module>/` root and put page-specific components in subfolders such as `src/components/customers/search/` and `src/components/customers/profile/`.
 - Use strict TypeScript. Do not introduce `any`.
 - Use shadcn/ui components where possible.
+- Every successful user action must show a success toast before or while navigating to the next screen.
 - Keep changes scoped to the requested module and existing project patterns.
 
 ## Testing Rules

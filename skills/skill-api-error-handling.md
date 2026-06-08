@@ -37,22 +37,23 @@ Quy ước xử lý API request và error tập trung trong dự án. Tham khả
 ```typescript
 // src/lib/fetchClient.ts
 import { ROUTES } from "@/constants/routes";
+import { dispatchAppNavigation } from "@/lib/appNavigation";
 
 export async function fetchClient(url: string, options?: RequestInit) {
   const response = await fetch(url, options);
 
   if (response.status === 401) {
-    window.location.href = ROUTES.login;
+    dispatchAppNavigation(ROUTES.login);
     throw new Error("Unauthorized");
   }
 
   if (response.status === 403) {
-    window.location.href = ROUTES.dashboard;
+    dispatchAppNavigation(ROUTES.dashboard);
     throw new Error("Forbidden");
   }
 
   if (response.status === 404) {
-    window.location.href = "/not-found";
+    dispatchAppNavigation(ROUTES.notFound);
     throw new Error("Not found");
   }
 
@@ -167,6 +168,7 @@ export const queryClient = new QueryClient({
 
 ## Lưu ý
 
-- `fetchClient` dùng `window.location.href` để redirect vì chạy ở client-side
+- Không dùng `window.location`, `window.location.href`, hoặc `window.location.assign` để redirect.
+- `fetchClient` dispatch app navigation event; app-level Provider nhận event và gọi `router.push` của Next.
 - `fetchServer` dùng `notFound()` của Next.js vì chạy ở server-side
 - Không dùng lẫn 2 wrapper này

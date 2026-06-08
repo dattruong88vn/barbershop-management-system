@@ -183,3 +183,49 @@ Copy this structure when starting a new date section:
 
 ### Notes
 - Did not run tests or ESLint because checks are only run on explicit request or commit.
+
+## 2026-06-07
+
+### Business Changes
+- Added standalone Visit Detail support for the documented `/visits/:id` workflow.
+- Added the documented Create Visit route as `/visits/create`.
+- Documented that only role `barber` can upload haircut photos; other roles can only view photos/photo warnings.
+
+### Database Changes
+- None
+
+### API Changes
+- Added `GET /api/visits/:id` to load a tenant-scoped visit detail response.
+- Aligned customer search and visit create/options API role checks with documented owner, manager, receptionist, barber, and skinner access.
+- Added Create Visit API validation to reject payloads that include both service IDs and combo IDs.
+
+### UI Changes
+- Built the responsive Visit Detail screen with visit information, status, services, combos, barber/skinner, photo section, missing-photo warning, and locked staff-edit state.
+- Built the responsive Create Visit page with customer search/selection followed by the services, combos, barber, skinner, and total price form.
+- Updated Create Visit form success flow to navigate to the newly created visit detail page.
+- Added a success toast when Create Visit completes before navigating to the visit detail page.
+- Wired desktop sidebar navigation and app mobile bottom navigation to documented `ROUTES`.
+- Split newly added visits/customer UI into focused child components for customer selection, visit detail sections, staff edit panel, form fields, and sidebar nav items.
+- Updated Customer Detail create-visit actions to pass the current customer into `/visits/create` so staff do not need to search for the same customer again.
+- Renamed the Create Visit submit button from "Tạo visit pending" to "Tạo visit".
+- Updated Create Visit selection behavior so selecting a combo clears selected services, and selecting a service clears selected combos.
+
+### Refactoring
+- Added a focused `useVisitDetail` hook for loading visit details and refreshing the detail cache after staff updates.
+- Added Visit Detail UI strings and component prop types to the existing visits constants/types.
+- Aligned Create Visit route documentation and KB routing with the new `/visits/create` page.
+- Removed the obsolete customer hash create-visit route constant.
+- Documented the mutually exclusive service/combo visit selection rule across agent, business, data model, screen, page specification, and user flow docs.
+- Documented the rule that every successful user action must show a success toast.
+- Documented the rule that all client navigation must use Next navigation and must not use `window.location`.
+- Replaced `fetchClient` `window.location` redirects with an app navigation event handled by `Providers` through `router.push`.
+- Added unit coverage for desktop sidebar and mobile bottom navigation route links.
+- Added component-splitting rules so new screen/module components are decomposed into section, panel, list, row, and form-field child components.
+- Added focused unit tests for changed visit routes, visit hooks, visit create/detail components, app navigation, mobile navigation, customer navigation, and updated API/customer tests.
+
+### Breaking Changes
+- None
+
+### Notes
+- `./node_modules/.bin/tsc --noEmit` passes.
+- Attempted targeted Vitest tests for all changed code paths, but Vitest failed during startup because the local Rollup native optional package `@rollup/rollup-darwin-arm64` has an invalid code signature.

@@ -3,15 +3,28 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { visitTexts } from "@/constants/texts";
+import { ROUTES } from "@/constants/routes";
 import type { VisitCreateFormProps } from "@/types";
 
 const mocks = vi.hoisted(() => ({
   createVisit: vi.fn(),
+  dispatchAppToast: vi.fn(),
+  routerPush: vi.fn(),
   useVisits: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: mocks.routerPush,
+  }),
 }));
 
 vi.mock("@/hooks/useVisits", () => ({
   useVisits: mocks.useVisits,
+}));
+
+vi.mock("@/lib/toast", () => ({
+  dispatchAppToast: mocks.dispatchAppToast,
 }));
 
 import VisitCreateForm from "./VisitCreateForm";
@@ -77,7 +90,7 @@ afterEach(() => {
 });
 
 describe("VisitCreateForm", () => {
-  it("should prefill suggestions and calculate total price", () => {
+  it("should prefill combo suggestions over service suggestions and calculate total price", () => {
     mockUseVisits();
 
     render(
@@ -86,7 +99,7 @@ describe("VisitCreateForm", () => {
 
     const [serviceCheckbox, comboCheckbox] = screen.getAllByRole("checkbox");
 
-    expect(serviceCheckbox).toBeChecked();
+    expect(serviceCheckbox).not.toBeChecked();
     expect(comboCheckbox).toBeChecked();
     expect(screen.getByLabelText(visitTexts.create.barberLabel)).toHaveValue(
       "barber-1",
@@ -94,14 +107,14 @@ describe("VisitCreateForm", () => {
     expect(screen.getByLabelText(visitTexts.create.skinnerLabel)).toHaveValue(
       "skinner-1",
     );
-    expect(screen.getByText(/150.000/)).toBeInTheDocument();
+    expect(screen.getAllByText(/50.000/).length).toBeGreaterThan(0);
   });
 
-  it("should submit selected services, combos, and staff", async () => {
+  it("should submit selected combo and staff", async () => {
     const user = userEvent.setup();
 
     mockUseVisits();
-    mocks.createVisit.mockResolvedValue({});
+    mocks.createVisit.mockResolvedValue({ id: "visit-1" });
 
     render(
       <VisitCreateForm customerId="customer-1" suggestions={suggestions} />,
@@ -111,14 +124,20 @@ describe("VisitCreateForm", () => {
 
     expect(mocks.createVisit).toHaveBeenCalledWith({
       customerId: "customer-1",
-      serviceIds: ["service-1"],
+      serviceIds: [],
       comboIds: ["combo-1"],
       barberId: "barber-1",
       skinnerId: "skinner-1",
     });
+    expect(mocks.dispatchAppToast).toHaveBeenCalledWith({
+      description: visitTexts.create.successDescription,
+      message: visitTexts.create.success,
+      type: "success",
+    });
+    expect(mocks.routerPush).toHaveBeenCalledWith(ROUTES.visitDetail("visit-1"));
   });
 
-  it("should update total price when items are toggled", async () => {
+  it("should uncheck combos when a service is selected", async () => {
     const user = userEvent.setup();
 
     mockUseVisits();
@@ -127,10 +146,12 @@ describe("VisitCreateForm", () => {
       <VisitCreateForm customerId="customer-1" suggestions={suggestions} />,
     );
 
-    const [, comboCheckbox] = screen.getAllByRole("checkbox");
+    const [serviceCheckbox, comboCheckbox] = screen.getAllByRole("checkbox");
 
-    await user.click(comboCheckbox);
+    await user.click(serviceCheckbox);
 
+    expect(serviceCheckbox).toBeChecked();
+    expect(comboCheckbox).not.toBeChecked();
     expect(screen.getAllByText(/100.000/)).toHaveLength(2);
   });
 

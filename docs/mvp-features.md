@@ -7,11 +7,11 @@
 | **Superadmin**  | `superadmin`   | Toàn quyền hệ thống, hỗ trợ xử lý sự cố tài khoản chủ tiệm  |
 | **Chủ tiệm**    | `owner`        | Quản lý dịch vụ, combo, nhân viên, chi nhánh                |
 | **Quản lý**     | `manager`      | Quản lý cấp chi nhánh, xem báo cáo chi nhánh được phân công |
-| **Lễ tân**      | `receptionist` | Tra cứu & lưu thông tin khách, upload ảnh                   |
+| **Lễ tân**      | `receptionist` | Tra cứu & lưu thông tin khách                               |
 | **Thợ cắt tóc** | `barber`       | Tra cứu & lưu thông tin khách, upload ảnh                   |
-| **Skinner**     | `skinner`      | Tra cứu & lưu thông tin khách, upload ảnh                   |
+| **Skinner**     | `skinner`      | Tra cứu & lưu thông tin khách                               |
 
-> Receptionist, barber và skinner có tính năng hoàn toàn giống nhau ở MVP. Phân quyền dữ liệu và màn hình theo role sẽ được thực hiện ở phase sau.
+> Chỉ role `barber` được upload ảnh kiểu tóc. Receptionist và skinner có thể tra cứu, xem ảnh/cảnh báo ảnh, nhưng không được upload ảnh.
 
 ---
 
@@ -22,7 +22,7 @@
 - Lưu SĐT, lịch sử dịch vụ (giá, ngày giờ, chi nhánh, thợ cắt, skinner)
 - Tra cứu nhanh theo tên hoặc SĐT
 - Gợi ý dịch vụ, thợ cắt, skinner từ lần sử dụng trước
-- Upload ảnh kiểu tóc vào session của khách sau khi phục vụ
+- Barber upload ảnh kiểu tóc vào session của khách sau khi phục vụ
 - Hiển thị ảnh kiểu tóc lần trước nếu khách không nhớ
 - Cho phép cập nhật SĐT khi khách đổi số — lịch sử visit không bị ảnh hưởng
 
@@ -39,7 +39,7 @@
 - Đăng nhập bằng username/password do chủ tiệm tạo
 - Đổi mật khẩu sau lần đăng nhập đầu tiên
 - Tra cứu & lưu thông tin khách
-- Upload ảnh kiểu tóc sau khi phục vụ
+- Chỉ barber được upload ảnh kiểu tóc sau khi phục vụ
 
 ---
 
@@ -47,20 +47,22 @@
 
 | Trạng thái    | Trigger                             | Người thực hiện      |
 | ------------- | ----------------------------------- | -------------------- |
-| `pending`     | Khách chọn dịch vụ/combo            | Bất kỳ nhân viên nào |
+| `pending`     | Khách chọn dịch vụ hoặc combo       | Bất kỳ nhân viên nào |
 | `in_progress` | Bắt đầu phục vụ                     | Barber hoặc skinner  |
 | `completed`   | Thu tiền, chọn tên barber + skinner | Bất kỳ nhân viên nào |
 
 - Barber/skinner có thể chọn trước hoặc chỉnh sửa sau khi completed
 - Chỉnh sửa barber/skinner trong vòng **3 tiếng kể từ completed_at**, không gia hạn
 - Log lại người thay đổi thông tin visit lần cuối (`last_updated_by`)
-- Một visit có thể chọn hỗn hợp dịch vụ lẻ và combo
+- Một visit chỉ được chọn **dịch vụ lẻ** hoặc **combo**, không chọn cả hai nhóm cùng lúc
+- Trong UI tạo visit, chọn combo sẽ bỏ chọn toàn bộ dịch vụ lẻ; chọn dịch vụ lẻ sẽ bỏ chọn toàn bộ combo
 - **Dữ liệu lịch sử bất biến** — sau 3 tiếng, không được phép thay đổi giá tiền hay dịch vụ đã dùng
 
 **Warning ảnh:**
 
 - Hiển thị nếu visit có dịch vụ cắt tóc nhưng chưa có ảnh
 - Hiển thị cho người tạo visit, barber, skinner và owner — ở cả danh sách lẫn chi tiết visit
+- Chỉ role `barber` được upload ảnh kiểu tóc; các role khác chỉ xem ảnh/cảnh báo
 
 ---
 

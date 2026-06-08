@@ -11,7 +11,13 @@ import type {
   VisitRequestBody,
 } from "@/types";
 
-const STAFF_ROLES: UserRole[] = ["receptionist", "barber", "skinner"];
+const VISIT_ROLES: UserRole[] = [
+  "owner",
+  "manager",
+  "receptionist",
+  "barber",
+  "skinner",
+];
 const VISIT_SELECT = {
   id: true,
   createdAt: true,
@@ -146,7 +152,7 @@ async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
 
   if (
     typeof token.role !== "string" ||
-    !STAFF_ROLES.includes(token.role as UserRole) ||
+    !VISIT_ROLES.includes(token.role as UserRole) ||
     !token.shop_id
   ) {
     return { error: visitTexts.api.errors.forbidden, status: 403 };
@@ -310,6 +316,13 @@ export async function POST(request: NextRequest) {
   if (!visitInput.serviceIds.length && !visitInput.comboIds.length) {
     return NextResponse.json(
       { error: visitTexts.api.errors.missingItems },
+      { status: 400 },
+    );
+  }
+
+  if (visitInput.serviceIds.length && visitInput.comboIds.length) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.mixedItems },
       { status: 400 },
     );
   }
