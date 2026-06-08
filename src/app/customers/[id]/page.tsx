@@ -162,6 +162,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
           <CustomerProfileHeader
             customerId={customerId}
             customerName={customer?.name ?? null}
+            customerPhone={customer?.phone ?? null}
             isMenuOpen={isMenuOpen}
             onEdit={openEditModal}
             onToggleMenu={() => setIsMenuOpen((current) => !current)}

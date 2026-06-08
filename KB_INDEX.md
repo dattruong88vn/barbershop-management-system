@@ -248,6 +248,8 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 ### UI
 
+- src/app/visits
+- src/components/visits
 - src/app/customers/[id]
 - src/components/customers/profile
 - src/components/customers
@@ -266,6 +268,8 @@ Supported agents include Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and 
 
 - src/app/api/visits
 - src/app/api/customers/[id]/visits
+- src/app/visits
+- src/components/visits
 - src/app/customers/[id]
 - src/components/customers/profile
 - src/hooks/useVisits.ts

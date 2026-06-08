@@ -2,12 +2,25 @@ import { render, screen, act } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { commonTexts } from "@/constants/texts";
+import { ROUTES } from "@/constants/routes";
+import { APP_NAVIGATION_EVENT } from "@/lib/appNavigation";
 import { API_SERVER_ERROR_EVENT } from "@/lib/queryClient";
 import { APP_TOAST_EVENT } from "@/lib/toast";
 import { Providers } from "@/app/providers";
 
+const mocks = vi.hoisted(() => ({
+  push: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+}));
+
 afterEach(() => {
   vi.useRealTimers();
+  vi.clearAllMocks();
 });
 
 describe("Providers", () => {
@@ -72,5 +85,25 @@ describe("Providers", () => {
     });
 
     expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("should navigate app routes through the Next router", () => {
+    render(
+      <Providers>
+        <div>child content</div>
+      </Providers>,
+    );
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent(APP_NAVIGATION_EVENT, {
+          detail: {
+            href: ROUTES.login,
+          },
+        }),
+      );
+    });
+
+    expect(mocks.push).toHaveBeenCalledWith(ROUTES.login);
   });
 });

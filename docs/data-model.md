@@ -126,7 +126,7 @@
 | `combo_id`   | uuid    | FK → combos, nullable     |
 | `price`      | decimal | Giá tại thời điểm sử dụng |
 
-> Một visit có thể có hỗn hợp dịch vụ lẻ và combo.
+> Một visit chỉ được có dịch vụ lẻ hoặc combo, không lưu hỗn hợp cả hai nhóm. UI tạo visit phải tự bỏ chọn dịch vụ lẻ khi chọn combo và tự bỏ chọn combo khi chọn dịch vụ lẻ; API cũng phải reject payload có cả `service_id` và `combo_id` trong cùng visit.
 
 ---
 
@@ -137,7 +137,8 @@
 | `id`          | uuid      | PK                         |
 | `visit_id`    | uuid      | FK → visits                |
 | `photo_url`   | string    | URL ảnh trên Cloudflare R2 |
-| `uploaded_by` | uuid      | FK → users                 |
+| `uploaded_by` | uuid      | FK → users, bắt buộc là user role `barber` |
 | `created_at`  | timestamp |                            |
 
 > Warning hiển thị nếu visit có dịch vụ cắt tóc (`is_haircut = true`) nhưng chưa có ảnh. Warning hiển thị cho người tạo visit, barber, skinner và owner — ở cả danh sách lẫn chi tiết visit.
+> Chỉ role `barber` được upload ảnh kiểu tóc. Receptionist, skinner, manager và owner chỉ được xem ảnh/cảnh báo ảnh.

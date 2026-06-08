@@ -135,11 +135,11 @@ Quy tắc:
 
 Route:
 
-- TBD
+- `/visits/create`
 
 Ghi chú route:
 
-- Phải align với hằng số `ROUTES` trước khi implement.
+- Route dùng hằng số `ROUTES.createVisit`.
 
 API:
 
@@ -156,6 +156,9 @@ Data bắt buộc:
 Validation:
 
 - Phải chọn ít nhất một service hoặc combo.
+- Không được chọn đồng thời service và combo trong cùng visit.
+- Khi chọn combo, UI phải tự uncheck toàn bộ service đã chọn.
+- Khi chọn service, UI phải tự uncheck toàn bộ combo đã chọn.
 
 Thành công:
 
@@ -180,7 +183,7 @@ Trạng thái backend:
 - Backend hiện có `GET /api/visits`, `POST /api/visits`, và `PATCH /api/visits/:id`.
 - Nếu chưa có `GET /api/visits/:id`, phải implement backend trước khi build màn hình này như một standalone route.
 - Photo upload API chưa có.
-- Action Upload Photo phải chờ backend/R2 upload support.
+- Action Upload Photo phải chờ backend/R2 upload support và chỉ hiển thị/cho phép với role `barber`.
 
 Sections:
 
@@ -195,6 +198,8 @@ Sections:
 Quy tắc:
 
 - Chỉ được edit barber/skinner trong vòng 3 giờ.
+- Chỉ role `barber` được upload ảnh kiểu tóc.
+- Receptionist, skinner, manager và owner chỉ được xem ảnh/cảnh báo ảnh, không được upload ảnh.
 
 Warning:
 

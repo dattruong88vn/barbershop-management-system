@@ -47,16 +47,27 @@ import type {
 export function CustomerProfileHeader({
   customerId,
   customerName,
+  customerPhone,
   isMenuOpen,
   onEdit,
   onToggleMenu,
 }: {
   customerId: string;
   customerName: string | null;
+  customerPhone: string | null;
   isMenuOpen: boolean;
   onEdit: () => void;
   onToggleMenu: () => void;
 }) {
+  const createVisitRoute =
+    customerName && customerPhone
+      ? ROUTES.createVisitForCustomer({
+          id: customerId,
+          name: customerName,
+          phone: customerPhone,
+        })
+      : ROUTES.createVisit;
+
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background px-4 md:h-14 md:px-5">
       <div className="hidden min-w-0 items-center gap-4 md:flex">
@@ -102,7 +113,7 @@ export function CustomerProfileHeader({
           size="lg"
           className="h-9 rounded-lg border-border bg-background px-4 text-sm hover:bg-muted"
         >
-          <Link href={ROUTES.customerCreateVisit(customerId)}>
+          <Link href={createVisitRoute}>
             <Plus className="size-4" aria-hidden="true" />
             {customerTexts.detail.createVisit}
           </Link>
@@ -129,7 +140,7 @@ export function CustomerProfileHeader({
               {customerTexts.detail.editInfo}
             </button>
             <Link
-              href={ROUTES.customerCreateVisit(customerId)}
+              href={createVisitRoute}
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted"
             >
               <Plus className="size-4" aria-hidden="true" />

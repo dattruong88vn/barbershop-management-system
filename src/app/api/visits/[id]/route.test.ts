@@ -26,7 +26,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { PATCH } from "@/app/api/visits/[id]/route";
+import { GET, PATCH } from "@/app/api/visits/[id]/route";
 
 function createRequest(body?: Record<string, unknown> | string): NextRequest {
   const requestBody =
@@ -92,6 +92,75 @@ function createVisitRecord() {
 afterEach(() => {
   vi.useRealTimers();
   vi.clearAllMocks();
+});
+
+describe("GET /api/visits/[id]", () => {
+  it("should return 401 when token is missing", async () => {
+    mocks.getToken.mockResolvedValue(null);
+
+    const response = await GET(createRequest(), createRouteContext());
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      error: visitTexts.api.errors.unauthorized,
+    });
+  });
+
+  it("should return 404 when visit is outside session shop", async () => {
+    mocks.getToken.mockResolvedValue(createStaffToken("owner"));
+    mocks.prismaVisitFindFirst.mockResolvedValue(null);
+
+    const response = await GET(createRequest(), createRouteContext());
+
+    expect(response.status).toBe(404);
+    expect(mocks.prismaVisitFindFirst).toHaveBeenCalledWith({
+      where: {
+        id: "visit-1",
+        shopId: "shop-1",
+      },
+      select: expect.any(Object),
+    });
+    await expect(response.json()).resolves.toEqual({
+      error: visitTexts.api.errors.notFound,
+    });
+  });
+
+  it("should return formatted visit detail", async () => {
+    mocks.getToken.mockResolvedValue(createStaffToken("manager"));
+    mocks.prismaVisitFindFirst.mockResolvedValue(createVisitRecord());
+
+    const response = await GET(createRequest(), createRouteContext());
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      visit: {
+        id: "visit-1",
+        createdAt: "2026-06-04T01:00:00.000Z",
+        completedAt: "2026-06-04T02:00:00.000Z",
+        lastUpdatedBy: "user-1",
+        status: "completed",
+        totalPrice: 150000,
+        barber: {
+          id: "barber-1",
+          username: "barber01",
+        },
+        skinner: {
+          id: "skinner-1",
+          username: "skinner01",
+        },
+        photos: [],
+        services: [
+          {
+            id: "visit-service-1",
+            itemId: "service-1",
+            name: "Cắt tóc nam",
+            type: "service",
+            price: 150000,
+          },
+        ],
+      },
+    });
+  });
 });
 
 describe("PATCH /api/visits/[id]", () => {

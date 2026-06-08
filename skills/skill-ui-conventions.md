@@ -140,6 +140,8 @@ Before creating, moving, or extracting any component or helper function, classif
 - Module reusable: put module components in `src/components/<module>/`; put module helper functions in a clearly named module lib file only when they depend on that module's data shape or business language.
 - Screen-local only: keep inside the screen/component file only when it is small, not reused, and tightly coupled to that screen's state or event handling.
 
+Split large screen/module components into focused child components for sections, panels, lists, rows, and form fields. Route/view components should orchestrate layout and state wiring instead of rendering every UI block inline.
+
 Do not leave app-wide wrappers or helper functions inside a module file just because the first use case came from that module. If a component/function can naturally be reused by multiple modules or screens, move it to the shared location immediately and let the module pass its own copy, route, active state, or behavior through props.
 
 Examples:
@@ -223,6 +225,7 @@ Do not invent additional sections unless required by business rules.
 Important:
 
 - Show warning when haircut service exists and no photo uploaded.
+- Only role `barber` can upload haircut photos; all other roles can only view photos/photo warnings.
 - Respect visit status restrictions.
 - Respect role-based access.
 - Respect tenant boundaries.

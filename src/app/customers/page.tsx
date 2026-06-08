@@ -274,7 +274,7 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      <CustomerMobileActions onCreateCustomer={() => openCreateCustomerModal()} />
+      <CustomerMobileActions />
 
       {isCreateOpen ? (
         <CreateCustomerModal

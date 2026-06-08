@@ -1,5 +1,6 @@
 import { ROUTES } from "@/constants/routes";
 import { commonTexts } from "@/constants/texts";
+import { dispatchAppNavigation } from "@/lib/appNavigation";
 import type { ApiErrorResponse, ApiRequestOptions } from "@/types";
 
 async function parseApiResponse(response: Response): Promise<unknown> {
@@ -38,17 +39,17 @@ export async function fetchClient<TResponse>(
   const responseBody = await parseApiResponse(response);
 
   if (response.status === 401) {
-    window.location.assign(ROUTES.login);
+    dispatchAppNavigation(ROUTES.login);
     throw new Error(commonTexts.api.errors.unauthorized);
   }
 
   if (response.status === 403) {
-    window.location.assign(ROUTES.dashboard);
+    dispatchAppNavigation(ROUTES.dashboard);
     throw new Error(commonTexts.api.errors.forbidden);
   }
 
   if (response.status === 404) {
-    window.location.assign(ROUTES.notFound);
+    dispatchAppNavigation(ROUTES.notFound);
     throw new Error(commonTexts.api.errors.notFound);
   }
 

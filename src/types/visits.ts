@@ -1,4 +1,5 @@
-import type { CustomerVisit } from "./customers";
+import type { ChangeEventHandler, FormEventHandler } from "react";
+import type { Customer, CustomerVisit } from "./customers";
 import type { StaffRole } from "./staff";
 
 export type VisitCreateItem = {
@@ -57,6 +58,11 @@ export type VisitApiResponse = {
   error?: string;
 };
 
+export type VisitDetailApiResponse = {
+  visit?: CustomerVisit;
+  error?: string;
+};
+
 export type VisitCreateFormProps = {
   customerId: string;
   suggestions: {
@@ -71,4 +77,39 @@ export type VisitCreateFormProps = {
       id: string;
     } | null;
   } | null;
+};
+
+export type VisitDetailViewProps = {
+  barbers: VisitCreateStaff[];
+  error: unknown;
+  isLoading: boolean;
+  isUpdatingStaff: boolean;
+  skinners: VisitCreateStaff[];
+  updateError: string;
+  visit: CustomerVisit | null;
+  onUpdateError: (error: string) => void;
+  onUpdateStaff: (input: VisitStaffUpdateInput) => Promise<CustomerVisit>;
+};
+
+export type VisitStaffEditFormProps = {
+  barbers: VisitCreateStaff[];
+  isUpdatingStaff: boolean;
+  skinners: VisitCreateStaff[];
+  visit: CustomerVisit;
+  onCancel: () => void;
+  onError: (error: string) => void;
+  onUpdateStaff: (input: VisitStaffUpdateInput) => Promise<CustomerVisit>;
+};
+
+export type VisitCreatePageViewProps = {
+  activeSearch: string;
+  customers: Customer[];
+  customersError: unknown;
+  isLoadingCustomers: boolean;
+  searchInput: string;
+  selectedCustomer: Customer | null;
+  onClearSelectedCustomer: () => void;
+  onSearch: FormEventHandler<HTMLFormElement>;
+  onSearchInputChange: ChangeEventHandler<HTMLInputElement>;
+  onSelectCustomer: (customer: Customer) => void;
 };
