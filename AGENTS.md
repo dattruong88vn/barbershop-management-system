@@ -1,112 +1,110 @@
 # AGENTS.md
 
-## Purpose
+## Project
 
-This file is the concise operating guide for AI agents working in this repository.
+Barber Shop SaaS — quản lý tiệm cắt tóc nam tại Việt Nam. Target: tiệm nhỏ độc lập và chuỗi nhỏ.
 
-Use `KB_INDEX.md` as the primary routing document for context loading. Use `CHANGELOG_AI.md` to record completed work.
+Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL · Prisma v6 · NextAuth.js · Cloudflare R2 · Vercel · Supabase
 
-This guide is intended for Claude Code, OpenAI Codex, Cursor, GitHub Copilot, and other AI-assisted development tools.
-
-## Project Summary
-
-This is a SaaS application for managing male barbershops in Vietnam. The target users are small independent shops and small local chains.
-
-Tech stack:
-
-- Frontend: Next.js 14+ App Router, Tailwind CSS, shadcn/ui
-- Backend: Next.js API Routes
-- Database: PostgreSQL with Prisma ORM
-- Auth: NextAuth.js Credentials Provider
-- File storage: Cloudflare R2 for haircut photos
-- Deploy: Vercel and Supabase
-
-## Context Loading Order
-
-Before changing code, load context in this order:
-
-1. `AGENTS.md`
-2. `KB_INDEX.md`
-3. The target module section in `KB_INDEX.md`
-4. Relevant files from `docs/`, `skills/`, `src/`, and `prisma/` listed for that module
-
-Always read `skills/` conventions before writing code. For feature work, also read `docs/mvp-features.md`. For database-related work, also read `docs/data-model.md` and `docs/database.md`. For UI work, also read: `docs/SCREENS.md` (consolidated screen spec), `docs/ui/navigation.md`, `docs/ui/component-spec.md`, `docs/ui/design-tokens.md`, `docs/ui/component-rules.md`, `docs/ui/ui-guideline.md`, `docs/ui/user-flows.md`, `docs/ui/page-specifications.md`.
-
-`docs/SCREENS.md` is the per-screen implementation spec (route, roles, sections, fields, actions, states, responsive priority) and is the recommended entry point for any screen work. It maps 1:1 to a visual responsive preview built in v0; treat that preview as reference layout only and do not copy preview code into the repo, since it does not follow the `ROUTES` / `fetchClient` / `texts` conventions below.
-
-## Key Business Rules
+## Business Rules
 
 - Every shop is a tenant. Tenant-owned tables must include and enforce `shop_id`.
-- Plans are `basic`, `pro`, and `pro_max`; default plan is `basic`.
-- Shop statuses are `active` and `expired`; trial expiry is tracked by `trial_expires_at`.
-- Roles are `superadmin`, `owner`, `manager`, `receptionist`, `barber`, and `skinner`.
-- Auth is username/password only. Do not add email or social login unless explicitly requested.
-- Visit statuses are `pending`, `in_progress`, and `completed`.
-- A visit can use either service items or combo items, not both. In Create Visit UI, selecting a combo clears selected services; selecting a service clears selected combos.
-- Barber/skinner assignment can be edited only within 3 hours after `completed_at`; do not extend this window.
-- Show a warning when a visit includes a haircut service (`is_haircut = true`) and has no photos.
-- Only the `barber` role can upload haircut photos. Other roles may view photo warnings/photos but must not upload photos.
+- Plans: `basic` (default) · `pro` · `pro_max`. Statuses: `active` · `expired`. Trial tracked by `trial_expires_at`.
+- Roles: `superadmin` · `owner` · `manager` · `receptionist` · `barber` · `skinner`.
+- Auth: username/password only. Do not add email or social login.
+- Visit statuses: `pending` · `in_progress` · `completed`.
+- A visit uses service items OR combo items, never both. Selecting a combo clears services; selecting a service clears combos.
+- Barber/skinner assignment editable only within 3 hours after `completed_at`.
+- Show warning when visit has `is_haircut = true` and no photos.
+- Only `barber` role can upload haircut photos. Other roles view only.
 
 ## Coding Rules
 
-- Use Prisma for database access. Do not write raw SQL in application code.
-- Keep API routes under `src/app/api/`.
-- API routes must return JSON responses.
-- Do not use `fetch` directly in components or hooks.
-- Client Components and hooks must use `fetchClient` from `@/lib/fetchClient`.
-- Server Components must use `fetchServer` from `@/lib/fetchServer`.
+- Prisma only for DB access. No raw SQL.
+- API routes under `src/app/api/`. Must return JSON.
+- Never use `fetch` directly in components or hooks.
+- Client Components/hooks → `fetchClient` from `@/lib/fetchClient`.
+- Server Components → `fetchServer` from `@/lib/fetchServer`.
 - Use `DEFAULT_JSON_HEADERS` from `@/lib/apiConfig` for JSON requests.
 - Use `hasResponseData` from `@/lib/apiResponse` for optional response data guards.
-- Use `ROUTES` for frontend navigation and `API_ROUTES` for API calls.
-- All client navigation must go through Next navigation (`router.push`, `router.replace`, `redirect`, or `Link`). Never use `window.location`, `window.location.href`, or `window.location.assign`.
-- Do not hardcode UI text in components. Put UI strings in `src/constants/texts/`.
-- Do not define shared types/interfaces inside components. Put them in `src/types/`.
-- Prefer putting reusable UI primitives and shared components in `src/components/design-system/`.
-- Module-specific components may live in the module folder only when they contain module-specific composition or behavior, and they must build on design-system primitives/components instead of redefining the visual base.
-- Split large screen/module components into focused child components for sections, panels, lists, rows, and form fields. Route/view components should orchestrate layout and state, not contain every UI block inline.
-- For modules with multiple pages, keep module-shared components at `src/components/<module>/` root and put page-specific components in subfolders such as `src/components/customers/search/` and `src/components/customers/profile/`.
-- Use strict TypeScript. Do not introduce `any`.
+- Use `ROUTES` for navigation, `API_ROUTES` for API calls. Never hardcode URLs.
+- Never use `window.location`, `window.location.href`, or `window.location.assign`.
+- Never hardcode UI text in components → `src/constants/texts/`.
+- Never define shared types inside components → `src/types/`.
+- Never hardcode colors or custom spacing → use design tokens only.
+- Strict TypeScript. No `any`.
 - Use shadcn/ui components where possible.
-- Every successful user action must show a success toast before or while navigating to the next screen.
-- Keep changes scoped to the requested module and existing project patterns.
+- Every successful user action must show a success toast.
+- Keep changes scoped to the requested module.
 
-## Testing Rules
+## Component Placement
 
-- Testing stack: Vitest and React Testing Library.
+- `src/app/` → route files only (`page.tsx` · `layout.tsx` · `loading.tsx` · `error.tsx` · `not-found.tsx` · `route.ts`).
+- App-wide reusable UI → `src/components/design-system/`.
+- Module components → `src/components/<module>/`.
+- Page-specific components → `src/components/<module>/<page>/`.
+- Route-only orchestration → inline in `page.tsx`.
+- Never create PascalCase component files inside `src/app/`.
+- Module components must build on design-system primitives, not redefine base visuals.
+- Split large components into focused children (sections, panels, lists, rows, form fields).
+
+## Naming
+
+- Files: pages/layouts = `kebab-case` · components = `PascalCase` · hooks = `camelCase` (prefix `use`) · utils/types/texts = `camelCase`
+- Functions: components = `PascalCase` · hooks = `use` prefix · internal handlers = `handle` prefix · exports = verb-first camelCase · API handlers = `GET` / `POST`
+- Variables: internal = `_camelCase` · exports = `camelCase` · booleans = `is/has/can` prefix · constants = `UPPER_SNAKE_CASE` · enums = `UPPER_SNAKE_CASE`
+
+## Data Fetching
+
+- Server Components → `fetchServer`. Client Components → `fetchClient` via TanStack Query.
+- Each entity has one hook in `src/hooks/`. Hook exports one function combining query + mutations.
+- Query key = private constant in hook module. Response data key = private constant, e.g. `const VISIT_RESPONSE_DATA_KEY = "visit"`.
+- When multiple mutations need optional response data → create one private `get[Entity]ResponseData()` using `hasResponseData`. Never repeat `if (!hasResponseData(...))` per mutation.
+- Error handling: 400 → show message · 401 → redirect `/login` · 403 → redirect `/dashboard` · 404 → redirect `/not-found` · 500 → toast error.
+
+## Types & Texts
+
+- Types → `src/types/<module>.ts`, export via `src/types/index.ts`.
+- Texts → `src/constants/texts/<module>.ts`, export via `src/constants/texts/index.ts`.
+- Prisma generates DB types. Only add types for API responses, session payloads, and what Prisma doesn't cover.
+- When adding a module, create matching `src/types/<module>.ts` and `src/constants/texts/<module>.ts`.
+
+## Testing
+
+- Stack: Vitest + React Testing Library.
 - Test files live next to the file under test.
-- Do not add or update unit tests unless the user explicitly asks for tests.
-- Do not run tests or ESLint after implementation unless the user asks to commit code.
-- When the user asks to commit code, run ESLint and only the new or updated test files before committing, for example `npx vitest run src/hooks/useCustomers.test.tsx`.
-- Run the full test suite only when explicitly requested.
-- If the user asks to commit related code before tests are written or updated, remind them and ask for confirmation before running checks and committing.
+- Do NOT write or update tests unless explicitly asked.
+- Do NOT run tests or ESLint after implementation unless asked.
+- When asked to commit: run ESLint + targeted Vitest for new/updated test files only.
+- Run full suite only when explicitly requested.
+- If feature code changed but tests not updated, remind user before committing.
 
-## Git Rules
+## Git
 
-- New feature branches use `feature/name`, bug fixes use `fix/description`, chores use `chore/description`.
-- Before creating a new branch, pull the latest `develop`:
-
-```bash
-git checkout develop
-git pull origin develop
-```
-
+- Branches: `feature/name` · `fix/description` · `chore/description`.
+- Before new branch: `git checkout develop && git pull origin develop`.
 - Never commit directly to `main` or `staging`.
-- Commit format: `type: short description`.
-- Valid types: `feat`, `fix`, `chore`, `refactor`, `style`, `test`.
-- If asked to commit only, commit and stop. Do not push or create a PR.
-- If asked to push code, commit, push the current branch, and create a PR into `develop`.
+- Commit format: `type: short description`. Types: `feat` · `fix` · `chore` · `refactor` · `style` · `test`.
+- If asked to commit only → commit and stop. Do not push or create PR.
+- If asked to push → commit + push + create PR into `develop`.
 
-## Dependency Rules
+## Dependencies
 
-- Use npm. Do not install packages globally.
-- When adding a package, check whether it includes TypeScript declarations.
-- If needed and available, install the matching `@types/package-name` as a dev dependency.
-- Follow `skills/skill-setup-conventions.md` for Node, Prisma, Supabase, and setup details.
+- Use npm. No global installs.
+- When adding a package, check for TypeScript declarations. Install `@types/package-name` as devDependency if needed.
+- Node v22+. Prisma v6. Do not upgrade without testing.
 
-## Documentation Rules
+## Workflow
 
-- Update `CHANGELOG_AI.md` after every completed task.
-- Never remove historical changelog entries.
-- Append changelog information only, in chronological order.
-- Keep `AGENTS.md` concise. Put routing details in `KB_INDEX.md`.
-- When adding or moving documentation, update `KB_INDEX.md`.
+- After every completed task, update `CHANGELOG_AI.md`. Append only, never remove entries.
+
+## Context Loading
+
+Before starting any task, decide which files to read based on task type:
+
+- UI task → read `CONTEXT.md` + `docs/SCREENS.md`
+- API task → read `CONTEXT.md` + relevant `src/app/api/` route file
+- DB task → read `CONTEXT.md` + `docs/data-model.md` + `prisma/schema.prisma`
+- Setup/config task → read `CONTEXT.md`
+- Bug fix → read the broken file + adjacent test file
+- Default → `AGENTS.md` is sufficient, no extra files needed

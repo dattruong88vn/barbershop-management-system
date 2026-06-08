@@ -8,7 +8,7 @@ Spec chi tiết:
 
 Route:
 
-- `/login`
+- `/login` (`ROUTES.login`)
 
 API:
 
@@ -19,7 +19,7 @@ Trạng thái:
 - Loading: disable submit button.
 - Error: username/password không hợp lệ.
 - Success: redirect.
-- Nếu `is_first_login = true`, redirect về `/change-password`.
+- Nếu `is_first_login = true`, redirect về `/change-password` (`ROUTES.changePassword`).
 - Nếu không, dùng callback/default route đã resolve.
 
 ---
@@ -32,7 +32,7 @@ Spec chi tiết:
 
 Route:
 
-- `/change-password`
+- `/change-password` (`ROUTES.changePassword`)
 
 API:
 
@@ -43,7 +43,7 @@ Trạng thái:
 - Loading: disable submit button.
 - Validation: password mismatch.
 - Success: redirect theo `redirectTo` do `POST /api/change-password` trả về.
-- Implementation hiện tại redirect staff roles về `/customers`, các role khác về `/dashboard`.
+- Implementation hiện tại redirect staff roles về `/customers` (`ROUTES.customers`), các role khác về `/dashboard` (`ROUTES.dashboard`).
 
 ---
 
@@ -55,7 +55,7 @@ Spec chi tiết:
 
 Route:
 
-- `/customers`
+- `/customers` (`ROUTES.customers`)
 
 API:
 
@@ -100,7 +100,7 @@ Spec chi tiết:
 
 Route:
 
-- `/customers/:id`
+- `/customers/:id` (`ROUTES.customerDetail(id)`)
 
 API:
 
@@ -135,7 +135,7 @@ Quy tắc:
 
 Route:
 
-- `/visits/create`
+- `/visits/create` (`ROUTES.createVisit`)
 
 Ghi chú route:
 
@@ -170,7 +170,7 @@ Thành công:
 
 Route:
 
-- `/visits/:id`
+- `/visits/:id` (`ROUTES.visitDetail(id)`)
 
 API:
 
@@ -217,7 +217,7 @@ No Photo
 
 Route:
 
-- `/owner/services`
+- `/owner/services` (`ROUTES.ownerServices`)
 
 API:
 
@@ -261,7 +261,7 @@ Validation:
 
 Route:
 
-- `/owner/combos`
+- `/owner/combos` (`ROUTES.ownerCombos`)
 
 API:
 
@@ -299,7 +299,7 @@ Validation:
 
 Route:
 
-- `/owner/staff`
+- `/owner/staff` (`ROUTES.ownerStaff`)
 
 API:
 
@@ -337,7 +337,7 @@ Validation:
 
 Route:
 
-- `/owner/branches`
+- `/owner/branches` (`ROUTES.ownerBranches`)
 
 API:
 
@@ -373,7 +373,7 @@ Validation:
 
 Route:
 
-- `/reports`
+- `/reports` (`ROUTES.reports`)
 
 Trạng thái backend:
 
@@ -399,7 +399,7 @@ Widgets tương lai:
 
 Route:
 
-- `/dashboard`
+- `/dashboard` (`ROUTES.dashboard`)
 
 Trạng thái backend:
 
@@ -430,7 +430,7 @@ Charts:
 
 Route:
 
-- `/superadmin`
+- Chưa có route constant trong `ROUTES`; không hardcode route cho đến khi `src/constants/routes/appRoutes.ts` được cập nhật.
 
 Hành động:
 

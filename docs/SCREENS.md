@@ -4,7 +4,7 @@
 > Đây là tài liệu nguồn hợp nhất cho toàn bộ UI screen spec.
 >
 > Trước khi code, đọc theo thứ tự trong `AGENTS.md`:
-> `AGENTS.md` → `KB_INDEX.md` → module section → `docs/ui/*`.
+> `AGENTS.md` → `CONTEXT.md` → `docs/SCREENS.md`.
 >
 > Bản preview trực quan (responsive, Geist theme) của toàn bộ màn hình này được
 > dựng bằng v0; dùng nó như reference layout, KHÔNG copy code preview vào repo
@@ -32,7 +32,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Theme: Geist neutral (light/dark). Nền neutral/gray là chủ đạo; gold chỉ là accent rất hạn chế.
 - Font: system (`font-sans`). Border thay cho shadow. Bo góc tối đa `rounded-xl`.
 - Status color: amber = pending, blue = in_progress, green = completed, red = lỗi/destructive.
-- Chi tiết: `docs/ui/design-tokens.md`, `docs/ui/component-spec.md`, `docs/ui/component-rules.md`.
+- Chi tiết: `CONTEXT.md`, `docs/ui/component-spec.md`, `docs/ui/navigation.md`.
 
 ## Responsive
 
@@ -43,18 +43,18 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 1. Login
 
-- **Route:** `/login`
+- **Route:** `/login` (`ROUTES.login`)
 - **Roles:** tất cả (chưa đăng nhập)
 - **Ưu tiên:** mobile
 - **Sections:** logo/brand, form đăng nhập
 - **Fields:** `username` (text, required), `password` (password, required)
 - **Actions:** Submit → đăng nhập
 - **States:** idle, submitting, error (sai thông tin đăng nhập)
-- **Notes:** auth username/password only. Sau khi đăng nhập, nếu là lần đầu của nhân viên → ép sang `/change-password`. Superadmin → Landing.
+- **Notes:** auth username/password only. Sau khi đăng nhập, nếu là lần đầu của nhân viên → ép sang `/change-password` (`ROUTES.changePassword`). Superadmin → Landing.
 
 ## 2. Change Password
 
-- **Route:** `/change-password`
+- **Route:** `/change-password` (`ROUTES.changePassword`)
 - **Roles:** mọi user cần đổi mật khẩu (bắt buộc lần đầu với nhân viên)
 - **Ưu tiên:** mobile
 - **Fields:** `newPassword` (required), `confirmPassword` (required)
@@ -66,7 +66,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 3. Customer Search
 
-- **Route:** `/customers`
+- **Route:** `/customers` (`ROUTES.customers`)
 - **Roles:** receptionist, barber, skinner, manager, owner
 - **Ưu tiên:** desktop (quầy) + mobile
 - **Sections:** ô search, danh sách khách hàng
@@ -77,7 +77,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 4. Customer Create
 
-- **Trình bày:** modal mở từ Customer Search (route nền `/customers`)
+- **Trình bày:** modal mở từ Customer Search (route nền `/customers`, `ROUTES.customers`)
 - **Roles:** như Customer Search
 - **Ưu tiên:** responsive
 - **Fields:** `name` (required), `phone` (required)
@@ -87,7 +87,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 5. Customer Detail
 
-- **Route:** `/customers/:id`
+- **Route:** `/customers/:id` (`ROUTES.customerDetail(id)`)
 - **Roles:** như Customer Search
 - **Ưu tiên:** responsive
 - **Spec chi tiết:** xem mục Customer Detail trong tài liệu này.
@@ -98,7 +98,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 6. Create Visit
 
-- **Route:** `/visits/create`
+- **Route:** `/visits/create` (`ROUTES.createVisit`)
 - **Roles:** receptionist, barber, skinner, manager, owner
 - **Ưu tiên:** responsive (nhân viên dùng mobile)
 - **Sections:** Customer, Services, Combos, Barber, Skinner, Total Price
@@ -109,7 +109,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 7. Visit Detail
 
-- **Route:** `/visits/:id`
+- **Route:** `/visits/:id` (`ROUTES.visitDetail(id)`)
 - **Roles:** như Create Visit
 - **Ưu tiên:** responsive
 - **Sections:** Visit Information, Services, Combos, Barber, Skinner, Photos
@@ -121,7 +121,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 8. Visit List
 
-- **Route:** `/visits`
+- **Route:** `/visits` (`ROUTES.visits`)
 - **Roles:** như Create Visit
 - **Ưu tiên:** desktop
 - **Sections:** filter trạng thái, danh sách visit
@@ -134,7 +134,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 9. Dashboard
 
-- **Route:** `/dashboard`
+- **Route:** `/dashboard` (`ROUTES.dashboard`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Widgets:** Revenue, Total Visits, New Customers, Returning Customers
@@ -144,7 +144,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 10. Services
 
-- **Route:** `/services`
+- **Route:** `/owner/services` (`ROUTES.ownerServices`)
 - **Roles:** owner
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
@@ -153,7 +153,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 11. Combos
 
-- **Route:** `/combos`
+- **Route:** `/owner/combos` (`ROUTES.ownerCombos`)
 - **Roles:** owner
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
@@ -162,7 +162,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 12. Staff
 
-- **Route:** `/staff`
+- **Route:** `/owner/staff` (`ROUTES.ownerStaff`)
 - **Roles:** owner
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
@@ -171,7 +171,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 13. Branches
 
-- **Route:** `/branches`
+- **Route:** `/owner/branches` (`ROUTES.ownerBranches`)
 - **Roles:** owner
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
@@ -180,7 +180,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 14. Reports
 
-- **Route:** `/reports`
+- **Route:** `/reports` (`ROUTES.reports`)
 - **Roles:** owner (phạm vi dữ liệu theo role)
 - **Ưu tiên:** desktop
 - **Sections:** Revenue, Branch Analytics, Top Employees, Top Services, Top Combos
