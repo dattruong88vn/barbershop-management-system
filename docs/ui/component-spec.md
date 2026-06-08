@@ -9,7 +9,7 @@ For modules with multiple pages, keep module-shared components at `src/component
 
 **Design system tham khảo:** [Vercel Geist](https://vercel.com/geist/introduction)
 **Theme:** Light + Dark — tự đổi theo `prefers-color-scheme` của hệ thống
-**Font:** Geist Sans (heading, body), Geist Mono (code, số)
+**Font:** System font qua `font-sans`. Không import custom font.
 
 ---
 
@@ -17,11 +17,7 @@ For modules with multiple pages, keep module-shared components at `src/component
 
 ### Font
 
-```typescript
-// src/app/layout.tsx
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-```
+Dùng Tailwind `font-sans` theo `CONTEXT.md`. Không import `geist/font` hoặc custom font khác trong MVP.
 
 ### Theme
 
@@ -81,8 +77,7 @@ Không hardcode hex. Dùng CSS variables của Geist — chúng tự adapt theo 
 
 ## 3. Typography
 
-Font: **Geist Sans** cho tất cả text UI. **Geist Mono** cho số liệu, code, timestamp.
-Dùng Tailwind class từ Geist typography system.
+Dùng system font qua `font-sans` cho UI. Dùng Tailwind class từ typography scale hiện có.
 
 | Tên             | Class             | Dùng cho                               |
 | --------------- | ----------------- | -------------------------------------- |
@@ -337,4 +332,4 @@ Tham khảo: [Geist Empty State](https://vercel.com/geist/empty-state)
 - **Không hardcode px trong className** — dùng Tailwind spacing scale
 - **Border radius:** Theo Geist materials — `6px` (base/small), `12px` (medium/large/modal)
 - **Theme:** Không build toggle, chỉ follow system preference
-- **Font:** Geist Sans cho UI, Geist Mono cho số liệu và timestamp
+- **Font:** Dùng `font-sans`; không import custom font

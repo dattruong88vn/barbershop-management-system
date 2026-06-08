@@ -229,3 +229,32 @@ Copy this structure when starting a new date section:
 ### Notes
 - `./node_modules/.bin/tsc --noEmit` passes.
 - Attempted targeted Vitest tests for all changed code paths, but Vitest failed during startup because the local Rollup native optional package `@rollup/rollup-darwin-arm64` has an invalid code signature.
+
+## 2026-06-08
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Removed stale UI documentation references to deleted context files from `docs/SCREENS.md`.
+- Aligned `docs/ui/component-spec.md` font guidance with `CONTEXT.md` to use `font-sans` without custom font imports.
+- Standardized documented UI routes against `src/constants/routes/appRoutes.ts`, including owner-prefixed routes.
+
+### Refactoring
+- Updated the UI context loading guidance in `docs/SCREENS.md` to use `AGENTS.md`, `CONTEXT.md`, and the remaining UI spec files.
+- Removed obsolete Geist font import guidance from the UI component spec.
+- Added route constant references to screen and page specs, and marked Superadmin Landing as pending a `ROUTES` constant.
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because this was a documentation-only change.
+- Did not run tests or ESLint for the font documentation update.
+- Did not run tests or ESLint for the route documentation update.
