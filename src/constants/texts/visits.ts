@@ -5,6 +5,7 @@ export const visitTexts = {
       invalidCombos: "Combo không thuộc tiệm của bạn",
       invalidCustomer: "Khách hàng không thuộc tiệm của bạn",
       invalidRequestBody: "Dữ liệu gửi lên không hợp lệ",
+      invalidPhoto: "Vui lòng chọn file ảnh hợp lệ",
       invalidStaff: "Nhân viên không thuộc tiệm của bạn",
       invalidServices: "Dịch vụ không thuộc tiệm của bạn",
       lockedStaffEdit: "Đã hết thời gian chỉnh sửa barber/skinner",

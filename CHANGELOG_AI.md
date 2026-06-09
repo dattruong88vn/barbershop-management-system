@@ -258,3 +258,27 @@ Copy this structure when starting a new date section:
 - Did not run tests or ESLint because this was a documentation-only change.
 - Did not run tests or ESLint for the font documentation update.
 - Did not run tests or ESLint for the route documentation update.
+
+## 2026-06-09
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- Added `POST /api/upload/presigned` for staff-only Cloudflare R2 presigned photo upload URLs.
+
+### UI Changes
+- None
+
+### Refactoring
+- Added a shared Cloudflare R2 S3 client helper and public photo URL formatter.
+
+### Breaking Changes
+- None
+
+### Notes
+- Installed `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`, and `nanoid`; all include TypeScript declarations.
+- Added R2 environment variable examples to `.env.example`.

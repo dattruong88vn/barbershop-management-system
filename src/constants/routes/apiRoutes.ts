@@ -11,6 +11,7 @@ export const API_ROUTES = {
   serviceDetail: (id: string) => `/api/services/${id}`,
   staff: "/api/staff",
   staffDetail: (id: string) => `/api/staff/${id}`,
+  uploadPresigned: "/api/upload/presigned",
   visits: "/api/visits",
   visitDetail: (id: string) => `/api/visits/${id}`,
 } as const;
