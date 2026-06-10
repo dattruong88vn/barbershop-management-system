@@ -10,11 +10,19 @@ export const ROUTES = {
       customerId: customer.id,
       name: customer.name,
       phone: customer.phone,
+      returnToCustomerId: customer.id,
     });
 
     return `/visits/create?${params.toString()}`;
   },
   visitDetail: (id: string) => `/visits/${id}`,
+  visitDetailFromCustomer: (visitId: string, customerId: string) => {
+    const params = new URLSearchParams({
+      returnToCustomerId: customerId,
+    });
+
+    return `/visits/${visitId}?${params.toString()}`;
+  },
   customers: "/customers",
   customerDetail: (id: string) => `/customers/${id}`,
   reports: "/reports",

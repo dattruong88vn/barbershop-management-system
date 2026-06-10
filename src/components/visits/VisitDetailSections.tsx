@@ -2,10 +2,17 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useMemo } from "react";
-import { AlertTriangle, ImageIcon, Scissors, User } from "lucide-react";
+import type { ChangeEvent } from "react";
+import { useMemo, useRef } from "react";
+import { AlertTriangle, ImageIcon, Scissors, Upload, User } from "lucide-react";
 
+import { InlineAlert } from "@/components/design-system/InlineAlert";
+import { Button } from "@/components/ui/button";
 import { visitTexts } from "@/constants/texts";
+import {
+  VISIT_STATUS_IN_PROGRESS,
+  VISIT_STATUS_PENDING,
+} from "@/constants/visitStatuses";
 import {
   formatCustomerVisitServices,
   formatMoney,
@@ -36,11 +43,11 @@ function formatVisitDateTime(value: string) {
 }
 
 function getStatusLabel(status: CustomerVisitStatus) {
-  if (status === "pending") {
+  if (status === VISIT_STATUS_PENDING) {
     return visitTexts.detail.status.pending;
   }
 
-  if (status === "in_progress") {
+  if (status === VISIT_STATUS_IN_PROGRESS) {
     return visitTexts.detail.status.inProgress;
   }
 
@@ -48,11 +55,11 @@ function getStatusLabel(status: CustomerVisitStatus) {
 }
 
 function getStatusClassName(status: CustomerVisitStatus) {
-  if (status === "pending") {
+  if (status === VISIT_STATUS_PENDING) {
     return "border-amber-900/40 bg-amber-100 text-amber-900";
   }
 
-  if (status === "in_progress") {
+  if (status === VISIT_STATUS_IN_PROGRESS) {
     return "border-blue-900/40 bg-blue-100 text-blue-900";
   }
 
@@ -144,14 +151,71 @@ function VisitItemsSection({
 }
 
 function VisitPhotosSection({
+  canUploadPhotos,
+  isUploadingPhoto,
   onSelectPhoto,
+  onUploadPhoto,
   photos,
+  uploadError,
 }: {
+  canUploadPhotos: boolean;
+  isUploadingPhoto: boolean;
   onSelectPhoto: (photo: CustomerVisitPhoto) => void;
+  onUploadPhoto: (file: File) => Promise<void>;
   photos: CustomerVisitPhoto[];
+  uploadError: string;
 }) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  function handleOpenFilePicker() {
+    fileInputRef.current?.click();
+  }
+
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    await onUploadPhoto(file);
+  }
+
   return (
     <VisitSectionShell title={visitTexts.detail.photosTitle}>
+      {canUploadPhotos ? (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      ) : null}
+
+      {canUploadPhotos && photos.length ? (
+        <div className="mb-3">
+          <Button
+            type="button"
+            disabled={isUploadingPhoto}
+            variant="secondary"
+            className="h-10 rounded-lg disabled:cursor-not-allowed"
+            onClick={handleOpenFilePicker}
+          >
+            <Upload className="mr-2 size-4" aria-hidden="true" />
+            {isUploadingPhoto
+              ? visitTexts.detail.uploadingPhoto
+              : visitTexts.detail.uploadPhoto}
+          </Button>
+        </div>
+      ) : null}
+
+      {uploadError ? (
+        <InlineAlert className="mb-3">{uploadError}</InlineAlert>
+      ) : null}
+
       {photos.length ? (
         <div className="grid grid-cols-3 gap-2 md:grid-cols-4 md:gap-3">
           {photos.map((photo) => (
@@ -169,15 +233,24 @@ function VisitPhotosSection({
             </button>
           ))}
         </div>
+      ) : canUploadPhotos ? (
+        <button
+          type="button"
+          disabled={isUploadingPhoto}
+          onClick={handleOpenFilePicker}
+          className="flex min-h-28 w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 text-sm text-muted-foreground transition hover:border-ring hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Upload className="mr-2 size-5" aria-hidden="true" />
+          {isUploadingPhoto
+            ? visitTexts.detail.uploadingPhoto
+            : visitTexts.detail.uploadPhoto}
+        </button>
       ) : (
         <div className="flex min-h-28 items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 text-sm text-muted-foreground">
           <ImageIcon className="mr-2 size-5" aria-hidden="true" />
           {visitTexts.detail.noPhotos}
         </div>
       )}
-      <p className="mt-3 text-xs text-muted-foreground">
-        {visitTexts.detail.uploadPending}
-      </p>
     </VisitSectionShell>
   );
 }
@@ -222,10 +295,18 @@ function VisitStaffSection({
 }
 
 export function VisitDetailMainSections({
+  canUploadPhotos,
+  isUploadingPhoto,
   onSelectPhoto,
+  onUploadPhoto,
+  uploadError,
   visit,
 }: {
+  canUploadPhotos: boolean;
+  isUploadingPhoto: boolean;
   onSelectPhoto: (photo: CustomerVisitPhoto) => void;
+  onUploadPhoto: (file: File) => Promise<void>;
+  uploadError: string;
   visit: CustomerVisit;
 }) {
   const serviceItems = useMemo(
@@ -258,7 +339,14 @@ export function VisitDetailMainSections({
         services={comboItems}
         title={visitTexts.detail.combosTitle}
       />
-      <VisitPhotosSection photos={visit.photos} onSelectPhoto={onSelectPhoto} />
+      <VisitPhotosSection
+        canUploadPhotos={canUploadPhotos}
+        isUploadingPhoto={isUploadingPhoto}
+        photos={visit.photos}
+        uploadError={uploadError}
+        onSelectPhoto={onSelectPhoto}
+        onUploadPhoto={onUploadPhoto}
+      />
     </div>
   );
 }

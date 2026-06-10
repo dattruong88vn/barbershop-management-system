@@ -1,14 +1,30 @@
 import { S3Client } from "@aws-sdk/client-s3";
 
-export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!;
-export const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL!;
+function getEnvValue(name: string): string {
+  return (process.env[name] ?? "")
+    .trim()
+    .replace(/^['"\\]+|['"\\]+$/g, "");
+}
+
+function getR2AccountId(): string {
+  return getEnvValue("R2_ACCOUNT_ID")
+    .replace(/^https?:\/\//, "")
+    .replace(/\.r2\.cloudflarestorage\.com\/?$/, "");
+}
+
+function normalizePublicUrl(url: string): string {
+  return url.replace(/\/$/, "");
+}
+
+export const R2_BUCKET_NAME = getEnvValue("R2_BUCKET_NAME");
+export const R2_PUBLIC_URL = normalizePublicUrl(getEnvValue("R2_PUBLIC_URL"));
 
 export const r2Client = new S3Client({
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  endpoint: `https://${getR2AccountId()}.r2.cloudflarestorage.com`,
   region: "auto",
   credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    accessKeyId: getEnvValue("R2_ACCESS_KEY_ID"),
+    secretAccessKey: getEnvValue("R2_SECRET_ACCESS_KEY"),
   },
 });
 

@@ -3,6 +3,10 @@ import { getToken } from "next-auth/jwt";
 import type { Prisma } from "@prisma/client";
 
 import { customerTexts, visitTexts } from "@/constants/texts";
+import {
+  VISIT_STATUS_PENDING,
+  isVisitStatus,
+} from "@/constants/visitStatuses";
 import { prisma } from "@/lib/prisma";
 import type {
   CustomerVisit,
@@ -25,6 +29,13 @@ const VISIT_SELECT = {
   lastUpdatedBy: true,
   status: true,
   totalPrice: true,
+  customer: {
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+    },
+  },
   barber: {
     select: {
       id: true,
@@ -140,6 +151,13 @@ function formatVisitResponse(visit: VisitRecord): CustomerVisit {
   };
 }
 
+function formatVisitListResponse(visit: VisitRecord) {
+  return {
+    ...formatVisitResponse(visit),
+    customer: visit.customer,
+  };
+}
+
 async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
   const token = await getToken({
     req: request,
@@ -222,6 +240,24 @@ export async function GET(request: NextRequest) {
       { error: authResult.error },
       { status: authResult.status },
     );
+  }
+
+  const statusFilter = request.nextUrl.searchParams.get("status");
+
+  if (isVisitStatus(statusFilter)) {
+    const visits = await prisma.visit.findMany({
+      where: {
+        shopId: authResult.shopId,
+        status: statusFilter,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      select: VISIT_SELECT,
+    });
+
+    return NextResponse.json({
+      visits: visits.map(formatVisitListResponse),
+    });
   }
 
   const [services, combos, barbers, skinners] = await Promise.all([
@@ -396,7 +432,7 @@ export async function POST(request: NextRequest) {
       branchId: authResult.branchId,
       barberId: visitInput.barberId,
       skinnerId: visitInput.skinnerId,
-      status: "pending",
+      status: VISIT_STATUS_PENDING,
       totalPrice,
       createdBy: authResult.userId,
       visitServices: {

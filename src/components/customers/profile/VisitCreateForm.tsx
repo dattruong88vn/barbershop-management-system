@@ -57,6 +57,7 @@ function toggleId(selectedIds: string[], id: string) {
 
 export default function VisitCreateForm({
   customerId,
+  returnToCustomerId,
   suggestions,
 }: VisitCreateFormProps) {
   const router = useRouter();
@@ -115,7 +116,11 @@ export default function VisitCreateForm({
           message: visitTexts.create.success,
           type: "success",
         });
-        router.push(ROUTES.visitDetail(visit.id));
+        router.push(
+          returnToCustomerId
+            ? ROUTES.visitDetailFromCustomer(visit.id, returnToCustomerId)
+            : ROUTES.visitDetail(visit.id),
+        );
       }
     } catch (mutationError) {
       setError(

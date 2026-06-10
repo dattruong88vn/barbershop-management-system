@@ -15,6 +15,7 @@ import {
 import { AppMobileBottomNav } from "@/components/design-system/AppMobileBottomNav";
 import { InlineAlert } from "@/components/design-system/InlineAlert";
 import { customerTexts } from "@/constants/texts";
+import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { useCustomerVisits } from "@/hooks/useCustomerVisits";
 import {
   formatCompactMoney,
@@ -56,7 +57,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
   const [visibleVisitCount, setVisibleVisitCount] = useState(VISIT_HISTORY_LIMIT);
 
   const completedVisits = useMemo(
-    () => visits.filter((visit) => visit.status === "completed"),
+    () => visits.filter((visit) => visit.status === VISIT_STATUS_COMPLETED),
     [visits],
   );
   const latestVisit = completedVisits[0] ?? null;

@@ -10,8 +10,26 @@ import { FormTextField } from "@/components/design-system/FormTextField";
 import { InlineAlert } from "@/components/design-system/InlineAlert";
 import { PasswordField } from "@/components/design-system/PasswordField";
 import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { getPostAuthRedirectPath } from "@/lib/authRedirect";
+
+function getSafeCallbackPath(callbackUrl: string | null): string | null {
+  if (!callbackUrl?.startsWith("/") || callbackUrl.startsWith("//")) {
+    return null;
+  }
+
+  if (
+    callbackUrl === ROUTES.login ||
+    callbackUrl.startsWith(`${ROUTES.login}?`) ||
+    callbackUrl === ROUTES.changePassword ||
+    callbackUrl.startsWith(`${ROUTES.changePassword}?`)
+  ) {
+    return null;
+  }
+
+  return callbackUrl;
+}
 
 function LoginForm() {
   const router = useRouter();
@@ -51,8 +69,11 @@ function LoginForm() {
       }
 
       const session = await getSession();
+      const safeCallbackPath = getSafeCallbackPath(callbackUrl);
       const redirectPath =
-        callbackUrl ?? getPostAuthRedirectPath(session?.user.role);
+        session?.user.is_first_login === true
+          ? ROUTES.changePassword
+          : safeCallbackPath ?? getPostAuthRedirectPath(session?.user.role);
 
       router.replace(redirectPath);
       router.refresh();

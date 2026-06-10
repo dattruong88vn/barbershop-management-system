@@ -5,20 +5,19 @@ import { ArrowLeft, Users } from "lucide-react";
 
 import VisitCreateForm from "@/components/customers/profile/VisitCreateForm";
 import { EmptyState } from "@/components/design-system/EmptyState";
-import { ROUTES } from "@/constants/routes";
 import { customerTexts, visitTexts } from "@/constants/texts";
 import type { VisitCreatePageViewProps } from "@/types";
 import { VisitCreateCustomerStep } from "./VisitCreateCustomerStep";
 
 export function VisitCreatePageView(props: VisitCreatePageViewProps) {
-  const { selectedCustomer } = props;
+  const { backHref, returnToCustomerId, selectedCustomer } = props;
 
   return (
     <main className="min-h-screen bg-muted/30 px-4 py-4 pb-8 text-foreground md:px-6 md:py-8">
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-4 md:mb-6">
           <Link
-            href={ROUTES.customers}
+            href={backHref}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
@@ -37,7 +36,11 @@ export function VisitCreatePageView(props: VisitCreatePageViewProps) {
 
           <div className="min-w-0">
             {selectedCustomer ? (
-              <VisitCreateForm customerId={selectedCustomer.id} suggestions={null} />
+              <VisitCreateForm
+                customerId={selectedCustomer.id}
+                returnToCustomerId={returnToCustomerId}
+                suggestions={null}
+              />
             ) : (
               <EmptyState icon={Users} text={visitTexts.create.emptyBeforeSearch} />
             )}

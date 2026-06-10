@@ -269,12 +269,22 @@ Copy this structure when starting a new date section:
 
 ### API Changes
 - Added `POST /api/upload/presigned` for staff-only Cloudflare R2 presigned photo upload URLs.
+- Added `POST /api/visits/:id/photos` to persist barber-uploaded R2 photo keys as visit photo records.
+- Returned Visit Detail photo upload permission from `GET /api/visits/:id` so the UI can render upload controls reliably.
+- Aligned customer search `lastVisit` with Customer Detail by only using completed visits for lookup warnings and visit badges.
+- Added status-filtered `GET /api/visits?status=...` list responses for pending, in-progress, and completed visits.
 
 ### UI Changes
-- None
+- Integrated Visit Detail photo upload with presigned R2 upload, success toast, inline errors, and immediate photo list updates.
+- Made the empty Visit Detail photos area clickable for barber uploads and added mobile camera capture hint.
+- Fixed Login redirect handling so auth callback URLs cannot point back to auth screens and first-login users go to Change Password.
+- Built `/visits` Visit List with status filters, pending visit cards, photo warning badges, and links back to Visit Detail.
+- Preserved Customer Detail as the back destination when creating or opening visits from a customer profile.
 
 ### Refactoring
 - Added a shared Cloudflare R2 S3 client helper and public photo URL formatter.
+- Added shared visit status constants and reused them for Visit List filtering and API status validation.
+- Replaced remaining non-test hardcoded visit status literals with shared visit status constants.
 
 ### Breaking Changes
 - None

@@ -14,4 +14,5 @@ export const API_ROUTES = {
   uploadPresigned: "/api/upload/presigned",
   visits: "/api/visits",
   visitDetail: (id: string) => `/api/visits/${id}`,
+  visitPhotos: (id: string) => `/api/visits/${id}/photos`,
 } as const;
