@@ -40,12 +40,13 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 ## Component Placement
 
 - `src/app/` → route files only (`page.tsx` · `layout.tsx` · `loading.tsx` · `error.tsx` · `not-found.tsx` · `route.ts`).
-- App-wide reusable UI → `src/components/design-system/`.
-- Module components → `src/components/<module>/`.
-- Page-specific components → `src/components/<module>/<page>/`.
+- App-wide reusable UI → `src/components/global/`.
+- Shared mobile navigation/components → `src/components/mobile/`.
+- Module components → `src/components/modules/<module>/`.
+- Page-specific components → `src/components/screens/<module-or-route>/`.
 - Route-only orchestration → inline in `page.tsx`.
 - Never create PascalCase component files inside `src/app/`.
-- Module components must build on design-system primitives, not redefine base visuals.
+- Module and screen components must build on global primitives, not redefine base visuals.
 - Split large components into focused children (sections, panels, lists, rows, form fields).
 
 ## Naming

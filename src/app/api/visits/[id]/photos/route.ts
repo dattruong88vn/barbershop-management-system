@@ -106,3 +106,65 @@ export async function POST(
 
   return NextResponse.json({ photo: formatPhotoResponse(photo) });
 }
+
+export async function DELETE(
+  request: NextRequest,
+  context: VisitPhotoRouteContext,
+) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token?.id) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.unauthorized },
+      { status: 401 },
+    );
+  }
+
+  if (token.role !== "barber" || !token.shop_id) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.forbidden },
+      { status: 403 },
+    );
+  }
+
+  const { id } = await context.params;
+  const photoId = request.nextUrl.searchParams.get("photoId")?.trim() ?? "";
+
+  if (!photoId) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.invalidPhoto },
+      { status: 400 },
+    );
+  }
+
+  const photo = await prisma.visitPhoto.findFirst({
+    where: {
+      id: photoId,
+      shopId: token.shop_id,
+      visitId: id,
+    },
+    select: {
+      id: true,
+      photoUrl: true,
+      createdAt: true,
+    },
+  });
+
+  if (!photo) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  await prisma.visitPhoto.delete({
+    where: {
+      id: photo.id,
+    },
+  });
+
+  return NextResponse.json({ photo: formatPhotoResponse(photo) });
+}

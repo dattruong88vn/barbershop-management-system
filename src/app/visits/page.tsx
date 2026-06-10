@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { AlertTriangle, CalendarClock, Plus } from "lucide-react";
 
-import { AppMobileBottomNav } from "@/components/design-system/AppMobileBottomNav";
-import { EmptyState } from "@/components/design-system/EmptyState";
-import { InlineAlert } from "@/components/design-system/InlineAlert";
-import { Skeleton } from "@/components/design-system/Skeleton";
-import { Button } from "@/components/ui/button";
+import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
+import { EmptyState } from "@/components/global/EmptyState";
+import { InlineAlert } from "@/components/global/InlineAlert";
+import { Skeleton } from "@/components/global/Skeleton";
+import { Button } from "@/components/global/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { visitTexts } from "@/constants/texts";
 import {

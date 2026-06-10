@@ -82,6 +82,8 @@ export type CustomerVisitPhoto = {
 };
 
 export type CustomerVisit = {
+  canCompleteVisit?: boolean;
+  canStartVisit?: boolean;
   canUploadPhotos?: boolean;
   id: string;
   createdAt: string;

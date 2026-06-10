@@ -5,10 +5,10 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import { AuthFormShell } from "@/components/design-system/AuthFormShell";
-import { InlineAlert } from "@/components/design-system/InlineAlert";
-import { PasswordField } from "@/components/design-system/PasswordField";
-import { Button } from "@/components/ui/button";
+import { AuthFormShell } from "@/components/screens/auth/AuthFormShell";
+import { InlineAlert } from "@/components/global/InlineAlert";
+import { PasswordField } from "@/components/global/PasswordField";
+import { Button } from "@/components/global/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { useChangePassword } from "@/hooks/useChangePassword";

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -16,7 +16,7 @@ vi.mock("@/hooks/useVisits", () => ({
   useVisits: mocks.useVisits,
 }));
 
-vi.mock("@/components/visits/VisitDetailView", () => ({
+vi.mock("@/components/modules/visits/VisitDetailView", () => ({
   VisitDetailView: ({ visit }: { visit: { id: string } | null }) => (
     <div data-testid="visit-detail-view">{visit?.id ?? "no-visit"}</div>
   ),
@@ -40,11 +40,16 @@ describe("VisitDetailPage", () => {
       skinners: [],
     });
 
-    render(
-      <Suspense fallback={null}>
-        <VisitDetailPage params={Promise.resolve({ id: "visit-1" })} />
-      </Suspense>,
-    );
+    await act(async () => {
+      render(
+        <Suspense fallback={null}>
+          <VisitDetailPage
+            params={Promise.resolve({ id: "visit-1" })}
+            searchParams={Promise.resolve({})}
+          />
+        </Suspense>,
+      );
+    });
 
     await waitFor(() => {
       expect(mocks.useVisitDetail).toHaveBeenCalledWith("visit-1");

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { Toast } from "@/components/design-system/Toast";
+import { Toast } from "@/components/global/Toast";
 import {
   API_SERVER_ERROR_EVENT,
   createQueryClient,

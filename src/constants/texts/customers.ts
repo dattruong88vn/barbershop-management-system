@@ -41,6 +41,8 @@ export const customerTexts = {
     morePhotos: (count: number) => `+${count}`,
     viewMore: "Xem thêm",
     statusCompleted: "Hoàn thành",
+    statusInProgress: "Đang làm",
+    statusPending: "Pending",
     idLabel: "Mã khách hàng",
     backToLookup: "Quay lại tra cứu",
     barberLabel: "Thợ cắt",

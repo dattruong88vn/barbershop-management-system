@@ -11,9 +11,9 @@ import {
   ProfileSummarySection,
   SuggestionsSection,
   VisitHistorySection,
-} from "@/components/customers/profile/CustomerVisitHistorySections";
-import { AppMobileBottomNav } from "@/components/design-system/AppMobileBottomNav";
-import { InlineAlert } from "@/components/design-system/InlineAlert";
+} from "@/components/modules/customers/profile/CustomerVisitHistorySections";
+import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
+import { InlineAlert } from "@/components/global/InlineAlert";
 import { customerTexts } from "@/constants/texts";
 import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { useCustomerVisits } from "@/hooks/useCustomerVisits";
@@ -65,7 +65,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
     () => getRecentVisitPhotos(completedVisits),
     [completedVisits],
   );
-  const visibleVisits = completedVisits.slice(0, visibleVisitCount);
+  const visibleVisits = visits.slice(0, visibleVisitCount);
   const totalSpend = completedVisits.reduce(
     (total, visit) => total + visit.totalPrice,
     0,
@@ -200,12 +200,13 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
             />
 
             <VisitHistorySection
-              completedVisitCount={completedVisits.length}
+              customerId={customerId}
               error={error}
               isLoading={isProfileLoading}
               onShowMore={() =>
                 setVisibleVisitCount((current) => current + VISIT_HISTORY_LIMIT)
               }
+              visitCount={visits.length}
               visibleVisitCount={visibleVisitCount}
               visibleVisits={visibleVisits}
             />

@@ -292,3 +292,53 @@ Copy this structure when starting a new date section:
 ### Notes
 - Installed `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`, and `nanoid`; all include TypeScript declarations.
 - Added R2 environment variable examples to `.env.example`.
+
+## 2026-06-10
+
+### Business Changes
+- Kept haircut photo deletion restricted to the barber upload permission path.
+- Added role-based visit status transitions: barber/skinner can start pending visits, receptionist can complete in-progress visits.
+
+### Database Changes
+- None
+
+### API Changes
+- Added `DELETE /api/visits/:id/photos?photoId=...` to remove a visit photo scoped by `shop_id` and `visit_id`.
+- Added status update support to `PATCH /api/visits/:id` for `pending` to `in_progress` and `in_progress` to `completed`.
+- Added Visit Detail update support to `PATCH /api/visits/:id` for replacing services/combos and updating barber/skinner on non-completed visits.
+
+### UI Changes
+- Added an X icon button on uploaded Visit Detail photos to delete photos with success toast and inline error handling.
+- Added a Visit Detail refresh button to reload the current visit details with loading, success toast, and inline error handling.
+- Changed the Visit Detail update button icon from refresh to edit-style `PencilLine`.
+- Updated Customer Detail visit history to show pending and in-progress visits so newly created visits appear when returning from Visit Detail.
+- Added Visit Detail status action buttons for starting and completing visits based on API permissions.
+- Added a Visit Detail edit panel with service/combo selectors and barber/skinner selects matching the Create Visit form.
+- Added the V0 Geist design-system component set under `src/components/design-system/`, including primitives, inputs, layout, display, feedback, overlay, specialized components, tokens, utilities, and barrel exports.
+- Added Geist typography utilities for `text-heading-32` and `text-copy-14`, and aligned radius tokens to the 6px/8px/12px Geist scale.
+- Extended existing `EmptyState` and `Skeleton` components with Geist-compatible props while preserving their existing call sites.
+- Moved app-wide shared UI components from `src/components/design-system/` to `src/components/global/`.
+- Moved the auth-only form shell component to `src/components/screens/auth/`.
+- Moved shadcn UI primitives from `src/components/ui/` to `src/components/global/ui/`.
+- Moved mobile navigation components from `src/components/global/` to `src/components/mobile/`.
+
+### Refactoring
+- Added visit photo delete route constants, hook mutation, and shared visit detail text/type entries.
+- Exposed a guarded Visit Detail refetch handler from the visit detail hook.
+- Added visit status mutation handling and cache invalidation for Visit Detail, Visit List, and Customer Detail history.
+- Added visit detail update mutation handling with cache invalidation for Visit Detail, Visit List, and Customer Detail history.
+- Added shared design-system copy constants and exported them through `src/constants/texts`.
+- Moved customer module components from `src/components/customers/` to `src/components/modules/customers/`.
+- Moved visit module components from `src/components/visits/` to `src/components/modules/visits/`.
+- Updated app, module, and test imports to use `global`, `modules`, and `screens` component paths.
+- Updated component placement documentation in `AGENTS.md` and `docs/ui/component-spec.md` for the new component folder structure.
+- Updated the shadcn `components.json` UI alias to `@/components/global/ui`.
+- Updated app, module, and test imports to use the new `mobile` component path.
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because they were not requested.
+- Referenced `../personal-project-design-v2/docs/GEIST_COMPONENTS.md` and adapted the V0 components to this repo's token, routing, and no-`window.location` conventions.
+- Did not run tests or ESLint for the component reorganization because they were not requested.

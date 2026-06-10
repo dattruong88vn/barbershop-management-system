@@ -73,6 +73,32 @@ export type VisitStaffUpdateRequestBody = {
   skinnerId?: unknown;
 };
 
+export type VisitDetailUpdateInput = {
+  comboIds: string[];
+  customerId?: string | null;
+  serviceIds: string[];
+  barberId: string | null;
+  skinnerId: string | null;
+  visitId: string;
+};
+
+export type VisitDetailUpdateRequestBody = {
+  comboIds?: unknown;
+  serviceIds?: unknown;
+  barberId?: unknown;
+  skinnerId?: unknown;
+};
+
+export type VisitStatusUpdateInput = {
+  customerId?: string | null;
+  status: CustomerVisitStatus;
+  visitId: string;
+};
+
+export type VisitStatusUpdateRequestBody = {
+  status?: unknown;
+};
+
 export type VisitPhotoCreateInput = {
   key: string;
   visitId: string;
@@ -84,6 +110,11 @@ export type VisitPhotoCreateRequestBody = {
 
 export type VisitPhotoUploadInput = {
   file: File;
+  visitId: string;
+};
+
+export type VisitPhotoDeleteInput = {
+  photoId: string;
   visitId: string;
 };
 
@@ -133,16 +164,26 @@ export type VisitCreateFormProps = {
 export type VisitDetailViewProps = {
   barbers: VisitCreateStaff[];
   backHref: string;
+  combos?: VisitCreateItem[];
   error: unknown;
+  isDeletingPhoto?: boolean;
+  isUpdatingDetail?: boolean;
   isLoading: boolean;
+  isRefreshingDetail?: boolean;
+  isUpdatingStatus?: boolean;
   isUploadingPhoto: boolean;
   isUpdatingStaff: boolean;
+  services?: VisitCreateItem[];
   skinners: VisitCreateStaff[];
   updateError: string;
   visit: CustomerVisit | null;
+  onDeletePhoto?: (input: VisitPhotoDeleteInput) => Promise<CustomerVisitPhoto>;
+  onRefreshDetail?: () => Promise<unknown>;
+  onUpdateDetail?: (input: VisitDetailUpdateInput) => Promise<CustomerVisit>;
   onUploadPhoto: (input: VisitPhotoUploadInput) => Promise<CustomerVisitPhoto>;
   onUpdateError: (error: string) => void;
   onUpdateStaff: (input: VisitStaffUpdateInput) => Promise<CustomerVisit>;
+  onUpdateStatus?: (input: VisitStatusUpdateInput) => Promise<CustomerVisit>;
 };
 
 export type VisitStaffEditFormProps = {
