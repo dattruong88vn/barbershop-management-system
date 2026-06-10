@@ -3,6 +3,7 @@ import { getToken } from "next-auth/jwt";
 import type { Prisma } from "@prisma/client";
 
 import { customerTexts, visitTexts } from "@/constants/texts";
+import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { prisma } from "@/lib/prisma";
 import type {
   CustomerVisit,
@@ -78,6 +79,7 @@ type VisitRouteContext = {
 
 type StaffAuthResult =
   | {
+      role: UserRole;
       userId: string;
       shopId: string;
     }
@@ -96,8 +98,14 @@ function normalizeNullableId(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function formatVisitResponse(visit: VisitRecord): CustomerVisit {
+function formatVisitResponse(
+  visit: VisitRecord,
+  options?: {
+    canUploadPhotos?: boolean;
+  },
+): CustomerVisit {
   return {
+    canUploadPhotos: options?.canUploadPhotos ?? false,
     id: visit.id,
     createdAt: visit.createdAt.toISOString(),
     completedAt: visit.completedAt?.toISOString() ?? null,
@@ -143,6 +151,7 @@ async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
   }
 
   return {
+    role: token.role as UserRole,
     userId: token.id,
     shopId: token.shop_id,
   };
@@ -207,7 +216,11 @@ export async function GET(request: NextRequest, context: VisitRouteContext) {
     );
   }
 
-  return NextResponse.json({ visit: formatVisitResponse(visit) });
+  return NextResponse.json({
+    visit: formatVisitResponse(visit, {
+      canUploadPhotos: authResult.role === "barber",
+    }),
+  });
 }
 
 export async function PATCH(
@@ -252,7 +265,7 @@ export async function PATCH(
     );
   }
 
-  if (visit.status !== "completed" || !visit.completedAt) {
+  if (visit.status !== VISIT_STATUS_COMPLETED || !visit.completedAt) {
     return NextResponse.json(
       { error: visitTexts.api.errors.notCompleted },
       { status: 400 },
@@ -291,5 +304,9 @@ export async function PATCH(
     select: VISIT_SELECT,
   });
 
-  return NextResponse.json({ visit: formatVisitResponse(updatedVisit) });
+  return NextResponse.json({
+    visit: formatVisitResponse(updatedVisit, {
+      canUploadPhotos: authResult.role === "barber",
+    }),
+  });
 }

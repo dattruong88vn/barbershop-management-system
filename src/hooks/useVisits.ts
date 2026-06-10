@@ -9,12 +9,15 @@ import type {
   CustomerVisit,
   VisitApiResponse,
   VisitCreateInput,
+  VisitListApiResponse,
+  VisitListStatusFilter,
   VisitCreateOptions,
   VisitCreateOptionsApiResponse,
   VisitStaffUpdateInput,
 } from "@/types";
 
 const VISIT_OPTIONS_QUERY_KEY = ["visit-options"] as const;
+const VISIT_LIST_QUERY_KEY = ["visits"] as const;
 const CUSTOMER_VISITS_QUERY_KEY = ["customer-visits"] as const;
 const VISIT_RESPONSE_DATA_KEY = "visit";
 
@@ -33,6 +36,12 @@ function getVisitResponseData(result: VisitApiResponse): CustomerVisit {
 
 async function getVisitOptions(): Promise<VisitCreateOptions> {
   return fetchClient<VisitCreateOptionsApiResponse>(API_ROUTES.visits);
+}
+
+async function getVisits(status: VisitListStatusFilter): Promise<VisitListApiResponse> {
+  return fetchClient<VisitListApiResponse>(
+    `${API_ROUTES.visits}?status=${status}`,
+  );
 }
 
 async function createVisit(input: VisitCreateInput): Promise<CustomerVisit> {
@@ -63,19 +72,28 @@ async function updateVisitStaff(
   return getVisitResponseData(result);
 }
 
-export function useVisits() {
+export function useVisits(status?: VisitListStatusFilter) {
   const queryClient = useQueryClient();
   const visitOptionsQuery = useQuery({
     queryKey: VISIT_OPTIONS_QUERY_KEY,
     queryFn: getVisitOptions,
   });
+  const visitsQuery = useQuery({
+    enabled: Boolean(status),
+    queryKey: [...VISIT_LIST_QUERY_KEY, status],
+    queryFn: () => getVisits(status as VisitListStatusFilter),
+  });
 
   const createVisitMutation = useMutation({
     mutationFn: createVisit,
-    onSuccess: (_visit, input) =>
+    onSuccess: (_visit, input) => {
       queryClient.invalidateQueries({
         queryKey: [...CUSTOMER_VISITS_QUERY_KEY, input.customerId],
-      }),
+      });
+      queryClient.invalidateQueries({
+        queryKey: VISIT_LIST_QUERY_KEY,
+      });
+    },
   });
   const updateVisitStaffMutation = useMutation({
     mutationFn: updateVisitStaff,
@@ -94,6 +112,9 @@ export function useVisits() {
     isUpdatingStaff: updateVisitStaffMutation.isPending,
     services: visitOptionsQuery.data?.services ?? [],
     skinners: visitOptionsQuery.data?.skinners ?? [],
+    visits: visitsQuery.data?.visits ?? [],
+    visitsError: visitsQuery.error,
+    isLoadingVisits: visitsQuery.isLoading,
     createVisit: createVisitMutation.mutateAsync,
     updateVisitStaff: updateVisitStaffMutation.mutateAsync,
   };

@@ -4,6 +4,7 @@ import type { SyntheticEvent } from "react";
 import { use, useEffect, useState } from "react";
 
 import { VisitCreatePageView } from "@/components/visits/VisitCreatePageView";
+import { ROUTES } from "@/constants/routes";
 import { useCustomers } from "@/hooks/useCustomers";
 import type { Customer } from "@/types";
 
@@ -14,6 +15,7 @@ type VisitCreatePageProps = {
     customerId?: string;
     name?: string;
     phone?: string;
+    returnToCustomerId?: string;
   }>;
 };
 
@@ -39,6 +41,11 @@ function getCustomerFromSearchParams({
 export default function VisitCreatePage({ searchParams }: VisitCreatePageProps) {
   const resolvedSearchParams = use(searchParams);
   const initialCustomer = getCustomerFromSearchParams(resolvedSearchParams);
+  const returnToCustomerId =
+    resolvedSearchParams.returnToCustomerId ?? initialCustomer?.id ?? null;
+  const backHref = returnToCustomerId
+    ? ROUTES.customerDetail(returnToCustomerId)
+    : ROUTES.customers;
   const [searchInput, setSearchInput] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
@@ -69,7 +76,9 @@ export default function VisitCreatePage({ searchParams }: VisitCreatePageProps) 
       activeSearch={activeSearch}
       customers={customers}
       customersError={customersError}
+      backHref={backHref}
       isLoadingCustomers={isLoading}
+      returnToCustomerId={returnToCustomerId}
       searchInput={searchInput}
       selectedCustomer={selectedCustomer}
       onClearSelectedCustomer={() => setSelectedCustomer(null)}

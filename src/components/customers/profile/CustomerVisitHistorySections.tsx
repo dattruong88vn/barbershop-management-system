@@ -394,7 +394,7 @@ export function VisitHistorySection({
           {visibleVisits.map((visit) => (
             <Link
               key={visit.id}
-              href={ROUTES.visitDetail(visit.id)}
+              href={ROUTES.visitDetailFromCustomer(visit.id, customerId)}
               className="flex items-center gap-3 px-3 py-3 transition hover:bg-muted/60 md:px-0 md:py-4"
             >
               <span className="size-2 shrink-0 rounded-full bg-green-900" />

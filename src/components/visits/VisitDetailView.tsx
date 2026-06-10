@@ -8,9 +8,14 @@ import { EmptyState } from "@/components/design-system/EmptyState";
 import { ImageLightbox } from "@/components/design-system/ImageLightbox";
 import { InlineAlert } from "@/components/design-system/InlineAlert";
 import { Skeleton } from "@/components/design-system/Skeleton";
-import { ROUTES } from "@/constants/routes";
 import { visitTexts } from "@/constants/texts";
-import type { CustomerVisit, CustomerVisitPhoto, VisitDetailViewProps } from "@/types";
+import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
+import { dispatchAppToast } from "@/lib/toast";
+import type {
+  CustomerVisit,
+  CustomerVisitPhoto,
+  VisitDetailViewProps,
+} from "@/types";
 import {
   VisitDetailMainSections,
   VisitDetailSidebar,
@@ -19,7 +24,7 @@ import {
 const STAFF_EDIT_WINDOW_MS = 3 * 60 * 60 * 1000;
 
 function canEditStaff(visit: CustomerVisit) {
-  if (visit.status !== "completed" || !visit.completedAt) {
+  if (visit.status !== VISIT_STATUS_COMPLETED || !visit.completedAt) {
     return false;
   }
 
@@ -36,12 +41,12 @@ function VisitDetailSkeleton() {
   );
 }
 
-function VisitDetailHeader() {
+function VisitDetailHeader({ backHref }: { backHref: string }) {
   return (
     <header className="mb-4 flex items-center justify-between gap-4 md:mb-6">
       <div className="min-w-0">
         <Link
-          href={ROUTES.customers}
+          href={backHref}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -60,10 +65,13 @@ function VisitDetailHeader() {
 
 export function VisitDetailView({
   barbers,
+  backHref,
   error,
   isLoading,
+  isUploadingPhoto,
   isUpdatingStaff,
   onUpdateError,
+  onUploadPhoto,
   onUpdateStaff,
   skinners,
   updateError,
@@ -72,11 +80,38 @@ export function VisitDetailView({
   const [selectedPhoto, setSelectedPhoto] = useState<CustomerVisitPhoto | null>(
     null,
   );
+  const [uploadError, setUploadError] = useState("");
+
+  async function handleUploadPhoto(file: File) {
+    if (!visit) {
+      return;
+    }
+
+    setUploadError("");
+
+    try {
+      await onUploadPhoto({
+        file,
+        visitId: visit.id,
+      });
+      dispatchAppToast({
+        description: visitTexts.detail.uploadSuccessDescription,
+        message: visitTexts.detail.uploadSuccess,
+        type: "success",
+      });
+    } catch (photoUploadError) {
+      setUploadError(
+        photoUploadError instanceof Error
+          ? photoUploadError.message
+          : visitTexts.detail.errors.generic,
+      );
+    }
+  }
 
   return (
     <main className="min-h-screen bg-muted/30 px-4 py-4 pb-8 text-foreground md:px-6 md:py-8">
       <div className="mx-auto w-full max-w-5xl">
-        <VisitDetailHeader />
+        <VisitDetailHeader backHref={backHref} />
 
         {isLoading ? <VisitDetailSkeleton /> : null}
 
@@ -95,8 +130,12 @@ export function VisitDetailView({
         {visit ? (
           <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
             <VisitDetailMainSections
+              canUploadPhotos={Boolean(visit.canUploadPhotos)}
+              isUploadingPhoto={isUploadingPhoto}
+              uploadError={uploadError}
               visit={visit}
               onSelectPhoto={setSelectedPhoto}
+              onUploadPhoto={handleUploadPhoto}
             />
             <VisitDetailSidebar
               barbers={barbers}

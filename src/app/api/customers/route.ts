@@ -3,6 +3,7 @@ import { getToken } from "next-auth/jwt";
 import { Prisma } from "@prisma/client";
 
 import { customerTexts } from "@/constants/texts";
+import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { prisma } from "@/lib/prisma";
 import type { CustomerRequestBody, UserRole } from "@/types";
 
@@ -20,6 +21,9 @@ const CUSTOMER_SELECT = {
   phone: true,
   createdAt: true,
   visits: {
+    where: {
+      status: VISIT_STATUS_COMPLETED,
+    },
     orderBy: { createdAt: "desc" },
     take: 1,
     select: {

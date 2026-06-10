@@ -2,6 +2,7 @@ import type {
   ChangeEventHandler,
   FormEventHandler,
 } from "react";
+import type { VisitStatusValue } from "@/constants/visitStatuses";
 
 export type CustomerLastVisitService = {
   id: string;
@@ -59,7 +60,7 @@ export type CustomerApiResponse = {
   error?: string;
 };
 
-export type CustomerVisitStatus = "pending" | "in_progress" | "completed";
+export type CustomerVisitStatus = VisitStatusValue;
 
 export type CustomerVisitService = {
   id: string;
@@ -81,6 +82,7 @@ export type CustomerVisitPhoto = {
 };
 
 export type CustomerVisit = {
+  canUploadPhotos?: boolean;
   id: string;
   createdAt: string;
   completedAt: string | null;
