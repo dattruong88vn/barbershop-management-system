@@ -8,7 +8,7 @@ import { Button } from "@/components/global/ui/button";
 import { visitTexts } from "@/constants/texts";
 import type { VisitStaffEditFormProps } from "@/types";
 import { VisitStaffEditForm } from "./VisitStaffEditForm";
-import { VisitSectionShell } from "../shared";
+import { VisitSectionShell } from "./VisitSectionShell";
 
 export function VisitStaffEditPanel({
   barbers,

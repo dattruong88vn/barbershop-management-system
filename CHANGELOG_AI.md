@@ -420,3 +420,4 @@ Copy this structure when starting a new date section:
 - Added an `AGENTS.md` rule to create module contexts in `src/context/` when API data or logic is shared across screens/components.
 - Moved remaining root-level visit components into `create/`, `detail/`, `shared/`, and `staff/` subfolders so the visits module root only exposes `index.ts`.
 - Flattened customer and visit module components back to direct module-level files, removed nested component folders, and updated module import paths.
+- Added a Husky pre-commit hook that runs lint and build.

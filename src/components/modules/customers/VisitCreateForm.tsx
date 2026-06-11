@@ -42,7 +42,9 @@ export default function VisitCreateForm({
   const [skinnerId, setSkinnerId] = useState(suggestions?.skinner?.id ?? "");
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState<AuthUserFields | null>(null);
-  const [hasAppliedCurrentStaffDefault, setHasAppliedCurrentStaffDefault] =
+  const [hasSkippedCurrentBarberDefault, setHasSkippedCurrentBarberDefault] =
+    useState(false);
+  const [hasSkippedCurrentSkinnerDefault, setHasSkippedCurrentSkinnerDefault] =
     useState(false);
   const {
     barbers,
@@ -65,6 +67,26 @@ export default function VisitCreateForm({
       ),
     [combos, selectedComboIds, selectedServiceIds, services],
   );
+  const currentUserBarberId = useMemo(
+    () =>
+      currentUser?.role === "barber" &&
+      !hasSkippedCurrentBarberDefault &&
+      barbers.some((barber) => barber.id === currentUser.id)
+        ? currentUser.id
+        : "",
+    [barbers, currentUser, hasSkippedCurrentBarberDefault],
+  );
+  const currentUserSkinnerId = useMemo(
+    () =>
+      currentUser?.role === "skinner" &&
+      !hasSkippedCurrentSkinnerDefault &&
+      skinners.some((skinner) => skinner.id === currentUser.id)
+        ? currentUser.id
+        : "",
+    [currentUser, hasSkippedCurrentSkinnerDefault, skinners],
+  );
+  const selectedBarberId = barberId || currentUserBarberId;
+  const selectedSkinnerId = skinnerId || currentUserSkinnerId;
 
   useEffect(() => {
     let isMounted = true;
@@ -83,29 +105,6 @@ export default function VisitCreateForm({
       isMounted = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (!currentUser || hasAppliedCurrentStaffDefault) {
-      return;
-    }
-
-    if (
-      currentUser.role === "barber" &&
-      barbers.some((barber) => barber.id === currentUser.id)
-    ) {
-      setBarberId(currentUser.id);
-      setHasAppliedCurrentStaffDefault(true);
-      return;
-    }
-
-    if (
-      currentUser.role === "skinner" &&
-      skinners.some((skinner) => skinner.id === currentUser.id)
-    ) {
-      setSkinnerId(currentUser.id);
-      setHasAppliedCurrentStaffDefault(true);
-    }
-  }, [barbers, currentUser, hasAppliedCurrentStaffDefault, skinners]);
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -126,8 +125,8 @@ export default function VisitCreateForm({
         customerId,
         serviceIds: selectedServiceIds,
         comboIds: selectedComboIds,
-        barberId: barberId || null,
-        skinnerId: skinnerId || null,
+        barberId: selectedBarberId || null,
+        skinnerId: selectedSkinnerId || null,
       });
       if (visit.id) {
         dispatchAppToast({
@@ -214,16 +213,22 @@ export default function VisitCreateForm({
           label={visitTexts.create.barberLabel}
           placeholder={visitTexts.create.barberPlaceholder}
           staff={barbers}
-          value={barberId}
-          onValueChange={setBarberId}
+          value={selectedBarberId}
+          onValueChange={(value) => {
+            setHasSkippedCurrentBarberDefault(!value);
+            setBarberId(value);
+          }}
         />
 
         <VisitCreateStaffSelect
           label={visitTexts.create.skinnerLabel}
           placeholder={visitTexts.create.skinnerPlaceholder}
           staff={skinners}
-          value={skinnerId}
-          onValueChange={setSkinnerId}
+          value={selectedSkinnerId}
+          onValueChange={(value) => {
+            setHasSkippedCurrentSkinnerDefault(!value);
+            setSkinnerId(value);
+          }}
         />
 
         <p className="flex items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground">
