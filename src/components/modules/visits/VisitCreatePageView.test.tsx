@@ -31,6 +31,7 @@ function createProps(
     customers: [],
     customersError: null,
     isLoadingCustomers: false,
+    returnToCustomerId: null,
     searchInput: "",
     selectedCustomer: null,
     onClearSelectedCustomer: vi.fn(),

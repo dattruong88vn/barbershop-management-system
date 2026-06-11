@@ -54,12 +54,12 @@ describe("VisitCreateItemSelector", () => {
 describe("VisitCreateStaffSelect", () => {
   it("should render staff options and call change handler", async () => {
     const user = userEvent.setup();
-    const onChange = vi.fn();
+    const onValueChange = vi.fn();
 
     render(
       <VisitCreateStaffSelect
         label="Thợ cắt"
-        noStaffOption="Chọn sau"
+        placeholder="Chọn thợ cắt"
         staff={[
           {
             id: "barber-1",
@@ -68,15 +68,13 @@ describe("VisitCreateStaffSelect", () => {
           },
         ]}
         value=""
-        onChange={onChange}
+        onValueChange={onValueChange}
       />,
     );
 
-    await user.selectOptions(screen.getByLabelText("Thợ cắt"), "barber-1");
+    await user.click(screen.getByRole("combobox", { name: "Thợ cắt" }));
+    await user.click(screen.getByRole("option", { name: "barber01" }));
 
-    expect(onChange).toHaveBeenCalled();
-    expect(screen.getByRole("option", { name: "barber01" })).toHaveValue(
-      "barber-1",
-    );
+    expect(onValueChange).toHaveBeenCalledWith("barber-1");
   });
 });

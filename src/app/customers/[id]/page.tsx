@@ -15,7 +15,11 @@ import {
 import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { customerTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
+import {
+  VISIT_STATUS_COMPLETED,
+  VISIT_STATUS_IN_PROGRESS,
+  VISIT_STATUS_PENDING,
+} from "@/constants/visitStatuses";
 import { useCustomerVisits } from "@/hooks/useCustomerVisits";
 import {
   formatCompactMoney,
@@ -59,6 +63,11 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
   const completedVisits = useMemo(
     () => visits.filter((visit) => visit.status === VISIT_STATUS_COMPLETED),
     [visits],
+  );
+  const hasOpenVisit = visits.some(
+    (visit) =>
+      visit.status === VISIT_STATUS_PENDING ||
+      visit.status === VISIT_STATUS_IN_PROGRESS,
   );
   const latestVisit = completedVisits[0] ?? null;
   const recentPhotos = useMemo(
@@ -164,6 +173,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
             customerId={customerId}
             customerName={customer?.name ?? null}
             customerPhone={customer?.phone ?? null}
+            hasOpenVisit={hasOpenVisit}
             isMenuOpen={isMenuOpen}
             onEdit={openEditModal}
             onToggleMenu={() => setIsMenuOpen((current) => !current)}

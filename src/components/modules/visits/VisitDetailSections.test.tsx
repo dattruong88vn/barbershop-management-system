@@ -38,11 +38,20 @@ function createVisit(overrides: Partial<CustomerVisit> = {}): CustomerVisit {
 
 describe("VisitDetailMainSections", () => {
   it("should render visit information, service list, and photo warning", () => {
+    const visit = createVisit({
+      status: "in_progress",
+    });
+
     render(
-      <VisitDetailMainSections visit={createVisit()} onSelectPhoto={vi.fn()} />,
+      <VisitDetailMainSections
+        visit={visit}
+        onSelectPhoto={vi.fn()}
+      />,
     );
 
     expect(screen.getByText(visitTexts.detail.photoWarning)).toBeInTheDocument();
+    expect(screen.getByText(visitTexts.detail.status.inProgress)).toBeInTheDocument();
+    expect(screen.queryByText(visitTexts.detail.lastUpdatedByLabel)).toBeNull();
     expect(screen.getByText("Cắt tóc nam")).toBeInTheDocument();
     expect(screen.getByText(visitTexts.detail.noPhotos)).toBeInTheDocument();
     expect(screen.getAllByText(/100.000/)).toHaveLength(2);
@@ -52,6 +61,7 @@ describe("VisitDetailMainSections", () => {
     const user = userEvent.setup();
     const onSelectPhoto = vi.fn();
     const visit = createVisit({
+      status: "in_progress",
       photos: [
         {
           id: "photo-1",
@@ -63,10 +73,17 @@ describe("VisitDetailMainSections", () => {
 
     render(
       <VisitDetailMainSections
+        canUploadPhotos
         visit={visit}
         onSelectPhoto={onSelectPhoto}
+        onUploadPhoto={vi.fn()}
       />,
     );
+
+    expect(
+      screen.getByRole("button", { name: visitTexts.detail.uploadPhoto }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(visitTexts.detail.uploadPhoto)).toBeNull();
 
     await user.click(
       screen.getByRole("button", { name: visitTexts.detail.photosTitle }),
@@ -74,25 +91,29 @@ describe("VisitDetailMainSections", () => {
 
     expect(onSelectPhoto).toHaveBeenCalledWith(visit.photos[0]);
   });
-});
 
-describe("VisitDetailSidebar", () => {
-  it("should render status, staff, and locked staff edit message", () => {
+  it("should not render photo warning while visit is pending", () => {
     render(
-      <VisitDetailSidebar
-        barbers={[]}
-        isStaffEditable={false}
-        isUpdatingStaff={false}
-        skinners={[]}
-        updateError=""
-        visit={createVisit()}
-        onUpdateError={() => undefined}
-        onUpdateStaff={vi.fn()}
+      <VisitDetailMainSections
+        visit={createVisit({ status: "pending" })}
+        onSelectPhoto={vi.fn()}
       />,
     );
 
-    expect(screen.getByText(visitTexts.detail.status.completed)).toBeInTheDocument();
+    expect(screen.queryByText(visitTexts.detail.photoWarning)).toBeNull();
+  });
+});
+
+describe("VisitDetailSidebar", () => {
+  it("should render staff without the separate staff edit panel", () => {
+    render(
+      <VisitDetailSidebar
+        visit={createVisit()}
+      />,
+    );
+
+    expect(screen.getByText(visitTexts.detail.staffTitle)).toBeInTheDocument();
     expect(screen.getByText("barber01")).toBeInTheDocument();
-    expect(screen.getByText(visitTexts.staffEdit.locked)).toBeInTheDocument();
+    expect(screen.queryByText(visitTexts.staffEdit.title)).toBeNull();
   });
 });

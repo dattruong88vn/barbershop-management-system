@@ -3,6 +3,7 @@
 import type { SyntheticEvent } from "react";
 import { useState } from "react";
 
+import { Button } from "@/components/global/ui/button";
 import { staffTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
 import { useStaff } from "@/hooks/useStaff";
@@ -232,23 +233,25 @@ export default function OwnerStaffPage() {
             ) : null}
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <button
+              <Button
                 type="submit"
+                variant="primary"
+                className="h-11"
                 disabled={isSubmitting}
-                className="h-11 rounded-md bg-zinc-950 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
               >
                 {editingStaff
                   ? staffTexts.ownerStaff.submitUpdate
                   : staffTexts.ownerStaff.submitCreate}
-              </button>
+              </Button>
               {editingStaff ? (
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  className="h-11"
                   onClick={resetForm}
-                  className="h-11 rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-800 transition hover:border-zinc-950"
                 >
                   {staffTexts.ownerStaff.cancelEdit}
-                </button>
+                </Button>
               ) : null}
             </div>
           </form>
@@ -304,23 +307,25 @@ export default function OwnerStaffPage() {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <button
+                      <Button
                         type="button"
+                        variant="secondary"
+                        className="h-9"
                         onClick={() => handleEdit(staffMember)}
-                        className="h-9 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-800 transition hover:border-zinc-950"
                       >
                         {staffTexts.ownerStaff.edit}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
+                        variant="destructive"
+                        className="h-9"
                         disabled={isDeleting}
                         onClick={() => handleDelete(staffMember)}
-                        className="h-9 rounded-md border border-red-200 px-3 text-sm font-medium text-red-700 transition hover:border-red-700 disabled:cursor-not-allowed disabled:text-red-300"
                       >
                         {isDeleting
                           ? staffTexts.ownerStaff.deleting
                           : staffTexts.ownerStaff.delete}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </article>

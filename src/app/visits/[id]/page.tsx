@@ -1,11 +1,10 @@
 "use client";
 
-import { use, useState } from "react";
+import { use } from "react";
 
 import { VisitDetailView } from "@/components/modules/visits/VisitDetailView";
 import { ROUTES } from "@/constants/routes";
-import { useVisitDetail } from "@/hooks/useVisitDetail";
-import { useVisits } from "@/hooks/useVisits";
+import { VisitProvider } from "@/context/VisitContext";
 
 type VisitDetailPageProps = {
   params: Promise<{
@@ -25,60 +24,14 @@ export default function VisitDetailPage({
   const backHref = returnToCustomerId
     ? ROUTES.customerDetail(returnToCustomerId)
     : ROUTES.customers;
-  const [updateError, setUpdateError] = useState("");
-  const {
-    deleteVisitPhoto,
-    error,
-    isDeletingPhoto,
-    isLoading,
-    isRefreshingDetail,
-    isUpdatingDetail,
-    isUploadingPhoto,
-    isUpdatingStaff,
-    isUpdatingStatus,
-    refreshVisitDetail,
-    updateVisitDetail,
-    uploadVisitPhoto,
-    updateVisitStaff,
-    updateVisitStatus,
-    visit,
-  } = useVisitDetail(visitId);
-  const { barbers, combos, services, skinners } = useVisits();
 
   return (
-    <VisitDetailView
-      barbers={barbers}
+    <VisitProvider
       backHref={backHref}
-      combos={combos}
-      error={error}
-      isDeletingPhoto={isDeletingPhoto}
-      isLoading={isLoading}
-      isRefreshingDetail={isRefreshingDetail}
-      isUpdatingDetail={isUpdatingDetail}
-      isUploadingPhoto={isUploadingPhoto}
-      isUpdatingStaff={isUpdatingStaff}
-      isUpdatingStatus={isUpdatingStatus}
-      services={services}
-      skinners={skinners}
-      updateError={updateError}
-      visit={visit}
-      onDeletePhoto={deleteVisitPhoto}
-      onRefreshDetail={refreshVisitDetail}
-      onUpdateDetail={(input) =>
-        updateVisitDetail({
-          ...input,
-          customerId: returnToCustomerId ?? null,
-        })
-      }
-      onUploadPhoto={uploadVisitPhoto}
-      onUpdateError={setUpdateError}
-      onUpdateStaff={updateVisitStaff}
-      onUpdateStatus={(input) =>
-        updateVisitStatus({
-          ...input,
-          customerId: returnToCustomerId ?? null,
-        })
-      }
-    />
+      returnToCustomerId={returnToCustomerId ?? null}
+      visitId={visitId}
+    >
+      <VisitDetailView />
+    </VisitProvider>
   );
 }

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { visitTexts } from "@/constants/texts";
+import { ROUTES } from "@/constants/routes";
 import type { Customer, VisitCreatePageViewProps } from "@/types";
 import { VisitCreateCustomerStep } from "./VisitCreateCustomerStep";
 
@@ -20,11 +21,13 @@ function createProps(
 ): VisitCreatePageViewProps {
   return {
     activeSearch: "",
+    backHref: ROUTES.customers,
     customers: [],
     customersError: null,
     isLoadingCustomers: false,
     searchInput: "",
     selectedCustomer: null,
+    returnToCustomerId: null,
     onClearSelectedCustomer: vi.fn(),
     onSearch: vi.fn(),
     onSearchInputChange: vi.fn(),

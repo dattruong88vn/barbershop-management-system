@@ -4,6 +4,7 @@ import * as React from "react";
 import { X } from "lucide-react";
 
 import { designSystemTexts } from "@/constants/texts";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import { cn } from "@/lib/utils";
 
 type Action = {
@@ -34,6 +35,8 @@ export const GeistModal = React.forwardRef<HTMLDivElement, GeistModalProps>(
     },
     ref,
   ) => {
+    useLockBodyScroll(open);
+
     if (!open) return null;
 
     return (
@@ -110,6 +113,8 @@ export const GeistDrawer = React.forwardRef<HTMLDivElement, GeistDrawerProps>(
     { children, className, onOpenChange, open, side = "right", title, ...props },
     ref,
   ) => {
+    useLockBodyScroll(open);
+
     if (!open) return null;
 
     return (
@@ -159,6 +164,8 @@ export interface GeistSheetProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const GeistSheet = React.forwardRef<HTMLDivElement, GeistSheetProps>(
   ({ children, className, onOpenChange, open, title, ...props }, ref) => {
+    useLockBodyScroll(open);
+
     if (!open) return null;
 
     return (
@@ -303,6 +310,8 @@ export const GeistCommandMenu = React.forwardRef<
     ref,
   ) => {
     const [search, setSearch] = React.useState("");
+    useLockBodyScroll(open);
+
     const filteredCommands = commands.filter((command) =>
       command.label.toLowerCase().includes(search.toLowerCase()),
     );

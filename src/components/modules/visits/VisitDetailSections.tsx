@@ -8,8 +8,8 @@ import {
   AlertTriangle,
   CheckCircle2,
   ImageIcon,
-  Pencil,
   Play,
+  Plus,
   Scissors,
   Upload,
   User,
@@ -29,13 +29,11 @@ import {
   VISIT_STATUS_PENDING,
 } from "@/constants/visitStatuses";
 import {
-  formatCustomerVisitServices,
   formatMoney,
   formatVisitTime,
   hasVisitPhotoWarning,
 } from "@/lib/customerVisitDisplay";
 import { dispatchAppToast } from "@/lib/toast";
-import { cn } from "@/lib/utils";
 import type {
   CustomerVisit,
   CustomerVisitPhoto,
@@ -47,7 +45,6 @@ import type {
   VisitStaffUpdateInput,
   VisitStatusUpdateInput,
 } from "@/types";
-import { VisitStaffEditPanel } from "./VisitStaffEditPanel";
 import { VisitSectionShell } from "./VisitSectionShell";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
@@ -130,23 +127,28 @@ function getStatusLabel(status: CustomerVisitStatus) {
   return visitTexts.detail.status.completed;
 }
 
-function getStatusClassName(status: CustomerVisitStatus) {
-  if (status === VISIT_STATUS_PENDING) {
-    return "border-amber-900/40 bg-amber-100 text-amber-900";
-  }
+function getMissingCompletionStaffMessage(visit: CustomerVisit) {
+  const isMissingBarber = !visit.barber && !visit.noHaircut;
+  const isMissingSkinner = !visit.skinner && !visit.noSkinnerService;
 
-  if (status === VISIT_STATUS_IN_PROGRESS) {
-    return "border-blue-900/40 bg-blue-100 text-blue-900";
-  }
-
-  return "border-green-900/40 bg-green-100 text-green-900";
+  return isMissingBarber || isMissingSkinner
+    ? visitTexts.api.errors.missingCompletionStaff
+    : "";
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({
+  label,
+  value,
+  valueClassName = "font-medium",
+}: {
+  label: string;
+  value: string;
+  valueClassName?: string;
+}) {
   return (
     <div className="flex items-start justify-between gap-4 py-2 text-sm">
       <span className="text-muted-foreground">{label}</span>
-      <span className="min-w-0 text-right font-medium text-foreground">
+      <span className={`min-w-0 text-right text-foreground ${valueClassName}`}>
         {value}
       </span>
     </div>
@@ -157,6 +159,10 @@ function VisitInformationSection({ visit }: { visit: CustomerVisit }) {
   return (
     <VisitSectionShell title={visitTexts.detail.visitInfoTitle}>
       <div className="divide-y divide-border">
+        <InfoRow
+          label={visitTexts.detail.statusTitle}
+          value={getStatusLabel(visit.status)}
+        />
         <InfoRow
           label={visitTexts.detail.createdAtLabel}
           value={formatVisitDateTime(visit.createdAt)}
@@ -172,10 +178,7 @@ function VisitInformationSection({ visit }: { visit: CustomerVisit }) {
         <InfoRow
           label={visitTexts.detail.totalPriceLabel}
           value={formatMoney(visit.totalPrice)}
-        />
-        <InfoRow
-          label={visitTexts.detail.lastUpdatedByLabel}
-          value={visit.lastUpdatedBy ?? "-"}
+          valueClassName="text-base font-semibold"
         />
       </div>
     </VisitSectionShell>
@@ -210,18 +213,10 @@ function ServiceList({
   );
 }
 
-function VisitItemsSection({
-  emptyText,
-  services,
-  title,
-}: {
-  emptyText: string;
-  services: CustomerVisitService[];
-  title: string;
-}) {
+function VisitItemsSection({ services }: { services: CustomerVisitService[] }) {
   return (
-    <VisitSectionShell title={title}>
-      <ServiceList emptyText={emptyText} services={services} />
+    <VisitSectionShell title={visitTexts.detail.servicesTitle}>
+      <ServiceList emptyText={visitTexts.detail.noServices} services={services} />
     </VisitSectionShell>
   );
 }
@@ -229,9 +224,12 @@ function VisitItemsSection({
 function VisitPhotosSection({
   canUploadPhotos,
   deleteError,
+  hasPendingPhotoRefresh,
   isDeletingPhoto,
+  isRefreshingDetail,
   isUploadingPhoto,
   onDeletePhoto,
+  onRefreshDetail,
   onSelectPhoto,
   onUploadPhoto,
   photos,
@@ -239,9 +237,12 @@ function VisitPhotosSection({
 }: {
   canUploadPhotos: boolean;
   deleteError: string;
+  hasPendingPhotoRefresh: boolean;
   isDeletingPhoto: boolean;
+  isRefreshingDetail: boolean;
   isUploadingPhoto: boolean;
   onDeletePhoto?: (photo: CustomerVisitPhoto) => Promise<void>;
+  onRefreshDetail?: () => Promise<void>;
   onSelectPhoto: (photo: CustomerVisitPhoto) => void;
   onUploadPhoto: (file: File) => Promise<void>;
   photos: CustomerVisitPhoto[];
@@ -264,8 +265,23 @@ function VisitPhotosSection({
     await onUploadPhoto(file);
   }
 
+  const refreshAction =
+    hasPendingPhotoRefresh && onRefreshDetail ? (
+      <Button
+        type="button"
+        loading={isRefreshingDetail}
+        variant="primary"
+        className="h-9 rounded-lg disabled:cursor-not-allowed"
+        onClick={onRefreshDetail}
+      >
+        {isRefreshingDetail
+          ? visitTexts.detail.refreshingDetail
+          : visitTexts.detail.refreshDetail}
+      </Button>
+    ) : null;
+
   return (
-    <VisitSectionShell title={visitTexts.detail.photosTitle}>
+    <VisitSectionShell action={refreshAction} title={visitTexts.detail.photosTitle}>
       {canUploadPhotos ? (
         <input
           ref={fileInputRef}
@@ -275,23 +291,6 @@ function VisitPhotosSection({
           className="hidden"
           onChange={handleFileChange}
         />
-      ) : null}
-
-      {canUploadPhotos && photos.length ? (
-        <div className="mb-3">
-          <Button
-            type="button"
-            disabled={isUploadingPhoto}
-            variant="secondary"
-            className="h-10 rounded-lg disabled:cursor-not-allowed"
-            onClick={handleOpenFilePicker}
-          >
-            <Upload className="mr-2 size-4" aria-hidden="true" />
-            {isUploadingPhoto
-              ? visitTexts.detail.uploadingPhoto
-              : visitTexts.detail.uploadPhoto}
-          </Button>
-        </div>
       ) : null}
 
       {uploadError || deleteError ? (
@@ -333,6 +332,22 @@ function VisitPhotosSection({
               ) : null}
             </div>
           ))}
+          {canUploadPhotos ? (
+            <button
+              type="button"
+              aria-label={visitTexts.detail.uploadPhoto}
+              title={
+                isUploadingPhoto
+                  ? visitTexts.detail.uploadingPhoto
+                  : visitTexts.detail.uploadPhoto
+              }
+              disabled={isUploadingPhoto}
+              onClick={handleOpenFilePicker}
+              className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 text-muted-foreground transition hover:border-ring hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus className="size-6" aria-hidden="true" />
+            </button>
+          ) : null}
         </div>
       ) : canUploadPhotos ? (
         <button
@@ -356,7 +371,31 @@ function VisitPhotosSection({
   );
 }
 
-function VisitStatusSection({
+export function getVisitStatusAction(visit: CustomerVisit): {
+  icon: typeof Play | typeof CheckCircle2;
+  label: string;
+  status: CustomerVisitStatus;
+} | null {
+  const nextStatus = visit.canStartVisit
+    ? VISIT_STATUS_IN_PROGRESS
+    : visit.canCompleteVisit
+      ? VISIT_STATUS_COMPLETED
+      : null;
+
+  if (!nextStatus) {
+    return null;
+  }
+
+  return {
+    icon: visit.canStartVisit ? Play : CheckCircle2,
+    label: visit.canStartVisit
+      ? visitTexts.detail.startVisit
+      : visitTexts.detail.completeVisit,
+    status: nextStatus,
+  };
+}
+
+export function VisitStatusActionButton({
   isUpdatingStatus,
   onUpdateStatus,
   visit,
@@ -366,28 +405,31 @@ function VisitStatusSection({
   visit: CustomerVisit;
 }) {
   const [statusError, setStatusError] = useState("");
-  const nextStatus = visit.canStartVisit
-    ? VISIT_STATUS_IN_PROGRESS
-    : visit.canCompleteVisit
-      ? VISIT_STATUS_COMPLETED
-      : null;
-  const statusButtonText = visit.canStartVisit
-    ? visitTexts.detail.startVisit
-    : visit.canCompleteVisit
-      ? visitTexts.detail.completeVisit
-      : "";
-  const StatusButtonIcon = visit.canStartVisit ? Play : CheckCircle2;
+  const action = getVisitStatusAction(visit);
 
   async function handleUpdateStatus() {
-    if (!nextStatus || !onUpdateStatus) {
+    if (!action || !onUpdateStatus) {
       return;
     }
 
     setStatusError("");
 
+    if (action.status === VISIT_STATUS_COMPLETED) {
+      const missingCompletionStaffMessage = getMissingCompletionStaffMessage(visit);
+
+      if (missingCompletionStaffMessage) {
+        setStatusError(missingCompletionStaffMessage);
+        dispatchAppToast({
+          message: missingCompletionStaffMessage,
+          type: "warning",
+        });
+        return;
+      }
+    }
+
     try {
       await onUpdateStatus({
-        status: nextStatus,
+        status: action.status,
         visitId: visit.id,
       });
       dispatchAppToast({
@@ -396,78 +438,88 @@ function VisitStatusSection({
         type: "success",
       });
     } catch (statusUpdateError) {
-      setStatusError(
+      const errorMessage =
         statusUpdateError instanceof Error
           ? statusUpdateError.message
-          : visitTexts.detail.errors.generic,
-      );
+          : visitTexts.detail.errors.generic;
+
+      setStatusError(errorMessage);
+
+      if (errorMessage === visitTexts.api.errors.missingCompletionStaff) {
+        dispatchAppToast({
+          message: errorMessage,
+          type: "warning",
+        });
+      }
     }
   }
 
+  if (!action) {
+    return null;
+  }
+
+  const StatusButtonIcon = action.icon;
+
   return (
-    <VisitSectionShell title={visitTexts.detail.statusTitle}>
-      <div className="flex items-center justify-between gap-3">
-        <div
-          className={cn(
-            "inline-flex rounded-md border px-2.5 py-1 text-xs font-medium",
-            getStatusClassName(visit.status),
-          )}
-        >
-          {getStatusLabel(visit.status)}
-        </div>
-        {nextStatus ? (
-          <Button
-            type="button"
-            variant="secondary"
-            loading={isUpdatingStatus}
-            onClick={handleUpdateStatus}
-          >
-            {isUpdatingStatus ? null : (
-              <StatusButtonIcon className="size-4" aria-hidden="true" />
-            )}
-            {isUpdatingStatus
-              ? visitTexts.detail.updatingStatus
-              : statusButtonText}
-          </Button>
-        ) : null}
-      </div>
-      <p className="mt-3 text-sm font-medium text-foreground">
-        {formatCustomerVisitServices(visit.services)}
-      </p>
+    <div>
+      <Button
+        type="button"
+        variant="secondary"
+        loading={isUpdatingStatus}
+        className="w-full md:w-auto"
+        onClick={handleUpdateStatus}
+      >
+        {isUpdatingStatus ? null : (
+          <StatusButtonIcon className="size-4" aria-hidden="true" />
+        )}
+        {isUpdatingStatus ? visitTexts.detail.updatingStatus : action.label}
+      </Button>
       {statusError ? (
         <InlineAlert className="mt-3">{statusError}</InlineAlert>
       ) : null}
-    </VisitSectionShell>
+    </div>
   );
 }
 
-function VisitStaffSection({
-  icon,
-  title,
-  username,
-}: {
-  icon: "barber" | "skinner";
-  title: string;
-  username: string | null;
-}) {
-  const Icon = icon === "barber" ? User : Scissors;
-
+function VisitStaffSection({ visit }: { visit: CustomerVisit }) {
   return (
-    <VisitSectionShell title={title}>
-      <div className="flex items-center gap-3 text-sm text-foreground">
-        <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
-        {username ?? visitTexts.detail.noStaff}
+    <VisitSectionShell title={visitTexts.detail.staffTitle}>
+      <div className="space-y-3 text-sm text-foreground">
+        <div className="flex items-center gap-3">
+          <User className="size-4 text-muted-foreground" aria-hidden="true" />
+          <span className="text-muted-foreground">
+            {visitTexts.detail.barberTitle}
+          </span>
+          <span className="font-medium">
+            {visit.noHaircut
+              ? visitTexts.create.noHaircutOption
+              : visit.barber?.username ?? visitTexts.detail.noStaff}
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Scissors className="size-4 text-muted-foreground" aria-hidden="true" />
+          <span className="text-muted-foreground">
+            {visitTexts.detail.skinnerTitle}
+          </span>
+          <span className="font-medium">
+            {visit.noSkinnerService
+              ? visitTexts.create.noSkinnerServiceOption
+              : visit.skinner?.username ?? visitTexts.detail.noStaff}
+          </span>
+        </div>
       </div>
     </VisitSectionShell>
   );
 }
 
-function VisitDetailEditForm({
+export function VisitDetailEditForm({
   barbers,
   combos,
   isUpdatingDetail,
+  isUpdatingStaff,
   onCancel,
   onUpdateDetail,
+  onUpdateStaff,
   services,
   skinners,
   visit,
@@ -475,8 +527,10 @@ function VisitDetailEditForm({
   barbers: VisitCreateStaff[];
   combos: VisitCreateItem[];
   isUpdatingDetail: boolean;
+  isUpdatingStaff: boolean;
   onCancel: () => void;
   onUpdateDetail: (input: VisitDetailUpdateInput) => Promise<CustomerVisit>;
+  onUpdateStaff: (input: VisitStaffUpdateInput) => Promise<CustomerVisit>;
   services: VisitCreateItem[];
   skinners: VisitCreateStaff[];
   visit: CustomerVisit;
@@ -488,8 +542,14 @@ function VisitDetailEditForm({
     getVisitItemIds(visit, "combo"),
   );
   const [barberId, setBarberId] = useState(visit.barber?.id ?? "");
+  const [noHaircut, setNoHaircut] = useState(Boolean(visit.noHaircut));
   const [skinnerId, setSkinnerId] = useState(visit.skinner?.id ?? "");
+  const [noSkinnerService, setNoSkinnerService] = useState(
+    Boolean(visit.noSkinnerService),
+  );
   const [error, setError] = useState("");
+  const isCompletedVisit = visit.status === VISIT_STATUS_COMPLETED;
+  const isSubmitting = isCompletedVisit ? isUpdatingStaff : isUpdatingDetail;
   const serviceOptions = useMemo(
     () => mergeVisitItems(services, visit, "service"),
     [services, visit],
@@ -513,24 +573,37 @@ function VisitDetailEditForm({
     event.preventDefault();
     setError("");
 
-    if (!selectedServiceIds.length && !selectedComboIds.length) {
+    if (!isCompletedVisit && !selectedServiceIds.length && !selectedComboIds.length) {
       setError(visitTexts.create.errors.missingItems);
       return;
     }
 
-    if (selectedServiceIds.length && selectedComboIds.length) {
+    if (!isCompletedVisit && selectedServiceIds.length && selectedComboIds.length) {
       setError(visitTexts.create.errors.mixedItems);
       return;
     }
 
     try {
-      await onUpdateDetail({
-        barberId: barberId || null,
-        comboIds: selectedComboIds,
-        serviceIds: selectedServiceIds,
-        skinnerId: skinnerId || null,
-        visitId: visit.id,
-      });
+      if (isCompletedVisit) {
+        await onUpdateStaff({
+          barberId: noHaircut ? null : barberId || null,
+          customerId: "",
+          noHaircut,
+          noSkinnerService,
+          skinnerId: noSkinnerService ? null : skinnerId || null,
+          visitId: visit.id,
+        });
+      } else {
+        await onUpdateDetail({
+          barberId: noHaircut ? null : barberId || null,
+          comboIds: selectedComboIds,
+          noHaircut,
+          noSkinnerService,
+          serviceIds: selectedServiceIds,
+          skinnerId: noSkinnerService ? null : skinnerId || null,
+          visitId: visit.id,
+        });
+      }
       dispatchAppToast({
         description: visitTexts.detail.editSuccessDescription,
         message: visitTexts.detail.editSuccess,
@@ -549,6 +622,7 @@ function VisitDetailEditForm({
   return (
     <form onSubmit={handleSubmit} className="mt-4 space-y-5">
       <VisitCreateItemSelector
+        disabled={isCompletedVisit}
         emptyText={visitTexts.create.emptyServices}
         items={serviceOptions}
         label={visitTexts.create.servicesLabel}
@@ -560,6 +634,7 @@ function VisitDetailEditForm({
       />
 
       <VisitCreateItemSelector
+        disabled={isCompletedVisit}
         emptyText={visitTexts.create.emptyCombos}
         items={comboOptions}
         label={visitTexts.create.combosLabel}
@@ -571,24 +646,44 @@ function VisitDetailEditForm({
       />
 
       <VisitCreateStaffSelect
+        isSkipped={noHaircut}
         label={visitTexts.create.barberLabel}
-        noStaffOption={visitTexts.create.noStaffOption}
+        skipOptionLabel={visitTexts.create.noHaircutOption}
+        placeholder={visitTexts.create.barberPlaceholder}
         staff={barbers}
         value={barberId}
-        onChange={(event) => setBarberId(event.target.value)}
+        onSkippedChange={(checked) => {
+          setNoHaircut(checked);
+
+          if (checked) {
+            setBarberId("");
+          }
+        }}
+        onValueChange={setBarberId}
       />
 
       <VisitCreateStaffSelect
+        isSkipped={noSkinnerService}
         label={visitTexts.create.skinnerLabel}
-        noStaffOption={visitTexts.create.noStaffOption}
+        skipOptionLabel={visitTexts.create.noSkinnerServiceOption}
+        placeholder={visitTexts.create.skinnerPlaceholder}
         staff={skinners}
         value={skinnerId}
-        onChange={(event) => setSkinnerId(event.target.value)}
+        onSkippedChange={(checked) => {
+          setNoSkinnerService(checked);
+
+          if (checked) {
+            setSkinnerId("");
+          }
+        }}
+        onValueChange={setSkinnerId}
       />
 
-      <p className="rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground">
+      <p className="flex items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground">
         <span>{visitTexts.create.totalPriceLabel}</span>
-        <span className="ml-2">{PRICE_FORMATTER.format(totalPrice)}</span>
+        <span className="text-right text-base font-semibold">
+          {PRICE_FORMATTER.format(totalPrice)}
+        </span>
       </p>
 
       {error ? <InlineAlert>{error}</InlineAlert> : null}
@@ -597,7 +692,7 @@ function VisitDetailEditForm({
         <Button type="button" variant="ghost" onClick={onCancel}>
           {visitTexts.detail.closeEditVisit}
         </Button>
-        <Button type="submit" variant="primary" loading={isUpdatingDetail}>
+        <Button type="submit" variant="primary" loading={isSubmitting}>
           {visitTexts.detail.saveEditVisit}
         </Button>
       </div>
@@ -605,72 +700,15 @@ function VisitDetailEditForm({
   );
 }
 
-function VisitDetailEditPanel({
-  barbers,
-  combos,
-  isUpdatingDetail,
-  onUpdateDetail,
-  services,
-  skinners,
-  visit,
-}: {
-  barbers: VisitCreateStaff[];
-  combos: VisitCreateItem[];
-  isUpdatingDetail: boolean;
-  onUpdateDetail?: (input: VisitDetailUpdateInput) => Promise<CustomerVisit>;
-  services: VisitCreateItem[];
-  skinners: VisitCreateStaff[];
-  visit: CustomerVisit;
-}) {
-  const [isEditingDetail, setIsEditingDetail] = useState(false);
-  const isEditable = visit.status !== VISIT_STATUS_COMPLETED && Boolean(onUpdateDetail);
-
-  return (
-    <VisitSectionShell title={visitTexts.detail.editVisitTitle}>
-      {isEditable ? (
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={() => setIsEditingDetail((current) => !current)}
-        >
-          {isEditingDetail ? (
-            <X className="size-4" aria-hidden="true" />
-          ) : (
-            <Pencil className="size-4" aria-hidden="true" />
-          )}
-          {isEditingDetail
-            ? visitTexts.detail.closeEditVisit
-            : visitTexts.detail.editVisit}
-        </Button>
-      ) : (
-        <InlineAlert className="border-amber-900/40 bg-amber-100 text-amber-900">
-          {visitTexts.detail.lockedEditVisit}
-        </InlineAlert>
-      )}
-
-      {isEditingDetail && onUpdateDetail ? (
-        <VisitDetailEditForm
-          barbers={barbers}
-          combos={combos}
-          isUpdatingDetail={isUpdatingDetail}
-          services={services}
-          skinners={skinners}
-          visit={visit}
-          onCancel={() => setIsEditingDetail(false)}
-          onUpdateDetail={onUpdateDetail}
-        />
-      ) : null}
-    </VisitSectionShell>
-  );
-}
-
 export function VisitDetailMainSections({
   canUploadPhotos = false,
   deleteError = "",
+  hasPendingPhotoRefresh = false,
   isDeletingPhoto = false,
+  isRefreshingDetail = false,
   isUploadingPhoto = false,
   onDeletePhoto,
+  onRefreshDetail,
   onSelectPhoto,
   onUploadPhoto = async () => undefined,
   uploadError = "",
@@ -678,23 +716,19 @@ export function VisitDetailMainSections({
 }: {
   canUploadPhotos?: boolean;
   deleteError?: string;
+  hasPendingPhotoRefresh?: boolean;
   isDeletingPhoto?: boolean;
+  isRefreshingDetail?: boolean;
   isUploadingPhoto?: boolean;
   onDeletePhoto?: (photo: CustomerVisitPhoto) => Promise<void>;
+  onRefreshDetail?: () => Promise<void>;
   onSelectPhoto: (photo: CustomerVisitPhoto) => void;
   onUploadPhoto?: (file: File) => Promise<void>;
   uploadError?: string;
   visit: CustomerVisit;
 }) {
-  const serviceItems = useMemo(
-    () => visit.services.filter((service) => service.type === "service"),
-    [visit.services],
-  );
-  const comboItems = useMemo(
-    () => visit.services.filter((service) => service.type === "combo"),
-    [visit.services],
-  );
-  const shouldWarnPhoto = hasVisitPhotoWarning(visit);
+  const shouldWarnPhoto =
+    visit.status !== VISIT_STATUS_PENDING && hasVisitPhotoWarning(visit);
 
   return (
     <div className="space-y-4">
@@ -706,98 +740,35 @@ export function VisitDetailMainSections({
       ) : null}
 
       <VisitInformationSection visit={visit} />
-      <VisitItemsSection
-        emptyText={visitTexts.detail.noServices}
-        services={serviceItems}
-        title={visitTexts.detail.servicesTitle}
-      />
-      <VisitItemsSection
-        emptyText={visitTexts.detail.noCombos}
-        services={comboItems}
-        title={visitTexts.detail.combosTitle}
-      />
-      <VisitPhotosSection
-        canUploadPhotos={canUploadPhotos}
-        deleteError={deleteError}
-        isDeletingPhoto={isDeletingPhoto}
-        isUploadingPhoto={isUploadingPhoto}
-        onDeletePhoto={onDeletePhoto}
-        photos={visit.photos}
-        uploadError={uploadError}
-        onSelectPhoto={onSelectPhoto}
-        onUploadPhoto={onUploadPhoto}
-      />
+      <VisitItemsSection services={visit.services} />
+      {visit.status === VISIT_STATUS_IN_PROGRESS ? (
+        <VisitPhotosSection
+          canUploadPhotos={canUploadPhotos}
+          deleteError={deleteError}
+          hasPendingPhotoRefresh={hasPendingPhotoRefresh}
+          isDeletingPhoto={isDeletingPhoto}
+          isRefreshingDetail={isRefreshingDetail}
+          isUploadingPhoto={isUploadingPhoto}
+          onDeletePhoto={onDeletePhoto}
+          onRefreshDetail={onRefreshDetail}
+          photos={visit.photos}
+          uploadError={uploadError}
+          onSelectPhoto={onSelectPhoto}
+          onUploadPhoto={onUploadPhoto}
+        />
+      ) : null}
     </div>
   );
 }
 
 export function VisitDetailSidebar({
-  barbers,
-  combos = [],
-  isStaffEditable,
-  isUpdatingDetail = false,
-  isUpdatingStaff,
-  isUpdatingStatus = false,
-  onUpdateDetail,
-  onUpdateError,
-  onUpdateStaff,
-  onUpdateStatus,
-  services = [],
-  skinners,
-  updateError,
   visit,
 }: {
-  barbers: VisitCreateStaff[];
-  combos?: VisitCreateItem[];
-  isStaffEditable: boolean;
-  isUpdatingDetail?: boolean;
-  isUpdatingStaff: boolean;
-  isUpdatingStatus?: boolean;
-  services?: VisitCreateItem[];
-  skinners: VisitCreateStaff[];
-  updateError: string;
   visit: CustomerVisit;
-  onUpdateDetail?: (input: VisitDetailUpdateInput) => Promise<CustomerVisit>;
-  onUpdateError: (error: string) => void;
-  onUpdateStaff: (input: VisitStaffUpdateInput) => Promise<CustomerVisit>;
-  onUpdateStatus?: (input: VisitStatusUpdateInput) => Promise<CustomerVisit>;
 }) {
   return (
     <aside className="space-y-4">
-      <VisitStatusSection
-        isUpdatingStatus={isUpdatingStatus}
-        visit={visit}
-        onUpdateStatus={onUpdateStatus}
-      />
-      <VisitDetailEditPanel
-        barbers={barbers}
-        combos={combos}
-        isUpdatingDetail={isUpdatingDetail}
-        services={services}
-        skinners={skinners}
-        visit={visit}
-        onUpdateDetail={onUpdateDetail}
-      />
-      <VisitStaffSection
-        icon="barber"
-        title={visitTexts.detail.barberTitle}
-        username={visit.barber?.username ?? null}
-      />
-      <VisitStaffSection
-        icon="skinner"
-        title={visitTexts.detail.skinnerTitle}
-        username={visit.skinner?.username ?? null}
-      />
-      <VisitStaffEditPanel
-        barbers={barbers}
-        isStaffEditable={isStaffEditable}
-        isUpdatingStaff={isUpdatingStaff}
-        skinners={skinners}
-        updateError={updateError}
-        visit={visit}
-        onError={onUpdateError}
-        onUpdateStaff={onUpdateStaff}
-      />
+      <VisitStaffSection visit={visit} />
     </aside>
   );
 }

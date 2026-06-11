@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ROUTES } from "@/constants/routes";
@@ -24,6 +25,22 @@ function createVisit(): CustomerVisit {
   };
 }
 
+function createRecentCompletedVisit(): CustomerVisit {
+  return {
+    ...createVisit(),
+    completedAt: new Date().toISOString(),
+    services: [
+      {
+        id: "visit-service-1",
+        itemId: "service-1",
+        name: "Cắt tóc nam",
+        price: 100000,
+        type: "service",
+      },
+    ],
+  };
+}
+
 function createProps(
   overrides: Partial<VisitDetailViewProps> = {},
 ): VisitDetailViewProps {
@@ -35,6 +52,7 @@ function createProps(
     isLoading: false,
     isUpdatingStaff: false,
     onRefreshDetail: vi.fn(),
+    onUpdateDetail: vi.fn(),
     onUploadPhoto: vi.fn(),
     skinners: [],
     updateError: "",
@@ -68,5 +86,38 @@ describe("VisitDetailView", () => {
     ).toHaveAttribute("href", ROUTES.customers);
     expect(screen.getByText(visitTexts.detail.status.completed)).toBeInTheDocument();
     expect(screen.getByText("barber01")).toBeInTheDocument();
+  });
+
+  it("should allow staff-only edit for a recently completed visit", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <VisitDetailView
+        {...createProps({
+          barbers: [{ id: "barber-1", username: "barber01" }],
+          services: [{ id: "service-1", name: "Cắt tóc nam", price: 100000 }],
+          visit: createRecentCompletedVisit(),
+        })}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: visitTexts.detail.editVisit }),
+    );
+
+    expect(
+      screen.getByRole("checkbox", { name: /Cắt tóc nam/ }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("combobox", { name: visitTexts.create.barberLabel }),
+    ).toBeEnabled();
+  });
+
+  it("should hide edit action after completed staff edit window expires", () => {
+    render(<VisitDetailView {...createProps()} />);
+
+    expect(
+      screen.queryByRole("button", { name: visitTexts.detail.editVisit }),
+    ).toBeNull();
   });
 });

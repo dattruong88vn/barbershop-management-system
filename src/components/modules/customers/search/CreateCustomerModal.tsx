@@ -4,6 +4,7 @@ import { FormTextField } from "@/components/global/FormTextField";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
 import { customerTexts } from "@/constants/texts";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import type { CreateCustomerModalProps } from "@/types";
 
 export function CreateCustomerModal({
@@ -16,6 +17,8 @@ export function CreateCustomerModal({
   onSubmit,
   phone,
 }: CreateCustomerModalProps) {
+  useLockBodyScroll(true);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-foreground/40 p-0 md:items-center md:justify-center md:p-6">
       <form

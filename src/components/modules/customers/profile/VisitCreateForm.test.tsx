@@ -101,12 +101,12 @@ describe("VisitCreateForm", () => {
 
     expect(serviceCheckbox).not.toBeChecked();
     expect(comboCheckbox).toBeChecked();
-    expect(screen.getByLabelText(visitTexts.create.barberLabel)).toHaveValue(
-      "barber-1",
-    );
-    expect(screen.getByLabelText(visitTexts.create.skinnerLabel)).toHaveValue(
-      "skinner-1",
-    );
+    expect(
+      screen.getByRole("combobox", { name: visitTexts.create.barberLabel }),
+    ).toHaveTextContent("barber01");
+    expect(
+      screen.getByRole("combobox", { name: visitTexts.create.skinnerLabel }),
+    ).toHaveTextContent("skinner01");
     expect(screen.getAllByText(/50.000/).length).toBeGreaterThan(0);
   });
 

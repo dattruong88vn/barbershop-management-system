@@ -33,6 +33,7 @@ import {
   VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
 } from "@/constants/visitStatuses";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import { getCustomerInitials } from "@/lib/customerDisplay";
 import {
   formatCustomerVisitServices,
@@ -41,6 +42,7 @@ import {
   formatSuggestionStaffName,
   formatVisitTime,
 } from "@/lib/customerVisitDisplay";
+import { dispatchAppToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import type {
   CustomerProfileMetric,
@@ -78,6 +80,7 @@ export function CustomerProfileHeader({
   customerId,
   customerName,
   customerPhone,
+  hasOpenVisit,
   isMenuOpen,
   onEdit,
   onToggleMenu,
@@ -85,6 +88,7 @@ export function CustomerProfileHeader({
   customerId: string;
   customerName: string | null;
   customerPhone: string | null;
+  hasOpenVisit: boolean;
   isMenuOpen: boolean;
   onEdit: () => void;
   onToggleMenu: () => void;
@@ -97,6 +101,18 @@ export function CustomerProfileHeader({
           phone: customerPhone,
         })
       : ROUTES.createVisit;
+
+  function handleBlockedCreateVisit() {
+    if (isMenuOpen) {
+      onToggleMenu();
+    }
+
+    dispatchAppToast({
+      description: customerTexts.detail.createVisitBlockedDescription,
+      message: customerTexts.detail.createVisitBlocked,
+      type: "warning",
+    });
+  }
 
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background px-4 md:h-14 md:px-5">
@@ -137,17 +153,30 @@ export function CustomerProfileHeader({
           <Pencil className="size-4" aria-hidden="true" />
           {customerTexts.detail.edit}
         </Button>
-        <Button
-          asChild
-          variant="secondary"
-          size="lg"
-          className="h-9 rounded-lg border-border bg-background px-4 text-sm hover:bg-muted"
-        >
-          <Link href={createVisitRoute}>
+        {hasOpenVisit ? (
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            className="h-9 rounded-lg border-border bg-background px-4 text-sm hover:bg-muted"
+            onClick={handleBlockedCreateVisit}
+          >
             <Plus className="size-4" aria-hidden="true" />
             {customerTexts.detail.createVisit}
-          </Link>
-        </Button>
+          </Button>
+        ) : (
+          <Button
+            asChild
+            variant="secondary"
+            size="lg"
+            className="h-9 rounded-lg border-border bg-background px-4 text-sm hover:bg-muted"
+          >
+            <Link href={createVisitRoute}>
+              <Plus className="size-4" aria-hidden="true" />
+              {customerTexts.detail.createVisit}
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className="relative ml-auto md:hidden">
@@ -169,13 +198,24 @@ export function CustomerProfileHeader({
               <Pencil className="size-4" aria-hidden="true" />
               {customerTexts.detail.editInfo}
             </button>
-            <Link
-              href={createVisitRoute}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted"
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              {customerTexts.detail.createVisit}
-            </Link>
+            {hasOpenVisit ? (
+              <button
+                type="button"
+                onClick={handleBlockedCreateVisit}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                {customerTexts.detail.createVisit}
+              </button>
+            ) : (
+              <Link
+                href={createVisitRoute}
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted"
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                {customerTexts.detail.createVisit}
+              </Link>
+            )}
           </div>
         ) : null}
       </div>
@@ -499,6 +539,8 @@ export function EditCustomerModal({
   onSubmit: (event: SyntheticEvent<HTMLFormElement>) => void;
   phone: string;
 }) {
+  useLockBodyScroll(isOpen);
+
   if (!isOpen) {
     return null;
   }

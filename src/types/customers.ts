@@ -89,8 +89,11 @@ export type CustomerVisit = {
   createdAt: string;
   completedAt: string | null;
   lastUpdatedBy: string | null;
+  lastUpdatedByName?: string | null;
   status: CustomerVisitStatus;
   totalPrice: number;
+  noHaircut?: boolean;
+  noSkinnerService?: boolean;
   services: CustomerVisitService[];
   barber: CustomerVisitStaff;
   skinner: CustomerVisitStaff;

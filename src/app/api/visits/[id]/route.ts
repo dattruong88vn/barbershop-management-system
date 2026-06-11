@@ -32,6 +32,11 @@ const VISIT_SELECT = {
   createdAt: true,
   completedAt: true,
   lastUpdatedBy: true,
+  lastUpdater: {
+    select: {
+      username: true,
+    },
+  },
   status: true,
   totalPrice: true,
   barber: {
@@ -134,6 +139,10 @@ function normalizeNullableId(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function normalizeBoolean(value: unknown) {
+  return value === true;
+}
+
 function normalizeVisitDetailUpdateInput(
   body: VisitDetailUpdateRequestBody,
   visitId: string,
@@ -142,6 +151,8 @@ function normalizeVisitDetailUpdateInput(
     barberId: normalizeNullableId(body.barberId),
     comboIds: normalizeStringArray(body.comboIds),
     customerId: null,
+    noHaircut: normalizeBoolean(body.noHaircut),
+    noSkinnerService: normalizeBoolean(body.noSkinnerService),
     serviceIds: normalizeStringArray(body.serviceIds),
     skinnerId: normalizeNullableId(body.skinnerId),
     visitId,
@@ -180,6 +191,9 @@ function formatVisitResponse(
     createdAt: visit.createdAt.toISOString(),
     completedAt: visit.completedAt?.toISOString() ?? null,
     lastUpdatedBy: visit.lastUpdatedBy,
+    lastUpdatedByName: visit.lastUpdater?.username ?? null,
+    noHaircut: false,
+    noSkinnerService: false,
     status: visit.status,
     totalPrice: Number(visit.totalPrice.toString()),
     barber: visit.barber,
@@ -290,7 +304,8 @@ export async function GET(request: NextRequest, context: VisitRouteContext) {
     visit: formatVisitResponse(visit, {
       canCompleteVisit: canCompleteVisitStatus(authResult.role, visit.status),
       canStartVisit: canStartVisitStatus(authResult.role, visit.status),
-      canUploadPhotos: authResult.role === "barber",
+      canUploadPhotos:
+        authResult.role === "barber" && visit.status !== VISIT_STATUS_COMPLETED,
     }),
   });
 }
@@ -325,7 +340,9 @@ export async function PATCH(
     },
     select: {
       id: true,
+      barberId: true,
       completedAt: true,
+      skinnerId: true,
       status: true,
     },
   });
@@ -362,6 +379,16 @@ export async function PATCH(
       );
     }
 
+    if (
+      isCompletingVisit &&
+      (!visit.barberId || !visit.skinnerId)
+    ) {
+      return NextResponse.json(
+        { error: visitTexts.api.errors.missingCompletionStaff },
+        { status: 400 },
+      );
+    }
+
     const updatedVisit = await prisma.visit.update({
       where: { id: visit.id },
       data: {
@@ -379,7 +406,9 @@ export async function PATCH(
           updatedVisit.status,
         ),
         canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
-        canUploadPhotos: authResult.role === "barber",
+        canUploadPhotos:
+          authResult.role === "barber" &&
+          updatedVisit.status !== VISIT_STATUS_COMPLETED,
       }),
     });
   }
@@ -408,6 +437,9 @@ export async function PATCH(
       );
     }
 
+    const barberId = visitInput.noHaircut ? null : visitInput.barberId;
+    const skinnerId = visitInput.noSkinnerService ? null : visitInput.skinnerId;
+
     const [services, combos, isValidStaff] = await Promise.all([
       prisma.service.findMany({
         where: {
@@ -430,8 +462,8 @@ export async function PATCH(
         },
       }),
       validateStaff(
-        visitInput.barberId,
-        visitInput.skinnerId,
+        barberId,
+        skinnerId,
         authResult.shopId,
       ),
     ]);
@@ -464,9 +496,9 @@ export async function PATCH(
     const updatedVisit = await prisma.visit.update({
       where: { id: visit.id },
       data: {
-        barberId: visitInput.barberId,
+        barberId,
         lastUpdatedBy: authResult.userId,
-        skinnerId: visitInput.skinnerId,
+        skinnerId,
         totalPrice,
         visitServices: {
           deleteMany: {},
@@ -494,7 +526,9 @@ export async function PATCH(
           updatedVisit.status,
         ),
         canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
-        canUploadPhotos: authResult.role === "barber",
+        canUploadPhotos:
+          authResult.role === "barber" &&
+          updatedVisit.status !== VISIT_STATUS_COMPLETED,
       }),
     });
   }
@@ -514,10 +548,14 @@ export async function PATCH(
   }
 
   const barberId = normalizeNullableId(body.barberId);
+  const noHaircut = normalizeBoolean(body.noHaircut);
   const skinnerId = normalizeNullableId(body.skinnerId);
+  const noSkinnerService = normalizeBoolean(body.noSkinnerService);
+  const effectiveBarberId = noHaircut ? null : barberId;
+  const effectiveSkinnerId = noSkinnerService ? null : skinnerId;
   const isValidStaff = await validateStaff(
-    barberId,
-    skinnerId,
+    effectiveBarberId,
+    effectiveSkinnerId,
     authResult.shopId,
   );
 
@@ -531,9 +569,9 @@ export async function PATCH(
   const updatedVisit = await prisma.visit.update({
     where: { id: visit.id },
     data: {
-      barberId,
-      skinnerId,
+      barberId: effectiveBarberId,
       lastUpdatedBy: authResult.userId,
+      skinnerId: effectiveSkinnerId,
     },
     select: VISIT_SELECT,
   });
@@ -542,7 +580,9 @@ export async function PATCH(
     visit: formatVisitResponse(updatedVisit, {
       canCompleteVisit: canCompleteVisitStatus(authResult.role, updatedVisit.status),
       canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
-      canUploadPhotos: authResult.role === "barber",
+      canUploadPhotos:
+        authResult.role === "barber" &&
+        updatedVisit.status !== VISIT_STATUS_COMPLETED,
     }),
   });
 }

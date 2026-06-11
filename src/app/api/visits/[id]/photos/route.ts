@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 import { visitTexts } from "@/constants/texts";
+import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { getPhotoUrl } from "@/lib/r2";
 import { prisma } from "@/lib/prisma";
 import type { VisitPhotoCreateRequestBody } from "@/types";
@@ -80,6 +81,7 @@ export async function POST(
     select: {
       id: true,
       shopId: true,
+      status: true,
     },
   });
 
@@ -87,6 +89,13 @@ export async function POST(
     return NextResponse.json(
       { error: visitTexts.api.errors.notFound },
       { status: 404 },
+    );
+  }
+
+  if (visit.status === VISIT_STATUS_COMPLETED) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.lockedPhotoEdit },
+      { status: 400 },
     );
   }
 
@@ -136,6 +145,30 @@ export async function DELETE(
   if (!photoId) {
     return NextResponse.json(
       { error: visitTexts.api.errors.invalidPhoto },
+      { status: 400 },
+    );
+  }
+
+  const visit = await prisma.visit.findFirst({
+    where: {
+      id,
+      shopId: token.shop_id,
+    },
+    select: {
+      status: true,
+    },
+  });
+
+  if (!visit) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  if (visit.status === VISIT_STATUS_COMPLETED) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.lockedPhotoEdit },
       { status: 400 },
     );
   }

@@ -4,6 +4,8 @@
 
 import { X } from "lucide-react";
 
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
+
 export function ImageLightbox({
   alt,
   closeLabel,
@@ -15,6 +17,8 @@ export function ImageLightbox({
   imageUrl: string | null;
   onClose: () => void;
 }) {
+  useLockBodyScroll(Boolean(imageUrl));
+
   if (!imageUrl) {
     return null;
   }

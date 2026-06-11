@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft, PencilLine, ReceiptText } from "lucide-react";
+import { ArrowLeft, PencilLine, ReceiptText, X } from "lucide-react";
 
 import { Button } from "@/components/global/ui/button";
 import { EmptyState } from "@/components/global/EmptyState";
@@ -11,15 +11,20 @@ import { InlineAlert } from "@/components/global/InlineAlert";
 import { Skeleton } from "@/components/global/Skeleton";
 import { visitTexts } from "@/constants/texts";
 import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
+import { useVisitContext } from "@/context/VisitContext";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import { dispatchAppToast } from "@/lib/toast";
 import type {
   CustomerVisit,
   CustomerVisitPhoto,
-  VisitDetailViewProps,
+  VisitContextValue,
+  VisitStatusUpdateInput,
 } from "@/types";
 import {
+  VisitDetailEditForm,
   VisitDetailMainSections,
   VisitDetailSidebar,
+  VisitStatusActionButton,
 } from "./VisitDetailSections";
 
 const STAFF_EDIT_WINDOW_MS = 3 * 60 * 60 * 1000;
@@ -44,16 +49,22 @@ function VisitDetailSkeleton() {
 
 function VisitDetailHeader({
   backHref,
-  isRefreshingDetail,
-  onRefreshDetail,
+  canEditDetail,
+  isUpdatingStatus,
+  onOpenEditDetail,
+  onUpdateStatus,
+  visit,
 }: {
   backHref: string;
-  isRefreshingDetail: boolean;
-  onRefreshDetail: () => Promise<void>;
+  canEditDetail: boolean;
+  isUpdatingStatus: boolean;
+  onOpenEditDetail: () => void;
+  onUpdateStatus?: (input: VisitStatusUpdateInput) => Promise<CustomerVisit>;
+  visit: CustomerVisit | null;
 }) {
   return (
-    <header className="mb-4 flex flex-col gap-4 md:mb-6 md:flex-row md:items-center md:justify-between">
-      <div className="min-w-0">
+    <header className="mb-4 flex flex-col gap-4 md:mb-6">
+      <div>
         <Link
           href={backHref}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
@@ -61,69 +72,151 @@ function VisitDetailHeader({
           <ArrowLeft className="size-4" aria-hidden="true" />
           {visitTexts.detail.backToCustomers}
         </Link>
-        <h1 className="mt-3 text-xl font-semibold text-foreground md:text-2xl">
-          {visitTexts.detail.title}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {visitTexts.detail.description}
-        </p>
       </div>
-      <Button
-        type="button"
-        variant="secondary"
-        loading={isRefreshingDetail}
-        className="w-full md:w-auto"
-        onClick={onRefreshDetail}
-      >
-        <PencilLine className="size-4" aria-hidden="true" />
-        {isRefreshingDetail
-          ? visitTexts.detail.refreshingDetail
-          : visitTexts.detail.refreshDetail}
-      </Button>
+
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold text-foreground md:text-2xl">
+            {visitTexts.detail.title}
+          </h1>
+        </div>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          {canEditDetail ? (
+            <Button
+              type="button"
+              variant="primary"
+              className="w-full md:w-auto"
+              onClick={onOpenEditDetail}
+            >
+              <PencilLine className="size-4" aria-hidden="true" />
+              {visitTexts.detail.editVisit}
+            </Button>
+          ) : null}
+          {visit ? (
+            <VisitStatusActionButton
+              isUpdatingStatus={isUpdatingStatus}
+              visit={visit}
+              onUpdateStatus={onUpdateStatus}
+            />
+          ) : null}
+        </div>
+      </div>
     </header>
   );
 }
 
-export function VisitDetailView({
+function VisitDetailEditModal({
   barbers,
-  backHref,
-  combos = [],
-  error,
-  isDeletingPhoto = false,
-  isLoading,
-  isRefreshingDetail = false,
-  isUpdatingDetail = false,
-  isUploadingPhoto,
+  combos,
+  isUpdatingDetail,
   isUpdatingStaff,
-  isUpdatingStatus = false,
-  onDeletePhoto,
-  onRefreshDetail,
+  onClose,
   onUpdateDetail,
-  onUpdateError,
-  onUploadPhoto,
   onUpdateStaff,
-  onUpdateStatus,
-  services = [],
+  open,
+  services,
   skinners,
-  updateError,
   visit,
-}: VisitDetailViewProps) {
+}: {
+  barbers: VisitContextValue["barbers"];
+  combos: VisitContextValue["combos"];
+  isUpdatingDetail: boolean;
+  isUpdatingStaff: boolean;
+  onClose: () => void;
+  onUpdateDetail: VisitContextValue["updateVisitDetail"];
+  onUpdateStaff: VisitContextValue["updateVisitStaff"];
+  open: boolean;
+  services: VisitContextValue["services"];
+  skinners: VisitContextValue["skinners"];
+  visit: CustomerVisit;
+}) {
+  useLockBodyScroll(open);
+
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-4 py-4 md:items-center">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-border bg-background p-4 shadow-lg md:p-6">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold text-foreground md:text-xl">
+            {visitTexts.detail.editVisitTitle}
+          </h2>
+          <Button
+            type="button"
+            aria-label={visitTexts.detail.closeEditVisit}
+            size="icon"
+            variant="ghost"
+            onClick={onClose}
+          >
+            <X className="size-4" aria-hidden="true" />
+          </Button>
+        </div>
+
+        <VisitDetailEditForm
+          barbers={barbers}
+          combos={combos}
+          isUpdatingDetail={isUpdatingDetail}
+          isUpdatingStaff={isUpdatingStaff}
+          services={services}
+          skinners={skinners}
+          visit={visit}
+          onCancel={onClose}
+          onUpdateDetail={onUpdateDetail}
+          onUpdateStaff={onUpdateStaff}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function VisitDetailView() {
+  const {
+    backHref,
+    barbers,
+    combos,
+    deleteVisitPhoto,
+    error,
+    isDeletingPhoto,
+    isLoading,
+    isRefreshingDetail,
+    isUpdatingDetail,
+    isUploadingPhoto,
+    isUpdatingStaff,
+    isUpdatingStatus,
+    refreshVisitDetail,
+    services,
+    skinners,
+    updateVisitDetail,
+    updateVisitStaff,
+    updateVisitStatus,
+    uploadVisitPhoto,
+    visit,
+  } = useVisitContext();
   const [selectedPhoto, setSelectedPhoto] = useState<CustomerVisitPhoto | null>(
     null,
   );
   const [deleteError, setDeleteError] = useState("");
+  const [hasPendingPhotoRefresh, setHasPendingPhotoRefresh] = useState(false);
+  const [isEditingDetail, setIsEditingDetail] = useState(false);
   const [refreshError, setRefreshError] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const canEditDetail =
+    Boolean(visit) &&
+    (visit?.status !== VISIT_STATUS_COMPLETED || canEditStaff(visit));
+  const canManagePhotos =
+    Boolean(visit?.canUploadPhotos) && visit?.status !== VISIT_STATUS_COMPLETED;
 
   async function handleUploadPhoto(file: File) {
-    if (!visit) {
+    if (!visit || visit.status === VISIT_STATUS_COMPLETED) {
       return;
     }
 
     setUploadError("");
 
     try {
-      await onUploadPhoto({
+      await uploadVisitPhoto({
         file,
         visitId: visit.id,
       });
@@ -132,6 +225,7 @@ export function VisitDetailView({
         message: visitTexts.detail.uploadSuccess,
         type: "success",
       });
+      setHasPendingPhotoRefresh(true);
     } catch (photoUploadError) {
       setUploadError(
         photoUploadError instanceof Error
@@ -142,14 +236,14 @@ export function VisitDetailView({
   }
 
   async function handleDeletePhoto(photo: CustomerVisitPhoto) {
-    if (!visit || !onDeletePhoto) {
+    if (!visit || visit.status === VISIT_STATUS_COMPLETED) {
       return;
     }
 
     setDeleteError("");
 
     try {
-      await onDeletePhoto({
+      await deleteVisitPhoto({
         photoId: photo.id,
         visitId: visit.id,
       });
@@ -161,6 +255,7 @@ export function VisitDetailView({
         message: visitTexts.detail.deleteSuccess,
         type: "success",
       });
+      setHasPendingPhotoRefresh(true);
     } catch (photoDeleteError) {
       setDeleteError(
         photoDeleteError instanceof Error
@@ -171,19 +266,16 @@ export function VisitDetailView({
   }
 
   async function handleRefreshDetail() {
-    if (!onRefreshDetail) {
-      return;
-    }
-
     setRefreshError("");
 
     try {
-      await onRefreshDetail();
+      await refreshVisitDetail();
       dispatchAppToast({
         description: visitTexts.detail.refreshSuccessDescription,
         message: visitTexts.detail.refreshSuccess,
         type: "success",
       });
+      setHasPendingPhotoRefresh(false);
     } catch (detailRefreshError) {
       setRefreshError(
         detailRefreshError instanceof Error
@@ -198,8 +290,11 @@ export function VisitDetailView({
       <div className="mx-auto w-full max-w-5xl">
         <VisitDetailHeader
           backHref={backHref}
-          isRefreshingDetail={isRefreshingDetail}
-          onRefreshDetail={handleRefreshDetail}
+          canEditDetail={canEditDetail}
+          isUpdatingStatus={isUpdatingStatus}
+          visit={visit}
+          onOpenEditDetail={() => setIsEditingDetail(true)}
+          onUpdateStatus={updateVisitStatus}
         />
 
         {refreshError ? (
@@ -223,31 +318,21 @@ export function VisitDetailView({
         {visit ? (
           <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
             <VisitDetailMainSections
-              canUploadPhotos={Boolean(visit.canUploadPhotos)}
+              canUploadPhotos={canManagePhotos}
               deleteError={deleteError}
+              hasPendingPhotoRefresh={hasPendingPhotoRefresh}
               isDeletingPhoto={isDeletingPhoto}
+              isRefreshingDetail={isRefreshingDetail}
               isUploadingPhoto={isUploadingPhoto}
               onDeletePhoto={handleDeletePhoto}
+              onRefreshDetail={handleRefreshDetail}
               uploadError={uploadError}
               visit={visit}
               onSelectPhoto={setSelectedPhoto}
               onUploadPhoto={handleUploadPhoto}
             />
             <VisitDetailSidebar
-              barbers={barbers}
-              combos={combos}
-              isStaffEditable={canEditStaff(visit)}
-              isUpdatingDetail={isUpdatingDetail}
-              isUpdatingStaff={isUpdatingStaff}
-              isUpdatingStatus={isUpdatingStatus}
-              services={services}
-              skinners={skinners}
-              updateError={updateError}
               visit={visit}
-              onUpdateError={onUpdateError}
-              onUpdateDetail={onUpdateDetail}
-              onUpdateStaff={onUpdateStaff}
-              onUpdateStatus={onUpdateStatus}
             />
           </div>
         ) : null}
@@ -259,6 +344,22 @@ export function VisitDetailView({
         imageUrl={selectedPhoto?.photoUrl ?? null}
         onClose={() => setSelectedPhoto(null)}
       />
+
+      {visit ? (
+        <VisitDetailEditModal
+          barbers={barbers}
+          combos={combos}
+          isUpdatingDetail={isUpdatingDetail}
+          isUpdatingStaff={isUpdatingStaff}
+          open={isEditingDetail}
+          services={services}
+          skinners={skinners}
+          visit={visit}
+          onClose={() => setIsEditingDetail(false)}
+          onUpdateDetail={updateVisitDetail}
+          onUpdateStaff={updateVisitStaff}
+        />
+      ) : null}
     </main>
   );
 }

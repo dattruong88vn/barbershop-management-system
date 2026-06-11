@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 
 import { customerTexts, visitTexts } from "@/constants/texts";
 import {
+  VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
   isVisitStatus,
 } from "@/constants/visitStatuses";
@@ -83,6 +84,7 @@ type VisitRecord = Prisma.VisitGetPayload<{
 
 type StaffAuthResult =
   | {
+      role: UserRole;
       userId: string;
       shopId: string;
       branchId: string;
@@ -181,6 +183,7 @@ async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
   }
 
   return {
+    role: token.role as UserRole,
     userId: token.id,
     shopId: token.shop_id,
     branchId: token.branch_id,
@@ -197,6 +200,21 @@ async function isCustomerValid(customerId: string, shopId: string) {
   });
 
   return Boolean(customer);
+}
+
+async function hasOpenVisit(customerId: string, shopId: string) {
+  const visit = await prisma.visit.findFirst({
+    where: {
+      customerId,
+      shopId,
+      status: {
+        in: [VISIT_STATUS_PENDING, VISIT_STATUS_IN_PROGRESS],
+      },
+    },
+    select: { id: true },
+  });
+
+  return Boolean(visit);
 }
 
 async function validateStaff(
@@ -375,6 +393,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const customerHasOpenVisit = await hasOpenVisit(
+    visitInput.customerId,
+    authResult.shopId,
+  );
+
+  if (customerHasOpenVisit) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.openVisitExists },
+      { status: 400 },
+    );
+  }
+
+  const barberId =
+    authResult.role === "barber" && !visitInput.barberId
+      ? authResult.userId
+      : visitInput.barberId;
+  const skinnerId =
+    authResult.role === "skinner" && !visitInput.skinnerId
+      ? authResult.userId
+      : visitInput.skinnerId;
+
   const [services, combos, isValidStaff] = await Promise.all([
     prisma.service.findMany({
       where: {
@@ -396,7 +435,7 @@ export async function POST(request: NextRequest) {
         price: true,
       },
     }),
-    validateStaff(visitInput.barberId, visitInput.skinnerId, authResult.shopId),
+    validateStaff(barberId, skinnerId, authResult.shopId),
   ]);
 
   if (services.length !== visitInput.serviceIds.length) {
@@ -430,8 +469,8 @@ export async function POST(request: NextRequest) {
       shopId: authResult.shopId,
       customerId: visitInput.customerId,
       branchId: authResult.branchId,
-      barberId: visitInput.barberId,
-      skinnerId: visitInput.skinnerId,
+      barberId,
+      skinnerId,
       status: VISIT_STATUS_PENDING,
       totalPrice,
       createdBy: authResult.userId,
