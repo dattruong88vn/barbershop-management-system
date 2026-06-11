@@ -107,6 +107,10 @@ function isVisitStaffUpdateRequestBody(
   return typeof body === "object" && body !== null;
 }
 
+function isVisitPatchRequestBody(body: unknown): body is Record<string, unknown> {
+  return typeof body === "object" && body !== null;
+}
+
 function isVisitStatusUpdateRequestBody(
   body: unknown,
 ): body is VisitStatusUpdateRequestBody {
@@ -325,7 +329,7 @@ export async function PATCH(
 
   const body: unknown = await request.json().catch(() => null);
 
-  if (!isVisitStaffUpdateRequestBody(body)) {
+  if (!isVisitPatchRequestBody(body)) {
     return NextResponse.json(
       { error: visitTexts.api.errors.invalidRequestBody },
       { status: 400 },
@@ -535,6 +539,13 @@ export async function PATCH(
           updatedVisit.status !== VISIT_STATUS_COMPLETED,
       }),
     });
+  }
+
+  if (!isVisitStaffUpdateRequestBody(body)) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.invalidRequestBody },
+      { status: 400 },
+    );
   }
 
   if (visit.status !== VISIT_STATUS_COMPLETED || !visit.completedAt) {

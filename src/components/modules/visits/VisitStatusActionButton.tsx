@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CheckCircle2, Play } from "lucide-react";
 
 import { InlineAlert } from "@/components/global/InlineAlert";
@@ -25,15 +25,16 @@ export function VisitStatusActionButton({
 }) {
   const [statusError, setStatusError] = useState("");
   const action = getVisitStatusAction(visit);
-
-  useEffect(() => {
-    if (
-      action?.status === VISIT_STATUS_COMPLETED &&
-      !getMissingCompletionStaffMessage(visit)
-    ) {
-      setStatusError("");
-    }
-  }, [action?.status, visit]);
+  const missingCompletionStaffMessage =
+    action?.status === VISIT_STATUS_COMPLETED
+      ? getMissingCompletionStaffMessage(visit)
+      : "";
+  const visibleStatusError =
+    statusError && missingCompletionStaffMessage !== ""
+      ? statusError
+      : action?.status === VISIT_STATUS_COMPLETED
+        ? ""
+        : statusError;
 
   async function handleUpdateStatus() {
     if (!action || !onUpdateStatus) {
@@ -43,8 +44,6 @@ export function VisitStatusActionButton({
     setStatusError("");
 
     if (action.status === VISIT_STATUS_COMPLETED) {
-      const missingCompletionStaffMessage = getMissingCompletionStaffMessage(visit);
-
       if (missingCompletionStaffMessage) {
         setStatusError(missingCompletionStaffMessage);
         dispatchAppToast({
@@ -108,8 +107,8 @@ export function VisitStatusActionButton({
         )}
         {isUpdatingStatus ? visitTexts.detail.updatingStatus : action.label}
       </Button>
-      {statusError ? (
-        <InlineAlert className="mt-3">{statusError}</InlineAlert>
+      {visibleStatusError ? (
+        <InlineAlert className="mt-3">{visibleStatusError}</InlineAlert>
       ) : null}
     </div>
   );

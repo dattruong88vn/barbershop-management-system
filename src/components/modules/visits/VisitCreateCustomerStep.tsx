@@ -2,11 +2,9 @@
 
 import { visitTexts } from "@/constants/texts";
 import type { VisitCreatePageViewProps } from "@/types";
-import {
-  VisitCustomerSearchForm,
-  VisitCustomerSearchResults,
-  VisitSelectedCustomerCard,
-} from "../create-customer";
+import { VisitCustomerSearchForm } from "./VisitCustomerSearchForm";
+import { VisitCustomerSearchResults } from "./VisitCustomerSearchResults";
+import { VisitSelectedCustomerCard } from "./VisitSelectedCustomerCard";
 
 export function VisitCreateCustomerStep({
   activeSearch,
