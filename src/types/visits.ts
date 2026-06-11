@@ -1,4 +1,4 @@
-import type { ChangeEventHandler, FormEventHandler } from "react";
+import type { ChangeEventHandler, FormEventHandler, ReactNode } from "react";
 import type {
   Customer,
   CustomerVisit,
@@ -65,12 +65,50 @@ export type VisitStaffUpdateInput = {
   visitId: string;
   customerId: string;
   barberId: string | null;
+  noHaircut?: boolean;
   skinnerId: string | null;
+  noSkinnerService?: boolean;
 };
 
 export type VisitStaffUpdateRequestBody = {
   barberId?: unknown;
+  noHaircut?: unknown;
   skinnerId?: unknown;
+  noSkinnerService?: unknown;
+};
+
+export type VisitDetailUpdateInput = {
+  comboIds: string[];
+  customerId?: string | null;
+  serviceIds: string[];
+  barberId: string | null;
+  noHaircut?: boolean;
+  skinnerId: string | null;
+  noSkinnerService?: boolean;
+  visitId: string;
+};
+
+export type VisitDetailUpdateRequestBody = {
+  comboIds?: unknown;
+  serviceIds?: unknown;
+  barberId?: unknown;
+  noHaircut?: unknown;
+  skinnerId?: unknown;
+  noSkinnerService?: unknown;
+};
+
+export type VisitStatusUpdateInput = {
+  customerId?: string | null;
+  noHaircut?: boolean;
+  noSkinnerService?: boolean;
+  status: CustomerVisitStatus;
+  visitId: string;
+};
+
+export type VisitStatusUpdateRequestBody = {
+  noHaircut?: unknown;
+  noSkinnerService?: unknown;
+  status?: unknown;
 };
 
 export type VisitPhotoCreateInput = {
@@ -84,6 +122,11 @@ export type VisitPhotoCreateRequestBody = {
 
 export type VisitPhotoUploadInput = {
   file: File;
+  visitId: string;
+};
+
+export type VisitPhotoDeleteInput = {
+  photoId: string;
   visitId: string;
 };
 
@@ -133,16 +176,57 @@ export type VisitCreateFormProps = {
 export type VisitDetailViewProps = {
   barbers: VisitCreateStaff[];
   backHref: string;
+  combos?: VisitCreateItem[];
   error: unknown;
+  isDeletingPhoto?: boolean;
+  isUpdatingDetail?: boolean;
   isLoading: boolean;
+  isRefreshingDetail?: boolean;
+  isUpdatingStatus?: boolean;
   isUploadingPhoto: boolean;
   isUpdatingStaff: boolean;
+  services?: VisitCreateItem[];
   skinners: VisitCreateStaff[];
   updateError: string;
   visit: CustomerVisit | null;
+  onDeletePhoto?: (input: VisitPhotoDeleteInput) => Promise<CustomerVisitPhoto>;
+  onRefreshDetail?: () => Promise<unknown>;
+  onUpdateDetail?: (input: VisitDetailUpdateInput) => Promise<CustomerVisit>;
   onUploadPhoto: (input: VisitPhotoUploadInput) => Promise<CustomerVisitPhoto>;
   onUpdateError: (error: string) => void;
   onUpdateStaff: (input: VisitStaffUpdateInput) => Promise<CustomerVisit>;
+  onUpdateStatus?: (input: VisitStatusUpdateInput) => Promise<CustomerVisit>;
+};
+
+export type VisitProviderProps = {
+  backHref: string;
+  children: ReactNode;
+  returnToCustomerId?: string | null;
+  visitId?: string;
+};
+
+export type VisitContextValue = VisitCreateOptions & {
+  backHref: string;
+  createVisit: (input: VisitCreateInput) => Promise<CustomerVisit>;
+  deleteVisitPhoto: (input: VisitPhotoDeleteInput) => Promise<CustomerVisitPhoto>;
+  error: unknown;
+  isCreating: boolean;
+  isDeletingPhoto: boolean;
+  isLoading: boolean;
+  isLoadingOptions: boolean;
+  isRefreshingDetail: boolean;
+  isUpdatingDetail: boolean;
+  isUploadingPhoto: boolean;
+  isUpdatingStaff: boolean;
+  isUpdatingStatus: boolean;
+  optionsError: unknown;
+  refreshVisitDetail: () => Promise<CustomerVisit | null>;
+  returnToCustomerId: string | null;
+  updateVisitDetail: (input: VisitDetailUpdateInput) => Promise<CustomerVisit>;
+  updateVisitStaff: (input: VisitStaffUpdateInput) => Promise<CustomerVisit>;
+  updateVisitStatus: (input: VisitStatusUpdateInput) => Promise<CustomerVisit>;
+  uploadVisitPhoto: (input: VisitPhotoUploadInput) => Promise<CustomerVisitPhoto>;
+  visit: CustomerVisit | null;
 };
 
 export type VisitStaffEditFormProps = {

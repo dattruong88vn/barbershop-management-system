@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import type { Customer } from "@/types";
@@ -12,7 +12,7 @@ vi.mock("@/hooks/useCustomers", () => ({
   useCustomers: mocks.useCustomers,
 }));
 
-vi.mock("@/components/visits/VisitCreatePageView", () => ({
+vi.mock("@/components/modules/visits", () => ({
   VisitCreatePageView: ({
     selectedCustomer,
   }: {
@@ -34,17 +34,19 @@ describe("VisitCreatePage", () => {
       isLoading: false,
     });
 
-    render(
-      <Suspense fallback={null}>
-        <VisitCreatePage
-          searchParams={Promise.resolve({
-            customerId: "customer-1",
-            name: "Nguyễn Văn Nam",
-            phone: "0901234567",
-          })}
-        />
-      </Suspense>,
-    );
+    await act(async () => {
+      render(
+        <Suspense fallback={null}>
+          <VisitCreatePage
+            searchParams={Promise.resolve({
+              customerId: "customer-1",
+              name: "Nguyễn Văn Nam",
+              phone: "0901234567",
+            })}
+          />
+        </Suspense>,
+      );
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("visit-create-page-view")).toHaveTextContent(
@@ -60,11 +62,13 @@ describe("VisitCreatePage", () => {
       isLoading: false,
     });
 
-    render(
-      <Suspense fallback={null}>
-        <VisitCreatePage searchParams={Promise.resolve({})} />
-      </Suspense>,
-    );
+    await act(async () => {
+      render(
+        <Suspense fallback={null}>
+          <VisitCreatePage searchParams={Promise.resolve({})} />
+        </Suspense>,
+      );
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("visit-create-page-view")).toHaveTextContent(

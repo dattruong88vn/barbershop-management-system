@@ -64,6 +64,8 @@ async function updateVisitStaff(
       headers: DEFAULT_JSON_HEADERS,
       body: JSON.stringify({
         barberId: input.barberId,
+        noHaircut: input.noHaircut,
+        noSkinnerService: input.noSkinnerService,
         skinnerId: input.skinnerId,
       }),
     },

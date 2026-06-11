@@ -63,6 +63,9 @@ function createVisitRecord() {
     createdAt: new Date("2026-06-04T01:00:00.000Z"),
     completedAt: new Date("2026-06-04T02:00:00.000Z"),
     lastUpdatedBy: "user-1",
+    lastUpdater: {
+      username: "Lễ tân",
+    },
     status: "completed",
     totalPrice: { toString: () => "150000" },
     barber: {
@@ -138,6 +141,10 @@ describe("GET /api/visits/[id]", () => {
         createdAt: "2026-06-04T01:00:00.000Z",
         completedAt: "2026-06-04T02:00:00.000Z",
         lastUpdatedBy: "user-1",
+        lastUpdatedByName: "Lễ tân",
+        canCompleteVisit: false,
+        canStartVisit: false,
+        canUploadPhotos: false,
         status: "completed",
         totalPrice: 150000,
         barber: {
@@ -301,6 +308,10 @@ describe("PATCH /api/visits/[id]", () => {
         createdAt: "2026-06-04T01:00:00.000Z",
         completedAt: "2026-06-04T02:00:00.000Z",
         lastUpdatedBy: "user-1",
+        lastUpdatedByName: "Lễ tân",
+        canCompleteVisit: false,
+        canStartVisit: false,
+        canUploadPhotos: false,
         status: "completed",
         totalPrice: 150000,
         barber: {

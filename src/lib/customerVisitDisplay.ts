@@ -81,13 +81,15 @@ export function getVisitCycleDays(visits: CustomerVisit[]) {
 }
 
 export function getRecentVisitPhotos(visits: CustomerVisit[]) {
-  return visits
-    .flatMap((visit) => visit.photos)
-    .sort(
-      (firstPhoto: CustomerVisitPhoto, secondPhoto: CustomerVisitPhoto) =>
-        new Date(secondPhoto.createdAt).getTime() -
-        new Date(firstPhoto.createdAt).getTime(),
-    );
+  const latestVisitWithPhotos = visits.find((visit) => visit.photos.length > 0);
+
+  return latestVisitWithPhotos
+    ? [...latestVisitWithPhotos.photos].sort(
+        (firstPhoto: CustomerVisitPhoto, secondPhoto: CustomerVisitPhoto) =>
+          new Date(secondPhoto.createdAt).getTime() -
+          new Date(firstPhoto.createdAt).getTime(),
+      )
+    : [];
 }
 
 export function hasVisitPhotoWarning(visit: CustomerVisit | null) {

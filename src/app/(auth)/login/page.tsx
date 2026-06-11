@@ -5,11 +5,11 @@ import { useState } from "react";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { AuthFormShell } from "@/components/design-system/AuthFormShell";
-import { FormTextField } from "@/components/design-system/FormTextField";
-import { InlineAlert } from "@/components/design-system/InlineAlert";
-import { PasswordField } from "@/components/design-system/PasswordField";
-import { Button } from "@/components/ui/button";
+import { AuthFormShell } from "@/components/screens/auth/AuthFormShell";
+import { FormTextField } from "@/components/global/FormTextField";
+import { InlineAlert } from "@/components/global/InlineAlert";
+import { PasswordField } from "@/components/global/PasswordField";
+import { Button } from "@/components/global/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { getPostAuthRedirectPath } from "@/lib/authRedirect";

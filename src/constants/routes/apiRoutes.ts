@@ -15,4 +15,6 @@ export const API_ROUTES = {
   visits: "/api/visits",
   visitDetail: (id: string) => `/api/visits/${id}`,
   visitPhotos: (id: string) => `/api/visits/${id}/photos`,
+  visitPhotoDetail: (visitId: string, photoId: string) =>
+    `/api/visits/${visitId}/photos?photoId=${photoId}`,
 } as const;

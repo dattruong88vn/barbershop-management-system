@@ -292,3 +292,131 @@ Copy this structure when starting a new date section:
 ### Notes
 - Installed `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`, and `nanoid`; all include TypeScript declarations.
 - Added R2 environment variable examples to `.env.example`.
+
+## 2026-06-10
+
+### Business Changes
+- Kept haircut photo deletion restricted to the barber upload permission path.
+- Added role-based visit status transitions: barber/skinner can start pending visits, receptionist can complete in-progress visits.
+
+### Database Changes
+- None
+
+### API Changes
+- Added `DELETE /api/visits/:id/photos?photoId=...` to remove a visit photo scoped by `shop_id` and `visit_id`.
+- Added status update support to `PATCH /api/visits/:id` for `pending` to `in_progress` and `in_progress` to `completed`.
+- Added Visit Detail update support to `PATCH /api/visits/:id` for replacing services/combos and updating barber/skinner on non-completed visits.
+- Added `lastUpdatedByName` to Visit Detail API responses so the UI can display the updater username instead of the raw user id.
+
+### UI Changes
+- Added an X icon button on uploaded Visit Detail photos to delete photos with success toast and inline error handling.
+- Added a Visit Detail refresh button to reload the current visit details with loading, success toast, and inline error handling.
+- Changed the Visit Detail update button icon from refresh to edit-style `PencilLine`.
+- Updated Customer Detail visit history to show pending and in-progress visits so newly created visits appear when returning from Visit Detail.
+- Added Visit Detail status action buttons for starting and completing visits based on API permissions.
+- Added a Visit Detail edit panel with service/combo selectors and barber/skinner selects matching the Create Visit form.
+- Added the V0 Geist design-system component set under `src/components/design-system/`, including primitives, inputs, layout, display, feedback, overlay, specialized components, tokens, utilities, and barrel exports.
+- Added Geist typography utilities for `text-heading-32` and `text-copy-14`, and aligned radius tokens to the 6px/8px/12px Geist scale.
+- Extended existing `EmptyState` and `Skeleton` components with Geist-compatible props while preserving their existing call sites.
+- Moved app-wide shared UI components from `src/components/design-system/` to `src/components/global/`.
+- Moved the auth-only form shell component to `src/components/screens/auth/`.
+- Moved shadcn UI primitives from `src/components/ui/` to `src/components/global/ui/`.
+- Moved mobile navigation components from `src/components/global/` to `src/components/mobile/`.
+- Removed the Visit Detail header refresh button and moved the edit action into that header position.
+- Changed Visit Detail editing from an inline sidebar panel to a modal form.
+- Hid the Visit Detail photo upload section until the visit status is `in_progress`.
+- Added an in-section photo refresh button that appears after a successful upload or delete.
+- Added shared body scroll locking for project overlays so the background screen does not scroll while modals, sheets, drawers, command menus, or image lightboxes are open.
+- Renamed Visit Detail "Thông tin visit" to "Thông tin chung", added status to that section, and display updater username when available.
+- Combined Visit Detail services and combos into one "Dịch vụ" section and removed the separate Combo section.
+- Removed the separate Visit Detail status section and moved status transition actions beside the header edit button.
+- Combined Visit Detail barber and skinner display into a single "Nhân sự" section.
+- Changed the pending status action label to "Thực hiện" while preserving existing role-based permissions.
+- Hid the haircut photo warning while Visit Detail is still pending.
+- Removed the Visit Detail header description and last-updater display row.
+- Shortened the in-progress status action label from "Hoàn thành visit" to "Hoàn thành".
+- Replaced the post-upload Visit Detail photo upload button with an inline plus tile at the end of the photo grid.
+- Moved the Visit Detail photo refresh action to the right side of the "Ảnh kiểu tóc" section header.
+- Updated default and primary button styling to use inverse neutral theme colors for stronger CTA contrast in light and dark modes.
+- Replaced hardcoded owner-screen action buttons with the shared Button primitive so branch, staff, service, and combo screens inherit the same theme-aware button styling.
+- Removed the separate Visit Detail staff-edit section and moved eligible completed-visit staff edits into the shared edit modal.
+- Kept service/combo controls visible but disabled in the edit modal after a visit is completed, while allowing barber/skinner edits only within the 3-hour completion window.
+- Matched the Visit Detail header edit button and photo refresh button styling to the primary save button used in the edit modal.
+- Updated Visit Create and Visit Detail edit staff dropdowns to use the shared design-system Select styling.
+- Replaced the generic staff dropdown placeholder with "Chọn thợ cắt" and "Chọn skinner".
+- Replaced Visit Create and Visit Detail edit staff native browser selects with custom design-system combobox dropdowns.
+
+### Refactoring
+- Added visit photo delete route constants, hook mutation, and shared visit detail text/type entries.
+- Exposed a guarded Visit Detail refetch handler from the visit detail hook.
+- Added visit status mutation handling and cache invalidation for Visit Detail, Visit List, and Customer Detail history.
+- Added visit detail update mutation handling with cache invalidation for Visit Detail, Visit List, and Customer Detail history.
+- Added shared design-system copy constants and exported them through `src/constants/texts`.
+- Moved customer module components from `src/components/customers/` to `src/components/modules/customers/`.
+- Moved visit module components from `src/components/visits/` to `src/components/modules/visits/`.
+- Updated app, module, and test imports to use `global`, `modules`, and `screens` component paths.
+- Updated component placement documentation in `AGENTS.md` and `docs/ui/component-spec.md` for the new component folder structure.
+- Updated the shadcn `components.json` UI alias to `@/components/global/ui`.
+- Updated app, module, and test imports to use the new `mobile` component path.
+- Reused the existing Visit Detail refresh handler for photo-section updates after photo mutations.
+- Added `useLockBodyScroll` as a shared hook and applied it to global overlay primitives plus customer and visit modals.
+- Updated Visit Detail tests and API tests for the new general-info, service/combo, staff, and updater-name behavior.
+- Updated Visit Detail section tests for the pending photo-warning and last-updater removal behavior.
+- Updated Visit Detail photo section tests for the inline plus upload control.
+- Updated Visit Detail tests for completed-visit staff-only editing and expired edit-window behavior.
+- Updated visit create/edit dropdown tests for the new design-system Select usage and staff placeholders.
+- Updated visit create/edit dropdown tests for the custom combobox interaction and displayed selected staff values.
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because they were not requested.
+- Referenced `../personal-project-design-v2/docs/GEIST_COMPONENTS.md` and adapted the V0 components to this repo's token, routing, and no-`window.location` conventions.
+- Did not run tests or ESLint for the component reorganization because they were not requested.
+- Verified the Visit Detail UI and overlay scroll-lock changes with TypeScript, targeted Vitest files, and ESLint; ESLint still reports the existing `no-img-element` warning in `src/components/global/Display.tsx`.
+- Verified the latest Visit Detail copy and warning changes with targeted Vitest files only.
+- Verified the completed-visit edit-window changes with targeted Visit Detail component tests only.
+- Verified the staff dropdown design-system and placeholder changes with targeted visit form/detail tests only.
+- Verified the custom staff combobox dropdown changes with targeted visit form/detail tests only.
+- Updated the Visit Detail desktop header so the edit button sits beside the page title beneath the customer back link.
+- Did not run tests or ESLint for the Visit Detail header layout tweak because they were not requested.
+- Adjusted the Visit Detail desktop header so the title stays left while the edit/status button group aligns right beneath the customer back link.
+- Added a Visit Create API guard that blocks creating a new visit when the customer already has a `pending` or `in_progress` visit.
+- Added API error copy for customers with an unfinished visit.
+- Blocked Customer Detail create-visit actions on the frontend when the customer has an unfinished visit and show a warning toast asking staff to complete the current visit first.
+- Added the same unfinished-visit warning toast when Visit Create submission is rejected by the API guard.
+- Added a Visit module context provider that centralizes visit options, create mutation, detail data, edit mutations, photo mutations, and status transitions.
+- Wrapped Visit Create and Visit Detail routes with the Visit provider.
+- Updated Visit Create form and Visit Detail view to consume shared visit data and methods from the Visit context instead of directly wiring hooks through route props.
+- Moved the Visit context from the visits module folder into the shared `src/context/` folder and updated imports.
+- Added visit staff-skip flags for "Không cắt tóc" and "Không có dịch vụ skinner" with Prisma schema and migration updates.
+- Blocked receptionist completion when a visit is missing barber/skinner and the matching skip flag is not selected.
+- Added warning feedback when completion is blocked by missing barber/skinner requirements.
+- Added optional skip checkboxes to Visit Detail barber/skinner dropdowns and persisted those values through visit detail/staff updates.
+- Removed visit staff-skip flag selection from customer visit history and visit list APIs so those endpoints do not 500 before Prisma Client is regenerated.
+- Removed visit staff-skip flag selection and writes from the Visit Detail API route so it does not 500 before Prisma Client is regenerated.
+- Moved Visit Detail staff-skip checkboxes out of the dropdown menus into the staff field header row and renamed the skinner skip option to "Không skinner".
+- Defaulted Visit Create staff selection to the current user when the creator is a barber or skinner, with an API fallback for submitted payloads.
+- Increased Visit Create/Edit field label typography for services, combos, barber, and skinner so labels stand out from option/value text.
+- Increased the Visit Detail edit modal title prominence and aligned it with the close icon.
+- Increased total price number typography in Visit Create and Visit Detail edit/detail views for easier recognition.
+- Right-aligned total price numbers in Visit Create and Visit Detail edit summaries.
+- Blocked Visit Detail photo upload/delete actions for completed visits in both the frontend and visit photo API.
+- Added an app toast dismiss event and clear Visit Detail warning toasts when leaving the screen or opening the edit popup.
+- Fixed Visit completion checks so saved "Không cắt tóc" and "Không skinner" selections satisfy the required staff validation.
+- Clear the Visit Detail completion inline error when the updated visit response satisfies completion requirements.
+- Navigate back to the customer detail screen after a visit is completed from Visit Detail.
+- Matched customer visit history item title color to each visit status color.
+- Changed customer visit history status icon from outlined styling to filled status color.
+- Show captured hairstyle photos on completed Visit Detail screens while keeping photo edit actions locked.
+- Limited Customer Detail recent hairstyle photos to the latest completed visit that has photos.
+- Removed frontend visit-date sorting for Customer Detail recent photos and rely on backend visit ordering.
+- Split Visit Detail sections into focused files under `src/components/modules/visits/detail/` and moved shared helpers into `src/utils/common/` and `src/utils/visits/`.
+- Removed the Visit Detail sections barrel file, added component-splitting rules to `AGENTS.md`, and extracted remaining customer/visit subcomponents and helpers into focused component files and utils.
+- Split Customer Detail profile/history sections into focused files under `src/components/modules/customers/profile/detail/` and reduced `CustomerVisitHistorySections.tsx` to a re-export file.
+- Added barrel `index.ts` files for customer/visit module folders and utils subfolders.
+- Added an `AGENTS.md` rule requiring `index.ts` barrel files for folders with exports.
+- Added an `AGENTS.md` rule to create module contexts in `src/context/` when API data or logic is shared across screens/components.
+- Moved remaining root-level visit components into `create/`, `detail/`, `shared/`, and `staff/` subfolders so the visits module root only exposes `index.ts`.
+- Flattened customer and visit module components back to direct module-level files, removed nested component folders, and updated module import paths.

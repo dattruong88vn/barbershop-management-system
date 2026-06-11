@@ -3,8 +3,9 @@
 import type { SyntheticEvent } from "react";
 import { use, useEffect, useState } from "react";
 
-import { VisitCreatePageView } from "@/components/visits/VisitCreatePageView";
+import { VisitCreatePageView } from "@/components/modules/visits";
 import { ROUTES } from "@/constants/routes";
+import { VisitProvider } from "@/context/VisitContext";
 import { useCustomers } from "@/hooks/useCustomers";
 import type { Customer } from "@/types";
 
@@ -72,19 +73,21 @@ export default function VisitCreatePage({ searchParams }: VisitCreatePageProps) 
   }
 
   return (
-    <VisitCreatePageView
-      activeSearch={activeSearch}
-      customers={customers}
-      customersError={customersError}
-      backHref={backHref}
-      isLoadingCustomers={isLoading}
-      returnToCustomerId={returnToCustomerId}
-      searchInput={searchInput}
-      selectedCustomer={selectedCustomer}
-      onClearSelectedCustomer={() => setSelectedCustomer(null)}
-      onSearch={handleSearch}
-      onSearchInputChange={(event) => setSearchInput(event.target.value)}
-      onSelectCustomer={setSelectedCustomer}
-    />
+    <VisitProvider backHref={backHref} returnToCustomerId={returnToCustomerId}>
+      <VisitCreatePageView
+        activeSearch={activeSearch}
+        customers={customers}
+        customersError={customersError}
+        backHref={backHref}
+        isLoadingCustomers={isLoading}
+        returnToCustomerId={returnToCustomerId}
+        searchInput={searchInput}
+        selectedCustomer={selectedCustomer}
+        onClearSelectedCustomer={() => setSelectedCustomer(null)}
+        onSearch={handleSearch}
+        onSearchInputChange={(event) => setSearchInput(event.target.value)}
+        onSelectCustomer={setSelectedCustomer}
+      />
+    </VisitProvider>
   );
 }

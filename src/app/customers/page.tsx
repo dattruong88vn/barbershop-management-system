@@ -10,15 +10,15 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 
-import { CreateCustomerModal } from "@/components/customers/search/CreateCustomerModal";
 import {
+  CreateCustomerModal,
   CustomerDesktopNav,
+  CustomerMobileActions,
   CustomerMobileHeader,
-} from "@/components/customers/search/CustomerSearchHeader";
-import { CustomerMobileActions } from "@/components/customers/search/CustomerMobileActions";
-import { CustomerSearchForm } from "@/components/customers/search/CustomerSearchForm";
-import { CustomerSearchResults } from "@/components/customers/search/CustomerSearchResults";
-import { RecentCustomerSearches } from "@/components/customers/search/RecentCustomerSearches";
+  CustomerSearchForm,
+  CustomerSearchResults,
+  RecentCustomerSearches,
+} from "@/components/modules/customers";
 import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import { useCustomers } from "@/hooks/useCustomers";

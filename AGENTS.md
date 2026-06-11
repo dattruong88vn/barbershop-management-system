@@ -36,17 +36,22 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Use shadcn/ui components where possible.
 - Every successful user action must show a success toast.
 - Keep changes scoped to the requested module.
+- Split components into the smallest practical focused components.
+- Shared or reusable functions must live in `src/utils/`; do not define helper functions inside default-export component files.
 
 ## Component Placement
 
 - `src/app/` → route files only (`page.tsx` · `layout.tsx` · `loading.tsx` · `error.tsx` · `not-found.tsx` · `route.ts`).
-- App-wide reusable UI → `src/components/design-system/`.
-- Module components → `src/components/<module>/`.
-- Page-specific components → `src/components/<module>/<page>/`.
+- App-wide reusable UI → `src/components/global/`.
+- Shared mobile navigation/components → `src/components/mobile/`.
+- Module components → `src/components/modules/<module>/`.
+- Page-specific components → `src/components/screens/<module-or-route>/`.
 - Route-only orchestration → inline in `page.tsx`.
 - Never create PascalCase component files inside `src/app/`.
-- Module components must build on design-system primitives, not redefine base visuals.
+- Module and screen components must build on global primitives, not redefine base visuals.
 - Split large components into focused children (sections, panels, lists, rows, form fields).
+- Keep module component files directly under `src/components/modules/<module>/`; do not create nested component subfolders inside a module.
+- Every component/util folder with exports must include an `index.ts` barrel file.
 
 ## Naming
 
@@ -58,6 +63,7 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 
 - Server Components → `fetchServer`. Client Components → `fetchClient` via TanStack Query.
 - Each entity has one hook in `src/hooks/`. Hook exports one function combining query + mutations.
+- When a module shares API data or shared business logic across multiple screens/components, create a module context in `src/context/` similar to `VisitContext`.
 - Query key = private constant in hook module. Response data key = private constant, e.g. `const VISIT_RESPONSE_DATA_KEY = "visit"`.
 - When multiple mutations need optional response data → create one private `get[Entity]ResponseData()` using `hasResponseData`. Never repeat `if (!hasResponseData(...))` per mutation.
 - Error handling: 400 → show message · 401 → redirect `/login` · 403 → redirect `/dashboard` · 404 → redirect `/not-found` · 500 → toast error.

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 import { visitTexts } from "@/constants/texts";
+import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { getPhotoUrl } from "@/lib/r2";
 import { prisma } from "@/lib/prisma";
 import type { VisitPhotoCreateRequestBody } from "@/types";
@@ -80,6 +81,7 @@ export async function POST(
     select: {
       id: true,
       shopId: true,
+      status: true,
     },
   });
 
@@ -87,6 +89,13 @@ export async function POST(
     return NextResponse.json(
       { error: visitTexts.api.errors.notFound },
       { status: 404 },
+    );
+  }
+
+  if (visit.status === VISIT_STATUS_COMPLETED) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.lockedPhotoEdit },
+      { status: 400 },
     );
   }
 
@@ -101,6 +110,92 @@ export async function POST(
       id: true,
       photoUrl: true,
       createdAt: true,
+    },
+  });
+
+  return NextResponse.json({ photo: formatPhotoResponse(photo) });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: VisitPhotoRouteContext,
+) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token?.id) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.unauthorized },
+      { status: 401 },
+    );
+  }
+
+  if (token.role !== "barber" || !token.shop_id) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.forbidden },
+      { status: 403 },
+    );
+  }
+
+  const { id } = await context.params;
+  const photoId = request.nextUrl.searchParams.get("photoId")?.trim() ?? "";
+
+  if (!photoId) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.invalidPhoto },
+      { status: 400 },
+    );
+  }
+
+  const visit = await prisma.visit.findFirst({
+    where: {
+      id,
+      shopId: token.shop_id,
+    },
+    select: {
+      status: true,
+    },
+  });
+
+  if (!visit) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  if (visit.status === VISIT_STATUS_COMPLETED) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.lockedPhotoEdit },
+      { status: 400 },
+    );
+  }
+
+  const photo = await prisma.visitPhoto.findFirst({
+    where: {
+      id: photoId,
+      shopId: token.shop_id,
+      visitId: id,
+    },
+    select: {
+      id: true,
+      photoUrl: true,
+      createdAt: true,
+    },
+  });
+
+  if (!photo) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.notFound },
+      { status: 404 },
+    );
+  }
+
+  await prisma.visitPhoto.delete({
+    where: {
+      id: photo.id,
     },
   });
 

@@ -82,13 +82,18 @@ export type CustomerVisitPhoto = {
 };
 
 export type CustomerVisit = {
+  canCompleteVisit?: boolean;
+  canStartVisit?: boolean;
   canUploadPhotos?: boolean;
   id: string;
   createdAt: string;
   completedAt: string | null;
   lastUpdatedBy: string | null;
+  lastUpdatedByName?: string | null;
   status: CustomerVisitStatus;
   totalPrice: number;
+  noHaircut?: boolean;
+  noSkinnerService?: boolean;
   services: CustomerVisitService[];
   barber: CustomerVisitStaff;
   skinner: CustomerVisitStaff;

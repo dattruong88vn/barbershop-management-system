@@ -3,9 +3,10 @@
 Đây là design system và component spec cho toàn bộ giao diện Barber Shop SaaS.
 Tất cả màn hình phải tham khảo file này trước khi build — không tự định nghĩa lại style.
 
-Shared primitives and reusable UI components live in `src/components/design-system/`.
-Module components should only compose module-specific layouts or behavior, and must build on design-system components instead of redefining base visuals.
-For modules with multiple pages, keep module-shared components at `src/components/<module>/` root and move page-specific components into page folders such as `src/components/customers/search/` and `src/components/customers/profile/`.
+Shared primitives and reusable UI components live in `src/components/global/`.
+Shared mobile navigation/components live in `src/components/mobile/`.
+Module components should only compose module-specific layouts or behavior, and must build on global components instead of redefining base visuals.
+For modules with multiple pages, keep module-shared components at `src/components/modules/<module>/` root and move page-specific components into `src/components/screens/<module-or-route>/` when they are not reused by the module.
 
 **Design system tham khảo:** [Vercel Geist](https://vercel.com/geist/introduction)
 **Theme:** Light + Dark — tự đổi theo `prefers-color-scheme` của hệ thống

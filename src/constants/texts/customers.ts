@@ -22,6 +22,9 @@ export const customerTexts = {
     updateSuccessDescription: (name: string) =>
       `Thông tin của ${name} đã được cập nhật.`,
     createVisit: "Tạo visit",
+    createVisitBlocked: "Cần hoàn thành visit hiện tại",
+    createVisitBlockedDescription:
+      "Khách hàng đang có visit chưa hoàn thành. Vui lòng hoàn thành visit hiện tại trước khi tạo visit mới.",
     visitCountMetric: "Tổng lần visit",
     visitCountMetricMobile: "Lần visit",
     totalSpendMetric: "Tổng chi tiêu",
@@ -41,6 +44,8 @@ export const customerTexts = {
     morePhotos: (count: number) => `+${count}`,
     viewMore: "Xem thêm",
     statusCompleted: "Hoàn thành",
+    statusInProgress: "Đang làm",
+    statusPending: "Pending",
     idLabel: "Mã khách hàng",
     backToLookup: "Quay lại tra cứu",
     barberLabel: "Thợ cắt",
