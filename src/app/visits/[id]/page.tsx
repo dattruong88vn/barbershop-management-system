@@ -2,7 +2,7 @@
 
 import { use } from "react";
 
-import { VisitDetailView } from "@/components/modules/visits/VisitDetailView";
+import { VisitDetailView } from "@/components/modules/visits";
 import { ROUTES } from "@/constants/routes";
 import { VisitProvider } from "@/context/VisitContext";
 

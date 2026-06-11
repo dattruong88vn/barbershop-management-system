@@ -166,6 +166,8 @@ async function updateVisitStatus(
       method: "PATCH",
       headers: DEFAULT_JSON_HEADERS,
       body: JSON.stringify({
+        noHaircut: input.noHaircut,
+        noSkinnerService: input.noSkinnerService,
         status: input.status,
       }),
     },
@@ -215,8 +217,12 @@ export function useVisitDetail(visitId: string) {
 
   const updateVisitStaffMutation = useMutation({
     mutationFn: updateVisitStaff,
-    onSuccess: (visit) =>
-      queryClient.setQueryData([VISIT_DETAIL_QUERY_KEY, visit.id], visit),
+    onSuccess: (visit, input) =>
+      queryClient.setQueryData([VISIT_DETAIL_QUERY_KEY, visit.id], {
+        ...visit,
+        noHaircut: input.noHaircut,
+        noSkinnerService: input.noSkinnerService,
+      }),
   });
   const updateVisitStatusMutation = useMutation({
     mutationFn: updateVisitStatus,
@@ -236,7 +242,11 @@ export function useVisitDetail(visitId: string) {
   const updateVisitDetailMutation = useMutation({
     mutationFn: updateVisitDetail,
     onSuccess: (visit, input) => {
-      queryClient.setQueryData([VISIT_DETAIL_QUERY_KEY, visit.id], visit);
+      queryClient.setQueryData([VISIT_DETAIL_QUERY_KEY, visit.id], {
+        ...visit,
+        noHaircut: input.noHaircut,
+        noSkinnerService: input.noSkinnerService,
+      });
       queryClient.invalidateQueries({
         queryKey: VISIT_LIST_QUERY_KEY,
       });

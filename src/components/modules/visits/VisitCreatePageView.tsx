@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Users } from "lucide-react";
 
-import VisitCreateForm from "@/components/modules/customers/profile/VisitCreateForm";
+import { VisitCreateForm } from "@/components/modules/customers";
 import { EmptyState } from "@/components/global/EmptyState";
 import { customerTexts, visitTexts } from "@/constants/texts";
 import type { VisitCreatePageViewProps } from "@/types";

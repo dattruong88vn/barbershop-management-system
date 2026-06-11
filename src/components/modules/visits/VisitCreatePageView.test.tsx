@@ -5,7 +5,7 @@ import { customerTexts, visitTexts } from "@/constants/texts";
 import { ROUTES } from "@/constants/routes";
 import type { Customer, VisitCreatePageViewProps } from "@/types";
 
-vi.mock("@/components/modules/customers/profile/VisitCreateForm", () => ({
+vi.mock("@/components/modules/customers", () => ({
   default: ({ customerId }: { customerId: string }) => (
     <div data-testid="visit-create-form">{customerId}</div>
   ),

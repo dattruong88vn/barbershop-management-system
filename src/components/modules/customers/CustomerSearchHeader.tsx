@@ -1,8 +1,6 @@
-import Link from "next/link";
 import {
   CalendarClock,
   Home,
-  type LucideIcon,
   Plus,
   Scissors,
   Search,
@@ -11,8 +9,8 @@ import {
 
 import { ROUTES } from "@/constants/routes";
 import { authTexts, customerTexts } from "@/constants/texts";
-import { cn } from "@/lib/utils";
 import type { CustomerMobileHeaderProps } from "@/types";
+import { CustomerDesktopNavItem } from "./CustomerDesktopNavItem";
 
 const DESKTOP_NAV_ITEMS = [
   { href: ROUTES.visits, icon: Home, label: customerTexts.lookup.navToday },
@@ -33,32 +31,6 @@ const DESKTOP_NAV_ITEMS = [
     label: customerTexts.lookup.navReports,
   },
 ];
-
-function CustomerDesktopNavItem({
-  active,
-  href,
-  icon: Icon,
-  label,
-}: {
-  active?: boolean;
-  href: string;
-  icon: LucideIcon;
-  label: string;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition hover:bg-muted hover:text-foreground",
-        active ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
-      )}
-    >
-      <Icon className="size-4" aria-hidden="true" />
-      {label}
-    </Link>
-  );
-}
 
 export function CustomerMobileHeader({
   onCreateCustomer,

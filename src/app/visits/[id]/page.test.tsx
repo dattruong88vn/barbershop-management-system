@@ -16,7 +16,7 @@ vi.mock("@/hooks/useVisits", () => ({
   useVisits: mocks.useVisits,
 }));
 
-vi.mock("@/components/modules/visits/VisitDetailView", () => ({
+vi.mock("@/components/modules/visits", () => ({
   VisitDetailView: ({ visit }: { visit: { id: string } | null }) => (
     <div data-testid="visit-detail-view">{visit?.id ?? "no-visit"}</div>
   ),

@@ -403,3 +403,20 @@ Copy this structure when starting a new date section:
 - Increased total price number typography in Visit Create and Visit Detail edit/detail views for easier recognition.
 - Right-aligned total price numbers in Visit Create and Visit Detail edit summaries.
 - Blocked Visit Detail photo upload/delete actions for completed visits in both the frontend and visit photo API.
+- Added an app toast dismiss event and clear Visit Detail warning toasts when leaving the screen or opening the edit popup.
+- Fixed Visit completion checks so saved "Không cắt tóc" and "Không skinner" selections satisfy the required staff validation.
+- Clear the Visit Detail completion inline error when the updated visit response satisfies completion requirements.
+- Navigate back to the customer detail screen after a visit is completed from Visit Detail.
+- Matched customer visit history item title color to each visit status color.
+- Changed customer visit history status icon from outlined styling to filled status color.
+- Show captured hairstyle photos on completed Visit Detail screens while keeping photo edit actions locked.
+- Limited Customer Detail recent hairstyle photos to the latest completed visit that has photos.
+- Removed frontend visit-date sorting for Customer Detail recent photos and rely on backend visit ordering.
+- Split Visit Detail sections into focused files under `src/components/modules/visits/detail/` and moved shared helpers into `src/utils/common/` and `src/utils/visits/`.
+- Removed the Visit Detail sections barrel file, added component-splitting rules to `AGENTS.md`, and extracted remaining customer/visit subcomponents and helpers into focused component files and utils.
+- Split Customer Detail profile/history sections into focused files under `src/components/modules/customers/profile/detail/` and reduced `CustomerVisitHistorySections.tsx` to a re-export file.
+- Added barrel `index.ts` files for customer/visit module folders and utils subfolders.
+- Added an `AGENTS.md` rule requiring `index.ts` barrel files for folders with exports.
+- Added an `AGENTS.md` rule to create module contexts in `src/context/` when API data or logic is shared across screens/components.
+- Moved remaining root-level visit components into `create/`, `detail/`, `shared/`, and `staff/` subfolders so the visits module root only exposes `index.ts`.
+- Flattened customer and visit module components back to direct module-level files, removed nested component folders, and updated module import paths.

@@ -12,7 +12,7 @@ vi.mock("@/hooks/useCustomers", () => ({
   useCustomers: mocks.useCustomers,
 }));
 
-vi.mock("@/components/modules/visits/VisitCreatePageView", () => ({
+vi.mock("@/components/modules/visits", () => ({
   VisitCreatePageView: ({
     selectedCustomer,
   }: {

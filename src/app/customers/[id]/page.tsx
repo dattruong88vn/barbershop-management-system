@@ -11,7 +11,7 @@ import {
   ProfileSummarySection,
   SuggestionsSection,
   VisitHistorySection,
-} from "@/components/modules/customers/profile/CustomerVisitHistorySections";
+} from "@/components/modules/customers";
 import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { customerTexts } from "@/constants/texts";

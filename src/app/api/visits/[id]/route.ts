@@ -379,9 +379,13 @@ export async function PATCH(
       );
     }
 
+    const noHaircut = normalizeBoolean(body.noHaircut);
+    const noSkinnerService = normalizeBoolean(body.noSkinnerService);
+
     if (
       isCompletingVisit &&
-      (!visit.barberId || !visit.skinnerId)
+      ((!visit.barberId && !noHaircut) ||
+        (!visit.skinnerId && !noSkinnerService))
     ) {
       return NextResponse.json(
         { error: visitTexts.api.errors.missingCompletionStaff },

@@ -7,7 +7,7 @@ import type { CustomerVisit } from "@/types";
 import {
   VisitDetailMainSections,
   VisitDetailSidebar,
-} from "./VisitDetailSections";
+} from ".";
 
 function createVisit(overrides: Partial<CustomerVisit> = {}): CustomerVisit {
   return {

@@ -3,12 +3,7 @@ import { Check, ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { VisitCreateItem, VisitCreateStaff } from "@/types";
-
-const PRICE_FORMATTER = new Intl.NumberFormat("vi-VN", {
-  currency: "VND",
-  maximumFractionDigits: 0,
-  style: "currency",
-});
+import { formatVndPrice } from "@/utils/common/formatters";
 
 export function VisitCreateItemSelector({
   disabled = false,
@@ -50,7 +45,7 @@ export function VisitCreateItemSelector({
                 </span>
               </span>
               <span className="font-medium text-muted-foreground">
-                {PRICE_FORMATTER.format(item.price)}
+                {formatVndPrice(item.price)}
               </span>
             </label>
           ))}

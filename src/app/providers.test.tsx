@@ -5,7 +5,7 @@ import { commonTexts } from "@/constants/texts";
 import { ROUTES } from "@/constants/routes";
 import { APP_NAVIGATION_EVENT } from "@/lib/appNavigation";
 import { API_SERVER_ERROR_EVENT } from "@/lib/queryClient";
-import { APP_TOAST_EVENT } from "@/lib/toast";
+import { APP_TOAST_DISMISS_EVENT, APP_TOAST_EVENT } from "@/lib/toast";
 import { Providers } from "@/app/providers";
 
 const mocks = vi.hoisted(() => ({
@@ -82,6 +82,35 @@ describe("Providers", () => {
 
     act(() => {
       screen.getByRole("button", { name: "Đóng thông báo" }).click();
+    });
+
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("should dismiss app toasts from the dismiss event", () => {
+    render(
+      <Providers>
+        <div>child content</div>
+      </Providers>,
+    );
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent(APP_TOAST_EVENT, {
+          detail: {
+            message: "Vui lòng chọn barber/skinner",
+            type: "warning",
+          },
+        }),
+      );
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Vui lòng chọn barber/skinner",
+    );
+
+    act(() => {
+      window.dispatchEvent(new Event(APP_TOAST_DISMISS_EVENT));
     });
 
     expect(screen.queryByRole("status")).toBeNull();

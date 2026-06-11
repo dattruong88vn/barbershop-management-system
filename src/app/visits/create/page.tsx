@@ -3,7 +3,7 @@
 import type { SyntheticEvent } from "react";
 import { use, useEffect, useState } from "react";
 
-import { VisitCreatePageView } from "@/components/modules/visits/VisitCreatePageView";
+import { VisitCreatePageView } from "@/components/modules/visits";
 import { ROUTES } from "@/constants/routes";
 import { VisitProvider } from "@/context/VisitContext";
 import { useCustomers } from "@/hooks/useCustomers";

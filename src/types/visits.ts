@@ -99,11 +99,15 @@ export type VisitDetailUpdateRequestBody = {
 
 export type VisitStatusUpdateInput = {
   customerId?: string | null;
+  noHaircut?: boolean;
+  noSkinnerService?: boolean;
   status: CustomerVisitStatus;
   visitId: string;
 };
 
 export type VisitStatusUpdateRequestBody = {
+  noHaircut?: unknown;
+  noSkinnerService?: unknown;
   status?: unknown;
 };
 

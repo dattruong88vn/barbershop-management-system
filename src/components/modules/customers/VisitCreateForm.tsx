@@ -11,54 +11,17 @@ import { ROUTES } from "@/constants/routes";
 import { customerTexts, visitTexts } from "@/constants/texts";
 import { useVisitContext } from "@/context/VisitContext";
 import { dispatchAppToast } from "@/lib/toast";
-import type {
-  AuthUserFields,
-  VisitCreateFormProps,
-  VisitCreateItem,
-} from "@/types";
+import type { AuthUserFields, VisitCreateFormProps } from "@/types";
+import { toggleId } from "@/utils/common/collection";
+import { formatVndPrice } from "@/utils/common/formatters";
+import {
+  calculateVisitTotalPrice,
+  getSuggestedVisitItemIds,
+} from "@/utils/visits/visitDetail";
 import {
   VisitCreateItemSelector,
   VisitCreateStaffSelect,
 } from "./VisitCreateFormFields";
-
-const PRICE_FORMATTER = new Intl.NumberFormat("vi-VN", {
-  currency: "VND",
-  maximumFractionDigits: 0,
-  style: "currency",
-});
-
-function getSuggestedIds(
-  suggestions: VisitCreateFormProps["suggestions"],
-  type: "service" | "combo",
-) {
-  return (
-    suggestions?.services
-      .filter((service) => service.type === type && service.itemId)
-      .map((service) => service.itemId as string) ?? []
-  );
-}
-
-function calculateTotalPrice(
-  selectedServiceIds: string[],
-  selectedComboIds: string[],
-  services: VisitCreateItem[],
-  combos: VisitCreateItem[],
-) {
-  const selectedServicesTotal = services
-    .filter((service) => selectedServiceIds.includes(service.id))
-    .reduce((total, service) => total + service.price, 0);
-  const selectedCombosTotal = combos
-    .filter((combo) => selectedComboIds.includes(combo.id))
-    .reduce((total, combo) => total + combo.price, 0);
-
-  return selectedServicesTotal + selectedCombosTotal;
-}
-
-function toggleId(selectedIds: string[], id: string) {
-  return selectedIds.includes(id)
-    ? selectedIds.filter((selectedId) => selectedId !== id)
-    : [...selectedIds, id];
-}
 
 export default function VisitCreateForm({
   customerId,
@@ -66,9 +29,11 @@ export default function VisitCreateForm({
   suggestions,
 }: VisitCreateFormProps) {
   const router = useRouter();
-  const suggestedComboIds = getSuggestedIds(suggestions, "combo");
+  const suggestedComboIds = getSuggestedVisitItemIds(suggestions, "combo");
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(() =>
-    suggestedComboIds.length ? [] : getSuggestedIds(suggestions, "service"),
+    suggestedComboIds.length
+      ? []
+      : getSuggestedVisitItemIds(suggestions, "service"),
   );
   const [selectedComboIds, setSelectedComboIds] = useState<string[]>(
     suggestedComboIds,
@@ -92,7 +57,12 @@ export default function VisitCreateForm({
 
   const totalPrice = useMemo(
     () =>
-      calculateTotalPrice(selectedServiceIds, selectedComboIds, services, combos),
+      calculateVisitTotalPrice(
+        selectedServiceIds,
+        selectedComboIds,
+        services,
+        combos,
+      ),
     [combos, selectedComboIds, selectedServiceIds, services],
   );
 
@@ -259,7 +229,7 @@ export default function VisitCreateForm({
         <p className="flex items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground">
           <span>{visitTexts.create.totalPriceLabel}</span>
           <span className="text-right text-base font-semibold">
-            {PRICE_FORMATTER.format(totalPrice)}
+            {formatVndPrice(totalPrice)}
           </span>
         </p>
 
