@@ -23,6 +23,7 @@ const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, "superadmin">, string[]
 
 const LOGIN_PATH = ROUTES.login;
 const CHANGE_PASSWORD_PATH = ROUTES.changePassword;
+const PUBLIC_ROUTES = [ROUTES.designSystem] as const;
 
 function isUserRole(role: unknown): role is UserRole {
   return (
@@ -40,6 +41,12 @@ function matchesRoute(pathname: string, route: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
+  if (
+    PUBLIC_ROUTES.some((route) => matchesRoute(request.nextUrl.pathname, route))
+  ) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,

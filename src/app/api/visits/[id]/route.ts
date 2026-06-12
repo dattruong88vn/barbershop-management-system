@@ -37,6 +37,14 @@ const VISIT_SELECT = {
       username: true,
     },
   },
+  customer: {
+    select: {
+      createdAt: true,
+      id: true,
+      name: true,
+      phone: true,
+    },
+  },
   status: true,
   totalPrice: true,
   barber: {
@@ -183,14 +191,22 @@ function formatVisitResponse(
   visit: VisitRecord,
   options?: {
     canCompleteVisit?: boolean;
+    canCreateNewVisit?: boolean;
     canStartVisit?: boolean;
     canUploadPhotos?: boolean;
   },
 ): CustomerVisit {
   return {
     canCompleteVisit: options?.canCompleteVisit ?? false,
+    canCreateNewVisit: options?.canCreateNewVisit ?? false,
     canStartVisit: options?.canStartVisit ?? false,
     canUploadPhotos: options?.canUploadPhotos ?? false,
+    customer: {
+      createdAt: visit.customer.createdAt.toISOString(),
+      id: visit.customer.id,
+      name: visit.customer.name,
+      phone: visit.customer.phone,
+    },
     id: visit.id,
     createdAt: visit.createdAt.toISOString(),
     completedAt: visit.completedAt?.toISOString() ?? null,
@@ -218,6 +234,20 @@ function formatVisitResponse(
       price: Number(visitService.price.toString()),
     })),
   };
+}
+
+async function canCreateNewVisitForCustomer(customerId: string, shopId: string) {
+  const incompleteVisitCount = await prisma.visit.count({
+    where: {
+      customerId,
+      shopId,
+      status: {
+        not: VISIT_STATUS_COMPLETED,
+      },
+    },
+  });
+
+  return incompleteVisitCount === 0;
 }
 
 async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
@@ -307,6 +337,10 @@ export async function GET(request: NextRequest, context: VisitRouteContext) {
   return NextResponse.json({
     visit: formatVisitResponse(visit, {
       canCompleteVisit: canCompleteVisitStatus(authResult.role, visit.status),
+      canCreateNewVisit: await canCreateNewVisitForCustomer(
+        visit.customer.id,
+        authResult.shopId,
+      ),
       canStartVisit: canStartVisitStatus(authResult.role, visit.status),
       canUploadPhotos:
         authResult.role === "barber" && visit.status !== VISIT_STATUS_COMPLETED,
@@ -412,6 +446,10 @@ export async function PATCH(
         canCompleteVisit: canCompleteVisitStatus(
           authResult.role,
           updatedVisit.status,
+        ),
+        canCreateNewVisit: await canCreateNewVisitForCustomer(
+          updatedVisit.customer.id,
+          authResult.shopId,
         ),
         canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
         canUploadPhotos:
@@ -533,6 +571,10 @@ export async function PATCH(
           authResult.role,
           updatedVisit.status,
         ),
+        canCreateNewVisit: await canCreateNewVisitForCustomer(
+          updatedVisit.customer.id,
+          authResult.shopId,
+        ),
         canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
         canUploadPhotos:
           authResult.role === "barber" &&
@@ -594,6 +636,10 @@ export async function PATCH(
   return NextResponse.json({
     visit: formatVisitResponse(updatedVisit, {
       canCompleteVisit: canCompleteVisitStatus(authResult.role, updatedVisit.status),
+      canCreateNewVisit: await canCreateNewVisitForCustomer(
+        updatedVisit.customer.id,
+        authResult.shopId,
+      ),
       canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
       canUploadPhotos:
         authResult.role === "barber" &&

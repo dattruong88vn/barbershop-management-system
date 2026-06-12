@@ -10,7 +10,7 @@ import type { VisitCreatePageViewProps } from "@/types";
 import { VisitCreateCustomerStep } from "./VisitCreateCustomerStep";
 
 export function VisitCreatePageView(props: VisitCreatePageViewProps) {
-  const { backHref, returnToCustomerId, selectedCustomer } = props;
+  const { backHref, returnToCustomerId, selectedCustomer, suggestions } = props;
 
   return (
     <main className="min-h-screen bg-muted/30 px-4 py-4 pb-8 text-foreground md:px-6 md:py-8">
@@ -26,9 +26,6 @@ export function VisitCreatePageView(props: VisitCreatePageViewProps) {
           <h1 className="mt-3 text-xl font-semibold text-foreground md:text-2xl">
             {visitTexts.create.pageTitle}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {visitTexts.create.pageDescription}
-          </p>
         </header>
 
         <div className="grid gap-4 lg:grid-cols-[420px_1fr]">
@@ -39,7 +36,7 @@ export function VisitCreatePageView(props: VisitCreatePageViewProps) {
               <VisitCreateForm
                 customerId={selectedCustomer.id}
                 returnToCustomerId={returnToCustomerId}
-                suggestions={null}
+                suggestions={suggestions ?? null}
               />
             ) : (
               <EmptyState icon={Users} text={visitTexts.create.emptyBeforeSearch} />

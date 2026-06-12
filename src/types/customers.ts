@@ -83,8 +83,10 @@ export type CustomerVisitPhoto = {
 
 export type CustomerVisit = {
   canCompleteVisit?: boolean;
+  canCreateNewVisit?: boolean;
   canStartVisit?: boolean;
   canUploadPhotos?: boolean;
+  customer?: CustomerVisitHistoryCustomer;
   id: string;
   createdAt: string;
   completedAt: string | null;

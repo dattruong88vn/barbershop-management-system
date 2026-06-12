@@ -7,18 +7,33 @@ import { VisitCreatePageView } from "@/components/modules/visits";
 import { ROUTES } from "@/constants/routes";
 import { VisitProvider } from "@/context/VisitContext";
 import { useCustomers } from "@/hooks/useCustomers";
-import type { Customer } from "@/types";
+import type { Customer, VisitCreateSuggestions } from "@/types";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
 type VisitCreatePageProps = {
   searchParams: Promise<{
     customerId?: string;
+    barberId?: string;
+    comboIds?: string;
     name?: string;
     phone?: string;
     returnToCustomerId?: string;
+    serviceIds?: string;
+    skinnerId?: string;
   }>;
 };
+
+function getIdsFromSearchParam(value?: string): string[] {
+  if (!value) {
+    return [];
+  }
+
+  return value
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
 
 function getCustomerFromSearchParams({
   customerId,
@@ -39,9 +54,43 @@ function getCustomerFromSearchParams({
   };
 }
 
+function getVisitSuggestionsFromSearchParams({
+  barberId,
+  comboIds,
+  serviceIds,
+  skinnerId,
+}: Awaited<VisitCreatePageProps["searchParams"]>): VisitCreateSuggestions | null {
+  const serviceSuggestions = getIdsFromSearchParam(serviceIds).map((itemId) => ({
+    itemId,
+    type: "service" as const,
+  }));
+  const comboSuggestions = getIdsFromSearchParam(comboIds).map((itemId) => ({
+    itemId,
+    type: "combo" as const,
+  }));
+
+  if (
+    !serviceSuggestions.length &&
+    !comboSuggestions.length &&
+    !barberId &&
+    !skinnerId
+  ) {
+    return null;
+  }
+
+  return {
+    barber: barberId ? { id: barberId } : null,
+    services: comboSuggestions.length
+      ? comboSuggestions
+      : serviceSuggestions,
+    skinner: skinnerId ? { id: skinnerId } : null,
+  };
+}
+
 export default function VisitCreatePage({ searchParams }: VisitCreatePageProps) {
   const resolvedSearchParams = use(searchParams);
   const initialCustomer = getCustomerFromSearchParams(resolvedSearchParams);
+  const suggestions = getVisitSuggestionsFromSearchParams(resolvedSearchParams);
   const returnToCustomerId =
     resolvedSearchParams.returnToCustomerId ?? initialCustomer?.id ?? null;
   const backHref = returnToCustomerId
@@ -83,6 +132,7 @@ export default function VisitCreatePage({ searchParams }: VisitCreatePageProps) 
         returnToCustomerId={returnToCustomerId}
         searchInput={searchInput}
         selectedCustomer={selectedCustomer}
+        suggestions={suggestions}
         onClearSelectedCustomer={() => setSelectedCustomer(null)}
         onSearch={handleSearch}
         onSearchInputChange={(event) => setSearchInput(event.target.value)}

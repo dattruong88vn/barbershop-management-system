@@ -159,17 +159,19 @@ export type VisitDetailApiResponse = {
 export type VisitCreateFormProps = {
   returnToCustomerId?: string | null;
   customerId: string;
-  suggestions: {
-    services: Array<{
-      itemId: string | null;
-      type: "service" | "combo";
-    }>;
-    barber: {
-      id: string;
-    } | null;
-    skinner: {
-      id: string;
-    } | null;
+  suggestions?: VisitCreateSuggestions | null;
+};
+
+export type VisitCreateSuggestions = {
+  services: Array<{
+    itemId: string | null;
+    type: "service" | "combo";
+  }>;
+  barber: {
+    id: string;
+  } | null;
+  skinner: {
+    id: string;
   } | null;
 };
 
@@ -247,6 +249,7 @@ export type VisitCreatePageViewProps = {
   isLoadingCustomers: boolean;
   searchInput: string;
   selectedCustomer: Customer | null;
+  suggestions?: VisitCreateSuggestions | null;
   returnToCustomerId: string | null;
   onClearSelectedCustomer: () => void;
   onSearch: FormEventHandler<HTMLFormElement>;

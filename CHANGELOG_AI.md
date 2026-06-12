@@ -421,3 +421,20 @@ Copy this structure when starting a new date section:
 - Moved remaining root-level visit components into `create/`, `detail/`, `shared/`, and `staff/` subfolders so the visits module root only exposes `index.ts`.
 - Flattened customer and visit module components back to direct module-level files, removed nested component folders, and updated module import paths.
 - Added a Husky pre-commit hook that runs lint and build.
+- Added a Visit Detail "Tạo mới" action beside the title actions that opens Visit Create with the current visit customer, services/combo, barber, and skinner prefilled.
+- Included customer summary data in the Visit Detail API response so duplicate visit creation can preselect the same customer.
+- Added Visit Create query-param parsing for prefilled service/combo and staff suggestions from an existing visit.
+- Did not run tests, ESLint, or build for the Visit Detail create-new action because they were not requested; TypeScript check could not run because `node`, `npm`, and `npx` were unavailable in the shell PATH.
+- Hid the Visit Detail "Tạo mới" action unless every visit for that customer is completed.
+- Moved the mobile "Tạo mới" action into the same row as the Visit Detail title and matched its button variant with the edit action.
+- Fixed the mobile selected-customer card on Visit Create so the "Đổi khách" action aligns cleanly in the card header without squeezing customer details.
+- Added a `/design-system` reference page that displays global component variants, app primitives, shadcn primitives, and interactive overlay examples.
+- Added design-system reference copy to `designSystemTexts` and a `ROUTES.designSystem` route constant.
+- Verified the design-system page changes with `git diff --check`; did not run tests, ESLint, or build because they were not requested.
+- Made `/design-system` a public route that bypasses middleware auth and role checks.
+- Changed the Visit Create selected-customer "Đổi khách" action to warning medium badge styling and removed the X icon.
+- Removed the profile-prefill helper text from the Visit Create selected-customer card.
+- Split the Visit Create form into "Chọn dịch vụ" and "Chọn nhân viên" sections and removed the form description line.
+- Removed the Visit Create wrapper title and gave the "Chọn dịch vụ" and "Chọn nhân viên" sections separate bordered cards.
+- Normalized Visit Create section spacing by removing the extra top margin before the service section.
+- Removed the Visit Create page description under the page title.
