@@ -438,3 +438,12 @@ Copy this structure when starting a new date section:
 - Removed the Visit Create wrapper title and gave the "Chọn dịch vụ" and "Chọn nhân viên" sections separate bordered cards.
 - Normalized Visit Create section spacing by removing the extra top margin before the service section.
 - Removed the Visit Create page description under the page title.
+- Refactored non-design-system `page.tsx` files so route files keep page orchestration/semantics while stateful screens and list/form UI live under `src/components/screens/` or module components.
+- Moved page-level helper logic for auth callbacks, customer recent searches/phone validation, and visit create/list display into `src/utils/`.
+- Split Visit List card and skeleton UI into focused visit module components and added missing screen/util barrel exports.
+- Replaced the default root Next.js page with a project landing page using route and text constants.
+- Documented the `page.tsx` structure rule in `AGENTS.md` and `CONTEXT.md`.
+- Inlined single-use page wrapper components back into their matching `page.tsx` files for auth, owner CRUD, customer, and visit routes.
+- Removed the now-unused screen wrapper component files and stale barrel exports after confirming they were not imported outside their route pages.
+- Clarified the page/component function rule so handlers can live inside the component while helper/component functions outside the component must move to utilities or separate files.
+- Split customer header, visit create field, and customer skeleton component files so each production component file has only one module-scope JSX-returning function.

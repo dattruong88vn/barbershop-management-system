@@ -14,14 +14,8 @@ type EmptyStateComponentProps =
   | LegacyEmptyStateProps
   | GeistEmptyStateProps;
 
-function isLegacyEmptyStateProps(
-  props: EmptyStateComponentProps,
-): props is LegacyEmptyStateProps {
-  return "text" in props && typeof props.text === "string";
-}
-
 export function EmptyState(props: EmptyStateComponentProps) {
-  if (isLegacyEmptyStateProps(props)) {
+  if ("text" in props && typeof props.text === "string") {
     const { action, icon: Icon, text } = props;
 
     return (

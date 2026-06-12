@@ -23,78 +23,20 @@ import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import { useCustomers } from "@/hooks/useCustomers";
 import { dispatchAppToast } from "@/lib/toast";
+import {
+  getEmptyRecentSearches,
+  getStoredRecentSearches,
+  subscribeToRecentSearches,
+  VIETNAM_PHONE_REGEX,
+  writeStoredRecentSearches,
+} from "@/utils/customers";
 
-const RECENT_SEARCHES_KEY = "barberos:recent-customer-searches";
-const RECENT_SEARCHES_EVENT = "barberos:recent-customer-searches-updated";
 const SEARCH_DEBOUNCE_MS = 300;
 const MAX_RECENT_SEARCHES = 5;
 const CREATE_SUCCESS_REDIRECT_DELAY_MS = 1000;
-const PHONE_REGEX = /^0\d{9}$/;
-const EMPTY_RECENT_SEARCHES: string[] = [];
-let recentSearchesSnapshot: string[] = EMPTY_RECENT_SEARCHES;
-let recentSearchesSnapshotValue: string | null = null;
-
-function getStoredRecentSearches() {
-  if (typeof window === "undefined") {
-    return EMPTY_RECENT_SEARCHES;
-  }
-
-  const storedSearches = window.localStorage.getItem(RECENT_SEARCHES_KEY);
-
-  if (storedSearches === recentSearchesSnapshotValue) {
-    return recentSearchesSnapshot;
-  }
-
-  recentSearchesSnapshotValue = storedSearches;
-
-  if (!storedSearches) {
-    recentSearchesSnapshot = EMPTY_RECENT_SEARCHES;
-    return recentSearchesSnapshot;
-  }
-
-  try {
-    const parsedSearches: unknown = JSON.parse(storedSearches);
-
-    recentSearchesSnapshot = Array.isArray(parsedSearches)
-      ? parsedSearches.filter((item): item is string => typeof item === "string")
-      : [];
-    return recentSearchesSnapshot;
-  } catch {
-    recentSearchesSnapshot = EMPTY_RECENT_SEARCHES;
-    return recentSearchesSnapshot;
-  }
-}
-
-function subscribeToRecentSearches(onStoreChange: () => void) {
-  if (typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  function handleStorage(event: StorageEvent) {
-    if (event.key === RECENT_SEARCHES_KEY) {
-      onStoreChange();
-    }
-  }
-
-  window.addEventListener("storage", handleStorage);
-  window.addEventListener(RECENT_SEARCHES_EVENT, onStoreChange);
-
-  return () => {
-    window.removeEventListener("storage", handleStorage);
-    window.removeEventListener(RECENT_SEARCHES_EVENT, onStoreChange);
-  };
-}
-
-function getEmptyRecentSearches() {
-  return EMPTY_RECENT_SEARCHES;
-}
-
-function writeStoredRecentSearches(searches: string[]) {
-  window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
-  window.dispatchEvent(new Event(RECENT_SEARCHES_EVENT));
-}
 
 export default function CustomersPage() {
+  const pageTitle = customerTexts.lookup.title;
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
@@ -203,7 +145,7 @@ export default function CustomersPage() {
       return;
     }
 
-    if (!PHONE_REGEX.test(customerInput.phone)) {
+    if (!VIETNAM_PHONE_REGEX.test(customerInput.phone)) {
       setError(customerTexts.lookup.errors.invalidPhone);
       return;
     }
@@ -232,62 +174,64 @@ export default function CustomersPage() {
   }
 
   return (
-    <main className="flex h-dvh overflow-hidden bg-muted/30 text-foreground md:min-h-screen md:overflow-visible">
-      <CustomerDesktopNav />
+    <main aria-label={pageTitle}>
+      <div className="flex h-dvh overflow-hidden bg-muted/30 text-foreground md:min-h-screen md:overflow-visible">
+        <CustomerDesktopNav />
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col md:min-h-screen">
-        <CustomerMobileHeader onCreateCustomer={() => openCreateCustomerModal()} />
-        <header className="hidden h-14 items-center justify-between border-b border-border bg-background px-5 md:flex">
-          <h1 className="text-sm font-semibold text-foreground">
-            {customerTexts.lookup.title}
-          </h1>
-          <div className="flex size-8 items-center justify-center rounded-full border border-border bg-muted text-xs font-medium text-foreground">
-            {customerTexts.lookup.currentUserInitials}
-          </div>
-        </header>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col md:min-h-screen">
+          <CustomerMobileHeader onCreateCustomer={() => openCreateCustomerModal()} />
+          <header className="hidden h-14 items-center justify-between border-b border-border bg-background px-5 md:flex">
+            <h1 className="text-sm font-semibold text-foreground">
+              {customerTexts.lookup.title}
+            </h1>
+            <div className="flex size-8 items-center justify-center rounded-full border border-border bg-muted text-xs font-medium text-foreground">
+              {customerTexts.lookup.currentUserInitials}
+            </div>
+          </header>
 
-        <div className="mx-auto mb-14 min-h-0 w-full max-w-3xl flex-1 overflow-y-auto px-4 py-4 md:mb-0 md:overflow-visible md:px-5 md:py-5">
-          <CustomerSearchForm
-            searchInput={searchInput}
-            onSearch={handleSearch}
-            onSearchInputChange={(event) => setSearchInput(event.target.value)}
-            onClearSearch={handleClearSearch}
-            onCreateCustomer={() => openCreateCustomerModal()}
-          />
-
-          {shouldShowRecentSearches ? (
-            <RecentCustomerSearches
-              searches={recentSearches}
-              onSelectSearch={handleRecentSearch}
+          <div className="mx-auto mb-14 min-h-0 w-full max-w-3xl flex-1 overflow-y-auto px-4 py-4 md:mb-0 md:overflow-visible md:px-5 md:py-5">
+            <CustomerSearchForm
+              searchInput={searchInput}
+              onSearch={handleSearch}
+              onSearchInputChange={(event) => setSearchInput(event.target.value)}
+              onClearSearch={handleClearSearch}
+              onCreateCustomer={() => openCreateCustomerModal()}
             />
-          ) : null}
 
-          <CustomerSearchResults
-            customers={customers}
-            customersError={customersError}
-            defaultEmptyStateText={defaultEmptyStateText}
-            hasNoResults={hasNoResults}
-            hasSearched={hasSearched}
-            isLoading={isLoading}
-            onCreateCustomer={() => openCreateCustomerModal()}
-          />
+            {shouldShowRecentSearches ? (
+              <RecentCustomerSearches
+                searches={recentSearches}
+                onSelectSearch={handleRecentSearch}
+              />
+            ) : null}
+
+            <CustomerSearchResults
+              customers={customers}
+              customersError={customersError}
+              defaultEmptyStateText={defaultEmptyStateText}
+              hasNoResults={hasNoResults}
+              hasSearched={hasSearched}
+              isLoading={isLoading}
+              onCreateCustomer={() => openCreateCustomerModal()}
+            />
+          </div>
         </div>
+
+        <CustomerMobileActions />
+
+        {isCreateOpen ? (
+          <CreateCustomerModal
+            error={error}
+            isCreating={isCreating}
+            name={newCustomerName}
+            phone={newCustomerPhone}
+            onClose={closeCreateCustomerModal}
+            onNameChange={(event) => setNewCustomerName(event.target.value)}
+            onPhoneChange={(event) => setNewCustomerPhone(event.target.value)}
+            onSubmit={handleCreateCustomer}
+          />
+        ) : null}
       </div>
-
-      <CustomerMobileActions />
-
-      {isCreateOpen ? (
-        <CreateCustomerModal
-          error={error}
-          isCreating={isCreating}
-          name={newCustomerName}
-          phone={newCustomerPhone}
-          onClose={closeCreateCustomerModal}
-          onNameChange={(event) => setNewCustomerName(event.target.value)}
-          onPhoneChange={(event) => setNewCustomerPhone(event.target.value)}
-          onSubmit={handleCreateCustomer}
-        />
-      ) : null}
     </main>
   );
 }

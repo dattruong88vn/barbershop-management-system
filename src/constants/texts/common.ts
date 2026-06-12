@@ -15,4 +15,10 @@ export const commonTexts = {
     search: "Tìm",
     today: "Hôm nay",
   },
+  home: {
+    primaryAction: "Vào dashboard",
+    secondaryAction: "Đăng nhập",
+    subtitle: "Quản lý khách, visit, dịch vụ và nhân sự cho tiệm tóc nam.",
+    title: "Barber Shop Management",
+  },
 };

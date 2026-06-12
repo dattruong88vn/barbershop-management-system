@@ -29,8 +29,8 @@ import {
 } from "@/lib/customerVisitDisplay";
 import { dispatchAppToast } from "@/lib/toast";
 import type { CustomerProfileMetric, CustomerVisitPhoto } from "@/types";
+import { VIETNAM_PHONE_REGEX } from "@/utils/customers";
 
-const PHONE_REGEX = /^0\d{9}$/;
 const VISIT_HISTORY_LIMIT = 10;
 
 type CustomerDetailPageProps = {
@@ -136,7 +136,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
       return;
     }
 
-    if (!PHONE_REGEX.test(customerInput.phone)) {
+    if (!VIETNAM_PHONE_REGEX.test(customerInput.phone)) {
       setFormError(customerTexts.detail.errors.invalidPhone);
       return;
     }
@@ -166,7 +166,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
   }
 
   return (
-    <main className="min-h-screen bg-muted/30 px-0 py-0 text-foreground md:px-6 md:py-8">
+    <div className="min-h-screen bg-muted/30 px-0 py-0 text-foreground md:px-6 md:py-8">
       <div className="mx-auto w-full md:max-w-5xl">
         <div className="overflow-hidden bg-muted/30 md:rounded-xl md:border md:border-border md:bg-background">
           <CustomerProfileHeader
@@ -242,6 +242,6 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
         photo={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
       />
-    </main>
+    </div>
   );
 }
