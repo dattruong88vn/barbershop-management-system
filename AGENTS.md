@@ -30,6 +30,8 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Use `ROUTES` for navigation, `API_ROUTES` for API calls. Never hardcode URLs.
 - Never use `window.location`, `window.location.href`, or `window.location.assign`.
 - Never hardcode UI text in components → `src/constants/texts/`.
+- Shared cross-module constants → `src/constants/common/`.
+- Known finite values such as item types, statuses, roles, and modes must be declared as constants/enums before use. Do not scatter raw string literals like `"service"` or `"combo"` through logic.
 - Never define shared types inside components → `src/types/`.
 - Never hardcode colors or custom spacing → use design tokens only.
 - Strict TypeScript. No `any`.
@@ -79,6 +81,8 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 
 - Types → `src/types/<module>.ts`, export via `src/types/index.ts`.
 - Texts → `src/constants/texts/<module>.ts`, export via `src/constants/texts/index.ts`.
+- Shared constants used by multiple modules/APIs → `src/constants/common/<name>.ts`, export via `src/constants/common/index.ts`.
+- Known finite data values → constants/enums in `src/constants/common/` when shared, or the owning module constants file when module-specific.
 - Prisma generates DB types. Only add types for API responses, session payloads, and what Prisma doesn't cover.
 - When adding a module, create matching `src/types/<module>.ts` and `src/constants/texts/<module>.ts`.
 

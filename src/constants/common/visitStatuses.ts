@@ -9,10 +9,3 @@ export const VISIT_STATUSES = [
 ] as const;
 
 export type VisitStatusValue = (typeof VISIT_STATUSES)[number];
-
-export function isVisitStatus(value: unknown): value is VisitStatusValue {
-  return (
-    typeof value === "string" &&
-    VISIT_STATUSES.includes(value as VisitStatusValue)
-  );
-}

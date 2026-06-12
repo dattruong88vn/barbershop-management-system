@@ -19,7 +19,7 @@ import {
   VISIT_STATUS_COMPLETED,
   VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
-} from "@/constants/visitStatuses";
+} from "@/constants/common";
 import { useCustomerVisits } from "@/hooks/useCustomerVisits";
 import {
   formatCompactMoney,

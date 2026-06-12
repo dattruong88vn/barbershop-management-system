@@ -4,7 +4,6 @@ import type { SyntheticEvent } from "react";
 import {
   useCallback,
   useEffect,
-  useMemo,
   useState,
   useSyncExternalStore,
 } from "react";
@@ -65,13 +64,7 @@ export default function CustomersPage() {
   const shouldShowRecentSearches =
     !hasSearchInput && recentSearches.length > 0;
 
-  const defaultEmptyStateText = useMemo(
-    () =>
-      shouldShowRecentSearches
-        ? ""
-        : customerTexts.lookup.emptyBeforeSearch,
-    [shouldShowRecentSearches],
-  );
+  const defaultEmptyStateText = "";
 
   const rememberRecentSearch = useCallback((search: string) => {
     if (!search) {

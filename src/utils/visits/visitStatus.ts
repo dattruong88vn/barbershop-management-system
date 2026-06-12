@@ -2,8 +2,17 @@ import { visitTexts } from "@/constants/texts";
 import {
   VISIT_STATUS_COMPLETED,
   VISIT_STATUS_IN_PROGRESS,
-} from "@/constants/visitStatuses";
+  VISIT_STATUSES,
+  type VisitStatusValue,
+} from "@/constants/common";
 import type { CustomerVisit, CustomerVisitStatus } from "@/types";
+
+export function isVisitStatus(value: unknown): value is VisitStatusValue {
+  return (
+    typeof value === "string" &&
+    VISIT_STATUSES.includes(value as VisitStatusValue)
+  );
+}
 
 export function getVisitStatusAction(visit: CustomerVisit): {
   isStartAction: boolean;

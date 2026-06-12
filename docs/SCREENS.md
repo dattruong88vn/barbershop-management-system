@@ -72,7 +72,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Sections:** ô search, danh sách khách hàng
 - **Fields:** search input (tên hoặc số điện thoại)
 - **Actions:** Search theo tên, Search theo SĐT, Tạo khách hàng (mở modal Customer Create), Mở Customer Detail, Tạo visit nhanh
-- **States:** empty (chưa search), kết quả, không có kết quả, loading
+- **States:** mặc định hiển thị page 1 gồm 10 khách do nhân viên hiện tại tạo, kết quả search, không có kết quả, loading
 - **Data:** danh sách customer (name, phone, số lượt visit, ngày ghé gần nhất)
 
 ## 4. Customer Create

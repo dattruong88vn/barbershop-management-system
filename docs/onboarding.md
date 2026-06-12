@@ -163,6 +163,7 @@ src/
 ├── app/                  # Next.js App Router pages & API routes
 ├── components/           # Reusable UI components
 ├── constants/
+│   ├── common/           # Shared cross-module constants
 │   ├── routes/
 │   │   ├── appRoutes.ts  # Frontend navigation URLs
 │   │   ├── apiRoutes.ts  # API endpoint URLs

@@ -1,19 +1,23 @@
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
+import {
+  STAFF_EDIT_WINDOW_MS,
+  VISIT_STATUS_COMPLETED,
+  type VisitItemTypeValue,
+} from "@/constants/common";
 import type {
   CustomerVisit,
   VisitCreateFormProps,
   VisitCreateItem,
 } from "@/types";
 
-const STAFF_EDIT_WINDOW_MS = 3 * 60 * 60 * 1000;
-
 export function canEditVisitStaff(visit: CustomerVisit) {
   if (visit.status !== VISIT_STATUS_COMPLETED || !visit.completedAt) {
     return false;
   }
 
-  return Date.now() <= new Date(visit.completedAt).getTime() + STAFF_EDIT_WINDOW_MS;
+  return (
+    Date.now() <= new Date(visit.completedAt).getTime() + STAFF_EDIT_WINDOW_MS
+  );
 }
 
 export function calculateVisitTotalPrice(
@@ -34,7 +38,7 @@ export function calculateVisitTotalPrice(
 
 export function getSuggestedVisitItemIds(
   suggestions: VisitCreateFormProps["suggestions"],
-  type: "service" | "combo",
+  type: VisitItemTypeValue,
 ) {
   return (
     suggestions?.services
@@ -45,7 +49,7 @@ export function getSuggestedVisitItemIds(
 
 export function getVisitItemIds(
   visit: CustomerVisit,
-  type: "service" | "combo",
+  type: VisitItemTypeValue,
 ) {
   return visit.services
     .filter((service) => service.type === type && service.itemId)
@@ -55,7 +59,7 @@ export function getVisitItemIds(
 export function mergeVisitItems(
   items: VisitCreateItem[],
   visit: CustomerVisit,
-  type: "service" | "combo",
+  type: VisitItemTypeValue,
 ) {
   const itemMap = new Map(items.map((item) => [item.id, item]));
 

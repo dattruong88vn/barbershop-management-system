@@ -9,8 +9,12 @@ import {
   VisitCreateItemSelector,
   VisitCreateStaffSelect,
 } from "@/components/modules/customers";
+import {
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
+  VISIT_STATUS_COMPLETED,
+} from "@/constants/common";
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { dispatchAppToast } from "@/lib/toast";
 import type {
   CustomerVisit,
@@ -51,10 +55,10 @@ export function VisitDetailEditForm({
   visit: CustomerVisit;
 }) {
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(() =>
-    getVisitItemIds(visit, "service"),
+    getVisitItemIds(visit, VISIT_ITEM_TYPE_SERVICE),
   );
   const [selectedComboIds, setSelectedComboIds] = useState<string[]>(() =>
-    getVisitItemIds(visit, "combo"),
+    getVisitItemIds(visit, VISIT_ITEM_TYPE_COMBO),
   );
   const [barberId, setBarberId] = useState(visit.barber?.id ?? "");
   const [noHaircut, setNoHaircut] = useState(Boolean(visit.noHaircut));
@@ -66,11 +70,11 @@ export function VisitDetailEditForm({
   const isCompletedVisit = visit.status === VISIT_STATUS_COMPLETED;
   const isSubmitting = isCompletedVisit ? isUpdatingStaff : isUpdatingDetail;
   const serviceOptions = useMemo(
-    () => mergeVisitItems(services, visit, "service"),
+    () => mergeVisitItems(services, visit, VISIT_ITEM_TYPE_SERVICE),
     [services, visit],
   );
   const comboOptions = useMemo(
-    () => mergeVisitItems(combos, visit, "combo"),
+    () => mergeVisitItems(combos, visit, VISIT_ITEM_TYPE_COMBO),
     [combos, visit],
   );
   const totalPrice = useMemo(

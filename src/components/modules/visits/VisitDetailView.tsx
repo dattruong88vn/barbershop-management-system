@@ -8,7 +8,7 @@ import { ImageLightbox } from "@/components/global/ImageLightbox";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { ROUTES } from "@/constants/routes";
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
+import { VISIT_STATUS_COMPLETED } from "@/constants/common";
 import { useVisitContext } from "@/context/VisitContext";
 import { dispatchAppNavigation } from "@/lib/appNavigation";
 import { dismissAppToast, dispatchAppToast } from "@/lib/toast";

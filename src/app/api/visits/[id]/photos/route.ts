@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
+import { VISIT_STATUS_COMPLETED } from "@/constants/common";
 import { getPhotoUrl } from "@/lib/r2";
 import { prisma } from "@/lib/prisma";
 import type { VisitPhotoCreateRequestBody } from "@/types";

@@ -1,3 +1,7 @@
+import {
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
+} from "@/constants/common";
 import type { Customer, VisitCreateSuggestions } from "@/types";
 
 export type VisitCreateSearchParams = {
@@ -49,11 +53,11 @@ export function getVisitSuggestionsFromSearchParams({
 }: VisitCreateSearchParams): VisitCreateSuggestions | null {
   const serviceSuggestions = getIdsFromSearchParam(serviceIds).map((itemId) => ({
     itemId,
-    type: "service" as const,
+    type: VISIT_ITEM_TYPE_SERVICE,
   }));
   const comboSuggestions = getIdsFromSearchParam(comboIds).map((itemId) => ({
     itemId,
-    type: "combo" as const,
+    type: VISIT_ITEM_TYPE_COMBO,
   }));
 
   if (

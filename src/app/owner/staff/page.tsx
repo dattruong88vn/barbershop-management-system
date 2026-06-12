@@ -4,6 +4,7 @@ import type { SyntheticEvent } from "react";
 import { useState } from "react";
 
 import { Button } from "@/components/global/ui/button";
+import { STAFF_ROLES } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
 import { useStaff } from "@/hooks/useStaff";
@@ -12,8 +13,6 @@ import type { Staff, StaffRole } from "@/types";
 const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
   dateStyle: "medium",
 });
-
-const STAFF_ROLES: StaffRole[] = ["receptionist", "barber", "skinner"];
 
 export default function OwnerStaffPage() {
   const [username, setUsername] = useState("");

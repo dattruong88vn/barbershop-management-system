@@ -2,7 +2,7 @@ import { customerTexts } from "@/constants/texts";
 import {
   VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
-} from "@/constants/visitStatuses";
+} from "@/constants/common";
 import type { CustomerVisitStatus } from "@/types";
 
 export function getCustomerVisitStatusLabel(status: CustomerVisitStatus) {

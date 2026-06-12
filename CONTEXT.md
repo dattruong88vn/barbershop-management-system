@@ -162,6 +162,11 @@ export const visitTexts = {
 // src/constants/texts/index.ts — export * from "./visits"
 ```
 
+Shared cross-module constants live in `src/constants/common/` and must be
+exported from `src/constants/common/index.ts`.
+Known finite values such as statuses, roles, modes, and item types must be
+declared as constants/enums before use instead of scattered raw literals.
+
 ---
 
 ## Setup & Environment

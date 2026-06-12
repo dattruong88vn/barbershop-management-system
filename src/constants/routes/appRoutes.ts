@@ -1,3 +1,9 @@
+import {
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
+  type VisitItemTypeValue,
+} from "@/constants/common";
+
 export const ROUTES = {
   login: "/login",
   changePassword: "/change-password",
@@ -19,14 +25,19 @@ export const ROUTES = {
   createVisitFromVisit: (visit: {
     barber: { id: string } | null;
     customer: { id: string; name: string; phone: string };
-    services: Array<{ itemId: string | null; type: "service" | "combo" }>;
+    services: Array<{ itemId: string | null; type: VisitItemTypeValue }>;
     skinner: { id: string } | null;
   }) => {
     const serviceIds = visit.services
-      .filter((service) => service.type === "service" && service.itemId)
+      .filter(
+        (service) =>
+          service.type === VISIT_ITEM_TYPE_SERVICE && service.itemId,
+      )
       .map((service) => service.itemId as string);
     const comboIds = visit.services
-      .filter((service) => service.type === "combo" && service.itemId)
+      .filter(
+        (service) => service.type === VISIT_ITEM_TYPE_COMBO && service.itemId,
+      )
       .map((service) => service.itemId as string);
     const params = new URLSearchParams({
       customerId: visit.customer.id,

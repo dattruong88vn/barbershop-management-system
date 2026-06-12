@@ -2,12 +2,12 @@ import type {
   ChangeEventHandler,
   FormEventHandler,
 } from "react";
-import type { VisitStatusValue } from "@/constants/visitStatuses";
+import type { VisitItemTypeValue, VisitStatusValue } from "@/constants/common";
 
 export type CustomerLastVisitService = {
   id: string;
   name: string;
-  type: "service" | "combo";
+  type: VisitItemTypeValue;
   price: number;
 };
 
@@ -53,6 +53,8 @@ export type CustomerRequestBody = {
 
 export type CustomerListApiResponse = {
   customers: Customer[];
+  page?: number;
+  pageSize?: number;
 };
 
 export type CustomerApiResponse = {
@@ -66,7 +68,7 @@ export type CustomerVisitService = {
   id: string;
   itemId: string | null;
   name: string;
-  type: "service" | "combo";
+  type: VisitItemTypeValue;
   price: number;
 };
 
