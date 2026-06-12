@@ -55,6 +55,8 @@ Mention file này khi task liên quan đến UI, API pattern, hoặc setup môi 
 
 **Screen structure:** Follow `docs/SCREENS.md`. Không tự thêm section.
 
+**Route pages:** `page.tsx` giữ route orchestration và page-level semantics/view. Không tạo single-use wrapper/container chỉ để render toàn bộ page body từ nơi khác; inline page body vào route file. Trong một page/component file chỉ có một module-scope function là function trả JSX của page/component đó. Handler/helper riêng của page/component có thể khai báo bên trong function component. Helper thuần hoặc reusable ở ngoài component phải đưa vào `src/utils/`. Nếu cần nhiều component functions, tách mỗi component sang file riêng trong `src/components/screens/` hoặc `src/components/modules/`. `/design-system` được exempt vì là reference page.
+
 ---
 
 ## API Pattern

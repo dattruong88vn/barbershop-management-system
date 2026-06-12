@@ -4,6 +4,7 @@ import { use } from "react";
 
 import { VisitDetailView } from "@/components/modules/visits";
 import { ROUTES } from "@/constants/routes";
+import { visitTexts } from "@/constants/texts";
 import { VisitProvider } from "@/context/VisitContext";
 
 type VisitDetailPageProps = {
@@ -26,12 +27,14 @@ export default function VisitDetailPage({
     : ROUTES.customers;
 
   return (
-    <VisitProvider
-      backHref={backHref}
-      returnToCustomerId={returnToCustomerId ?? null}
-      visitId={visitId}
-    >
-      <VisitDetailView />
-    </VisitProvider>
+    <main aria-label={visitTexts.detail.title}>
+      <VisitProvider
+        backHref={backHref}
+        returnToCustomerId={returnToCustomerId ?? null}
+        visitId={visitId}
+      >
+        <VisitDetailView />
+      </VisitProvider>
+    </main>
   );
 }

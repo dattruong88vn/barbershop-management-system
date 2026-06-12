@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, type SyntheticEvent } from "react";
+import { use, type SyntheticEvent } from "react";
 import { useState } from "react";
 import { getSession, signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { AuthFormShell } from "@/components/screens/auth/AuthFormShell";
 import { FormTextField } from "@/components/global/FormTextField";
@@ -13,32 +13,22 @@ import { Button } from "@/components/global/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { authTexts } from "@/constants/texts";
 import { getPostAuthRedirectPath } from "@/lib/authRedirect";
+import { getSafeCallbackPath } from "@/utils/auth";
 
-function getSafeCallbackPath(callbackUrl: string | null): string | null {
-  if (!callbackUrl?.startsWith("/") || callbackUrl.startsWith("//")) {
-    return null;
-  }
+type LoginPageProps = {
+  searchParams: Promise<{
+    callbackUrl?: string;
+  }>;
+};
 
-  if (
-    callbackUrl === ROUTES.login ||
-    callbackUrl.startsWith(`${ROUTES.login}?`) ||
-    callbackUrl === ROUTES.changePassword ||
-    callbackUrl.startsWith(`${ROUTES.changePassword}?`)
-  ) {
-    return null;
-  }
-
-  return callbackUrl;
-}
-
-function LoginForm() {
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const resolvedSearchParams = use(searchParams);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const callbackUrl = searchParams.get("callbackUrl");
+  const callbackUrl = resolvedSearchParams.callbackUrl ?? null;
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -133,13 +123,5 @@ function LoginForm() {
         {authTexts.login.supportText}
       </p>
     </AuthFormShell>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={null}>
-      <LoginForm />
-    </Suspense>
   );
 }

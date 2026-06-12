@@ -153,7 +153,7 @@ export function VisitDetailView() {
   }
 
   return (
-    <main className="min-h-screen bg-muted/30 px-4 py-4 pb-8 text-foreground md:px-6 md:py-8">
+    <div className="min-h-screen bg-muted/30 px-4 py-4 pb-8 text-foreground md:px-6 md:py-8">
       <div className="mx-auto w-full max-w-5xl">
         <VisitDetailHeader
           backHref={backHref}
@@ -228,6 +228,6 @@ export function VisitDetailView() {
           onUpdateStaff={updateVisitStaff}
         />
       ) : null}
-    </main>
+    </div>
   );
 }

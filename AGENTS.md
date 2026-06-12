@@ -37,7 +37,10 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Every successful user action must show a success toast.
 - Keep changes scoped to the requested module.
 - Split components into the smallest practical focused components.
-- Shared or reusable functions must live in `src/utils/`; do not define helper functions inside default-export component files.
+- Shared or reusable helper functions must live in `src/utils/`.
+- Inside a page/component file, keep only one module-scope function: the page/component function that returns JSX.
+- Page/component-specific handlers and helpers may be declared inside that component function.
+- Do not declare helper functions or additional component functions outside the main component function in the same file.
 
 ## Component Placement
 
@@ -47,6 +50,10 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Module components → `src/components/modules/<module>/`.
 - Page-specific components → `src/components/screens/<module-or-route>/`.
 - Route-only orchestration → inline in `page.tsx`.
+- `page.tsx` files must keep route orchestration plus page-level view/semantics, not only a one-line render of another component.
+- Do not create single-use page wrapper/container components that only move the whole page body out of `page.tsx`; inline that page body directly into the route file.
+- Move reusable or pure functions declared outside a component to `src/utils/`; page-specific handlers may stay inside the page component function.
+- If a `page.tsx` or component file contains multiple component functions, split them into separate files under the matching `src/components/screens/` or `src/components/modules/` folder. `/design-system` is exempt as the reference screen.
 - Never create PascalCase component files inside `src/app/`.
 - Module and screen components must build on global primitives, not redefine base visuals.
 - Split large components into focused children (sections, panels, lists, rows, form fields).

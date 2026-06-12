@@ -122,7 +122,7 @@ export default function OwnerServicesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-zinc-50 px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
       <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[360px_1fr]">
         <section>
           <h1 className="text-2xl font-semibold">
@@ -292,6 +292,6 @@ export default function OwnerServicesPage() {
           ) : null}
         </section>
       </div>
-    </main>
+    </div>
   );
 }
