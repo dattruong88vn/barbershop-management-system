@@ -161,15 +161,8 @@ export default function VisitCreateForm({
   return (
     <section
       id="create-visit"
-      className="mt-4 scroll-mt-6 rounded-xl border border-border bg-background p-5"
+      className="scroll-mt-6"
     >
-      <h2 className="text-base font-semibold text-foreground">
-        {visitTexts.create.title}
-      </h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        {visitTexts.create.description}
-      </p>
-
       {isLoadingOptions ? (
         <p className="mt-4 text-sm text-muted-foreground">
           {visitTexts.create.loadingOptions}
@@ -184,52 +177,66 @@ export default function VisitCreateForm({
         </InlineAlert>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="mt-5 space-y-5">
-        <VisitCreateItemSelector
-          emptyText={visitTexts.create.emptyServices}
-          items={services}
-          label={visitTexts.create.servicesLabel}
-          selectedIds={selectedServiceIds}
-          onToggleItem={(serviceId) => {
-            setSelectedComboIds([]);
-            setSelectedServiceIds((currentIds) =>
-              toggleId(currentIds, serviceId),
-            );
-          }}
-        />
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <section className="rounded-xl border border-border bg-background p-5">
+          <h2 className="text-base font-semibold text-foreground">
+            {visitTexts.create.serviceSectionTitle}
+          </h2>
+          <div className="mt-4 space-y-5">
+            <VisitCreateItemSelector
+              emptyText={visitTexts.create.emptyServices}
+              items={services}
+              label={visitTexts.create.servicesLabel}
+              selectedIds={selectedServiceIds}
+              onToggleItem={(serviceId) => {
+                setSelectedComboIds([]);
+                setSelectedServiceIds((currentIds) =>
+                  toggleId(currentIds, serviceId),
+                );
+              }}
+            />
 
-        <VisitCreateItemSelector
-          emptyText={visitTexts.create.emptyCombos}
-          items={combos}
-          label={visitTexts.create.combosLabel}
-          selectedIds={selectedComboIds}
-          onToggleItem={(comboId) => {
-            setSelectedServiceIds([]);
-            setSelectedComboIds((currentIds) => toggleId(currentIds, comboId));
-          }}
-        />
+            <VisitCreateItemSelector
+              emptyText={visitTexts.create.emptyCombos}
+              items={combos}
+              label={visitTexts.create.combosLabel}
+              selectedIds={selectedComboIds}
+              onToggleItem={(comboId) => {
+                setSelectedServiceIds([]);
+                setSelectedComboIds((currentIds) => toggleId(currentIds, comboId));
+              }}
+            />
+          </div>
+        </section>
 
-        <VisitCreateStaffSelect
-          label={visitTexts.create.barberLabel}
-          placeholder={visitTexts.create.barberPlaceholder}
-          staff={barbers}
-          value={selectedBarberId}
-          onValueChange={(value) => {
-            setHasSkippedCurrentBarberDefault(!value);
-            setBarberId(value);
-          }}
-        />
+        <section className="rounded-xl border border-border bg-background p-5">
+          <h2 className="text-base font-semibold text-foreground">
+            {visitTexts.create.staffSectionTitle}
+          </h2>
+          <div className="mt-4 space-y-5">
+            <VisitCreateStaffSelect
+              label={visitTexts.create.barberLabel}
+              placeholder={visitTexts.create.barberPlaceholder}
+              staff={barbers}
+              value={selectedBarberId}
+              onValueChange={(value) => {
+                setHasSkippedCurrentBarberDefault(!value);
+                setBarberId(value);
+              }}
+            />
 
-        <VisitCreateStaffSelect
-          label={visitTexts.create.skinnerLabel}
-          placeholder={visitTexts.create.skinnerPlaceholder}
-          staff={skinners}
-          value={selectedSkinnerId}
-          onValueChange={(value) => {
-            setHasSkippedCurrentSkinnerDefault(!value);
-            setSkinnerId(value);
-          }}
-        />
+            <VisitCreateStaffSelect
+              label={visitTexts.create.skinnerLabel}
+              placeholder={visitTexts.create.skinnerPlaceholder}
+              staff={skinners}
+              value={selectedSkinnerId}
+              onValueChange={(value) => {
+                setHasSkippedCurrentSkinnerDefault(!value);
+                setSkinnerId(value);
+              }}
+            />
+          </div>
+        </section>
 
         <p className="flex items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-foreground">
           <span>{visitTexts.create.totalPriceLabel}</span>
