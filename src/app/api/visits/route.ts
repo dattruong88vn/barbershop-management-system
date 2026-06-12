@@ -4,11 +4,13 @@ import type { Prisma } from "@prisma/client";
 
 import { customerTexts, visitTexts } from "@/constants/texts";
 import {
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
   VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
-  isVisitStatus,
-} from "@/constants/visitStatuses";
+} from "@/constants/common";
 import { prisma } from "@/lib/prisma";
+import { isVisitStatus } from "@/utils/visits/visitStatus";
 import type {
   CustomerVisit,
   UserRole,
@@ -147,7 +149,9 @@ function formatVisitResponse(visit: VisitRecord): CustomerVisit {
         visitService.service?.name ??
         visitService.combo?.name ??
         customerTexts.detail.noServices,
-      type: visitService.service ? "service" : "combo",
+      type: visitService.service
+        ? VISIT_ITEM_TYPE_SERVICE
+        : VISIT_ITEM_TYPE_COMBO,
       price: Number(visitService.price.toString()),
     })),
   };

@@ -447,3 +447,11 @@ Copy this structure when starting a new date section:
 - Removed the now-unused screen wrapper component files and stale barrel exports after confirming they were not imported outside their route pages.
 - Clarified the page/component function rule so handlers can live inside the component while helper/component functions outside the component must move to utilities or separate files.
 - Split customer header, visit create field, and customer skeleton component files so each production component file has only one module-scope JSX-returning function.
+- Added `created_by` tracking for customers and made `/customers` show customers created by the current staff member by default when no search term is entered.
+- Removed the new customer `created_by` column dependency and made default customer lookup use existing visit creator data to avoid API 500s before a database migration is applied.
+- Split customer lookup into an independent one-time default page-1 cache and separate search result cache, with the customers API returning 10 records per page.
+- Moved default pagination values into shared constants and removed the default empty customer list message.
+- Moved shared pagination constants into `src/constants/common/` and documented the common constants convention for future modules.
+- Moved shared staff roles, visit statuses, and visit staff edit window constants into `src/constants/common/`.
+- Moved `isVisitStatus` into visit helpers and added shared visit item type constants for `service` and `combo`.
+- Documented the rule that known finite values must be declared as constants/enums before use.

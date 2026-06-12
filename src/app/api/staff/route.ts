@@ -2,12 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { Prisma } from "@prisma/client";
 
+import { STAFF_ROLES } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import type { StaffRequestBody, StaffRole, UserRole } from "@/types";
 
-const STAFF_ROLES: StaffRole[] = ["receptionist", "barber", "skinner"];
 const STAFF_SELECT = {
   id: true,
   shopId: true,
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
   const staff = await prisma.user.findMany({
     where: {
       shopId: authResult.shopId,
-      role: { in: STAFF_ROLES },
+      role: { in: [...STAFF_ROLES] },
       status: "active",
     },
     orderBy: { createdAt: "desc" },

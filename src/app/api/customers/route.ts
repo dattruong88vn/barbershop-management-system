@@ -2,8 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { Prisma } from "@prisma/client";
 
+import {
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
+  VISIT_STATUS_COMPLETED,
+} from "@/constants/common";
 import { customerTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
 import { prisma } from "@/lib/prisma";
 import type { CustomerRequestBody, UserRole } from "@/types";
 
@@ -86,6 +92,12 @@ function normalizeCustomerInput(body: CustomerRequestBody) {
   };
 }
 
+function getCustomerPage(request: NextRequest) {
+  const page = Number(request.nextUrl.searchParams.get("page"));
+
+  return Number.isInteger(page) && page > 0 ? page : DEFAULT_PAGE;
+}
+
 function formatCustomerResponse(customer: CustomerRecord) {
   const lastVisit = customer.visits[0] ?? null;
 
@@ -113,7 +125,9 @@ function formatCustomerResponse(customer: CustomerRecord) {
               visitService.service?.name ??
               visitService.combo?.name ??
               customerTexts.lookup.noServices,
-            type: visitService.service ? "service" : "combo",
+            type: visitService.service
+              ? VISIT_ITEM_TYPE_SERVICE
+              : VISIT_ITEM_TYPE_COMBO,
             price: Number(visitService.price.toString()),
           })),
         }
@@ -139,7 +153,7 @@ async function getStaffShopId(request: NextRequest) {
     return { error: customerTexts.api.errors.forbidden, status: 403 };
   }
 
-  return { shopId: token.shop_id };
+  return { shopId: token.shop_id, staffId: token.id };
 }
 
 export async function GET(request: NextRequest) {
@@ -153,26 +167,36 @@ export async function GET(request: NextRequest) {
   }
 
   const searchTerm = request.nextUrl.searchParams.get("search")?.trim() ?? "";
-
-  if (!searchTerm) {
-    return NextResponse.json({ customers: [] });
-  }
+  const page = getCustomerPage(request);
 
   const customers = await prisma.customer.findMany({
     where: {
       shopId: authResult.shopId,
-      OR: [
-        { name: { contains: searchTerm, mode: "insensitive" } },
-        { phone: { contains: searchTerm } },
-      ],
+      ...(searchTerm
+        ? {
+            OR: [
+              { name: { contains: searchTerm, mode: "insensitive" } },
+              { phone: { contains: searchTerm } },
+            ],
+          }
+        : {
+            visits: {
+              some: {
+                createdBy: authResult.staffId,
+              },
+            },
+          }),
     },
     orderBy: { createdAt: "desc" },
-    take: 20,
+    skip: (page - 1) * DEFAULT_PAGE_SIZE,
+    take: DEFAULT_PAGE_SIZE,
     select: CUSTOMER_SELECT,
   });
 
   return NextResponse.json({
     customers: customers.map(formatCustomerResponse),
+    page,
+    pageSize: DEFAULT_PAGE_SIZE,
   });
 }
 

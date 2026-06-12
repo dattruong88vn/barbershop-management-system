@@ -2,11 +2,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { Prisma } from "@prisma/client";
 
+import {
+  STAFF_ROLES,
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
+} from "@/constants/common";
 import { customerTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
-import type { CustomerVisit, UserRole } from "@/types";
+import type { CustomerVisit } from "@/types";
 
-const STAFF_ROLES: UserRole[] = ["receptionist", "barber", "skinner"];
 const CUSTOMER_VISITS_SELECT = {
   id: true,
   name: true,
@@ -110,7 +114,9 @@ function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
         visitService.service?.name ??
         visitService.combo?.name ??
         customerTexts.detail.noServices,
-      type: visitService.service ? "service" : "combo",
+      type: visitService.service
+        ? VISIT_ITEM_TYPE_SERVICE
+        : VISIT_ITEM_TYPE_COMBO,
       price: Number(visitService.price.toString()),
     })),
   };
@@ -132,7 +138,7 @@ async function getStaffShopId(request: NextRequest) {
 
   if (
     typeof token.role !== "string" ||
-    !STAFF_ROLES.includes(token.role as UserRole) ||
+    !STAFF_ROLES.includes(token.role as (typeof STAFF_ROLES)[number]) ||
     !token.shop_id
   ) {
     return { error: customerTexts.api.errors.forbidden, status: 403 };

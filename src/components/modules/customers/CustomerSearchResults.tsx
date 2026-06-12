@@ -35,7 +35,10 @@ export function CustomerSearchResults({
         </InlineAlert>
       ) : null}
 
-      {!hasSearched && defaultEmptyStateText ? (
+      {!isLoading &&
+      !customers.length &&
+      !hasSearched &&
+      defaultEmptyStateText ? (
         <EmptyState icon={Users} text={defaultEmptyStateText} />
       ) : null}
 

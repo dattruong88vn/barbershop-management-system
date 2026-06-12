@@ -11,7 +11,7 @@ import { Button } from "@/components/global/ui/button";
 import { VisitListCard, VisitListSkeleton } from "@/components/modules/visits";
 import { ROUTES } from "@/constants/routes";
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_PENDING, VISIT_STATUSES } from "@/constants/visitStatuses";
+import { VISIT_STATUS_PENDING, VISIT_STATUSES } from "@/constants/common";
 import { useVisits } from "@/hooks/useVisits";
 import type { CustomerVisitStatus } from "@/types";
 import { getVisitListStatusLabel } from "@/utils/visits";

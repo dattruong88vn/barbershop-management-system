@@ -6,7 +6,7 @@ import { CheckCircle2, Play } from "lucide-react";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/visitStatuses";
+import { VISIT_STATUS_COMPLETED } from "@/constants/common";
 import { dispatchAppToast } from "@/lib/toast";
 import type { CustomerVisit, VisitStatusUpdateInput } from "@/types";
 import { getMissingCompletionStaffMessage } from "@/utils/visits/visitDetail";

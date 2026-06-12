@@ -1,7 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_PENDING } from "@/constants/visitStatuses";
+import { VISIT_STATUS_PENDING } from "@/constants/common";
 import { hasVisitPhotoWarning } from "@/lib/customerVisitDisplay";
 import type { CustomerVisit, CustomerVisitPhoto } from "@/types";
 import { VisitInformationSection } from "./VisitInformationSection";

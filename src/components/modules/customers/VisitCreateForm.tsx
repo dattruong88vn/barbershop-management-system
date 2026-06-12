@@ -7,6 +7,10 @@ import { useRouter } from "next/navigation";
 
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
+import {
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
+} from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
 import { customerTexts, visitTexts } from "@/constants/texts";
 import { useVisitContext } from "@/context/VisitContext";
@@ -29,11 +33,14 @@ export default function VisitCreateForm({
   suggestions,
 }: VisitCreateFormProps) {
   const router = useRouter();
-  const suggestedComboIds = getSuggestedVisitItemIds(suggestions, "combo");
+  const suggestedComboIds = getSuggestedVisitItemIds(
+    suggestions,
+    VISIT_ITEM_TYPE_COMBO,
+  );
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>(() =>
     suggestedComboIds.length
       ? []
-      : getSuggestedVisitItemIds(suggestions, "service"),
+      : getSuggestedVisitItemIds(suggestions, VISIT_ITEM_TYPE_SERVICE),
   );
   const [selectedComboIds, setSelectedComboIds] = useState<string[]>(
     suggestedComboIds,

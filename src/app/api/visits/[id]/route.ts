@@ -4,12 +4,15 @@ import type { Prisma } from "@prisma/client";
 
 import { customerTexts, visitTexts } from "@/constants/texts";
 import {
+  STAFF_EDIT_WINDOW_MS,
+  VISIT_ITEM_TYPE_COMBO,
+  VISIT_ITEM_TYPE_SERVICE,
   VISIT_STATUS_COMPLETED,
   VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
-  isVisitStatus,
-} from "@/constants/visitStatuses";
+} from "@/constants/common";
 import { prisma } from "@/lib/prisma";
+import { isVisitStatus } from "@/utils/visits/visitStatus";
 import type {
   CustomerVisit,
   UserRole,
@@ -26,7 +29,6 @@ const VISIT_DETAIL_ROLES: UserRole[] = [
   "barber",
   "skinner",
 ];
-const STAFF_EDIT_WINDOW_MS = 3 * 60 * 60 * 1000;
 const VISIT_SELECT = {
   id: true,
   createdAt: true,
@@ -230,7 +232,9 @@ function formatVisitResponse(
         visitService.service?.name ??
         visitService.combo?.name ??
         customerTexts.detail.noServices,
-      type: visitService.service ? "service" : "combo",
+      type: visitService.service
+        ? VISIT_ITEM_TYPE_SERVICE
+        : VISIT_ITEM_TYPE_COMBO,
       price: Number(visitService.price.toString()),
     })),
   };

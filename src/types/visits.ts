@@ -1,4 +1,5 @@
 import type { ChangeEventHandler, FormEventHandler, ReactNode } from "react";
+import type { VisitItemTypeValue } from "@/constants/common";
 import type {
   Customer,
   CustomerVisit,
@@ -165,7 +166,7 @@ export type VisitCreateFormProps = {
 export type VisitCreateSuggestions = {
   services: Array<{
     itemId: string | null;
-    type: "service" | "combo";
+    type: VisitItemTypeValue;
   }>;
   barber: {
     id: string;
