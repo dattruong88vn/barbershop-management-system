@@ -66,11 +66,13 @@ export {
   type GeistTableRowProps as TableRowProps,
 } from "./Display";
 export {
+  AppFeedbackNotification,
   GeistBanner as Banner,
   GeistError as Error,
   GeistFeedback as Feedback,
   GeistNote as Note,
   GeistToast as GeistToast,
+  type AppFeedbackNotificationProps,
   type GeistBannerProps as BannerProps,
   type GeistErrorProps as ErrorProps,
   type GeistFeedbackProps as FeedbackProps,

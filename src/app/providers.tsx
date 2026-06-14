@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { Toast } from "@/components/global/Toast";
+import { AppFeedbackNotification } from "@/components/global";
 import {
   API_SERVER_ERROR_EVENT,
   createQueryClient,
@@ -92,7 +92,12 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {toast ? <Toast toast={toast} onClose={() => setToast(null)} /> : null}
+      {toast ? (
+        <AppFeedbackNotification
+          toast={toast}
+          onClose={() => setToast(null)}
+        />
+      ) : null}
     </QueryClientProvider>
   );
 }

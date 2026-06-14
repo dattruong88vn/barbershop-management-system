@@ -468,6 +468,8 @@ Copy this structure when starting a new date section:
 - Added `GET /api/reports/personal` for staff personal reports scoped by `shop_id`, current user role, completed visits, and `period=month|year|all&month=YYYY-MM`.
 
 ### UI Changes
+- Updated runtime app notifications to render through the shared Feedback notification component for success, warning, and error messages while leaving the global Toast component unchanged.
+- Moved runtime feedback notifications to the top-right corner of the screen.
 - Added `/reports` with a mobile-first personal report view showing service count, combo count, period, supporting metrics, and top performed services.
 - Added a management report placeholder for owner/manager users until Report API support is implemented.
 - Allowed staff roles to access `/reports` through middleware.
