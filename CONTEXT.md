@@ -50,7 +50,7 @@ Title/value display pairs must stay on one row with title left, value right, and
 **Every screen must have:** Loading state · Empty state · Error state.
 Loading/empty/error UI bắt buộc reuse global primitives như `Skeleton`, `EmptyState`, `InlineAlert` khi phù hợp.
 
-**Success feedback:** Toast trước khi navigate. Dispatch trước router.push để toast không mất.
+**Success feedback:** Runtime app notifications must render through the global Feedback notification flow. Dispatch success feedback before `router.push` so the notification is not lost during navigation. Keep `src/components/global/Toast.tsx` as a design-system component; do not use it for runtime success/error/warning notifications.
 
 **Tables:** Desktop only. Dùng cho Services · Combos · Staff · Branches · Reports. Có search + sort + pagination.
 

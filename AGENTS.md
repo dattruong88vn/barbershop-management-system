@@ -39,7 +39,7 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Use shadcn/ui components where possible.
 - Mandatory: before writing or styling any UI, search `src/components/global/` for an existing component/pattern and reuse it. If the pattern is reusable, add or extend a global component first.
 - Do not use native/browser controls or hand-rolled visuals when a global component exists for that pattern.
-- Every successful user action must show a success toast.
+- Every successful user action must show success feedback through the global Feedback notification flow. Do not render the global Toast component for runtime app notifications.
 - Keep changes scoped to the requested module.
 - Split components into the smallest practical focused components.
 - Shared or reusable helper functions must live in `src/utils/`.
@@ -80,7 +80,7 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - When a module shares API data or shared business logic across multiple screens/components, create a module context in `src/context/` similar to `VisitContext`.
 - Query key = private constant in hook module. Response data key = private constant, e.g. `const VISIT_RESPONSE_DATA_KEY = "visit"`.
 - When multiple mutations need optional response data → create one private `get[Entity]ResponseData()` using `hasResponseData`. Never repeat `if (!hasResponseData(...))` per mutation.
-- Error handling: 400 → show message · 401 → redirect `/login` · 403 → redirect `/dashboard` · 404 → redirect `/not-found` · 500 → toast error.
+- Error handling: 400 → show message · 401 → redirect `/login` · 403 → redirect `/dashboard` · 404 → redirect `/not-found` · 500 → show error feedback.
 
 ## Types & Texts
 

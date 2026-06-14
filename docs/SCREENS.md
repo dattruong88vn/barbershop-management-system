@@ -18,7 +18,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Điều hướng client phải dùng Next navigation (`router.push`, `router.replace`, `redirect`, hoặc `Link`). Tuyệt đối không dùng `window.location`, `window.location.href`, hoặc `window.location.assign`.
 - Client Component / hook dùng `fetchClient` từ `@/lib/fetchClient`. Server Component dùng `fetchServer` từ `@/lib/fetchServer`. Không gọi `fetch` trực tiếp.
 - Mọi chuỗi UI đặt trong `src/constants/texts/`. Không hardcode text trong component.
-- Mọi thao tác thành công phải hiển thị success toast; nếu có điều hướng sau thành công, toast phải được dispatch trước khi điều hướng bằng app router.
+- Mọi thao tác thành công phải hiển thị success feedback qua global Feedback notification flow; nếu có điều hướng sau thành công, feedback phải được dispatch trước khi điều hướng bằng app router.
 - Type/interface dùng chung đặt trong `src/types/`. Không định nghĩa trong component.
 - Dùng shadcn/ui khi có thể. TypeScript strict, không dùng `any`.
 - Mỗi bảng thuộc tenant phải enforce `shop_id`.

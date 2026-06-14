@@ -470,6 +470,7 @@ Copy this structure when starting a new date section:
 ### UI Changes
 - Updated runtime app notifications to render through the shared Feedback notification component for success, warning, and error messages while leaving the global Toast component unchanged.
 - Moved runtime feedback notifications to the top-right corner of the screen.
+- Documented that runtime success, warning, and error notifications must use the global Feedback notification flow instead of rendering the Toast component directly.
 - Added `/reports` with a mobile-first personal report view showing service count, combo count, period, supporting metrics, and top performed services.
 - Added a management report placeholder for owner/manager users until Report API support is implemented.
 - Allowed staff roles to access `/reports` through middleware.
