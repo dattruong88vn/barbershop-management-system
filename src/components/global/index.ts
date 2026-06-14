@@ -1,10 +1,12 @@
 export { GeistButton as Button, type GeistButtonProps as ButtonProps } from "./Button";
 export {
   GeistBadge as Badge,
+  GeistBadgeButton as BadgeButton,
   GeistDescription as Description,
   GeistLabel as Label,
   GeistText as Text,
   type GeistBadgeProps as BadgeProps,
+  type GeistBadgeButtonProps as BadgeButtonProps,
   type GeistDescriptionProps as DescriptionProps,
   type GeistLabelProps as LabelProps,
   type GeistTextProps as TextProps,
@@ -118,8 +120,19 @@ export {
   type GeistWindowProps as WindowProps,
 } from "./Specialized";
 export { EmptyState } from "./EmptyState";
+export { Combobox, type ComboboxOption } from "./Combobox";
+export { KeyValueRow } from "./KeyValueRow";
+export { MonthCalendar } from "./MonthCalendar";
 export { Skeleton } from "./Skeleton";
 export { Toast } from "./Toast";
+export {
+  Heading,
+  MetricValue,
+  Paragraph,
+  type HeadingProps,
+  type MetricValueProps,
+  type ParagraphProps,
+} from "./Typography";
 export { colors, radius, shadow, spacing, typography, zIndex } from "./tokens";
 export {
   cn,

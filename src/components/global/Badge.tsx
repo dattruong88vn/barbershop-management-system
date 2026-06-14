@@ -8,6 +8,35 @@ export interface GeistBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "success" | "danger" | "warning" | "info";
 }
 
+const badgeVariants = {
+  danger: {
+    filled: "bg-red-100 text-red-900",
+    outline: "border-red-900 bg-transparent text-red-900",
+  },
+  default: {
+    filled: "bg-gray-200 text-gray-1000",
+    outline: "border-gray-500 bg-transparent text-gray-1000",
+  },
+  info: {
+    filled: "bg-blue-100 text-blue-900",
+    outline: "border-blue-900 bg-transparent text-blue-900",
+  },
+  success: {
+    filled: "bg-green-100 text-green-900",
+    outline: "border-green-900 bg-transparent text-green-900",
+  },
+  warning: {
+    filled: "bg-amber-100 text-amber-900",
+    outline: "border-amber-900 bg-transparent text-amber-900",
+  },
+};
+
+const badgeSizes = {
+  lg: "px-4 py-1.5 text-base",
+  md: "px-3 py-1 text-sm",
+  sm: "px-2.5 py-0.5 text-xs",
+};
+
 export const GeistBadge = React.forwardRef<HTMLDivElement, GeistBadgeProps>(
   (
     {
@@ -20,36 +49,15 @@ export const GeistBadge = React.forwardRef<HTMLDivElement, GeistBadgeProps>(
     },
     ref,
   ) => {
-    const variants = {
-      danger: outline
-        ? "border-red-900 bg-transparent text-red-900"
-        : "bg-red-100 text-red-900",
-      default: outline
-        ? "border-gray-500 bg-transparent text-gray-1000"
-        : "bg-gray-200 text-gray-1000",
-      info: outline
-        ? "border-blue-900 bg-transparent text-blue-900"
-        : "bg-blue-100 text-blue-900",
-      success: outline
-        ? "border-green-900 bg-transparent text-green-900"
-        : "bg-green-100 text-green-900",
-      warning: outline
-        ? "border-amber-900 bg-transparent text-amber-900"
-        : "bg-amber-100 text-amber-900",
-    };
-    const sizes = {
-      lg: "px-4 py-1.5 text-base",
-      md: "px-3 py-1 text-sm",
-      sm: "px-2.5 py-0.5 text-xs",
-    };
-
     return (
       <div
         ref={ref}
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full border border-transparent font-medium",
-          variants[variant],
-          sizes[size],
+          outline
+            ? badgeVariants[variant].outline
+            : badgeVariants[variant].filled,
+          badgeSizes[size],
           className,
         )}
         {...props}
@@ -60,6 +68,47 @@ export const GeistBadge = React.forwardRef<HTMLDivElement, GeistBadgeProps>(
   },
 );
 GeistBadge.displayName = "GeistBadge";
+
+export interface GeistBadgeButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  outline?: boolean;
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "success" | "danger" | "warning" | "info";
+}
+
+export const GeistBadgeButton = React.forwardRef<
+  HTMLButtonElement,
+  GeistBadgeButtonProps
+>(
+  (
+    {
+      children,
+      className,
+      outline = false,
+      size = "md",
+      variant = "default",
+      ...props
+    },
+    ref,
+  ) => (
+    <button
+      ref={ref}
+      className={cn(
+        "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-transparent font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+        outline
+          ? badgeVariants[variant].outline
+          : badgeVariants[variant].filled,
+        badgeSizes[size],
+        className,
+      )}
+      type="button"
+      {...props}
+    >
+      {children}
+    </button>
+  ),
+);
+GeistBadgeButton.displayName = "GeistBadgeButton";
 
 export interface GeistTextProps extends React.HTMLAttributes<HTMLParagraphElement> {
   color?: "default" | "muted" | "subtle";

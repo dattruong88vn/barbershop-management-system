@@ -377,12 +377,14 @@ Route:
 
 Trạng thái backend:
 
-- Chưa implement.
-- Report API chưa có.
+- Personal report cho nhân viên đã có: `GET /api/reports/personal?period=month|year|all&month=YYYY-MM`.
+- Owner/manager report API chưa có.
 
 UI hiện tại:
 
-- Placeholder.
+- Staff roles (`receptionist`, `barber`, `skinner`) dùng dữ liệu thật từ personal report API, có section thông tin nhân viên và dropdown kỳ báo cáo.
+- Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm checkbox Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
+- Owner/manager vẫn là placeholder.
 
 Widgets tương lai:
 

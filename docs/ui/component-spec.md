@@ -8,6 +8,16 @@ Shared mobile navigation/components live in `src/components/mobile/`.
 Module components should only compose module-specific layouts or behavior, and must build on global components instead of redefining base visuals.
 For modules with multiple pages, keep module-shared components at `src/components/modules/<module>/` root and move page-specific components into `src/components/screens/<module-or-route>/` when they are not reused by the module.
 
+## Global Component Requirement
+
+- Bắt buộc kiểm tra `src/components/global/` trước khi viết hoặc style bất kỳ UI nào.
+- Bắt buộc dùng global component nếu đã có pattern tương ứng: typography, button, input, checkbox, combobox, calendar/month picker, skeleton, empty state, alert, modal, card/table primitives.
+- Không dùng native/browser controls trực tiếp trong module/screen nếu đã có global component tương ứng.
+- Nếu cần UI pattern mới và có khả năng dùng lại, thêm hoặc mở rộng component trong `src/components/global/` trước, sau đó compose trong module/screen.
+- Module/screen components chỉ chứa layout/behavior đặc thù module; không định nghĩa lại base visuals.
+- Các role/status/mode hiển thị hoặc điều kiện UI phải dùng constants/enums từ `src/constants/common/`; không hardcode role strings trong component.
+- Cặp title/value phải nằm cùng một hàng, title bên trái, value bên phải, canh đều hai bên; dùng global title-value component/pattern thay vì tự style trong module.
+
 **Design system tham khảo:** [Vercel Geist](https://vercel.com/geist/introduction)
 **Theme:** Light + Dark — tự đổi theo `prefers-color-scheme` của hệ thống
 **Font:** System font qua `font-sans`. Không import custom font.

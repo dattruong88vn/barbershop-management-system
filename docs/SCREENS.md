@@ -193,6 +193,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Roles:** barber, skinner, receptionist
 - **Ưu tiên:** mobile
 - **Sections:** số dịch vụ đã làm, số combo đã làm, dịch vụ thực hiện nhiều nhất trong kỳ
+- **Backend:** `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` đã implement, chỉ tính visit `completed` theo `shop_id` và user hiện tại (`barberId`, `skinnerId`, hoặc `createdBy` theo role)
+- **Filter:** mặc định tháng hiện tại; bộ chọn gồm checkbox Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker chỉ cho chọn từ 12 tháng gần nhất đến tháng hiện tại.
 - **States:** loading, loaded
 
 ---

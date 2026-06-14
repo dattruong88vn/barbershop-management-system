@@ -1,13 +1,22 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import {
+  USER_ROLE_BARBER,
+  USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
+  USER_ROLE_RECEPTIONIST,
+  USER_ROLE_SKINNER,
+  USER_ROLE_SUPERADMIN,
+  USER_ROLES,
+} from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
 import { getPostAuthRedirectPath } from "@/lib/authRedirect";
 import type { UserRole } from "@/types";
 
-const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, "superadmin">, string[]> =
+const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, typeof USER_ROLE_SUPERADMIN>, string[]> =
   {
-    owner: [
+    [USER_ROLE_OWNER]: [
       ROUTES.dashboard,
       ROUTES.ownerServices,
       ROUTES.ownerCombos,
@@ -15,10 +24,10 @@ const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, "superadmin">, string[]
       ROUTES.ownerBranches,
       ROUTES.reports,
     ],
-    manager: [ROUTES.dashboard, ROUTES.reports],
-    receptionist: [ROUTES.visits, ROUTES.customers],
-    barber: [ROUTES.visits, ROUTES.customers],
-    skinner: [ROUTES.visits, ROUTES.customers],
+    [USER_ROLE_MANAGER]: [ROUTES.dashboard, ROUTES.reports],
+    [USER_ROLE_RECEPTIONIST]: [ROUTES.visits, ROUTES.customers, ROUTES.reports],
+    [USER_ROLE_BARBER]: [ROUTES.visits, ROUTES.customers, ROUTES.reports],
+    [USER_ROLE_SKINNER]: [ROUTES.visits, ROUTES.customers, ROUTES.reports],
   };
 
 const LOGIN_PATH = ROUTES.login;
@@ -26,14 +35,7 @@ const CHANGE_PASSWORD_PATH = ROUTES.changePassword;
 const PUBLIC_ROUTES = [ROUTES.designSystem] as const;
 
 function isUserRole(role: unknown): role is UserRole {
-  return (
-    role === "superadmin" ||
-    role === "owner" ||
-    role === "manager" ||
-    role === "receptionist" ||
-    role === "barber" ||
-    role === "skinner"
-  );
+  return USER_ROLES.some((userRole) => userRole === role);
 }
 
 function matchesRoute(pathname: string, route: string): boolean {
@@ -86,7 +88,7 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  if (role === "superadmin") {
+  if (role === USER_ROLE_SUPERADMIN) {
     return NextResponse.next();
   }
 
