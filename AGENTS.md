@@ -31,11 +31,14 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Never use `window.location`, `window.location.href`, or `window.location.assign`.
 - Never hardcode UI text in components → `src/constants/texts/`.
 - Shared cross-module constants → `src/constants/common/`.
-- Known finite values such as item types, statuses, roles, and modes must be declared as constants/enums before use. Do not scatter raw string literals like `"service"` or `"combo"` through logic.
+- Known finite values such as item types, statuses, roles, and modes must be declared as constants/enums in `src/constants/common/` before use. Do not scatter raw string literals like `"service"`, `"combo"`, `"barber"`, or `"owner"` through logic.
+- Role checks, role arrays, role-keyed records, and role labels must use exported role constants/types from `src/constants/common/roles.ts`.
 - Never define shared types inside components → `src/types/`.
 - Never hardcode colors or custom spacing → use design tokens only.
 - Strict TypeScript. No `any`.
 - Use shadcn/ui components where possible.
+- Mandatory: before writing or styling any UI, search `src/components/global/` for an existing component/pattern and reuse it. If the pattern is reusable, add or extend a global component first.
+- Do not use native/browser controls or hand-rolled visuals when a global component exists for that pattern.
 - Every successful user action must show a success toast.
 - Keep changes scoped to the requested module.
 - Split components into the smallest practical focused components.
@@ -58,6 +61,8 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - If a `page.tsx` or component file contains multiple component functions, split them into separate files under the matching `src/components/screens/` or `src/components/modules/` folder. `/design-system` is exempt as the reference screen.
 - Never create PascalCase component files inside `src/app/`.
 - Module and screen components must build on global primitives, not redefine base visuals.
+- Module and screen components must not reimplement existing global primitives such as typography, buttons, inputs, comboboxes, calendars, skeletons, cards, alerts, or empty states.
+- Title/value display pairs must use a single-row layout with title on the left and value on the right, spaced evenly; use or add a global component for this pattern.
 - Split large components into focused children (sections, panels, lists, rows, form fields).
 - Keep module component files directly under `src/components/modules/<module>/`; do not create nested component subfolders inside a module.
 - Every component/util folder with exports must include an `index.ts` barrel file.

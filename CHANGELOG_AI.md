@@ -455,3 +455,58 @@ Copy this structure when starting a new date section:
 - Moved shared staff roles, visit statuses, and visit staff edit window constants into `src/constants/common/`.
 - Moved `isVisitStatus` into visit helpers and added shared visit item type constants for `service` and `combo`.
 - Documented the rule that known finite values must be declared as constants/enums before use.
+
+## 2026-06-14
+
+### Business Changes
+- Added the personal reports screen path for `receptionist`, `barber`, and `skinner` roles.
+
+### Database Changes
+- None
+
+### API Changes
+- Added `GET /api/reports/personal` for staff personal reports scoped by `shop_id`, current user role, completed visits, and `period=month|year|all&month=YYYY-MM`.
+
+### UI Changes
+- Added `/reports` with a mobile-first personal report view showing service count, combo count, period, supporting metrics, and top performed services.
+- Added a management report placeholder for owner/manager users until Report API support is implemented.
+- Allowed staff roles to access `/reports` through middleware.
+- Connected the personal report screen to the new API with loading, error, empty, and loaded states.
+- Added reusable global typography primitives for headings, paragraphs, and metric values.
+- Updated the report screens to use shared typography and skeleton primitives instead of local text/skeleton styling.
+- Updated personal reports with a two-column staff info section and a report-period dropdown section that contains the summary metric cards.
+- Switched staff and personal report period selection to the shared global combobox primitive.
+- Updated the personal report staff info section so labels are in the left column and values are aligned in the right column.
+- Fixed the shared combobox runtime hook error by marking it as a Client Component.
+- Updated the report-period dropdown to default to the current month and offer the last 12 months, current year, and all-time filters.
+- Replaced the report-period dropdown with exclusive checkbox options for month/current year/all time, plus a month picker limited to the last 12 months through the current month.
+- Added skeleton placeholders to the personal report data cards while switching report period filters.
+- Replaced the native month input with a shared design-system month calendar that disables future months and months older than one year.
+- Moved report metric cards and top-service data into a single data section separate from the report-period controls.
+- Added a subtle divider between the report-period row and filter checkboxes.
+- Renamed the month report filter to "Tháng hiện tại" and moved specific month selection behind a warning badge-style button that opens the shared month calendar in a modal.
+- Split report filters into two rows with the current-month checkbox and month picker button on the first row, and year/all-time checkboxes on the second row.
+- Changed the month picker badge action to small size and placed it directly after the current-month checkbox.
+- Kept the year and all-time report checkboxes on one row on mobile, and changed the month picker badge action to a compact warning outline button.
+- Added a separate specific-month report checkbox with the month picker badge beside it; choosing a calendar month now selects the specific-month option and unchecks current month.
+- Aligned the specific-month checkbox with the all-time checkbox by moving report filters into a shared two-column grid with a wider second column.
+- Changed the specific-month checkbox to open the calendar without fetching until a month is selected, preserving the previous checkbox when the modal is closed.
+
+### Refactoring
+- Added report text constants, report types, focused report module components, and report module barrel exports.
+- Added a personal report hook and API route constant.
+- Added individual staff role constants for new role-specific report filtering.
+- Extended the shared `Skeleton` primitive with a card variant for module loading states.
+- Added a shared global `Combobox` primitive and documented the rule to search/reuse global components before writing module UI.
+- Strengthened UI documentation to make global component reuse mandatory and forbid native/browser controls when a matching global component exists.
+- Added shared user-role constants/types and documented that role checks, role labels, and role-keyed records must use common role constants.
+- Added a shared title-value row component and documented that title/value pairs must stay on one row with title left and value right.
+- Added a reusable global badge-style button for compact badge actions.
+- Added a distinct current-month report period constant so current month and specific month are separate UI states.
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because they were not requested.
+- Updated report screen and user-flow documentation to mark personal report API as implemented while owner/manager report APIs remain pending.

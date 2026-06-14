@@ -1,12 +1,7 @@
 import type { ReactNode } from "react";
+import type { UserRoleValue } from "@/constants/common";
 
-export type UserRole =
-  | "superadmin"
-  | "owner"
-  | "manager"
-  | "receptionist"
-  | "barber"
-  | "skinner";
+export type UserRole = UserRoleValue;
 
 export type UserStatus = "active" | "inactive";
 

@@ -1,1 +1,6 @@
-export const STAFF_ROLES = ["receptionist", "barber", "skinner"] as const;
+export {
+  STAFF_ROLES,
+  USER_ROLE_BARBER as STAFF_ROLE_BARBER,
+  USER_ROLE_RECEPTIONIST as STAFF_ROLE_RECEPTIONIST,
+  USER_ROLE_SKINNER as STAFF_ROLE_SKINNER,
+} from "./roles";

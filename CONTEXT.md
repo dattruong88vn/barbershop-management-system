@@ -7,6 +7,7 @@ Mention file này khi task liên quan đến UI, API pattern, hoặc setup môi 
 ## UI Rules
 
 **Principles:** Mobile first. Speed first (tìm khách <3s, tạo visit <10s, upload ảnh <5s). Không tự tạo style riêng.
+Luôn bắt buộc tìm trong `src/components/global/` trước khi viết component hoặc style mới. Reuse global component nếu đã có; nếu pattern có thể dùng lại, thêm hoặc mở rộng global component trước. Không dùng native/browser controls hoặc tự dựng visual khi global component đã tồn tại.
 
 **Layout:**
 
@@ -32,6 +33,7 @@ Mention file này khi task liên quan đến UI, API pattern, hoặc setup môi 
 - Theme tự đổi theo `prefers-color-scheme`. Dùng `font-sans`, không import custom font.
 
 **Typography:** Heading = `text-heading-*` + `text-gray-1000`. Label/body = `text-label-*` / `text-copy-*` + `text-gray-900`.
+Title/value display pairs must stay on one row with title left, value right, and even spacing; use the global title-value component/pattern.
 
 **Spacing & radius:** Tailwind scale only, no hardcode px. Card/dialog = `rounded-xl`. Badge/avatar = `rounded-full`. Dùng border thay shadow trong dark UI.
 
@@ -46,6 +48,7 @@ Mention file này khi task liên quan đến UI, API pattern, hoặc setup môi 
 **Haircut warning:** Hiển thị khi `is_haircut = true` AND no photos. Dùng `AlertTriangle` từ lucide-react. Text: `Chưa upload ảnh kiểu tóc`. Token: `text-amber-900 bg-amber-100 border-amber-900/30`. Hiện ở Visit List · Visit Detail · Dashboard. Chỉ `barber` thấy action upload; roles khác chỉ xem.
 
 **Every screen must have:** Loading state · Empty state · Error state.
+Loading/empty/error UI bắt buộc reuse global primitives như `Skeleton`, `EmptyState`, `InlineAlert` khi phù hợp.
 
 **Success feedback:** Toast trước khi navigate. Dispatch trước router.push để toast không mất.
 
@@ -166,6 +169,8 @@ Shared cross-module constants live in `src/constants/common/` and must be
 exported from `src/constants/common/index.ts`.
 Known finite values such as statuses, roles, modes, and item types must be
 declared as constants/enums before use instead of scattered raw literals.
+Role checks, role arrays, role-keyed records, and role labels must use exported
+role constants/types from `src/constants/common/roles.ts`.
 
 ---
 

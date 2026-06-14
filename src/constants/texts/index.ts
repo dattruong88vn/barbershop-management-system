@@ -5,6 +5,7 @@ export * from "./common";
 export * from "./customers";
 export * from "./dashboard";
 export * from "./designSystem";
+export * from "./reports";
 export * from "./services";
 export * from "./staff";
 export * from "./visits";

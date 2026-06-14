@@ -180,8 +180,9 @@ Save
 
 Backend status:
 
-- Report API chưa được implement.
-- Giữ Reports ở dạng placeholder/mock cho đến khi có backend support.
+- Personal report API đã implement tại `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` cho `receptionist`, `barber`, `skinner`.
+- Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm checkbox Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
+- Owner/manager report API chưa implement; giữ Reports quản lý ở dạng placeholder/mock cho đến khi có backend support.
 
 ```text
 Reports
