@@ -15,6 +15,9 @@ export const commonTexts = {
     search: "Tìm",
     today: "Hôm nay",
   },
+  feedback: {
+    closeNotification: "Đóng thông báo",
+  },
   home: {
     primaryAction: "Vào dashboard",
     secondaryAction: "Đăng nhập",
