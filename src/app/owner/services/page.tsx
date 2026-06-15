@@ -4,6 +4,11 @@ import type { SyntheticEvent } from "react";
 import { useState } from "react";
 
 import { Button } from "@/components/global/ui/button";
+import {
+  SERVICE_RESPONSIBLE_ROLE_BARBER,
+  SERVICE_RESPONSIBLE_ROLE_SKINNER,
+  type ServiceResponsibleRoleValue,
+} from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
 import { useServices } from "@/hooks/useServices";
 import type { Service } from "@/types";
@@ -21,6 +26,8 @@ const PRICE_FORMATTER = new Intl.NumberFormat("vi-VN", {
 export default function OwnerServicesPage() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [responsibleRole, setResponsibleRole] =
+    useState<ServiceResponsibleRoleValue>(SERVICE_RESPONSIBLE_ROLE_BARBER);
   const [isHaircut, setIsHaircut] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [error, setError] = useState("");
@@ -41,6 +48,7 @@ export default function OwnerServicesPage() {
   function resetForm() {
     setName("");
     setPrice("");
+    setResponsibleRole(SERVICE_RESPONSIBLE_ROLE_BARBER);
     setIsHaircut(false);
     setEditingService(null);
     setError("");
@@ -49,6 +57,7 @@ export default function OwnerServicesPage() {
   function handleEdit(service: Service) {
     setName(service.name);
     setPrice(String(service.price));
+    setResponsibleRole(service.responsibleRole);
     setIsHaircut(service.isHaircut);
     setEditingService(service);
     setError("");
@@ -83,6 +92,7 @@ export default function OwnerServicesPage() {
     const serviceInput = {
       name: name.trim(),
       price: Number.parseFloat(price),
+      responsibleRole,
       isHaircut,
     };
 
@@ -173,6 +183,36 @@ export default function OwnerServicesPage() {
                 />
               </label>
 
+              <label className="block">
+                <span className="text-sm font-medium text-zinc-800">
+                  {serviceTexts.ownerServices.responsibleRoleLabel}
+                </span>
+                <select
+                  value={responsibleRole}
+                  onChange={(event) =>
+                    setResponsibleRole(
+                      event.target.value as ServiceResponsibleRoleValue,
+                    )
+                  }
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                >
+                  <option value={SERVICE_RESPONSIBLE_ROLE_BARBER}>
+                    {
+                      serviceTexts.ownerServices.responsibleRoles[
+                        SERVICE_RESPONSIBLE_ROLE_BARBER
+                      ]
+                    }
+                  </option>
+                  <option value={SERVICE_RESPONSIBLE_ROLE_SKINNER}>
+                    {
+                      serviceTexts.ownerServices.responsibleRoles[
+                        SERVICE_RESPONSIBLE_ROLE_SKINNER
+                      ]
+                    }
+                  </option>
+                </select>
+              </label>
+
               <label className="flex items-center gap-3 rounded-md border border-zinc-200 px-3 py-3">
                 <input
                   type="checkbox"
@@ -256,6 +296,13 @@ export default function OwnerServicesPage() {
                       </div>
                       <p className="mt-2 text-sm font-medium text-zinc-800">
                         {PRICE_FORMATTER.format(service.price)}
+                      </p>
+                      <p className="mt-1 text-sm text-zinc-600">
+                        {
+                          serviceTexts.ownerServices.responsibleRoles[
+                            service.responsibleRole
+                          ]
+                        }
                       </p>
                       <p className="mt-3 text-xs text-zinc-500">
                         <span>{serviceTexts.ownerServices.createdAtLabel}</span>

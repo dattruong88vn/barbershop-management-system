@@ -10,6 +10,7 @@ import {
   VISIT_STATUS_PENDING,
 } from "@/constants/common";
 import { prisma } from "@/lib/prisma";
+import { buildVisitServiceSnapshots } from "@/utils/visits";
 import { isVisitStatus } from "@/utils/visits/visitStatus";
 import type {
   CustomerVisit,
@@ -66,6 +67,9 @@ const VISIT_SELECT = {
       serviceId: true,
       comboId: true,
       price: true,
+      serviceNameSnapshot: true,
+      comboNameSnapshot: true,
+      comboPriceSnapshot: true,
       service: {
         select: {
           name: true,
@@ -128,6 +132,53 @@ function normalizeVisitInput(body: VisitRequestBody): VisitCreateInput {
 }
 
 function formatVisitResponse(visit: VisitRecord): CustomerVisit {
+  const services = visit.visitServices.reduce<CustomerVisit["services"]>(
+    (items, visitService) => {
+      if (visitService.comboId) {
+        const hasCombo = items.some(
+          (item) => item.itemId === visitService.comboId,
+        );
+
+        if (hasCombo) {
+          return items;
+        }
+
+        return [
+          ...items,
+          {
+            id: visitService.id,
+            itemId: visitService.comboId,
+            name:
+              visitService.comboNameSnapshot ??
+              visitService.combo?.name ??
+              customerTexts.detail.noServices,
+            type: VISIT_ITEM_TYPE_COMBO,
+            price: Number(
+              (
+                visitService.comboPriceSnapshot ?? visitService.price
+              ).toString(),
+            ),
+          },
+        ];
+      }
+
+      return [
+        ...items,
+        {
+          id: visitService.id,
+          itemId: visitService.serviceId,
+          name:
+            visitService.serviceNameSnapshot ??
+            visitService.service?.name ??
+            customerTexts.detail.noServices,
+          type: VISIT_ITEM_TYPE_SERVICE,
+          price: Number(visitService.price.toString()),
+        },
+      ];
+    },
+    [],
+  );
+
   return {
     id: visit.id,
     createdAt: visit.createdAt.toISOString(),
@@ -142,18 +193,7 @@ function formatVisitResponse(visit: VisitRecord): CustomerVisit {
       photoUrl: photo.photoUrl,
       createdAt: photo.createdAt.toISOString(),
     })),
-    services: visit.visitServices.map((visitService) => ({
-      id: visitService.id,
-      itemId: visitService.serviceId ?? visitService.comboId,
-      name:
-        visitService.service?.name ??
-        visitService.combo?.name ??
-        customerTexts.detail.noServices,
-      type: visitService.service
-        ? VISIT_ITEM_TYPE_SERVICE
-        : VISIT_ITEM_TYPE_COMBO,
-      price: Number(visitService.price.toString()),
-    })),
+    services,
   };
 }
 
@@ -426,7 +466,9 @@ export async function POST(request: NextRequest) {
       },
       select: {
         id: true,
+        name: true,
         price: true,
+        responsibleRole: true,
       },
     }),
     prisma.combo.findMany({
@@ -436,7 +478,20 @@ export async function POST(request: NextRequest) {
       },
       select: {
         id: true,
+        name: true,
         price: true,
+        comboServices: {
+          select: {
+            service: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                responsibleRole: true,
+              },
+            },
+          },
+        },
       },
     }),
     validateStaff(barberId, skinnerId, authResult.shopId),
@@ -456,6 +511,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (combos.some((combo) => combo.comboServices.length === 0)) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.invalidCombos },
+      { status: 400 },
+    );
+  }
+
   if (!isValidStaff) {
     return NextResponse.json(
       { error: visitTexts.api.errors.invalidStaff },
@@ -463,10 +525,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const totalPrice = [...services, ...combos].reduce(
-    (total, item) => total + Number(item.price.toString()),
-    0,
-  );
+  const visitServiceSnapshots = buildVisitServiceSnapshots({
+    combos,
+    services,
+    shopId: authResult.shopId,
+  });
 
   const visit = await prisma.visit.create({
     data: {
@@ -476,21 +539,10 @@ export async function POST(request: NextRequest) {
       barberId,
       skinnerId,
       status: VISIT_STATUS_PENDING,
-      totalPrice,
+      totalPrice: visitServiceSnapshots.totalPrice,
       createdBy: authResult.userId,
       visitServices: {
-        create: [
-          ...services.map((service) => ({
-            shopId: authResult.shopId,
-            serviceId: service.id,
-            price: Number(service.price.toString()),
-          })),
-          ...combos.map((combo) => ({
-            shopId: authResult.shopId,
-            comboId: combo.id,
-            price: Number(combo.price.toString()),
-          })),
-        ],
+        create: visitServiceSnapshots.visitServices,
       },
     },
     select: VISIT_SELECT,

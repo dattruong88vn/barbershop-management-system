@@ -28,7 +28,7 @@
 
 ### 2. Chủ tiệm (owner)
 
-- Quản lý dịch vụ lẻ + giá (cắt, gội, ráy tai...)
+- Quản lý dịch vụ lẻ + giá (cắt, gội, ráy tai...) và người phụ trách báo cáo (`barber` hoặc `skinner`)
 - Quản lý combo (gộp nhiều dịch vụ lẻ + giá combo, có mô tả)
 - Quản lý nhân viên (thợ cắt + skinner), phân công chi nhánh
 - Nhân viên nghỉ làm được set inactive — không xoá khỏi DB, không hiển thị khi chọn barber/skinner mới
@@ -56,6 +56,8 @@
 - Log lại người thay đổi thông tin visit lần cuối (`last_updated_by`)
 - Một visit chỉ được chọn **dịch vụ lẻ** hoặc **combo**, không chọn cả hai nhóm cùng lúc
 - Trong UI tạo visit, chọn combo sẽ bỏ chọn toàn bộ dịch vụ lẻ; chọn dịch vụ lẻ sẽ bỏ chọn toàn bộ combo
+- Khi tạo/sửa visit, hệ thống snapshot tên, giá và role phụ trách của service/combo để báo cáo không bị sai khi owner đổi cấu hình sau này
+- Combo được phân bổ doanh thu xuống từng service con theo tỷ lệ `combo.price / sum(service.price)`; tổng phân bổ luôn bằng giá combo
 - **Dữ liệu lịch sử bất biến** — sau 3 tiếng, không được phép thay đổi giá tiền hay dịch vụ đã dùng
 
 **Warning ảnh:**
@@ -74,8 +76,8 @@
 | `owner`        | Tất cả chi nhánh của tiệm mình               |
 | `manager`      | Chỉ chi nhánh được phân công                 |
 | `receptionist` | Số lượng dịch vụ/combo bản thân đã thực hiện |
-| `barber`       | Số lượng dịch vụ/combo bản thân đã thực hiện |
-| `skinner`      | Số lượng dịch vụ/combo bản thân đã thực hiện |
+| `barber`       | Dịch vụ/combo có phần doanh thu phụ trách barber |
+| `skinner`      | Dịch vụ/combo có phần doanh thu phụ trách skinner |
 
 **Báo cáo dành cho owner & manager:**
 
@@ -83,6 +85,8 @@
 - Biểu đồ doanh thu theo chi nhánh: chọn 1 hoặc nhiều tháng
 - Top 10 barber, skinner có visits cao nhất
 - Top 3 combo, top 3 dịch vụ được sử dụng nhiều nhất
+- Báo cáo doanh thu dùng `allocated_price` và snapshot fields, không dùng giá/tên service hoặc combo hiện tại
+- Doanh thu phân bổ thiếu nhân viên tương ứng được đưa vào nhóm `Chưa xác định`
 
 ---
 

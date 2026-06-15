@@ -47,6 +47,8 @@ Title/value display pairs must stay on one row with title left, value right, and
 
 **Haircut warning:** Hiển thị khi `is_haircut = true` AND no photos. Dùng `AlertTriangle` từ lucide-react. Text: `Chưa upload ảnh kiểu tóc`. Token: `text-amber-900 bg-amber-100 border-amber-900/30`. Hiện ở Visit List · Visit Detail · Dashboard. Chỉ `barber` thấy action upload; roles khác chỉ xem.
 
+**Service/combo reporting:** Mỗi service phải có `responsibleRole` (`barber` hoặc `skinner`). Khi tạo/sửa visit, backend phải snapshot tên, giá và role phụ trách của service/combo vào `visit_services`. Với combo, lưu một dòng cho từng service con, phân bổ `allocatedPrice` theo tỷ lệ `combo.price / sum(service.price)`, làm tròn từng dòng và để dòng cuối nhận chênh lệch để tổng phân bổ bằng giá combo. Giá combo cao hơn tổng giá dịch vụ lẻ chỉ cảnh báo ở UI, không chặn backend. Nếu visit thiếu nhân viên tương ứng, doanh thu phân bổ thuộc nhóm báo cáo "Chưa xác định". Báo cáo phải dùng `allocatedPrice` và snapshot fields, không tính bằng giá/tên service/combo hiện tại.
+
 **Every screen must have:** Loading state · Empty state · Error state.
 Loading/empty/error UI bắt buộc reuse global primitives như `Skeleton`, `EmptyState`, `InlineAlert` khi phù hợp.
 

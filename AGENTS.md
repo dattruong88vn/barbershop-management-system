@@ -14,6 +14,10 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Auth: username/password only. Do not add email or social login.
 - Visit statuses: `pending` · `in_progress` · `completed`.
 - A visit uses service items OR combo items, never both. Selecting a combo clears services; selecting a service clears combos.
+- Every service must declare `responsibleRole` as `barber` or `skinner` for reporting allocation.
+- Visit service/combo pricing must be snapshotted into `visit_services` at visit create/update time. Reports must use snapshot fields and `allocatedPrice`, never current service/combo names or prices.
+- Combo revenue allocation uses `combo.price / sum(service.price)` across combo services. Round VND per line and assign the final rounding difference to the last line so allocated totals always match combo price.
+- If allocated revenue has no matching barber/skinner on the visit, keep the line item details and report it under "Chưa xác định" until reassignment exists.
 - Barber/skinner assignment editable only within 3 hours after `completed_at`.
 - Show warning when visit has `is_haircut = true` and no photos.
 - Only `barber` role can upload haircut photos. Other roles view only.

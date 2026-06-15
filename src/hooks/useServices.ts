@@ -53,6 +53,7 @@ async function updateService(input: ServiceFormInput & { id: string }) {
       body: JSON.stringify({
         name: input.name,
         price: input.price,
+        responsibleRole: input.responsibleRole,
         isHaircut: input.isHaircut,
       }),
     },

@@ -1,6 +1,7 @@
 export * from "./pagination";
 export * from "./reportPeriods";
 export * from "./roles";
+export * from "./serviceResponsibleRoles";
 export * from "./staff";
 export * from "./visitItems";
 export * from "./visitStaff";
