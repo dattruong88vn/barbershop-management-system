@@ -11,6 +11,7 @@ Tech stack: Next.js 14+ App Router · Tailwind CSS · shadcn/ui · PostgreSQL ·
 - Every shop is a tenant. Tenant-owned tables must include and enforce `shop_id`.
 - Plans: `basic` (default) · `pro` · `pro_max`. Statuses: `active` · `expired`. Trial tracked by `trial_expires_at`.
 - Roles: `superadmin` · `owner` · `manager` · `receptionist` · `barber` · `skinner`.
+- `owner` and `manager` can manage services, combos, and staff accounts. Branch management remains owner-only.
 - Auth: username/password only. Do not add email or social login.
 - Visit statuses: `pending` · `in_progress` · `completed`.
 - A visit uses service items OR combo items, never both. Selecting a combo clears services; selecting a service clears combos.

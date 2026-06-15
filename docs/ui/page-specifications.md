@@ -221,6 +221,10 @@ Route:
 
 - `/owner/services` (`ROUTES.ownerServices`)
 
+Roles:
+
+- `owner`, `manager`
+
 API:
 
 - `GET /api/services`
@@ -267,6 +271,10 @@ Route:
 
 - `/owner/combos` (`ROUTES.ownerCombos`)
 
+Roles:
+
+- `owner`, `manager`
+
 API:
 
 - `GET /api/combos`
@@ -305,6 +313,10 @@ Validation:
 Route:
 
 - `/owner/staff` (`ROUTES.ownerStaff`)
+
+Roles:
+
+- `owner`, `manager`
 
 API:
 

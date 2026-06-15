@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import {
+  MANAGEMENT_ROLES,
+  type ManagementRoleValue,
+} from "@/constants/common";
 import { branchTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
 import type { BranchRequestBody, UserRole } from "@/types";
@@ -33,8 +37,29 @@ async function getOwnerShopId(request: NextRequest) {
   return { shopId: token.shop_id };
 }
 
+async function getManagementShopId(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token?.id) {
+    return { error: branchTexts.api.errors.unauthorized, status: 401 };
+  }
+
+  if (
+    typeof token.role !== "string" ||
+    !MANAGEMENT_ROLES.includes(token.role as ManagementRoleValue) ||
+    !token.shop_id
+  ) {
+    return { error: branchTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return { shopId: token.shop_id };
+}
+
 export async function GET(request: NextRequest) {
-  const authResult = await getOwnerShopId(request);
+  const authResult = await getManagementShopId(request);
 
   if ("error" in authResult) {
     return NextResponse.json(

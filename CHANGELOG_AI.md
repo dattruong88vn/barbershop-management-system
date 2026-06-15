@@ -524,10 +524,10 @@ Copy this structure when starting a new date section:
 - Added `Service.responsibleRole` to identify whether a service contributes to barber or skinner reporting.
 
 ### API Changes
-- None
+- Allowed `manager` users to manage services, combos, and staff accounts while keeping branch mutations owner-only.
 
 ### UI Changes
-- None
+- Allowed `manager` users to access the existing service, combo, and staff management routes.
 
 ### Refactoring
 - None

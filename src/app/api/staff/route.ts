@@ -2,11 +2,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { Prisma } from "@prisma/client";
 
-import { STAFF_ROLES } from "@/constants/common";
+import {
+  MANAGEMENT_ROLES,
+  STAFF_ROLES,
+  type ManagementRoleValue,
+} from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
-import type { StaffRequestBody, StaffRole, UserRole } from "@/types";
+import type { StaffRequestBody, StaffRole } from "@/types";
 
 const STAFF_SELECT = {
   id: true,
@@ -45,7 +49,7 @@ function normalizeStaffInput(body: StaffRequestBody) {
   };
 }
 
-async function getOwnerShopId(request: NextRequest) {
+async function getManagementShopId(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -55,7 +59,11 @@ async function getOwnerShopId(request: NextRequest) {
     return { error: staffTexts.api.errors.unauthorized, status: 401 };
   }
 
-  if (token.role !== ("owner" satisfies UserRole) || !token.shop_id) {
+  if (
+    typeof token.role !== "string" ||
+    !MANAGEMENT_ROLES.includes(token.role as ManagementRoleValue) ||
+    !token.shop_id
+  ) {
     return { error: staffTexts.api.errors.forbidden, status: 403 };
   }
 
@@ -79,7 +87,7 @@ async function isBranchValid(branchId: string | null, shopId: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const authResult = await getOwnerShopId(request);
+  const authResult = await getManagementShopId(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -102,7 +110,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const authResult = await getOwnerShopId(request);
+  const authResult = await getManagementShopId(request);
 
   if ("error" in authResult) {
     return NextResponse.json(

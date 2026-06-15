@@ -6,7 +6,7 @@
 | --------------- | -------------- | ----------------------------------------------------------- |
 | **Superadmin**  | `superadmin`   | Toàn quyền hệ thống, hỗ trợ xử lý sự cố tài khoản chủ tiệm  |
 | **Chủ tiệm**    | `owner`        | Quản lý dịch vụ, combo, nhân viên, chi nhánh                |
-| **Quản lý**     | `manager`      | Quản lý cấp chi nhánh, xem báo cáo chi nhánh được phân công |
+| **Quản lý**     | `manager`      | Quản lý dịch vụ, combo, nhân viên và xem báo cáo             |
 | **Lễ tân**      | `receptionist` | Tra cứu & lưu thông tin khách                               |
 | **Thợ cắt tóc** | `barber`       | Tra cứu & lưu thông tin khách, upload ảnh                   |
 | **Skinner**     | `skinner`      | Tra cứu & lưu thông tin khách                               |
@@ -33,6 +33,13 @@
 - Quản lý nhân viên (thợ cắt + skinner), phân công chi nhánh
 - Nhân viên nghỉ làm được set inactive — không xoá khỏi DB, không hiển thị khi chọn barber/skinner mới
 - Quản lý chi nhánh (phân nhân viên theo chi nhánh, doanh thu theo chi nhánh)
+
+### 2b. Quản lý (manager)
+
+- Quản lý dịch vụ lẻ + giá và người phụ trách báo cáo
+- Quản lý combo
+- Quản lý nhân viên, dùng danh sách chi nhánh hiện có để phân công nhân viên
+- Không quản lý tạo/sửa/xoá chi nhánh
 
 ### 3. Nhân viên
 
