@@ -1,0 +1,37 @@
+export type DashboardMetric = {
+  label: string;
+  value: string;
+};
+
+export type DashboardTrendPoint = {
+  label: string;
+  revenue: number;
+  visits: number;
+};
+
+export type DashboardTopItem = {
+  count: number;
+  name: string;
+  revenue: number;
+};
+
+export type DashboardHaircutWarning = {
+  customerName: string;
+  visitId: string;
+};
+
+export type DashboardData = {
+  haircutWarnings: DashboardHaircutWarning[];
+  metrics: DashboardMetric[];
+  periodLabel: string;
+  revenueTrend: DashboardTrendPoint[];
+  topBarbers: DashboardTopItem[];
+  topCombos: DashboardTopItem[];
+  topServices: DashboardTopItem[];
+  topSkinners: DashboardTopItem[];
+};
+
+export type DashboardApiResponse = {
+  dashboard?: DashboardData;
+  error?: string;
+};

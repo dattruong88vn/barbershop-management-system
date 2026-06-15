@@ -512,7 +512,6 @@ Copy this structure when starting a new date section:
 
 ### Notes
 - Did not run tests or ESLint because they were not requested.
-- Updated report screen and user-flow documentation to mark personal report API as implemented while owner/manager report APIs remain pending.
 
 ## 2026-06-15
 
@@ -528,6 +527,31 @@ Copy this structure when starting a new date section:
 
 ### UI Changes
 - Allowed `manager` users to access the existing service, combo, and staff management routes.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because they were not requested.
+
+## 2026-06-15
+
+### Business Changes
+- Added real manager/owner dashboard API support for revenue, visit, customer, trend, top employee, top service, top combo, and missing haircut photo data.
+
+### Database Changes
+- None
+
+### API Changes
+- Added `GET /api/dashboard?period=month|year|all&month=YYYY-MM` for `owner` and `manager` users, scoped by `shop_id`.
+- Dashboard revenue now uses `visit_services.allocated_price` and snapshot fields instead of current service/combo prices.
+- Added dashboard API route constant and response types for future UI integration.
+
+### UI Changes
+- None
 
 ### Refactoring
 - None
