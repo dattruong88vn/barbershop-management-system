@@ -146,7 +146,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 ## 10. Services
 
 - **Route:** `/owner/services` (`ROUTES.ownerServices`)
-- **Roles:** owner
+- **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
 - **Fields:** name, price, responsibleRole (`barber` hoặc `skinner`), duration, active
@@ -156,7 +156,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 ## 11. Combos
 
 - **Route:** `/owner/combos` (`ROUTES.ownerCombos`)
-- **Roles:** owner
+- **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
 - **Fields:** name, danh sách dịch vụ thành phần, price, active
@@ -166,7 +166,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 ## 12. Staff
 
 - **Route:** `/owner/staff` (`ROUTES.ownerStaff`)
-- **Roles:** owner
+- **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
 - **Fields:** name, role, branch, active/inactive

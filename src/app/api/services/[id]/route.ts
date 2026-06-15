@@ -2,10 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { Prisma } from "@prisma/client";
 
-import { isServiceResponsibleRole } from "@/constants/common";
+import {
+  MANAGEMENT_ROLES,
+  type ManagementRoleValue,
+  isServiceResponsibleRole,
+} from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
-import type { ServiceRequestBody, UserRole } from "@/types";
+import type { ServiceRequestBody } from "@/types";
 
 type ServiceRouteContext = {
   params: Promise<{ id?: string }>;
@@ -61,7 +65,7 @@ async function getServiceId(context: ServiceRouteContext) {
   return typeof params.id === "string" ? params.id : "";
 }
 
-async function getOwnerShopId(request: NextRequest) {
+async function getManagementShopId(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -71,7 +75,11 @@ async function getOwnerShopId(request: NextRequest) {
     return { error: serviceTexts.api.errors.unauthorized, status: 401 };
   }
 
-  if (token.role !== ("owner" satisfies UserRole) || !token.shop_id) {
+  if (
+    typeof token.role !== "string" ||
+    !MANAGEMENT_ROLES.includes(token.role as ManagementRoleValue) ||
+    !token.shop_id
+  ) {
     return { error: serviceTexts.api.errors.forbidden, status: 403 };
   }
 
@@ -89,7 +97,7 @@ async function findService(serviceId: string, shopId: string) {
 }
 
 export async function GET(request: NextRequest, context: ServiceRouteContext) {
-  const authResult = await getOwnerShopId(request);
+  const authResult = await getManagementShopId(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -120,7 +128,7 @@ export async function GET(request: NextRequest, context: ServiceRouteContext) {
 }
 
 export async function PATCH(request: NextRequest, context: ServiceRouteContext) {
-  const authResult = await getOwnerShopId(request);
+  const authResult = await getManagementShopId(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -208,7 +216,7 @@ export async function DELETE(
   request: NextRequest,
   context: ServiceRouteContext,
 ) {
-  const authResult = await getOwnerShopId(request);
+  const authResult = await getManagementShopId(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
