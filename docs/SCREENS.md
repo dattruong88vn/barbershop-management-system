@@ -106,6 +106,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Data:** chọn dịch vụ lẻ hoặc combo, gán barber/skinner, tạm tính tổng tiền
 - **States:** new visit → tạo ở trạng thái `pending`
 - **Business:** chọn combo sẽ bỏ chọn toàn bộ dịch vụ lẻ; chọn dịch vụ lẻ sẽ bỏ chọn toàn bộ combo. Total price = tổng nhóm đang được chọn.
+- **Reporting snapshot:** khi lưu visit, backend snapshot tên/giá/role phụ trách của service hoặc combo. Với combo, backend tách combo thành các dòng service con và phân bổ doanh thu theo tỷ lệ `combo.price / sum(service.price)` tại thời điểm visit.
 
 ## 7. Visit Detail
 
@@ -148,7 +149,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Roles:** owner
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
-- **Fields:** name, price, duration, active
+- **Fields:** name, price, responsibleRole (`barber` hoặc `skinner`), duration, active
+- **Reporting:** mỗi service phải có `responsibleRole` để phân bổ doanh thu báo cáo.
 - **States:** list, create modal, edit modal, confirm delete
 
 ## 11. Combos
@@ -158,6 +160,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
 - **Fields:** name, danh sách dịch vụ thành phần, price, active
+- **Business:** giá combo do owner nhập độc lập với tổng giá dịch vụ lẻ. Nếu giá combo cao hơn tổng giá dịch vụ lẻ thì chỉ cảnh báo ở UI, không chặn backend.
 - **States:** list, create modal, edit modal, confirm delete
 
 ## 12. Staff
@@ -186,6 +189,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Sections:** Revenue, Branch Analytics, Top Employees, Top Services, Top Combos
 - **Backend:** Report API chưa implement → giữ placeholder/mock cho đến khi có backend
 - **States:** loading, loaded, mock/placeholder
+- **Reporting data:** báo cáo doanh thu phải dùng `visit_services.allocated_price` và các field snapshot, không dùng giá/tên service hoặc combo hiện tại.
 
 ## 14b. Báo cáo cá nhân
 

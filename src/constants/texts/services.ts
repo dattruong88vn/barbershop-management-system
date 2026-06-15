@@ -4,8 +4,10 @@ export const serviceTexts = {
       forbidden: "Bạn không có quyền quản lý dịch vụ",
       invalidPrice: "Giá dịch vụ phải lớn hơn 0",
       invalidRequestBody: "Dữ liệu gửi lên không hợp lệ",
+      invalidResponsibleRole: "Người phụ trách dịch vụ không hợp lệ",
       missingName: "Vui lòng nhập tên dịch vụ",
       missingPrice: "Vui lòng nhập giá dịch vụ",
+      missingResponsibleRole: "Vui lòng chọn người phụ trách dịch vụ",
       missingServiceId: "Thiếu mã dịch vụ",
       notFound: "Không tìm thấy dịch vụ",
       serviceInUse: "Dịch vụ đã có dữ liệu liên quan, không thể xoá",
@@ -19,6 +21,7 @@ export const serviceTexts = {
     editTitle: "Cập nhật dịch vụ",
     nameLabel: "Tên dịch vụ",
     priceLabel: "Giá dịch vụ",
+    responsibleRoleLabel: "Người phụ trách",
     isHaircutLabel: "Dịch vụ cắt tóc",
     namePlaceholder: "Ví dụ: Cắt tóc nam",
     pricePlaceholder: "Nhập giá dịch vụ",
@@ -36,8 +39,14 @@ export const serviceTexts = {
     errors: {
       generic: "Có lỗi xảy ra, vui lòng thử lại",
       invalidPrice: "Giá dịch vụ phải lớn hơn 0",
+      invalidResponsibleRole: "Người phụ trách dịch vụ không hợp lệ",
       missingName: "Vui lòng nhập tên dịch vụ",
       missingPrice: "Vui lòng nhập giá dịch vụ",
+      missingResponsibleRole: "Vui lòng chọn người phụ trách dịch vụ",
+    },
+    responsibleRoles: {
+      barber: "Barber",
+      skinner: "Skinner",
     },
   },
 };

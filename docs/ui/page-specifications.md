@@ -159,6 +159,8 @@ Validation:
 - Không được chọn đồng thời service và combo trong cùng visit.
 - Khi chọn combo, UI phải tự uncheck toàn bộ service đã chọn.
 - Khi chọn service, UI phải tự uncheck toàn bộ combo đã chọn.
+- Backend snapshot tên, giá và `responsibleRole` của service/combo vào `visit_services`.
+- Với combo, backend lưu từng service con và phân bổ doanh thu theo `combo.price / sum(service.price)`; dòng cuối nhận chênh lệch làm tròn.
 
 Thành công:
 
@@ -248,12 +250,14 @@ Fields:
 
 - Name
 - Price
+- Responsible Role (`barber` hoặc `skinner`)
 - Is Haircut
 
 Validation:
 
 - Name bắt buộc.
 - Price bắt buộc.
+- Responsible Role bắt buộc.
 
 ---
 
@@ -292,6 +296,7 @@ Fields:
 Validation:
 
 - Phải chọn ít nhất một service.
+- Giá combo lớn hơn tổng giá dịch vụ lẻ chỉ cảnh báo ở UI, không chặn backend.
 
 ---
 
@@ -394,6 +399,12 @@ Widgets tương lai:
 - Top Skinners
 - Top Services
 - Top Combos
+
+Reporting data:
+
+- Reports phải dùng `visit_services.allocated_price` và snapshot fields.
+- Không tính report bằng tên/giá service hoặc combo hiện tại.
+- Doanh thu thiếu barber/skinner tương ứng hiển thị trong nhóm `Chưa xác định`.
 
 ---
 

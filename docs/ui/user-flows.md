@@ -64,6 +64,10 @@ Kiểm tra tổng tiền
     ↓
 Tạo visit
     ↓
+Backend snapshot tên/giá/role phụ trách
+    ↓
+Nếu là combo → phân bổ doanh thu xuống service con
+    ↓
 Visit Detail
 ```
 
@@ -181,8 +185,10 @@ Save
 Backend status:
 
 - Personal report API đã implement tại `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` cho `receptionist`, `barber`, `skinner`.
+- Personal report dùng snapshot service/combo và `responsibleRoleSnapshot`; combo được đếm distinct theo combo trong từng visit để tránh nhân đôi do phân bổ service con.
 - Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm checkbox Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
 - Owner/manager report API chưa implement; giữ Reports quản lý ở dạng placeholder/mock cho đến khi có backend support.
+- Owner/manager report tương lai phải dùng `allocatedPrice` và snapshot fields; doanh thu thiếu nhân viên tương ứng đưa vào nhóm `Chưa xác định`.
 
 ```text
 Reports

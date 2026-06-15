@@ -11,7 +11,11 @@ import {
 } from "@/constants/common";
 import { customerTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
-import type { CustomerRequestBody, UserRole } from "@/types";
+import type {
+  CustomerLastVisitService,
+  CustomerRequestBody,
+  UserRole,
+} from "@/types";
 
 const CUSTOMER_ACCESS_ROLES: UserRole[] = [
   "owner",
@@ -60,7 +64,12 @@ const CUSTOMER_SELECT = {
         orderBy: { id: "asc" },
         select: {
           id: true,
+          serviceId: true,
+          comboId: true,
           price: true,
+          serviceNameSnapshot: true,
+          comboNameSnapshot: true,
+          comboPriceSnapshot: true,
           service: {
             select: {
               name: true,
@@ -100,6 +109,51 @@ function getCustomerPage(request: NextRequest) {
 
 function formatCustomerResponse(customer: CustomerRecord) {
   const lastVisit = customer.visits[0] ?? null;
+  const seenComboIds = new Set<string>();
+  const services = lastVisit
+    ? lastVisit.visitServices.reduce<CustomerLastVisitService[]>(
+      (items, visitService) => {
+        if (visitService.comboId) {
+          if (seenComboIds.has(visitService.comboId)) {
+            return items;
+          }
+
+          seenComboIds.add(visitService.comboId);
+
+          return [
+            ...items,
+            {
+              id: visitService.id,
+              name:
+                visitService.comboNameSnapshot ??
+                visitService.combo?.name ??
+                customerTexts.lookup.noServices,
+              type: VISIT_ITEM_TYPE_COMBO,
+              price: Number(
+                (
+                  visitService.comboPriceSnapshot ?? visitService.price
+                ).toString(),
+              ),
+            },
+          ];
+        }
+
+        return [
+          ...items,
+          {
+            id: visitService.id,
+            name:
+              visitService.serviceNameSnapshot ??
+              visitService.service?.name ??
+              customerTexts.lookup.noServices,
+            type: VISIT_ITEM_TYPE_SERVICE,
+            price: Number(visitService.price.toString()),
+          },
+        ];
+      },
+      [],
+    )
+    : [];
 
   return {
     id: customer.id,
@@ -119,17 +173,7 @@ function formatCustomerResponse(customer: CustomerRecord) {
             photoUrl: photo.photoUrl,
             createdAt: photo.createdAt.toISOString(),
           })),
-          services: lastVisit.visitServices.map((visitService) => ({
-            id: visitService.id,
-            name:
-              visitService.service?.name ??
-              visitService.combo?.name ??
-              customerTexts.lookup.noServices,
-            type: visitService.service
-              ? VISIT_ITEM_TYPE_SERVICE
-              : VISIT_ITEM_TYPE_COMBO,
-            price: Number(visitService.price.toString()),
-          })),
+          services,
         }
       : null,
   };

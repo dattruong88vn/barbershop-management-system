@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import { isServiceResponsibleRole } from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
 import type { ServiceRequestBody, UserRole } from "@/types";
@@ -10,6 +11,7 @@ const SERVICE_SELECT = {
   shopId: true,
   name: true,
   price: true,
+  responsibleRole: true,
   isHaircut: true,
   createdAt: true,
 } as const;
@@ -27,6 +29,9 @@ function normalizeServiceInput(body: ServiceRequestBody) {
         : Number.parseFloat(
             typeof body.price === "string" ? body.price.trim() : "",
           ),
+    responsibleRole: isServiceResponsibleRole(body.responsibleRole)
+      ? body.responsibleRole
+      : null,
     isHaircut: body.isHaircut === true,
   };
 }
@@ -36,6 +41,7 @@ function formatServiceResponse(service: {
   shopId: string;
   name: string;
   price: { toString: () => string };
+  responsibleRole: string;
   isHaircut: boolean;
   createdAt: Date;
 }) {
@@ -125,11 +131,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const responsibleRole = serviceInput.responsibleRole;
+
+  if (!responsibleRole) {
+    return NextResponse.json(
+      { error: serviceTexts.api.errors.missingResponsibleRole },
+      { status: 400 },
+    );
+  }
+
   const service = await prisma.service.create({
     data: {
       shopId: authResult.shopId,
       name: serviceInput.name,
       price: serviceInput.price,
+      responsibleRole,
       isHaircut: serviceInput.isHaircut,
     },
     select: SERVICE_SELECT,

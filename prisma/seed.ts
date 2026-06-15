@@ -1,4 +1,8 @@
-import { PrismaClient, UserRole } from "@prisma/client";
+import {
+  PrismaClient,
+  ServiceResponsibleRole,
+  UserRole,
+} from "@prisma/client";
 import { createHash } from "node:crypto";
 
 const prisma = new PrismaClient();
@@ -35,6 +39,7 @@ type SeedService = {
   id: string;
   name: string;
   price: string;
+  responsibleRole: ServiceResponsibleRole;
   isHaircut: boolean;
 };
 
@@ -84,18 +89,21 @@ const seedServices: SeedService[] = [
     id: haircutServiceId,
     name: "Cắt tóc nam",
     price: "100000",
+    responsibleRole: ServiceResponsibleRole.barber,
     isHaircut: true,
   },
   {
     id: shampooServiceId,
     name: "Gội đầu thư giãn",
     price: "70000",
+    responsibleRole: ServiceResponsibleRole.skinner,
     isHaircut: false,
   },
   {
     id: earCleaningServiceId,
     name: "Ráy tai",
     price: "80000",
+    responsibleRole: ServiceResponsibleRole.skinner,
     isHaircut: false,
   },
 ];
@@ -192,6 +200,7 @@ async function main() {
       update: {
         name: service.name,
         price: service.price,
+        responsibleRole: service.responsibleRole,
         isHaircut: service.isHaircut,
       },
       create: {
@@ -199,6 +208,7 @@ async function main() {
         shopId,
         name: service.name,
         price: service.price,
+        responsibleRole: service.responsibleRole,
         isHaircut: service.isHaircut,
       },
     });

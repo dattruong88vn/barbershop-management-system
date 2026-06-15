@@ -11,7 +11,13 @@ CREATE TYPE "ShopStatus" AS ENUM ('active', 'expired');
 CREATE TYPE "UserRole" AS ENUM ('superadmin', 'owner', 'manager', 'receptionist', 'barber', 'skinner');
 
 -- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('active', 'inactive');
+
+-- CreateEnum
 CREATE TYPE "VisitStatus" AS ENUM ('pending', 'in_progress', 'completed');
+
+-- CreateEnum
+CREATE TYPE "ServiceResponsibleRole" AS ENUM ('barber', 'skinner');
 
 -- CreateTable
 CREATE TABLE "shops" (
@@ -45,6 +51,7 @@ CREATE TABLE "users" (
     "username" TEXT NOT NULL,
     "password_hash" TEXT NOT NULL,
     "role" "UserRole" NOT NULL,
+    "status" "UserStatus" NOT NULL DEFAULT 'active',
     "is_first_login" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -57,6 +64,7 @@ CREATE TABLE "services" (
     "shop_id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "price" DECIMAL(12,2) NOT NULL,
+    "responsible_role" "ServiceResponsibleRole" NOT NULL,
     "is_haircut" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -104,6 +112,8 @@ CREATE TABLE "visits" (
     "branch_id" UUID NOT NULL,
     "barber_id" UUID,
     "skinner_id" UUID,
+    "no_haircut" BOOLEAN NOT NULL DEFAULT false,
+    "no_skinner_service" BOOLEAN NOT NULL DEFAULT false,
     "status" "VisitStatus" NOT NULL DEFAULT 'pending',
     "total_price" DECIMAL(12,2) NOT NULL,
     "created_by" UUID NOT NULL,
@@ -122,6 +132,12 @@ CREATE TABLE "visit_services" (
     "service_id" UUID,
     "combo_id" UUID,
     "price" DECIMAL(12,2) NOT NULL,
+    "service_name_snapshot" TEXT,
+    "service_price_snapshot" DECIMAL(12,2),
+    "combo_name_snapshot" TEXT,
+    "combo_price_snapshot" DECIMAL(12,2),
+    "responsible_role_snapshot" "ServiceResponsibleRole",
+    "allocated_price" DECIMAL(12,2) NOT NULL,
 
     CONSTRAINT "visit_services_pkey" PRIMARY KEY ("id")
 );
@@ -202,6 +218,9 @@ CREATE INDEX "visit_services_service_id_idx" ON "visit_services"("service_id");
 CREATE INDEX "visit_services_combo_id_idx" ON "visit_services"("combo_id");
 
 -- CreateIndex
+CREATE INDEX "visit_services_responsible_role_snapshot_idx" ON "visit_services"("responsible_role_snapshot");
+
+-- CreateIndex
 CREATE INDEX "visit_photos_shop_id_idx" ON "visit_photos"("shop_id");
 
 -- CreateIndex
@@ -278,3 +297,4 @@ ALTER TABLE "visit_photos" ADD CONSTRAINT "visit_photos_visit_id_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "visit_photos" ADD CONSTRAINT "visit_photos_uploaded_by_fkey" FOREIGN KEY ("uploaded_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+

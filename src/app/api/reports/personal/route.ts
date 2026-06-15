@@ -191,11 +191,8 @@ export async function GET(request: NextRequest) {
           select: {
             comboId: true,
             serviceId: true,
-            service: {
-              select: {
-                name: true,
-              },
-            },
+            responsibleRoleSnapshot: true,
+            serviceNameSnapshot: true,
           },
         },
       },
@@ -208,10 +205,19 @@ export async function GET(request: NextRequest) {
 
     visits.forEach((visit) => {
       customerIds.add(visit.customerId);
+      const comboIds = new Set<string>();
 
       visit.visitServices.forEach((visitService) => {
+        if (
+          (authResult.role === STAFF_ROLE_BARBER ||
+            authResult.role === STAFF_ROLE_SKINNER) &&
+          visitService.responsibleRoleSnapshot !== authResult.role
+        ) {
+          return;
+        }
+
         if (visitService.comboId) {
-          comboCount += 1;
+          comboIds.add(visitService.comboId);
           return;
         }
 
@@ -219,13 +225,15 @@ export async function GET(request: NextRequest) {
           serviceCount += 1;
         }
 
-        if (visitService.service?.name) {
+        if (visitService.serviceNameSnapshot) {
           serviceCounts.set(
-            visitService.service.name,
-            (serviceCounts.get(visitService.service.name) ?? 0) + 1,
+            visitService.serviceNameSnapshot,
+            (serviceCounts.get(visitService.serviceNameSnapshot) ?? 0) + 1,
           );
         }
       });
+
+      comboCount += comboIds.size;
     });
 
     return NextResponse.json({

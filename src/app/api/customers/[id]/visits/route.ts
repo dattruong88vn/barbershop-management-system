@@ -54,6 +54,9 @@ const CUSTOMER_VISITS_SELECT = {
           serviceId: true,
           comboId: true,
           price: true,
+          serviceNameSnapshot: true,
+          comboNameSnapshot: true,
+          comboPriceSnapshot: true,
           service: {
             select: {
               name: true,
@@ -93,6 +96,52 @@ function formatVisitStaff(staff: CustomerVisitStaffRecord) {
 }
 
 function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
+  const seenComboIds = new Set<string>();
+  const services = visit.visitServices.reduce<CustomerVisit["services"]>(
+    (items, visitService) => {
+      if (visitService.comboId) {
+        if (seenComboIds.has(visitService.comboId)) {
+          return items;
+        }
+
+        seenComboIds.add(visitService.comboId);
+
+        return [
+          ...items,
+          {
+            id: visitService.id,
+            itemId: visitService.comboId,
+            name:
+              visitService.comboNameSnapshot ??
+              visitService.combo?.name ??
+              customerTexts.detail.noServices,
+            type: VISIT_ITEM_TYPE_COMBO,
+            price: Number(
+              (
+                visitService.comboPriceSnapshot ?? visitService.price
+              ).toString(),
+            ),
+          },
+        ];
+      }
+
+      return [
+        ...items,
+        {
+          id: visitService.id,
+          itemId: visitService.serviceId,
+          name:
+            visitService.serviceNameSnapshot ??
+            visitService.service?.name ??
+            customerTexts.detail.noServices,
+          type: VISIT_ITEM_TYPE_SERVICE,
+          price: Number(visitService.price.toString()),
+        },
+      ];
+    },
+    [],
+  );
+
   return {
     id: visit.id,
     createdAt: visit.createdAt.toISOString(),
@@ -107,18 +156,7 @@ function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
       photoUrl: photo.photoUrl,
       createdAt: photo.createdAt.toISOString(),
     })),
-    services: visit.visitServices.map((visitService) => ({
-      id: visitService.id,
-      itemId: visitService.serviceId ?? visitService.comboId,
-      name:
-        visitService.service?.name ??
-        visitService.combo?.name ??
-        customerTexts.detail.noServices,
-      type: visitService.service
-        ? VISIT_ITEM_TYPE_SERVICE
-        : VISIT_ITEM_TYPE_COMBO,
-      price: Number(visitService.price.toString()),
-    })),
+    services,
   };
 }
 

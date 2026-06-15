@@ -513,3 +513,27 @@ Copy this structure when starting a new date section:
 ### Notes
 - Did not run tests or ESLint because they were not requested.
 - Updated report screen and user-flow documentation to mark personal report API as implemented while owner/manager report APIs remain pending.
+
+## 2026-06-15
+
+### Business Changes
+- Started the service/combo revenue allocation backend groundwork by defining service responsibility roles for `barber` and `skinner`.
+
+### Database Changes
+- Added the Prisma `ServiceResponsibleRole` enum with `barber` and `skinner` values.
+- Added `Service.responsibleRole` to identify whether a service contributes to barber or skinner reporting.
+
+### API Changes
+- None
+
+### UI Changes
+- None
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not run tests or ESLint because they were not requested.
