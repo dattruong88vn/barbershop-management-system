@@ -70,3 +70,16 @@ export function getPersonalReportPeriodFilter({
     period: REPORT_PERIOD_MONTH,
   };
 }
+
+export function getDashboardPeriodFilter({
+  month,
+  period,
+}: {
+  month: string;
+  period: ReportPeriodValue;
+}): {
+  month?: string;
+  period: ReportPeriodValue;
+} {
+  return getPersonalReportPeriodFilter({ month, period });
+}

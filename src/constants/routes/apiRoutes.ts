@@ -7,6 +7,15 @@ export const API_ROUTES = {
   customers: "/api/customers",
   customerDetail: (id: string) => `/api/customers/${id}`,
   customerVisits: (id: string) => `/api/customers/${id}/visits`,
+  dashboard: ({ month, period }: { month?: string; period: string }) => {
+    const params = new URLSearchParams({ period });
+
+    if (month) {
+      params.set("month", month);
+    }
+
+    return `/api/dashboard?${params.toString()}`;
+  },
   personalReport: ({ month, period }: { month?: string; period: string }) => {
     const params = new URLSearchParams({ period });
 

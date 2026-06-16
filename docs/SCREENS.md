@@ -17,6 +17,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Điều hướng dùng hằng số `ROUTES`; gọi API dùng `API_ROUTES`. Không hardcode path.
 - Điều hướng client phải dùng Next navigation (`router.push`, `router.replace`, `redirect`, hoặc `Link`). Tuyệt đối không dùng `window.location`, `window.location.href`, hoặc `window.location.assign`.
 - Client Component / hook dùng `fetchClient` từ `@/lib/fetchClient`. Server Component dùng `fetchServer` từ `@/lib/fetchServer`. Không gọi `fetch` trực tiếp.
+- Client data dùng TanStack Query không được tự refetch khi browser/window focus lại. Dữ liệu chỉ fetch khi vào page, reload browser, query key thay đổi, hoặc được invalidate/refetch chủ động sau mutation/action.
 - Mọi chuỗi UI đặt trong `src/constants/texts/`. Không hardcode text trong component.
 - Mọi thao tác thành công phải hiển thị success feedback qua global Feedback notification flow; nếu có điều hướng sau thành công, feedback phải được dispatch trước khi điều hướng bằng app router.
 - Type/interface dùng chung đặt trong `src/types/`. Không định nghĩa trong component.
@@ -138,10 +139,16 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Route:** `/dashboard` (`ROUTES.dashboard`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
+- **Purpose:** overview nhanh + action alerts. Dashboard dùng để scan tình hình vận hành hiện tại/kỳ đang xem và nhắc việc cần xử lý ngay, không thay thế báo cáo chi tiết.
+- **Header:** chỉ hiển thị title `Dashboard`, không hiển thị description/subtitle.
+- **Filter:** dùng 3 tabs `Tháng`, `Năm hiện tại`, `Tất cả thời gian`. Mặc định chọn `Tháng` của tháng hiện tại. Khi tab `Tháng` active, hiển thị badge action `Chọn tháng` để mở month picker; chọn tháng xong vẫn giữ tab `Tháng`.
+- **Content layout:** toàn bộ widgets/charts/alerts bên dưới filter nằm trong một global card chung. Card title là kỳ đang chọn: tên tháng được chọn, `Năm hiện tại`, hoặc `Tất cả thời gian`.
+- **Title casing:** tất cả title trên Dashboard phải viết hoa chữ đầu, bao gồm page title, section title, card title, chart title và title kỳ được chọn.
 - **Widgets:** Revenue, Total Visits, New Customers, Returning Customers
 - **Charts:** Revenue Trend, Top Barbers, Top Skinners, Top Services, Top Combos
-- **Backend:** phụ thuộc report/dashboard APIs; dùng placeholder/mock cho đến khi backend xong
-- **States:** loading, loaded, mock/placeholder
+- **Alerts:** haircut visit thiếu ảnh kiểu tóc
+- **Backend:** `GET /api/dashboard?period=month|year|all&month=YYYY-MM` đã implement cho `owner` và `manager`, scoped theo `shop_id`
+- **States:** loading, loaded, empty, error
 
 ## 10. Services
 
@@ -186,6 +193,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Route:** `/reports` (`ROUTES.reports`)
 - **Roles:** owner (phạm vi dữ liệu theo role)
 - **Ưu tiên:** desktop
+- **Purpose:** audit + analysis. Reports dùng để phân tích sâu, đối soát doanh thu phân bổ, xem bảng/biểu đồ chi tiết và drill-down theo kỳ/nhân sự/dịch vụ.
 - **Sections:** Revenue, Branch Analytics, Top Employees, Top Services, Top Combos
 - **Backend:** Report API chưa implement → giữ placeholder/mock cho đến khi có backend
 - **States:** loading, loaded, mock/placeholder

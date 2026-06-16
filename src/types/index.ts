@@ -3,6 +3,7 @@ export * from "./auth";
 export * from "./branches";
 export * from "./combos";
 export * from "./customers";
+export * from "./dashboard";
 export * from "./designSystem";
 export * from "./reports";
 export * from "./services";

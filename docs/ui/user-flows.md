@@ -1,5 +1,11 @@
 # User Flows
 
+## Data Fetching Behavior
+
+- Khi user truy cập page hoặc reload browser, page fetch dữ liệu theo query key hiện tại.
+- Browser/window focus lại không tự refetch data.
+- Data chỉ refetch thêm khi user đổi filter/query key, thực hiện action/mutation có invalidate query, hoặc bấm một action refresh được thiết kế rõ ràng.
+
 ## Luồng Đăng Nhập
 
 ```text
@@ -184,11 +190,14 @@ Save
 
 Backend status:
 
+- Dashboard API đã implement tại `GET /api/dashboard?period=month|year|all&month=YYYY-MM` cho `owner` và `manager`; dashboard là overview nhanh + action alerts.
 - Personal report API đã implement tại `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` cho `receptionist`, `barber`, `skinner`.
 - Personal report dùng snapshot service/combo và `responsibleRoleSnapshot`; combo được đếm distinct theo combo trong từng visit để tránh nhân đôi do phân bổ service con.
-- Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm checkbox Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
+- Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm các lựa chọn Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
+- Dashboard manager dùng 3 tabs cho `Tháng`, `Năm hiện tại`, `Tất cả thời gian`; khi tab `Tháng` active, badge `Chọn tháng` mở month picker. Phần dữ liệu dashboard nằm trong một global card chung với title là kỳ đang chọn.
 - Owner/manager report API chưa implement; giữ Reports quản lý ở dạng placeholder/mock cho đến khi có backend support.
 - Owner/manager report tương lai phải dùng `allocatedPrice` và snapshot fields; doanh thu thiếu nhân viên tương ứng đưa vào nhóm `Chưa xác định`.
+- Reports là audit + analysis: dùng cho phân tích sâu, đối soát doanh thu phân bổ, bảng/biểu đồ chi tiết và drill-down.
 
 ```text
 Reports

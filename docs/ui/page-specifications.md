@@ -1,5 +1,11 @@
 # Page Specifications
 
+## Data Fetching
+
+- Client page data dùng TanStack Query không refetch khi browser/window focus lại.
+- Mặc định page fetch dữ liệu khi user truy cập page hoặc reload browser.
+- Chỉ refetch thêm khi query key thay đổi, mutation/action invalidate query, hoặc UI gọi refetch chủ động.
+
 ## Login
 
 Spec chi tiết:
@@ -397,10 +403,15 @@ Trạng thái backend:
 - Personal report cho nhân viên đã có: `GET /api/reports/personal?period=month|year|all&month=YYYY-MM`.
 - Owner/manager report API chưa có.
 
+Purpose:
+
+- Reports là audit + analysis: dùng để phân tích sâu, đối soát doanh thu phân bổ, xem bảng/biểu đồ chi tiết và drill-down theo kỳ/nhân sự/dịch vụ.
+- Dashboard không thay thế Reports; dashboard chỉ hiển thị overview nhanh và action alerts.
+
 UI hiện tại:
 
 - Staff roles (`receptionist`, `barber`, `skinner`) dùng dữ liệu thật từ personal report API, có section thông tin nhân viên và dropdown kỳ báo cáo.
-- Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm checkbox Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
+- Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm các lựa chọn Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
 - Owner/manager vẫn là placeholder.
 
 Widgets tương lai:
@@ -428,13 +439,23 @@ Route:
 
 Trạng thái backend:
 
-- Phụ thuộc report APIs.
-- Dashboard API chưa có.
-- Chỉ dùng placeholder hoặc mock data cho đến khi có backend support.
+- Dashboard API đã có: `GET /api/dashboard?period=month|year|all&month=YYYY-MM`.
+- API chỉ cho `owner` và `manager`, scoped theo `shop_id`, và dùng `visit_services.allocated_price` + snapshot fields.
+
+Purpose:
+
+- Dashboard là overview nhanh + action alerts: dùng để scan tình hình vận hành hiện tại/kỳ đang xem và nhắc việc cần xử lý ngay.
+- Dashboard không dùng cho đối soát chi tiết; phần đó thuộc Reports.
 
 UI hiện tại:
 
-- Cho phép mock data.
+- Page header chỉ hiển thị title `Dashboard`, không hiển thị description/subtitle.
+- Bộ chọn kỳ dùng 3 tabs: `Tháng`, `Năm hiện tại`, `Tất cả thời gian`.
+- Mặc định chọn tab `Tháng` với tháng hiện tại.
+- Khi tab `Tháng` active, hiển thị badge action `Chọn tháng` để mở month picker; month picker chỉ cho chọn từ 12 tháng gần nhất đến tháng hiện tại.
+- Toàn bộ phần dữ liệu bên dưới filter nằm trong một global card chung, không lồng global card bên trong global card.
+- Card dữ liệu dùng title theo kỳ đang chọn: tên tháng được chọn, `Năm hiện tại`, hoặc `Tất cả thời gian`.
+- Tất cả title trong dashboard phải viết hoa chữ đầu, bao gồm title kỳ được chọn.
 
 Widgets:
 
@@ -442,6 +463,12 @@ Widgets:
 - Visits
 - New Customers
 - Returning Customers
+- Revenue Trend
+- Top Barbers
+- Top Skinners
+- Top Services
+- Top Combos
+- Haircut visits missing photos
 
 Charts:
 

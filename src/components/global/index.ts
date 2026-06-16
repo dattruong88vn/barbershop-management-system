@@ -122,6 +122,12 @@ export {
   type GeistWindowProps as WindowProps,
 } from "./Specialized";
 export { EmptyState } from "./EmptyState";
+export {
+  ChartContainer,
+  ChartTooltipContent,
+  type ChartContainerProps,
+  type ChartTooltipContentProps,
+} from "./Chart";
 export { Combobox, type ComboboxOption } from "./Combobox";
 export { KeyValueRow } from "./KeyValueRow";
 export { MonthCalendar } from "./MonthCalendar";

@@ -89,6 +89,7 @@ Không hardcode hex. Dùng CSS variables của Geist — chúng tự adapt theo 
 ## 3. Typography
 
 Dùng system font qua `font-sans` cho UI. Dùng Tailwind class từ typography scale hiện có.
+Tất cả title/heading hiển thị trong UI phải viết hoa chữ đầu, bao gồm page title, section title, card title, chart title, modal title và title kỳ báo cáo/dashboard.
 
 | Tên             | Class             | Dùng cho                               |
 | --------------- | ----------------- | -------------------------------------- |

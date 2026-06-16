@@ -5,14 +5,25 @@ import { ChevronDown } from "lucide-react";
 import { designSystemTexts } from "@/constants/texts";
 import { cn } from "@/lib/utils";
 
-export interface GeistCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface GeistCardProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+  action?: React.ReactNode;
   bordered?: boolean;
   padding?: "sm" | "md" | "lg";
+  title?: React.ReactNode;
 }
 
 export const GeistCard = React.forwardRef<HTMLDivElement, GeistCardProps>(
   (
-    { bordered = true, children, className, padding = "md", ...props },
+    {
+      action,
+      bordered = true,
+      children,
+      className,
+      padding = "md",
+      title,
+      ...props
+    },
     ref,
   ) => {
     const paddings = {
@@ -32,6 +43,18 @@ export const GeistCard = React.forwardRef<HTMLDivElement, GeistCardProps>(
         )}
         {...props}
       >
+        {title || action ? (
+          <div className="mb-4 flex items-start justify-between gap-3">
+            {title ? (
+              <h2 className="text-base font-semibold text-gray-1000">
+                {title}
+              </h2>
+            ) : (
+              <span aria-hidden="true" />
+            )}
+            {action}
+          </div>
+        ) : null}
         {children}
       </div>
     );
