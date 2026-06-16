@@ -16,6 +16,7 @@ Luôn bắt buộc tìm trong `src/components/global/` trước khi viết compo
 - Bottom nav mobile: 56px. Top nav tablet: 52px.
 - Breakpoints: mobile 0–767px · tablet 768–1023px · desktop 1024px+.
 - Min touch target 44px. Min font size 14px. All interactive elements keyboard accessible.
+- Text inputs, textareas, selects, and combobox triggers must use 16px text (`text-base`) to avoid mobile browser zoom on focus.
 
 **Role-based layout:**
 
@@ -39,6 +40,7 @@ Title/value display pairs must stay on one row with title left, value right, and
 **Spacing & radius:** Tailwind scale only, no hardcode px. Card/dialog = `rounded-xl`. Badge/avatar = `rounded-full`. Dùng border thay shadow trong dark UI.
 
 **Forms:** React Hook Form + Zod. Label trên input. Required fields dùng `*`. Inline validation dưới field. Password có toggle show/hide. Search có icon + auto focus mobile + debounce 300ms + clear button.
+Text inputs, textareas, selects, and combobox triggers use `text-base`; labels/help/error text may remain smaller.
 
 **Cards:** Border nhẹ · `rounded-xl` · padding 16px. Dùng trên mobile thay table.
 

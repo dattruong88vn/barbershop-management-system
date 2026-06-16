@@ -928,6 +928,29 @@ Copy this structure when starting a new date section:
 - None
 
 ### UI Changes
+- Updated project docs to match the latest mobile bottom navigation, visit creation origins, visit completion redirect, visit list filter order, personal report layout, and input font-size rules.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Documentation-only update; tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
 - Updated the customer and visit create back-link text from `Quay lại tra cứu` to `Quay lại`.
 
 ### Refactoring

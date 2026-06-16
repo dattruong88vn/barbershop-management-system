@@ -131,6 +131,8 @@ Trạng thái:
 
 Quy tắc:
 
+- `Tạo visit` nằm cạnh tên khách trong profile summary, canh phải, dùng primary button, và chỉ hiển thị khi khách không có visit `pending`/`in_progress`.
+- Edit customer info là action icon bút chì trực tiếp trên header; không dùng overflow menu mobile cho action này.
 - Visit history chỉ hiển thị visit `completed`.
 - Chu kỳ ghé tính từ khoảng cách trung bình giữa các visit completed.
 - Sửa SĐT khách không ảnh hưởng lịch sử visit vì visit liên kết bằng `customer_id`.
@@ -146,6 +148,9 @@ Route:
 Ghi chú route:
 
 - Route dùng hằng số `ROUTES.createVisit`.
+- Từ Visit List dùng `ROUTES.createVisitFromVisits()` và query `origin=visits`.
+- Từ Customer Detail dùng `ROUTES.createVisitForCustomer(customer)` và query `origin=customer` + `returnToCustomerId`.
+- Back link quay về Customer Detail khi có `returnToCustomerId`; quay về `/visits` khi `origin=visits`; mặc định quay về `/customers`.
 
 API:
 
@@ -208,6 +213,8 @@ Quy tắc:
 - Chỉ được edit barber/skinner trong vòng 3 giờ.
 - Chỉ role `barber` được upload ảnh kiểu tóc.
 - Receptionist, skinner, manager và owner chỉ được xem ảnh/cảnh báo ảnh, không được upload ảnh.
+- Khi hoàn thành visit, điều hướng về Customer Detail bằng `returnToCustomerId` hoặc `visit.customer.id`.
+- Khi hoàn thành visit thiếu barber/skinner theo dịch vụ, không hiển thị inline error trong màn detail; dùng global feedback warning.
 
 Warning:
 
@@ -410,7 +417,8 @@ Purpose:
 
 UI hiện tại:
 
-- Staff roles (`receptionist`, `barber`, `skinner`) dùng dữ liệu thật từ personal report API, có section thông tin nhân viên và dropdown kỳ báo cáo.
+- Report headers không hiển thị description/subtitle.
+- Staff roles (`receptionist`, `barber`, `skinner`) dùng dữ liệu thật từ personal report API, có section thông tin nhân viên, bộ lọc kỳ, card `Thông tin chung`, card `Dịch vụ thực hiện nhiều nhất`, và card `Khách phục vụ nhiều nhất`.
 - Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm các lựa chọn Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
 - Owner/manager vẫn là placeholder.
 

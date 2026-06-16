@@ -93,7 +93,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Ưu tiên:** responsive
 - **Spec chi tiết:** xem mục Customer Detail trong tài liệu này.
 - **Sections:** Profile header, Metrics, Suggestions (gợi ý dịch vụ/thợ), Recent hair photos, Completed visit history, Edit customer modal
-- **Actions:** Create Visit, Edit customer info
+- **Actions:** Create Visit nằm cạnh tên khách hàng trong profile summary và chỉ hiển thị khi khách không có visit `pending`/`in_progress`; Edit customer info dùng icon bút chì trực tiếp trên header.
 - **Data:** thông tin khách, dịch vụ/thợ quen, ảnh kiểu tóc gần đây, lịch sử visit hoàn thành
 - **States:** loading, loaded, edit modal open
 
@@ -106,6 +106,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Actions:** Save Visit
 - **Data:** chọn dịch vụ lẻ hoặc combo, gán barber/skinner, tạm tính tổng tiền
 - **States:** new visit → tạo ở trạng thái `pending`
+- **Navigation:** route có thể nhận `origin=customer` hoặc `origin=visits`. Nếu đi từ Customer Detail, back link quay về chi tiết khách; nếu đi từ Visit List, back link quay về `/visits`; mặc định không có origin thì quay về `/customers`.
 - **Business:** chọn combo sẽ bỏ chọn toàn bộ dịch vụ lẻ; chọn dịch vụ lẻ sẽ bỏ chọn toàn bộ combo. Total price = tổng nhóm đang được chọn.
 - **Reporting snapshot:** khi lưu visit, backend snapshot tên/giá/role phụ trách của service hoặc combo. Với combo, backend tách combo thành các dòng service con và phân bổ doanh thu theo tỷ lệ `combo.price / sum(service.price)` tại thời điểm visit.
 
@@ -117,7 +118,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Sections:** Visit Information, Services, Combos, Barber, Skinner, Photos
 - **Actions:** Upload Photo (chỉ role `barber`), Edit Barber, Edit Skinner
 - **Warning:** dịch vụ haircut (`is_haircut = true`) chưa có ảnh → hiển thị cảnh báo
-- **Business:** edit barber/skinner chỉ trong 3 giờ sau `completed_at`; ngoài cửa sổ này khoá chỉnh sửa và hiển thị thông báo. Chỉ role `barber` được upload ảnh kiểu tóc.
+- **Business:** edit barber/skinner chỉ trong 3 giờ sau `completed_at`; ngoài cửa sổ này khoá chỉnh sửa và hiển thị thông báo. Chỉ role `barber` được upload ảnh kiểu tóc. Khi hoàn thành visit, điều hướng về Customer Detail bằng `returnToCustomerId` hoặc `visit.customer.id`.
 - **States:** pending, in_progress, completed; locked (quá 3h)
 - **API:** cần `GET /api/visits/:id` để load standalone. Hiện có `GET /api/visits`, `POST /api/visits`, `PATCH /api/visits/:id`. Nếu chưa có `GET /api/visits/:id`, phải thêm backend trước khi build route này.
 
@@ -126,8 +127,9 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Route:** `/visits` (`ROUTES.visits`)
 - **Roles:** như Create Visit
 - **Ưu tiên:** desktop
+- **Header:** chỉ hiển thị title, không hiển thị description/subtitle.
 - **Sections:** filter trạng thái, danh sách visit
-- **Filter:** `pending`, `in_progress`, `completed`
+- **Filter:** thứ tự `completed`, `in_progress`, `pending`; mặc định `completed`.
 - **Actions:** mở Visit Detail, tạo visit mới
 - **Indicator:** badge cảnh báo thiếu ảnh trên các visit haircut chưa có ảnh
 - **States:** loading, danh sách, empty
@@ -204,8 +206,9 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Trình bày:** view cá nhân cho nhân viên (trong khu báo cáo)
 - **Roles:** barber, skinner, receptionist
 - **Ưu tiên:** mobile
-- **Sections:** số dịch vụ đã làm, số combo đã làm, dịch vụ thực hiện nhiều nhất trong kỳ
-- **Backend:** `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` đã implement, chỉ tính visit `completed` theo `shop_id` và user hiện tại (`barberId`, `skinnerId`, hoặc `createdBy` theo role)
+- **Header:** chỉ hiển thị title, không hiển thị description/subtitle.
+- **Sections:** thông tin nhân viên, bộ lọc kỳ, Thông tin chung, Dịch vụ thực hiện nhiều nhất, Khách phục vụ nhiều nhất
+- **Backend:** `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` đã implement, chỉ tính visit `completed` theo `shop_id` và user hiện tại (`barberId`, `skinnerId`, hoặc `createdBy` theo role). Response có `metrics`, `topItems`, và `topCustomers`.
 - **Filter:** mặc định tháng hiện tại; bộ chọn gồm checkbox Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker chỉ cho chọn từ 12 tháng gần nhất đến tháng hiện tại.
 - **States:** loading, loaded
 

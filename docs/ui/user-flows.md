@@ -53,7 +53,25 @@ Customer Detail
 ```text
 Customer Detail
     ↓
-Tạo visit
+Tạo visit (origin=customer, returnToCustomerId)
+    ↓
+/visits/create
+    ↓
+Back → Customer Detail
+```
+
+```text
+Visit List
+    ↓
+Tạo visit (origin=visits)
+    ↓
+/visits/create
+    ↓
+Back → Visit List
+```
+
+```text
+/visits/create
     ↓
 Chọn services
     ↓
@@ -126,6 +144,20 @@ Trong vòng 3 giờ?
                 Save
 ```
 
+## Luồng Hoàn Thành Visit
+
+```text
+Visit Detail
+    ↓
+Bấm Hoàn thành
+    ↓
+Thiếu nhân viên theo dịch vụ?
+    ├─ Có    → Global warning feedback, không hiện inline error
+    └─ Không → Cập nhật status completed
+              ↓
+              Navigate Customer Detail
+```
+
 ---
 
 ## Luồng Quản Lý Service
@@ -193,6 +225,7 @@ Backend status:
 - Tổng quan API đã implement tại `GET /api/dashboard?period=month|year|all&month=YYYY-MM` cho `owner` và `manager`; tổng quan là overview nhanh + action alerts.
 - Personal report API đã implement tại `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` cho `receptionist`, `barber`, `skinner`.
 - Personal report dùng snapshot service/combo và `responsibleRoleSnapshot`; combo được đếm distinct theo combo trong từng visit để tránh nhân đôi do phân bổ service con.
+- Personal report hiển thị card `Thông tin chung`, `Dịch vụ thực hiện nhiều nhất`, và `Khách phục vụ nhiều nhất`.
 - Bộ chọn kỳ báo cáo mặc định tháng hiện tại, gồm các lựa chọn Tháng/Năm hiện tại/Tất cả thời gian. Khi chọn Tháng, hiển thị month picker giới hạn từ 12 tháng gần nhất đến tháng hiện tại.
 - Tổng quan manager dùng 3 tabs cho `Tháng`, `Năm hiện tại`, `Tất cả thời gian`; khi tab `Tháng` active, badge `Chọn tháng` mở month picker. Phần dữ liệu tổng quan nằm trong một global card chung với title là kỳ đang chọn.
 - Owner/manager report API chưa implement; giữ Reports quản lý ở dạng placeholder/mock cho đến khi có backend support.
