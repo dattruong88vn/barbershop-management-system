@@ -50,7 +50,7 @@ export function VisitStaffEditForm({
         <select
           value={barberId}
           onChange={(event) => setBarberId(event.target.value)}
-          className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-ring"
+          className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-base text-foreground outline-none transition focus:border-ring"
         >
           <option value="">{visitTexts.create.barberPlaceholder}</option>
           {barbers.map((barber) => (
@@ -68,7 +68,7 @@ export function VisitStaffEditForm({
         <select
           value={skinnerId}
           onChange={(event) => setSkinnerId(event.target.value)}
-          className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-ring"
+          className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-base text-foreground outline-none transition focus:border-ring"
         >
           <option value="">{visitTexts.create.skinnerPlaceholder}</option>
           {skinners.map((skinner) => (

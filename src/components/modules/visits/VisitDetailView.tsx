@@ -70,8 +70,10 @@ export function VisitDetailView() {
   }
 
   function handleCompletedVisit() {
-    if (returnToCustomerId) {
-      dispatchAppNavigation(ROUTES.customerDetail(returnToCustomerId));
+    const customerId = returnToCustomerId ?? visit?.customer?.id;
+
+    if (customerId) {
+      dispatchAppNavigation(ROUTES.customerDetail(customerId));
     }
   }
 

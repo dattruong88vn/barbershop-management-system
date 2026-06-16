@@ -336,7 +336,7 @@ export const GeistCommandMenu = React.forwardRef<
         >
           <div className="rounded-xl border border-gray-400 bg-gray-100">
             <input
-              className="w-full border-b border-gray-400 bg-transparent px-4 py-3 text-sm outline-none"
+              className="w-full border-b border-gray-400 bg-transparent px-4 py-3 text-base outline-none"
               placeholder={placeholder}
               type="text"
               value={search}

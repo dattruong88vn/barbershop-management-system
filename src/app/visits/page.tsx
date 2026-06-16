@@ -11,15 +11,25 @@ import { Button } from "@/components/global/ui/button";
 import { VisitListCard, VisitListSkeleton } from "@/components/modules/visits";
 import { ROUTES } from "@/constants/routes";
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_PENDING, VISIT_STATUSES } from "@/constants/common";
+import {
+  VISIT_STATUS_COMPLETED,
+  VISIT_STATUS_IN_PROGRESS,
+  VISIT_STATUS_PENDING,
+} from "@/constants/common";
 import { useVisits } from "@/hooks/useVisits";
 import type { CustomerVisitStatus } from "@/types";
 import { getVisitListStatusLabel } from "@/utils/visits";
 
+const VISIT_LIST_STATUS_FILTERS: CustomerVisitStatus[] = [
+  VISIT_STATUS_COMPLETED,
+  VISIT_STATUS_IN_PROGRESS,
+  VISIT_STATUS_PENDING,
+];
+
 export default function VisitsPage() {
   const pageTitle = visitTexts.list.title;
   const [status, setStatus] = useState<CustomerVisitStatus>(
-    VISIT_STATUS_PENDING,
+    VISIT_STATUS_COMPLETED,
   );
   const { isLoadingVisits, visits, visitsError } = useVisits(status);
 
@@ -32,20 +42,22 @@ export default function VisitsPage() {
               <h1 className="text-xl font-semibold text-foreground md:text-2xl">
                 {visitTexts.list.title}
               </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {visitTexts.list.description}
-              </p>
             </div>
-            <Button asChild variant="primary" className="h-10 rounded-lg">
-              <Link href={ROUTES.createVisit}>
-                <Plus className="mr-2 size-4" aria-hidden="true" />
+            <Button
+              asChild
+              variant="primary"
+              size="lg"
+              className="h-9 shrink-0 rounded-lg px-3 text-sm md:px-4"
+            >
+              <Link href={ROUTES.createVisitFromVisits()}>
+                <Plus className="size-4" aria-hidden="true" />
                 {visitTexts.list.createVisit}
               </Link>
             </Button>
           </header>
 
           <div className="mb-4 flex gap-2 overflow-x-auto">
-            {VISIT_STATUSES.map((filter) => (
+            {VISIT_LIST_STATUS_FILTERS.map((filter) => (
               <Button
                 key={filter}
                 type="button"

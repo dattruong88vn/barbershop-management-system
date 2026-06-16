@@ -10,7 +10,6 @@ import {
   KeyValueRow,
   Modal,
   MonthCalendar,
-  Paragraph,
   Skeleton,
 } from "@/components/global";
 import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
@@ -31,8 +30,7 @@ import {
   getReportMonthKey,
 } from "@/utils/reports";
 
-import { PersonalReportMetricCard } from "./PersonalReportMetricCard";
-import { PersonalReportSummaryCard } from "./PersonalReportSummaryCard";
+import { PersonalReportGeneralInfoCard } from "./PersonalReportGeneralInfoCard";
 import { PersonalReportTopItems } from "./PersonalReportTopItems";
 import { PersonalReportSkeleton } from "./PersonalReportSkeleton";
 
@@ -78,9 +76,6 @@ export function PersonalReportView() {
             <Heading level={1} size="page">
               {reportTexts.personal.title}
             </Heading>
-            <Paragraph className="mt-1" tone="muted">
-              {reportTexts.personal.description}
-            </Paragraph>
           </header>
 
           {error ? (
@@ -161,42 +156,21 @@ export function PersonalReportView() {
                 </div>
               </section>
 
-              <section className="mb-4 rounded-xl border border-border bg-background p-4">
+              <section className="mb-4">
                 {shouldShowDataSkeleton ? (
                   <div className="grid gap-3">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Skeleton className="h-32" variant="card" />
-                      <Skeleton className="h-32" variant="card" />
-                    </div>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Skeleton className="h-24" variant="card" />
-                      <Skeleton className="h-24" variant="card" />
-                    </div>
+                    <Skeleton className="h-32" variant="card" />
+                    <Skeleton className="h-48" variant="card" />
                     <Skeleton className="h-48" variant="card" />
                   </div>
                 ) : (
-                  <div className="grid gap-4">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <PersonalReportSummaryCard
-                        label={reportTexts.personal.serviceCountLabel}
-                        value={report.serviceCount}
-                      />
-                      <PersonalReportSummaryCard
-                        label={reportTexts.personal.comboCountLabel}
-                        value={report.comboCount}
-                      />
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {report.metrics.map((metric) => (
-                        <PersonalReportMetricCard
-                          key={metric.label}
-                          metric={metric}
-                        />
-                      ))}
-                    </div>
-
+                  <div className="grid gap-6">
+                    <PersonalReportGeneralInfoCard metrics={report.metrics} />
                     <PersonalReportTopItems items={report.topItems} />
+                    <PersonalReportTopItems
+                      items={report.topCustomers}
+                      title={reportTexts.personal.topCustomerTitle}
+                    />
                   </div>
                 )}
               </section>

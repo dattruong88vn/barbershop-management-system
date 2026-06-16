@@ -40,7 +40,7 @@ export function FormTextField({
         aria-invalid={Boolean(error)}
         onChange={onChange}
         className={cn(
-          "h-10 rounded-lg border-border bg-background px-3 text-sm text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/20",
+          "h-10 rounded-lg border-border bg-background px-3 text-base text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/20",
           error ? "border-red-900 focus-visible:border-red-900" : null,
           className,
         )}

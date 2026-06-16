@@ -156,7 +156,7 @@ export default function OwnerStaffPage() {
                   required
                   placeholder={staffTexts.ownerStaff.usernamePlaceholder}
                   onChange={(event) => setUsername(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -171,7 +171,7 @@ export default function OwnerStaffPage() {
                   required={!editingStaff}
                   placeholder={staffTexts.ownerStaff.passwordPlaceholder}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -182,7 +182,7 @@ export default function OwnerStaffPage() {
                 <select
                   value={role}
                   onChange={(event) => setRole(event.target.value as StaffRole)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 >
                   {STAFF_ROLES.map((staffRole) => (
                     <option key={staffRole} value={staffRole}>
@@ -199,7 +199,7 @@ export default function OwnerStaffPage() {
                 <select
                   value={branchId}
                   onChange={(event) => setBranchId(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 >
                   <option value="">
                     {staffTexts.ownerStaff.noBranchOption}

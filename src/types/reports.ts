@@ -22,6 +22,7 @@ export type PersonalReportData = {
   roleLabel: string;
   serviceCount: string;
   staffName: string;
+  topCustomers: PersonalReportTopItem[];
   topItems: PersonalReportTopItem[];
 };
 

@@ -1,4 +1,6 @@
 import {
+  VISIT_CREATE_ORIGINS,
+  type VisitCreateOriginValue,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
 } from "@/constants/common";
@@ -9,6 +11,7 @@ export type VisitCreateSearchParams = {
   barberId?: string;
   comboIds?: string;
   name?: string;
+  origin?: string;
   phone?: string;
   returnToCustomerId?: string;
   serviceIds?: string;
@@ -24,6 +27,14 @@ function getIdsFromSearchParam(value?: string): string[] {
     .split(",")
     .map((id) => id.trim())
     .filter(Boolean);
+}
+
+export function getVisitCreateOriginFromSearchParams({
+  origin,
+}: VisitCreateSearchParams): VisitCreateOriginValue | null {
+  return VISIT_CREATE_ORIGINS.some((visitOrigin) => visitOrigin === origin)
+    ? (origin as VisitCreateOriginValue)
+    : null;
 }
 
 export function getCustomerFromVisitCreateSearchParams({

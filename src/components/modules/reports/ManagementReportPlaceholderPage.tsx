@@ -1,6 +1,6 @@
 import { BarChart3 } from "lucide-react";
 
-import { Card, EmptyState, Heading, Paragraph } from "@/components/global";
+import { Card, EmptyState, Heading } from "@/components/global";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { reportTexts } from "@/constants/texts";
 import type { ManagementReportKind } from "@/types";
@@ -20,9 +20,6 @@ export function ManagementReportPlaceholderPage({
             <Heading level={1} size="page">
               {title}
             </Heading>
-            <Paragraph className="mt-1" tone="muted">
-              {reportTexts.manager.description}
-            </Paragraph>
           </header>
 
           <InlineAlert className="border-amber-900/30 bg-amber-100 text-amber-900">

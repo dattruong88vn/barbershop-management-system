@@ -867,3 +867,567 @@ Copy this structure when starting a new date section:
 ### Notes
 - Completed sidebar planning steps 1, 2, 3, and 4.
 - Did not run tests or ESLint because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Replaced the mobile bottom navigation `Tạo` item with a final `Đăng xuất` action.
+- Mobile logout now uses the same NextAuth sign-out flow as the management sidebar and redirects to the login route.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Removed descriptions from the visit list and report headers.
+- Updated text inputs, textareas, and selects to use 16px text to avoid mobile browser zoom on focus.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Updated the customer and visit create back-link text from `Quay lại tra cứu` to `Quay lại`.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Updated the visit list create button to match the customer detail create-visit button style.
+- Create-visit links now carry an origin so the create screen can distinguish customer-detail and visit-list entry points.
+
+### Refactoring
+- Added shared visit-create origin constants and a route helper for creating visits from the visit list.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Reordered visit list status filters to `Hoàn thành`, `Đang làm`, then `Pending`.
+- Updated the default visit list filter to `Hoàn thành`.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Fixed the create-visit customer result row markup to avoid nested button hydration errors.
+
+### Refactoring
+- Replaced the inner select button visual with a non-interactive styled span because the whole row is already the selection button.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Changed personal report top services and top customers into separate cards matching the general info card style.
+
+### Refactoring
+- Removed the shared history-list component from the personal report top sections.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Wrapped the personal report top services and top customers sections in one shared card.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Grouped `Visit hoàn thành` and `Khách đã phục vụ` into one `Thông tin chung` card on the personal report screen.
+
+### Refactoring
+- Added a focused `PersonalReportGeneralInfoCard` component for grouped personal report metrics.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Increased spacing between personal report sections while keeping title-to-content spacing tighter.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Removed the outer card frame around the personal report top services and top customers sections.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Added a reusable global history-style list component based on the customer detail visit history row pattern.
+- Applied the shared history-style list to both personal report top services and top customers.
+
+### Refactoring
+- Replaced custom personal report top-item rows with the shared `HistoryList` component.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- Added top served customers to the personal report API response.
+
+### UI Changes
+- Added a `Khách phục vụ nhiều nhất` card to the personal report screen.
+
+### Refactoring
+- Made the personal report top-items card title configurable for reuse.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Removed the `Dịch vụ đã làm` and `Combo đã làm` summary cards from the personal report screen.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Removed the outer border/background wrapper around the personal report metric and top-item cards.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Changed the customer detail profile `Tạo visit` action to use the primary button variant.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Reduced the horizontal gap between the customer avatar and name/phone block on the customer detail profile summary.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Rebalanced the customer profile summary so avatar plus customer text align as one left cluster against the create-visit button.
+- Restored a more comfortable gap between customer name and phone number.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Tightened the customer name and phone stack further on the customer detail profile summary.
+- Vertically centered the left customer information cluster with the create-visit action.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Tightened the spacing between customer name and phone number on the customer detail profile summary.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Moved customer edit access to a direct pencil action in the customer detail header on mobile.
+- Removed the mobile overflow menu from the customer detail header.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Moved the customer detail `Tạo visit` action next to the customer name in the profile summary.
+- The create-visit action now appears only when the customer has no pending or in-progress visits.
+- Removed the duplicate create-visit action from the customer detail header and mobile menu.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Updated visit completion flow to navigate back to the completed visit customer's detail screen.
+- Visit detail completion now falls back to the loaded visit customer when no `returnToCustomerId` query parameter is present.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Removed the inline visit-detail error shown when completing a visit without enough assigned staff.
+- Kept warning feedback through the global notification flow for the missing-staff completion case.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.

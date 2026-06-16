@@ -163,7 +163,7 @@ export default function OwnerServicesPage() {
                   required
                   placeholder={serviceTexts.ownerServices.namePlaceholder}
                   onChange={(event) => setName(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -179,7 +179,7 @@ export default function OwnerServicesPage() {
                   required
                   placeholder={serviceTexts.ownerServices.pricePlaceholder}
                   onChange={(event) => setPrice(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -194,7 +194,7 @@ export default function OwnerServicesPage() {
                       event.target.value as ServiceResponsibleRoleValue,
                     )
                   }
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 >
                   <option value={SERVICE_RESPONSIBLE_ROLE_BARBER}>
                     {

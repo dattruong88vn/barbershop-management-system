@@ -138,7 +138,7 @@ export default function OwnerBranchesPage() {
                   required
                   placeholder={branchTexts.ownerBranches.namePlaceholder}
                   onChange={(event) => setName(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -152,7 +152,7 @@ export default function OwnerBranchesPage() {
                   required
                   placeholder={branchTexts.ownerBranches.addressPlaceholder}
                   onChange={(event) => setAddress(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
             </div>

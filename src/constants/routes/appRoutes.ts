@@ -1,4 +1,6 @@
 import {
+  VISIT_CREATE_ORIGIN_CUSTOMER,
+  VISIT_CREATE_ORIGIN_VISITS,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
   type VisitItemTypeValue,
@@ -12,10 +14,18 @@ export const ROUTES = {
   notFound: "/not-found",
   visits: "/visits",
   createVisit: "/visits/create",
+  createVisitFromVisits: () => {
+    const params = new URLSearchParams({
+      origin: VISIT_CREATE_ORIGIN_VISITS,
+    });
+
+    return `/visits/create?${params.toString()}`;
+  },
   createVisitForCustomer: (customer: { id: string; name: string; phone: string }) => {
     const params = new URLSearchParams({
       customerId: customer.id,
       name: customer.name,
+      origin: VISIT_CREATE_ORIGIN_CUSTOMER,
       phone: customer.phone,
       returnToCustomerId: customer.id,
     });
@@ -42,6 +52,7 @@ export const ROUTES = {
     const params = new URLSearchParams({
       customerId: visit.customer.id,
       name: visit.customer.name,
+      origin: VISIT_CREATE_ORIGIN_CUSTOMER,
       phone: visit.customer.phone,
       returnToCustomerId: visit.customer.id,
     });
