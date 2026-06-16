@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { SessionProvider } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import { AppFeedbackNotification } from "@/components/global";
+import {
+  AppFeedbackNotification,
+  ManagementSidebar,
+  ManagementSidebarContentOffset,
+} from "@/components/global";
 import {
   API_SERVER_ERROR_EVENT,
   createQueryClient,
@@ -90,14 +95,19 @@ export function Providers({ children }: ProvidersProps) {
   }, [toast]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      {toast ? (
-        <AppFeedbackNotification
-          toast={toast}
-          onClose={() => setToast(null)}
-        />
-      ) : null}
-    </QueryClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ManagementSidebar />
+        <ManagementSidebarContentOffset>
+          {children}
+        </ManagementSidebarContentOffset>
+        {toast ? (
+          <AppFeedbackNotification
+            toast={toast}
+            onClose={() => setToast(null)}
+          />
+        ) : null}
+      </QueryClientProvider>
+    </SessionProvider>
   );
 }

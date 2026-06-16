@@ -1,3 +1,4 @@
+export * from "./ManagementReportPlaceholderPage";
 export * from "./ManagerReportPlaceholder";
 export * from "./PersonalReportMetricCard";
 export * from "./PersonalReportSkeleton";

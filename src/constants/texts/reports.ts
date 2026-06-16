@@ -19,9 +19,28 @@ export const reportTexts = {
     description:
       "Report API chưa implement, màn hình này đang giữ placeholder theo spec.",
     empty: "Chưa có dữ liệu báo cáo quản lý.",
+    filtersTitle: "Bộ lọc",
     mockNotice:
       "Dữ liệu báo cáo quản lý đang là placeholder cho tới khi Report API hoàn tất.",
+    tableTitle: "Bảng dữ liệu",
     title: "Báo cáo",
+  },
+  management: {
+    branches: {
+      title: "Báo cáo chi nhánh",
+    },
+    combos: {
+      title: "Báo cáo combo",
+    },
+    revenue: {
+      title: "Báo cáo doanh thu",
+    },
+    services: {
+      title: "Báo cáo dịch vụ",
+    },
+    staff: {
+      title: "Báo cáo nhân viên",
+    },
   },
   personal: {
     comboCountLabel: "Combo đã làm",

@@ -42,6 +42,10 @@ export {
   type GeistTabsProps as TabsProps,
 } from "./Layout";
 export {
+  ManagementSidebar,
+} from "./ManagementSidebar";
+export { ManagementSidebarContentOffset } from "./ManagementSidebarContentOffset";
+export {
   GeistAvatar as Avatar,
   GeistGauge as Gauge,
   GeistLoadingDots as LoadingDots,

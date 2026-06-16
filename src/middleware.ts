@@ -99,6 +99,29 @@ export async function middleware(request: NextRequest) {
   }
 
   const allowedRoutes = PROTECTED_ROUTES_BY_ROLE[role];
+  const isReportChildPath = request.nextUrl.pathname.startsWith(
+    `${ROUTES.reports}/`,
+  );
+
+  if (
+    (role === USER_ROLE_RECEPTIONIST ||
+      role === USER_ROLE_BARBER ||
+      role === USER_ROLE_SKINNER) &&
+    isReportChildPath
+  ) {
+    return NextResponse.redirect(
+      new URL(getPostAuthRedirectPath(role), request.url),
+    );
+  }
+
+  if (
+    role === USER_ROLE_MANAGER &&
+    matchesRoute(request.nextUrl.pathname, ROUTES.reportBranches)
+  ) {
+    return NextResponse.redirect(
+      new URL(getPostAuthRedirectPath(role), request.url),
+    );
+  }
 
   if (
     allowedRoutes.some((route) => matchesRoute(request.nextUrl.pathname, route))

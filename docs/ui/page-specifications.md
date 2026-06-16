@@ -406,7 +406,7 @@ Trạng thái backend:
 Purpose:
 
 - Reports là audit + analysis: dùng để phân tích sâu, đối soát doanh thu phân bổ, xem bảng/biểu đồ chi tiết và drill-down theo kỳ/nhân sự/dịch vụ.
-- Dashboard không thay thế Reports; dashboard chỉ hiển thị overview nhanh và action alerts.
+- Tổng quan không thay thế Reports; tổng quan chỉ hiển thị overview nhanh và action alerts.
 
 UI hiện tại:
 
@@ -431,7 +431,7 @@ Reporting data:
 
 ---
 
-## Dashboard
+## Tổng quan
 
 Route:
 
@@ -439,23 +439,23 @@ Route:
 
 Trạng thái backend:
 
-- Dashboard API đã có: `GET /api/dashboard?period=month|year|all&month=YYYY-MM`.
+- Tổng quan API đã có: `GET /api/dashboard?period=month|year|all&month=YYYY-MM`.
 - API chỉ cho `owner` và `manager`, scoped theo `shop_id`, và dùng `visit_services.allocated_price` + snapshot fields.
 
 Purpose:
 
-- Dashboard là overview nhanh + action alerts: dùng để scan tình hình vận hành hiện tại/kỳ đang xem và nhắc việc cần xử lý ngay.
-- Dashboard không dùng cho đối soát chi tiết; phần đó thuộc Reports.
+- Tổng quan là overview nhanh + action alerts: dùng để scan tình hình vận hành hiện tại/kỳ đang xem và nhắc việc cần xử lý ngay.
+- Tổng quan không dùng cho đối soát chi tiết; phần đó thuộc Reports.
 
 UI hiện tại:
 
-- Page header chỉ hiển thị title `Dashboard`, không hiển thị description/subtitle.
+- Page header chỉ hiển thị title `Tổng quan`, không hiển thị description/subtitle.
 - Bộ chọn kỳ dùng 3 tabs: `Tháng`, `Năm hiện tại`, `Tất cả thời gian`.
 - Mặc định chọn tab `Tháng` với tháng hiện tại.
 - Khi tab `Tháng` active, hiển thị badge action `Chọn tháng` để mở month picker; month picker chỉ cho chọn từ 12 tháng gần nhất đến tháng hiện tại.
 - Toàn bộ phần dữ liệu bên dưới filter nằm trong một global card chung, không lồng global card bên trong global card.
 - Card dữ liệu dùng title theo kỳ đang chọn: tên tháng được chọn, `Năm hiện tại`, hoặc `Tất cả thời gian`.
-- Tất cả title trong dashboard phải viết hoa chữ đầu, bao gồm title kỳ được chọn.
+- Tất cả title trong Tổng quan phải viết hoa chữ đầu, bao gồm title kỳ được chọn.
 
 Widgets:
 
