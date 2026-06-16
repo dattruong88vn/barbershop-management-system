@@ -38,6 +38,7 @@ import {
   Grid,
   Input,
   KeyboardInput,
+  KeyValueRow,
   Label,
   LoadingDots,
   MiddleTruncate,
@@ -117,6 +118,19 @@ const shadcnBadgeVariants = [
   "destructive",
   "outline",
 ] as const;
+const componentMapRows = [
+  { title: texts.sections.buttons, value: texts.componentMap.button },
+  { title: texts.sections.inputs, value: texts.componentMap.formField },
+  { title: texts.sections.feedback, value: texts.componentMap.feedback },
+  { title: texts.labels.alert, value: texts.componentMap.alert },
+  { title: texts.labels.card, value: texts.componentMap.card },
+  { title: texts.sections.display, value: texts.componentMap.dataTable },
+  { title: texts.labels.emptyState, value: texts.componentMap.emptyState },
+  { title: texts.labels.keyValue, value: texts.componentMap.keyValue },
+  { title: texts.labels.loading, value: texts.componentMap.loading },
+  { title: texts.labels.modal, value: texts.componentMap.modal },
+  { title: texts.groups.navigation, value: texts.componentMap.navigation },
+] as const;
 
 function ReferenceSection({
   children,
@@ -180,6 +194,20 @@ export function DesignSystemReferenceView() {
             {texts.description}
           </p>
         </header>
+
+        <ReferenceSection title={texts.sections.componentMap}>
+          <ReferenceGroup title={texts.groups.navigation}>
+            <div className="grid gap-3">
+              {componentMapRows.map((row) => (
+                <KeyValueRow
+                  key={row.title}
+                  title={row.title}
+                  value={row.value}
+                />
+              ))}
+            </div>
+          </ReferenceGroup>
+        </ReferenceSection>
 
         <ReferenceSection title={texts.sections.buttons}>
           <ReferenceGroup title={texts.groups.actions}>
