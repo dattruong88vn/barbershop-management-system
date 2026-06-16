@@ -89,7 +89,7 @@ Không hardcode hex. Dùng CSS variables của Geist — chúng tự adapt theo 
 ## 3. Typography
 
 Dùng system font qua `font-sans` cho UI. Dùng Tailwind class từ typography scale hiện có.
-Tất cả title/heading hiển thị trong UI phải viết hoa chữ đầu, bao gồm page title, section title, card title, chart title, modal title và title kỳ báo cáo/dashboard.
+Tất cả title/heading hiển thị trong UI phải viết hoa chữ đầu, bao gồm page title, section title, card title, chart title, modal title và title kỳ báo cáo/tổng quan.
 
 | Tên             | Class             | Dùng cho                               |
 | --------------- | ----------------- | -------------------------------------- |
@@ -203,7 +203,7 @@ Tham khảo: [Geist Materials](https://vercel.com/geist/materials)
 | Modal / Dialog  | `material-modal` | Overlay content                       |
 | Menu / Dropdown | `material-menu`  | Dropdown, popover                     |
 
-**Metric card** (dashboard):
+**Metric card** (tổng quan):
 
 - Dùng `material-base`
 - Cấu trúc: Label (`text-label-12`) → Value (`text-heading-24`) → Trend (`text-label-13`)

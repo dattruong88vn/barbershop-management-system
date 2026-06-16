@@ -134,16 +134,16 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ---
 
-## 9. Dashboard
+## 9. Tổng quan
 
 - **Route:** `/dashboard` (`ROUTES.dashboard`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
-- **Purpose:** overview nhanh + action alerts. Dashboard dùng để scan tình hình vận hành hiện tại/kỳ đang xem và nhắc việc cần xử lý ngay, không thay thế báo cáo chi tiết.
-- **Header:** chỉ hiển thị title `Dashboard`, không hiển thị description/subtitle.
+- **Purpose:** overview nhanh + action alerts. Tổng quan dùng để scan tình hình vận hành hiện tại/kỳ đang xem và nhắc việc cần xử lý ngay, không thay thế báo cáo chi tiết.
+- **Header:** chỉ hiển thị title `Tổng quan`, không hiển thị description/subtitle.
 - **Filter:** dùng 3 tabs `Tháng`, `Năm hiện tại`, `Tất cả thời gian`. Mặc định chọn `Tháng` của tháng hiện tại. Khi tab `Tháng` active, hiển thị badge action `Chọn tháng` để mở month picker; chọn tháng xong vẫn giữ tab `Tháng`.
 - **Content layout:** toàn bộ widgets/charts/alerts bên dưới filter nằm trong một global card chung. Card title là kỳ đang chọn: tên tháng được chọn, `Năm hiện tại`, hoặc `Tất cả thời gian`.
-- **Title casing:** tất cả title trên Dashboard phải viết hoa chữ đầu, bao gồm page title, section title, card title, chart title và title kỳ được chọn.
+- **Title casing:** tất cả title trên Tổng quan phải viết hoa chữ đầu, bao gồm page title, section title, card title, chart title và title kỳ được chọn.
 - **Widgets:** Revenue, Total Visits, New Customers, Returning Customers
 - **Charts:** Revenue Trend, Top Barbers, Top Skinners, Top Services, Top Combos
 - **Alerts:** haircut visit thiếu ảnh kiểu tóc

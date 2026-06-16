@@ -830,3 +830,40 @@ Copy this structure when starting a new date section:
 
 ### Notes
 - Tests were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- Confirmed the management sidebar structure will include dashboard, nested report pages, services, combos, staff, and owner-only branches.
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Added route constants for revenue, staff, services, combos, and branches report pages.
+- Added navigation text constants for the management sidebar and report submenu labels.
+- Added a desktop management sidebar for owner and manager routes.
+- Added nested report links under the management report menu.
+- Limited branch management and branch report links to owner users.
+- Added placeholder pages for revenue, staff, services, combos, and branches reports.
+- Redirected management users from the base reports route to the revenue report.
+- Kept the base reports route available for staff personal reports.
+- Restricted report child routes in middleware by role.
+- Updated the navigation documentation for owner and manager sidebars.
+- Added shared constants for management report kinds.
+- Added bottom sidebar actions for settings and logout.
+- Wrapped the app in NextAuth SessionProvider and rendered the management sidebar from useSession so manager users see it after login.
+- Renamed user-facing Dashboard text to Tổng quan across the app and updated related documentation.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Completed sidebar planning steps 1, 2, 3, and 4.
+- Did not run tests or ESLint because they were not requested.

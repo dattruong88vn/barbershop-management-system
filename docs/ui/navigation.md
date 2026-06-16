@@ -30,20 +30,33 @@ Owner role:
 
 Sidebar:
 
-- Dashboard
-- Services
-- Combos
-- Staff
-- Branches
-- Reports
-- Account
+- Tổng quan
+- Báo cáo
+  - Doanh thu
+  - Nhân viên
+  - Dịch vụ
+  - Combo
+  - Chi nhánh
+- Dịch vụ
+- Combo
+- Nhân viên
+- Chi nhánh
 
 Manager role:
 
 - `manager`
 - MVP business scope là branch-level reporting.
-- Manager navigation không được giả định có quyền vào Services, Combos, Staff hoặc Branches nếu backend permissions chưa implement.
-- Sidebar manager đề xuất hiện tại: Dashboard, Reports, Account.
+- Manager có quyền quản lý dịch vụ, combo, và nhân viên. Branch management remains owner-only.
+- Sidebar:
+  - Tổng quan
+  - Báo cáo
+    - Doanh thu
+    - Nhân viên
+    - Dịch vụ
+    - Combo
+  - Dịch vụ
+  - Combo
+  - Nhân viên
 
 ---
 

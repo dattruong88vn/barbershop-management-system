@@ -16,18 +16,18 @@ export const dashboardTexts = {
     revenueTrend: "Xu hướng doanh thu",
     visits: "Visit",
   },
-  empty: "Chưa có dữ liệu dashboard cho kỳ này.",
+  empty: "Chưa có dữ liệu tổng quan cho kỳ này.",
   filters: {
     chooseSpecificMonth: "Chọn tháng",
-    monthPickerLabel: "Chọn tháng dashboard",
+    monthPickerLabel: "Chọn tháng tổng quan",
     periodOptions: {
       all: "Tất cả thời gian",
       month: "Tháng",
       year: "Năm hiện tại",
     },
-    periodTitle: "Kỳ dashboard",
+    periodTitle: "Kỳ tổng quan",
   },
-  loading: "Đang tải dashboard",
+  loading: "Đang tải tổng quan",
   metrics: {
     newCustomers: "Khách mới",
     returningCustomers: "Khách quay lại",
@@ -46,5 +46,5 @@ export const dashboardTexts = {
     empty: "Chưa có dữ liệu xếp hạng.",
   },
   unknownStaff: "Chưa xác định",
-  title: "Dashboard",
+  title: "Tổng quan",
 };

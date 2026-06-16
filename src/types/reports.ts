@@ -1,4 +1,5 @@
 import type {
+  ManagementReportKindValue,
   ManagementRoleValue,
   ReportPeriodValue,
   StaffRoleValue,
@@ -28,6 +29,8 @@ export type PersonalReportApiResponse = {
   error?: string;
   report?: PersonalReportData;
 };
+
+export type ManagementReportKind = ManagementReportKindValue;
 
 export type PersonalReportFilter = {
   month?: string;
