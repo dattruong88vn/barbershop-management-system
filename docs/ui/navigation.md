@@ -10,14 +10,15 @@ Roles:
 
 Bottom navigation:
 
-1. Customers
-2. Visits
-3. Create Visit
-4. Account
+1. Hôm nay → `/visits` (`ROUTES.visits`)
+2. Tìm → `/customers` (`ROUTES.customers`)
+3. Báo cáo → `/reports` (`ROUTES.reports`)
+4. Đăng xuất → NextAuth `signOut`, redirect `/login`
 
 Ghi chú:
 
 - MVP không có menu Photos độc lập.
+- Mobile bottom navigation không có item `Tạo`; tạo visit là action trong Customer Detail hoặc Visit List.
 - Hair photos được xử lý trong Customer Detail và Visit Detail.
 
 ---
