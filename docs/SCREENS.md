@@ -33,7 +33,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Theme: Geist neutral (light/dark). Nền neutral/gray là chủ đạo; gold chỉ là accent rất hạn chế.
 - Font: system (`font-sans`). Border thay cho shadow. Bo góc tối đa `rounded-xl`.
 - Status color: amber = pending, blue = in_progress, green = completed, red = lỗi/destructive.
-- Chi tiết: `CONTEXT.md`, `docs/ui/component-spec.md`, `docs/ui/navigation.md`.
+- Chi tiết: `CONTEXT.md`, `docs/ui/design-system.md`, `docs/ui/navigation.md`.
 
 ## Responsive
 

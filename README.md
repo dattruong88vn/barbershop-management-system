@@ -14,7 +14,7 @@ A SaaS application for managing male barbershops in Vietnam.
 ## Prerequisites
 
 - Node.js latest (v22+) — do NOT use v20, seed will hang
-- npm or yarn
+- npm
 - Supabase account
 
 ## Start Source Code Locally
@@ -192,21 +192,27 @@ npx prisma studio        # Open Prisma GUI
 /
 ├── src/
 │   ├── app/              # Next.js App Router pages & API routes
-│   ├── components/       # Reusable UI components
-│   ├── lib/              # Utilities, Prisma client, auth config
-│   └── types/            # TypeScript types
+│   ├── components/       # Global, mobile, module, and screen components
+│   ├── constants/        # Common constants, routes, and UI text
+│   ├── hooks/            # TanStack Query hooks
+│   ├── lib/              # API, fetch, Prisma, auth, and query utilities
+│   ├── types/            # TypeScript types
+│   └── utils/            # Shared helpers
 ├── prisma/
 │   ├── schema.prisma     # Database schema
 │   └── migrations/       # Prisma migrations
-├── docs/                 # Project documentation
-├── skills/               # Project conventions for AI agents
+├── docs/                 # Project and developer documentation
+├── .codex/skills/        # Project conventions for Codex
 └── public/
 ```
 
 ## Documentation
 
-- [MVP Features](docs/mvp-features.md)
+- [Developer Docs](docs/dev/README.md)
+- [Screen Specs](docs/SCREENS.md)
 - [Data Model](docs/data-model.md)
-- [Tech Stack](docs/tech-stack.md)
-- [Git Flow](docs/git-flow.md)
-- [Onboarding](docs/onboarding.md)
+- [Market Positioning](docs/market-positioning.md)
+- [Setup](docs/dev/setup.md)
+- [Git Flow](docs/dev/git-flow.md)
+- [Design System](docs/ui/design-system.md)
+- [Navigation](docs/ui/navigation.md)
