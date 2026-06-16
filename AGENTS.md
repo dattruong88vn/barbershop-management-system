@@ -24,6 +24,42 @@ Choose context by task:
 
 Developer handbook entry point: `docs/dev/README.md`.
 
+## Prompt Commands
+
+Yêu cầu của user phải bắt đầu bằng keyword command tiếng Anh. Keyword không phân biệt chữ hoa/thường. Phần mô tả sau keyword nên viết bằng tiếng Việt hoặc tiếng Anh đều được.
+
+Nếu yêu cầu không có keyword command, dừng lại và yêu cầu user gửi lại với keyword trước khi đọc thêm file, sửa code, chạy test, commit hoặc push.
+
+Định dạng command:
+
+`<MODE> [AREA]: <mô tả yêu cầu bằng tiếng Việt hoặc tiếng Anh>`
+
+Modes:
+
+- `ASK`: chỉ trả lời hoặc giải thích; không sửa file.
+- `PLAN`: đọc context liên quan và đề xuất kế hoạch; không sửa file.
+- `FIX`: đọc context liên quan và thực hiện thay đổi.
+- `REVIEW`: review bug, rủi ro, regression và test còn thiếu; không sửa file trừ khi được yêu cầu.
+- `TEST`: chỉ chạy các test được yêu cầu.
+- `COMMIT`: kiểm tra diff, chạy các bước kiểm tra bắt buộc theo Git rules, commit rồi dừng.
+- `PUSH`: commit nếu cần, push branch và tạo PR vào `develop`.
+
+Areas:
+
+- `UI`: làm theo read order của UI.
+- `API`: làm theo read order của API.
+- `DB`: làm theo read order của DB.
+- `VISIT`: làm theo read order của Visit.
+- `REPORT`: làm theo read order của Report.
+- `GIT`: làm theo read order của Git.
+
+Ví dụ:
+
+- `ASK DB: giải thích vì sao visit_services cần snapshot price.`
+- `FIX VISIT: lỗi tạo visit bằng combo vẫn chọn được service.`
+- `REVIEW API: kiểm tra src/app/api/reports có vi phạm tenant/shop_id không.`
+- `fix docs: cho phép nhập keyword bằng chữ thường.`
+
 ## Mandatory Business Rules
 
 - Every shop is a tenant. Tenant-owned tables must include and enforce `shop_id`.
