@@ -21,7 +21,8 @@ Luôn bắt buộc tìm trong `src/components/global/` trước khi viết compo
 **Role-based layout:**
 
 - `owner` · `manager` · `superadmin` → desktop sidebar. Show "chỉ hỗ trợ desktop" warning on <1024px.
-- `barber` · `skinner` · `receptionist` → mobile bottom navigation.
+- `barber` · `skinner` · `receptionist` → mobile bottom navigation on <1024px.
+- `barber` · `skinner` · `receptionist` → show the global "Chỉ hỗ trợ trên điện thoại" fallback on desktop (1024px+). Do not render staff workflow desktop UI.
 - `receptionist` → tablet top navigation where documented.
 - `owner` và `manager` được quản lý services, combos, staff. Branch management chỉ dành cho `owner`.
 

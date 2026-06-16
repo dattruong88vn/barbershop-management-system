@@ -38,6 +38,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 ## Responsive
 
 - Một codebase responsive. Màn tác nghiệp của nhân viên ưu tiên mobile; màn quản lý (owner) ưu tiên desktop.
+- Với role nhân viên (`receptionist`, `barber`, `skinner`), desktop (1024px+) không hiển thị UI thao tác. Thay vào đó dùng fallback toàn cục "Chỉ hỗ trợ trên điện thoại"; mobile/tablet tiếp tục dùng workflow nhân viên.
 - Mỗi spec bên dưới ghi `Ưu tiên` để biết breakpoint nào quan trọng nhất.
 
 ---
@@ -69,7 +70,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 - **Route:** `/customers` (`ROUTES.customers`)
 - **Roles:** receptionist, barber, skinner, manager, owner
-- **Ưu tiên:** desktop (quầy) + mobile
+- **Ưu tiên:** manager/owner desktop (quầy) + staff mobile/tablet
+- **Desktop staff fallback:** receptionist, barber, skinner thấy fallback toàn cục thay vì Customer Search UI khi viewport từ 1024px.
 - **Sections:** ô search, danh sách khách hàng
 - **Fields:** search input (tên hoặc số điện thoại)
 - **Actions:** Search theo tên, Search theo SĐT, Tạo khách hàng (mở modal Customer Create), Mở Customer Detail, Tạo visit nhanh
@@ -90,7 +92,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 - **Route:** `/customers/:id` (`ROUTES.customerDetail(id)`)
 - **Roles:** như Customer Search
-- **Ưu tiên:** responsive
+- **Ưu tiên:** manager/owner responsive + staff mobile/tablet
+- **Desktop staff fallback:** receptionist, barber, skinner thấy fallback toàn cục thay vì Customer Detail UI khi viewport từ 1024px.
 - **Spec chi tiết:** xem mục Customer Detail trong tài liệu này.
 - **Sections:** Profile header, Metrics, Suggestions (gợi ý dịch vụ/thợ), Recent hair photos, Completed visit history, Edit customer modal
 - **Actions:** Create Visit nằm cạnh tên khách hàng trong profile summary và chỉ hiển thị khi khách không có visit `pending`/`in_progress`; Edit customer info dùng icon bút chì trực tiếp trên header.
@@ -101,7 +104,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 - **Route:** `/visits/create` (`ROUTES.createVisit`)
 - **Roles:** receptionist, barber, skinner, manager, owner
-- **Ưu tiên:** responsive (nhân viên dùng mobile)
+- **Ưu tiên:** manager/owner responsive + staff mobile/tablet
+- **Desktop staff fallback:** receptionist, barber, skinner thấy fallback toàn cục thay vì Create Visit UI khi viewport từ 1024px.
 - **Sections:** Customer, Services, Combos, Barber, Skinner, Total Price
 - **Actions:** Save Visit
 - **Data:** chọn dịch vụ lẻ hoặc combo, gán barber/skinner, tạm tính tổng tiền
@@ -114,7 +118,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 - **Route:** `/visits/:id` (`ROUTES.visitDetail(id)`)
 - **Roles:** như Create Visit
-- **Ưu tiên:** responsive
+- **Ưu tiên:** manager/owner responsive + staff mobile/tablet
+- **Desktop staff fallback:** receptionist, barber, skinner thấy fallback toàn cục thay vì Visit Detail UI khi viewport từ 1024px.
 - **Sections:** Visit Information, Services, Combos, Barber, Skinner, Photos
 - **Actions:** Upload Photo (chỉ role `barber`), Edit Barber, Edit Skinner
 - **Warning:** dịch vụ haircut (`is_haircut = true`) chưa có ảnh → hiển thị cảnh báo
@@ -126,7 +131,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 - **Route:** `/visits` (`ROUTES.visits`)
 - **Roles:** như Create Visit
-- **Ưu tiên:** desktop
+- **Ưu tiên:** manager/owner desktop + staff mobile/tablet
+- **Desktop staff fallback:** receptionist, barber, skinner thấy fallback toàn cục thay vì Visit List UI khi viewport từ 1024px.
 - **Header:** chỉ hiển thị title, không hiển thị description/subtitle.
 - **Sections:** filter trạng thái, danh sách visit
 - **Filter:** thứ tự `completed`, `in_progress`, `pending`; mặc định `completed`.
@@ -206,6 +212,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Trình bày:** view cá nhân cho nhân viên (trong khu báo cáo)
 - **Roles:** barber, skinner, receptionist
 - **Ưu tiên:** mobile
+- **Desktop staff fallback:** receptionist, barber, skinner thấy fallback toàn cục thay vì Báo cáo cá nhân khi viewport từ 1024px.
 - **Header:** chỉ hiển thị title, không hiển thị description/subtitle.
 - **Sections:** thông tin nhân viên, bộ lọc kỳ, Thông tin chung, Dịch vụ thực hiện nhiều nhất, Khách phục vụ nhiều nhất
 - **Backend:** `GET /api/reports/personal?period=month|year|all&month=YYYY-MM` đã implement, chỉ tính visit `completed` theo `shop_id` và user hiện tại (`barberId`, `skinnerId`, hoặc `createdBy` theo role). Response có `metrics`, `topItems`, và `topCustomers`.

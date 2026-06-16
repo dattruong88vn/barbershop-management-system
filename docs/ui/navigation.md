@@ -8,6 +8,11 @@ Roles:
 - `barber`
 - `skinner`
 
+Breakpoint:
+
+- Áp dụng cho role nhân viên trên viewport dưới desktop (`<1024px`).
+- Trên desktop (`1024px+`), role nhân viên không hiển thị navigation hoặc workflow desktop; app hiển thị fallback toàn cục "Chỉ hỗ trợ trên điện thoại".
+
 Bottom navigation:
 
 1. Hôm nay → `/visits` (`ROUTES.visits`)

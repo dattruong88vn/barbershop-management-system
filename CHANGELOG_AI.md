@@ -1454,3 +1454,51 @@ Copy this structure when starting a new date section:
 
 ### Notes
 - Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Added a desktop fallback message for staff roles so receptionist, barber, and skinner accounts only see the mobile workflow below the desktop breakpoint.
+- Hid staff-role screen content on desktop while preserving the existing management desktop layout for owner and manager roles.
+
+### Refactoring
+- Moved role-aware app shell rendering into the global provider layer.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Documented the staff-role desktop fallback behavior across UI context, screen specs, and navigation docs.
+- Clarified that receptionist, barber, and skinner workflows render below the desktop breakpoint and show the global mobile-only fallback on desktop.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests and ESLint were not run because this was a documentation-only update.

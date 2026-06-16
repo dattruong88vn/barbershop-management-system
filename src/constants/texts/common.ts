@@ -31,6 +31,11 @@ export const commonTexts = {
   feedback: {
     closeNotification: "Đóng thông báo",
   },
+  staffDesktopFallback: {
+    description:
+      "Tài khoản nhân viên chỉ hỗ trợ thao tác trên điện thoại. Vui lòng mở ứng dụng bằng màn hình nhỏ hơn để tiếp tục.",
+    title: "Chỉ hỗ trợ trên điện thoại",
+  },
   home: {
     primaryAction: "Vào tổng quan",
     secondaryAction: "Đăng nhập",

@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import {
   AppFeedbackNotification,
   ManagementSidebar,
   ManagementSidebarContentOffset,
+  StaffDesktopFallback,
 } from "@/components/global";
+import { STAFF_ROLES } from "@/constants/common";
 import {
   API_SERVER_ERROR_EVENT,
   createQueryClient,
@@ -97,10 +99,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        <ManagementSidebar />
-        <ManagementSidebarContentOffset>
-          {children}
-        </ManagementSidebarContentOffset>
+        <RoleAwareAppShell>{children}</RoleAwareAppShell>
         {toast ? (
           <AppFeedbackNotification
             toast={toast}
@@ -109,5 +108,27 @@ export function Providers({ children }: ProvidersProps) {
         ) : null}
       </QueryClientProvider>
     </SessionProvider>
+  );
+}
+
+function RoleAwareAppShell({ children }: ProvidersProps) {
+  const { data: session } = useSession();
+  const role = session?.user.role;
+  const isStaffRole = STAFF_ROLES.some((staffRole) => staffRole === role);
+
+  if (isStaffRole) {
+    return (
+      <>
+        <div className="lg:hidden">{children}</div>
+        <StaffDesktopFallback />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <ManagementSidebar />
+      <ManagementSidebarContentOffset>{children}</ManagementSidebarContentOffset>
+    </>
   );
 }

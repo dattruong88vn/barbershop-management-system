@@ -45,6 +45,7 @@ export {
   ManagementSidebar,
 } from "./ManagementSidebar";
 export { ManagementSidebarContentOffset } from "./ManagementSidebarContentOffset";
+export { StaffDesktopFallback } from "./StaffDesktopFallback";
 export {
   GeistAvatar as Avatar,
   GeistGauge as Gauge,
