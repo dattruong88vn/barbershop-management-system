@@ -110,6 +110,7 @@ export function useEntity() {
 
 **fetchClient** — Client Components. Redirects: 401→login · 403→dashboard · 404→not-found. Throws on 500.
 **fetchServer** — Server Components. `notFound()` on 404. Throws on error.
+**TanStack Query default** — không refetch khi browser/window focus lại. Page data chỉ fetch khi truy cập page, reload trình duyệt, query key thay đổi, hoặc có invalidate/refetch chủ động sau mutation/action.
 
 ---
 

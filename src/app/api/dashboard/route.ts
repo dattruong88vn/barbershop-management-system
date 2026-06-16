@@ -66,11 +66,6 @@ const DASHBOARD_VISIT_SELECT = {
       comboId: true,
       comboNameSnapshot: true,
       responsibleRoleSnapshot: true,
-      service: {
-        select: {
-          isHaircut: true,
-        },
-      },
       serviceId: true,
       serviceNameSnapshot: true,
     },
@@ -195,6 +190,15 @@ function getReportPeriodLabel(period: ReportPeriodValue, monthDate: Date) {
   }
 
   return REPORT_MONTH_FORMATTER.format(monthDate);
+}
+
+function getDashboardServerError(error: unknown) {
+  console.error("[dashboard-api] Failed to load dashboard", error);
+
+  return NextResponse.json(
+    { error: dashboardTexts.api.errors.serverError },
+    { status: 500 },
+  );
 }
 
 function getTrendKey(date: Date, period: ReportPeriodValue) {
@@ -376,11 +380,15 @@ function applyVisitServicesToTopItems({
   });
 }
 
-function getHaircutWarnings(visits: DashboardVisitRecord[]) {
+function getHaircutWarnings(
+  visits: DashboardVisitRecord[],
+  haircutServiceIds: Set<string>,
+) {
   return visits
     .filter((visit) => {
       const hasHaircutService = visit.visitServices.some(
-        (visitService) => visitService.service?.isHaircut,
+        (visitService) =>
+          visitService.serviceId && haircutServiceIds.has(visitService.serviceId),
       );
 
       return hasHaircutService && visit.visitPhotos.length === 0;
@@ -392,20 +400,20 @@ function getHaircutWarnings(visits: DashboardVisitRecord[]) {
 }
 
 export async function GET(request: NextRequest) {
-  const authResult = await getDashboardAuth(request);
-
-  if ("error" in authResult) {
-    return NextResponse.json(
-      { error: authResult.error },
-      { status: authResult.status },
-    );
-  }
-
-  const period = getReportPeriod(request);
-  const monthDate = getReportMonth(request);
-  const range = getReportRange(period, monthDate);
-
   try {
+    const authResult = await getDashboardAuth(request);
+
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status },
+      );
+    }
+
+    const period = getReportPeriod(request);
+    const monthDate = getReportMonth(request);
+    const range = getReportRange(period, monthDate);
+
     const visits = await prisma.visit.findMany({
       orderBy: { completedAt: "asc" },
       select: DASHBOARD_VISIT_SELECT,
@@ -435,6 +443,30 @@ export async function GET(request: NextRequest) {
         shopId: authResult.shopId,
       },
     });
+    const serviceIds = [
+      ...new Set(
+        visits.flatMap((visit) =>
+          visit.visitServices
+            .map((visitService) => visitService.serviceId)
+            .filter((serviceId): serviceId is string => Boolean(serviceId)),
+        ),
+      ),
+    ];
+    const haircutServices = serviceIds.length
+      ? await prisma.service.findMany({
+          select: { id: true },
+          where: {
+            id: {
+              in: serviceIds,
+            },
+            isHaircut: true,
+            shopId: authResult.shopId,
+          },
+        })
+      : [];
+    const haircutServiceIds = new Set(
+      haircutServices.map((service) => service.id),
+    );
     const revenueTrend = new Map<string, DashboardTrendPoint>();
     const topBarbers = new Map<string, TopItemAccumulator>();
     const topCombos = new Map<string, TopItemAccumulator>();
@@ -464,7 +496,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       [DASHBOARD_RESPONSE_DATA_KEY]: {
-        haircutWarnings: getHaircutWarnings(visits),
+        haircutWarnings: getHaircutWarnings(visits, haircutServiceIds),
         metrics: [
           {
             label: dashboardTexts.metrics.revenue,
@@ -491,10 +523,7 @@ export async function GET(request: NextRequest) {
         topSkinners: formatTopItems(topSkinners),
       },
     });
-  } catch {
-    return NextResponse.json(
-      { error: dashboardTexts.api.errors.serverError },
-      { status: 500 },
-    );
+  } catch (error) {
+    return getDashboardServerError(error);
   }
 }

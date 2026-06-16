@@ -372,6 +372,248 @@ Copy this structure when starting a new date section:
 
 ### Notes
 - Did not run tests or ESLint because they were not requested.
+
+## 2026-06-15
+
+### Business Changes
+- Clarified that manager dashboard is for quick operational overview and action alerts, while reports are for audit and deeper analysis.
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- None
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Documentation-only change; did not run tests or ESLint.
+
+## 2026-06-15
+
+### Business Changes
+- Started manager dashboard UI groundwork with chart dependency, dashboard data hook, dashboard texts, and reusable chart primitives.
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Added `recharts` as the charting dependency for dashboard visualizations.
+- Added global chart container and tooltip primitives aligned with the existing design tokens.
+
+### Refactoring
+- Added a dashboard hook that loads the real dashboard API through `fetchClient` and `API_ROUTES.dashboard`.
+- Added dashboard filter and response typing support for UI integration.
+
+### Breaking Changes
+- None
+
+### Notes
+- Did not build the dashboard page yet; this covers steps 1-4 only.
+
+## 2026-06-15
+
+### Business Changes
+- Began the manager dashboard UI implementation with summary metrics, period filtering, and revenue trend visualization.
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Added focused dashboard screen components for metric cards, period filters, revenue trend charts, and loading skeletons.
+- Replaced the placeholder dashboard heading with a data-backed dashboard page using the real dashboard API.
+- Added current month, specific month, current year, and all-time filtering for the dashboard.
+- Added the first Recharts visualization for dashboard revenue trend.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Top lists and action alerts are still pending for the next dashboard UI pass.
+
+## 2026-06-15
+
+### Business Changes
+- Completed the remaining manager dashboard overview UI sections for ranking lists and haircut photo action alerts.
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Added dashboard top lists for barbers, skinners, services, and combos with count and allocated revenue.
+- Added dashboard haircut warning alerts that link to visit detail pages for visits missing haircut photos.
+- Expanded dashboard loading skeletons to cover the full dashboard layout.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- Dev server browser verification was blocked by an existing Next dev lock for PID `12217`; lint and static checks were used instead.
+
+## 2026-06-15
+
+### Business Changes
+- Improved dashboard API diagnostics after a reported 500 response on the dashboard endpoint.
+
+### Database Changes
+- None
+
+### API Changes
+- Added dashboard API error logging around the full request handler so server logs reveal the underlying 500 cause.
+
+### UI Changes
+- None
+
+### Refactoring
+- Added a dashboard-named report period filter helper for dashboard UI code.
+
+### Breaking Changes
+- None
+
+### Notes
+- Direct Prisma dashboard queries succeeded against the configured database; the API handler now logs hidden runtime errors for faster follow-up.
+
+## 2026-06-16
+
+### Business Changes
+- Simplified the dashboard period selector from separate current-month and month choices into a single monthly tab.
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Replaced the dashboard period checkboxes with three tabs: Month, Current Year, and All Time.
+- Kept the month tab defaulting to the current month and showing the month picker badge.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- None
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Grouped the dashboard data sections into one global card titled by the selected month, current year, or all-time period.
+- Changed dashboard child sections to plain panels inside the grouped card to avoid nested cards.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- None
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Wrapped the dashboard period tabs and month picker badge in the global card without a title.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- None
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Simplified the dashboard period filter to show only the three period tabs and the month picker badge.
+- Removed the dashboard period label/value row, divider, and card border wrapper.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- None
+
+## 2026-06-16
+
+### Business Changes
+- None
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Extended the global `Card` component with a reusable title and action header pattern.
+- Updated dashboard chart, top-list, and alert cards to use the global card title pattern.
+
+### Refactoring
+- None
+
+### Breaking Changes
+- None
+
+### Notes
+- None
+- Regenerated Prisma Client after dashboard API returned 500 because the local client did not include `VisitService.allocatedPrice`.
 - Referenced `../personal-project-design-v2/docs/GEIST_COMPONENTS.md` and adapted the V0 components to this repo's token, routing, and no-`window.location` conventions.
 - Did not run tests or ESLint for the component reorganization because they were not requested.
 - Verified the Visit Detail UI and overlay scroll-lock changes with TypeScript, targeted Vitest files, and ESLint; ESLint still reports the existing `no-img-element` warning in `src/components/global/Display.tsx`.
@@ -561,3 +803,30 @@ Copy this structure when starting a new date section:
 
 ### Notes
 - Did not run tests or ESLint because they were not requested.
+
+## 2026-06-16
+
+### Business Changes
+- Clarified the manager dashboard UI contract: no page description, title text uses uppercase first letters, and the selected-period data is grouped in one card.
+- Standardized client page data loading so browser/window focus does not refetch data automatically.
+
+### Database Changes
+- None
+
+### API Changes
+- None
+
+### UI Changes
+- Removed the dashboard page description under the `Dashboard` title.
+- Capitalized the first letter of the selected month card title.
+- Documented the manager dashboard tab filter, month-picker badge, selected-period card title, and shared data card layout.
+- Documented the global page data-fetching behavior for all screens.
+
+### Refactoring
+- Disabled TanStack Query `refetchOnWindowFocus` in the shared query client.
+
+### Breaking Changes
+- None
+
+### Notes
+- Tests were not run because they were not requested.

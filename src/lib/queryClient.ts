@@ -31,6 +31,7 @@ export function createQueryClient() {
     }),
     defaultOptions: {
       queries: {
+        refetchOnWindowFocus: false,
         retry: 1,
       },
     },

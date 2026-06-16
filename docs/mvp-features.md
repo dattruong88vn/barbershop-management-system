@@ -77,6 +77,14 @@
 
 ## Báo cáo
 
+**Dashboard vs Báo cáo:**
+
+- Dashboard dành cho owner/manager là overview nhanh + action alerts: theo dõi tình hình vận hành trong kỳ đang xem, top performers/items và cảnh báo cần xử lý như haircut thiếu ảnh.
+- Dashboard manager không hiển thị description dưới page title; filter kỳ dùng 3 tabs `Tháng`, `Năm hiện tại`, `Tất cả thời gian`, mặc định tháng hiện tại và mở chọn tháng bằng badge `Chọn tháng`.
+- Toàn bộ widgets/charts/alerts của Dashboard nằm trong một global card chung với title là tháng được chọn, `Năm hiện tại`, hoặc `Tất cả thời gian`.
+- Báo cáo là audit + analysis: phân tích sâu, đối soát doanh thu phân bổ, bảng/biểu đồ chi tiết và drill-down theo kỳ/nhân sự/dịch vụ.
+- Cả Dashboard và Báo cáo quản lý đều phải dùng `allocated_price` và snapshot fields cho doanh thu, không dùng giá/tên service hoặc combo hiện tại.
+
 | Role           | Phạm vi báo cáo                              |
 | -------------- | -------------------------------------------- |
 | `superadmin`   | Toàn hệ thống (xem mục Superadmin bên dưới)  |

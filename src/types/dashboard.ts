@@ -1,3 +1,5 @@
+import type { ReportPeriodValue } from "@/constants/common";
+
 export type DashboardMetric = {
   label: string;
   value: string;
@@ -34,4 +36,9 @@ export type DashboardData = {
 export type DashboardApiResponse = {
   dashboard?: DashboardData;
   error?: string;
+};
+
+export type DashboardFilter = {
+  month?: string;
+  period: ReportPeriodValue;
 };
