@@ -14,6 +14,7 @@ import {
 } from "@/components/modules/customers";
 import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
 import { InlineAlert } from "@/components/global/InlineAlert";
+import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 import {
   VISIT_STATUS_COMPLETED,
@@ -50,7 +51,6 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
     updateCustomer,
     visits,
   } = useCustomerVisits(customerId);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -84,6 +84,14 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
   const isProfileLoading = isLoading && !customer;
   const displayName = customer?.name ?? customerTexts.detail.profileTitle;
   const displayPhone = customer?.phone ?? customerTexts.detail.noStaff;
+  const createVisitHref =
+    !hasOpenVisit && customer
+      ? ROUTES.createVisitForCustomer({
+          id: customer.id,
+          name: customer.name,
+          phone: customer.phone,
+        })
+      : null;
   const metrics: CustomerProfileMetric[] = [
     {
       desktopLabel: customerTexts.detail.visitCountMetric,
@@ -113,7 +121,6 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
     setName(customer?.name ?? "");
     setPhone(customer?.phone ?? "");
     setFormError("");
-    setIsMenuOpen(false);
     setIsEditOpen(true);
   }
 
@@ -170,13 +177,8 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
       <div className="mx-auto w-full md:max-w-5xl">
         <div className="overflow-hidden bg-muted/30 md:rounded-xl md:border md:border-border md:bg-background">
           <CustomerProfileHeader
-            customerId={customerId}
             customerName={customer?.name ?? null}
-            customerPhone={customer?.phone ?? null}
-            hasOpenVisit={hasOpenVisit}
-            isMenuOpen={isMenuOpen}
             onEdit={openEditModal}
-            onToggleMenu={() => setIsMenuOpen((current) => !current)}
           />
 
           <div className="px-4 pb-16 pt-4 md:px-5 md:pb-7 md:pt-5">
@@ -190,6 +192,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
 
             <ProfileSummarySection
               completedVisitCount={completedVisits.length}
+              createVisitHref={createVisitHref}
               displayName={displayName}
               displayPhone={displayPhone}
               isLoading={isProfileLoading}

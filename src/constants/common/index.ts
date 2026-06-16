@@ -4,6 +4,7 @@ export * from "./reportPeriods";
 export * from "./roles";
 export * from "./serviceResponsibleRoles";
 export * from "./staff";
+export * from "./visitCreateOrigins";
 export * from "./visitItems";
 export * from "./visitStaff";
 export * from "./visitStatuses";

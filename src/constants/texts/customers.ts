@@ -47,7 +47,7 @@ export const customerTexts = {
     statusInProgress: "Đang làm",
     statusPending: "Pending",
     idLabel: "Mã khách hàng",
-    backToLookup: "Quay lại tra cứu",
+    backToLookup: "Quay lại",
     barberLabel: "Thợ cắt",
     barberLabelShort: "Barber",
     customerInfoTitle: "Thông tin khách",

@@ -1,6 +1,5 @@
 import { Phone } from "lucide-react";
 
-import { Button } from "@/components/global/ui/button";
 import { CustomerAvatar } from "@/components/modules/customers/CustomerAvatar";
 import { visitTexts } from "@/constants/texts";
 import type { Customer } from "@/types";
@@ -31,9 +30,9 @@ export function VisitCustomerResultRow({
         </div>
       </div>
 
-      <Button type="button" variant="secondary" className="shrink-0">
+      <span className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground">
         {visitTexts.create.selectCustomer}
-      </Button>
+      </span>
     </button>
   );
 }

@@ -31,7 +31,7 @@ export function VisitCustomerSearchForm({
             value={searchInput}
             onChange={onSearchInputChange}
             placeholder={visitTexts.create.customerSearchPlaceholder}
-            className="h-11 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
+            className="h-11 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
           />
         </div>
         <Button type="submit" variant="primary" className="h-11 shrink-0">

@@ -29,12 +29,6 @@ export function VisitStatusActionButton({
     action?.status === VISIT_STATUS_COMPLETED
       ? getMissingCompletionStaffMessage(visit)
       : "";
-  const visibleStatusError =
-    statusError && missingCompletionStaffMessage !== ""
-      ? statusError
-      : action?.status === VISIT_STATUS_COMPLETED
-        ? ""
-        : statusError;
 
   async function handleUpdateStatus() {
     if (!action || !onUpdateStatus) {
@@ -45,7 +39,6 @@ export function VisitStatusActionButton({
 
     if (action.status === VISIT_STATUS_COMPLETED) {
       if (missingCompletionStaffMessage) {
-        setStatusError(missingCompletionStaffMessage);
         dispatchAppToast({
           message: missingCompletionStaffMessage,
           type: "warning",
@@ -76,14 +69,15 @@ export function VisitStatusActionButton({
           ? statusUpdateError.message
           : visitTexts.detail.errors.generic;
 
-      setStatusError(errorMessage);
-
       if (errorMessage === visitTexts.api.errors.missingCompletionStaff) {
         dispatchAppToast({
           message: errorMessage,
           type: "warning",
         });
+        return;
       }
+
+      setStatusError(errorMessage);
     }
   }
 
@@ -107,8 +101,8 @@ export function VisitStatusActionButton({
         )}
         {isUpdatingStatus ? visitTexts.detail.updatingStatus : action.label}
       </Button>
-      {visibleStatusError ? (
-        <InlineAlert className="mt-3">{visibleStatusError}</InlineAlert>
+      {statusError ? (
+        <InlineAlert className="mt-3">{statusError}</InlineAlert>
       ) : null}
     </div>
   );

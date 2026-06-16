@@ -30,7 +30,7 @@ export function CustomerSearchForm({
             placeholder=""
             autoFocus
             onChange={onSearchInputChange}
-            className="h-11 rounded-xl border-border bg-background pl-9 pr-10 text-sm text-foreground shadow-none focus-visible:border-ring focus-visible:ring-ring/20"
+            className="h-11 rounded-xl border-border bg-background pl-9 pr-10 text-base text-foreground shadow-none focus-visible:border-ring focus-visible:ring-ring/20"
           />
           <span className="pointer-events-none absolute left-9 top-1/2 hidden -translate-y-1/2 text-label-14 text-gray-700 md:inline">
             {searchInput ? "" : customerTexts.lookup.searchPlaceholder}

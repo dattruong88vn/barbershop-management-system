@@ -48,6 +48,11 @@ type VisitFilterByRoleInput = {
   userId: string;
 };
 
+type CustomerCount = {
+  count: number;
+  name: string;
+};
+
 async function getPersonalReportAuth(
   request: NextRequest,
 ): Promise<PersonalReportAuthResult> {
@@ -157,6 +162,21 @@ function getTopItems(itemCounts: Map<string, number>): PersonalReportTopItem[] {
     }));
 }
 
+function getTopCustomers(
+  customerCounts: Map<string, CustomerCount>,
+): PersonalReportTopItem[] {
+  return Array.from(customerCounts.values())
+    .sort(
+      (firstCustomer, secondCustomer) =>
+        secondCustomer.count - firstCustomer.count,
+    )
+    .slice(0, 3)
+    .map((customer) => ({
+      count: reportTexts.personal.topItemCount(customer.count),
+      name: customer.name,
+    }));
+}
+
 export async function GET(request: NextRequest) {
   const authResult = await getPersonalReportAuth(request);
 
@@ -186,6 +206,11 @@ export async function GET(request: NextRequest) {
         status: VISIT_STATUS_COMPLETED,
       },
       select: {
+        customer: {
+          select: {
+            name: true,
+          },
+        },
         customerId: true,
         visitServices: {
           select: {
@@ -201,10 +226,16 @@ export async function GET(request: NextRequest) {
     let comboCount = 0;
     let serviceCount = 0;
     const customerIds = new Set<string>();
+    const customerCounts = new Map<string, CustomerCount>();
     const serviceCounts = new Map<string, number>();
 
     visits.forEach((visit) => {
       customerIds.add(visit.customerId);
+      const customerCount = customerCounts.get(visit.customerId);
+      customerCounts.set(visit.customerId, {
+        count: (customerCount?.count ?? 0) + 1,
+        name: visit.customer.name,
+      });
       const comboIds = new Set<string>();
 
       visit.visitServices.forEach((visitService) => {
@@ -253,6 +284,7 @@ export async function GET(request: NextRequest) {
         roleLabel: reportTexts.roles[authResult.role],
         serviceCount: String(serviceCount),
         staffName: authResult.username,
+        topCustomers: getTopCustomers(customerCounts),
         topItems: getTopItems(serviceCounts),
       },
     });

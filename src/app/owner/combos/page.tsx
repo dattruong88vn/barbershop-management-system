@@ -189,7 +189,7 @@ export default function OwnerCombosPage() {
                   required
                   placeholder={comboTexts.ownerCombos.namePlaceholder}
                   onChange={(event) => setName(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -202,7 +202,7 @@ export default function OwnerCombosPage() {
                   required
                   placeholder={comboTexts.ownerCombos.descriptionPlaceholder}
                   onChange={(event) => setDescription(event.target.value)}
-                  className="mt-2 min-h-24 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 min-h-24 w-full rounded-md border border-zinc-300 px-3 py-2 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -218,7 +218,7 @@ export default function OwnerCombosPage() {
                   required
                   placeholder={comboTexts.ownerCombos.pricePlaceholder}
                   onChange={(event) => setPrice(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 />
               </label>
 
@@ -229,7 +229,7 @@ export default function OwnerCombosPage() {
                 <select
                   value=""
                   onChange={(event) => handleCopyCombo(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950"
+                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
                 >
                   <option value="">
                     {comboTexts.ownerCombos.copyPlaceholder}
