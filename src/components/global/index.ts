@@ -23,6 +23,7 @@ export {
 } from "./Typography";
 export {
   GeistInput as Input,
+  GeistSearchInput as SearchInput,
   GeistTextarea as Textarea,
   GeistSelect as Select,
   GeistCheckbox as Checkbox,
@@ -30,6 +31,7 @@ export {
   GeistSwitch as Switch,
   GeistSlider as Slider,
   type GeistInputProps as InputProps,
+  type GeistSearchInputProps as SearchInputProps,
   type GeistTextareaProps as TextareaProps,
   type GeistSelectProps as SelectProps,
   type GeistCheckboxProps as CheckboxProps,

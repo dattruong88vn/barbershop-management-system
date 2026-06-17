@@ -29,6 +29,7 @@ export const commonTexts = {
     today: "Hôm nay",
   },
   feedback: {
+    clearSearch: "Xoá tìm kiếm",
     closeNotification: "Đóng thông báo",
   },
   staffDesktopFallback: {

@@ -9,16 +9,13 @@ import {
 } from "@/components/global";
 import { staffTexts } from "@/constants/texts";
 import type { Staff } from "@/types";
+import { formatDisplayDate } from "@/utils/common";
 import { getStaffDisplayStatus } from "@/utils/staff";
 
 import {
   STAFF_ROLE_BADGE_VARIANTS,
   STAFF_STATUS_BADGE_VARIANTS,
 } from "./ownerStaffTypes";
-
-const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
-  dateStyle: "medium",
-});
 
 type OwnerStaffDetailModalProps = {
   onEdit: (staffMember: Staff) => void;
@@ -90,7 +87,7 @@ export function OwnerStaffDetailModal({
                     {staffTexts.ownerStaff.createdAtLabel}
                   </TableCell>
                   <TableCell>
-                    {DATE_FORMATTER.format(new Date(staffMember.createdAt))}
+                    {formatDisplayDate(staffMember.createdAt)}
                   </TableCell>
                 </TableRow>
               </TableBody>

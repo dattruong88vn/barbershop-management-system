@@ -6,6 +6,7 @@
 - Put module text in `src/constants/texts/<module>.ts`.
 - Export text files through `src/constants/texts/index.ts`.
 - Keep page/component files focused on structure and behavior, not copy storage.
+- Filter/select options that mean "all values" must display exactly `Tất cả`; do not append the filtered noun such as role, branch, status, scope, or assignee.
 
 ## Constants
 

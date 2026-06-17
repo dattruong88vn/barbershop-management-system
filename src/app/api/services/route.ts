@@ -3,7 +3,11 @@ import { getToken } from "next-auth/jwt";
 
 import {
   MANAGEMENT_ROLES,
+  SERVICE_SCOPE_BRANCH,
+  SERVICE_SCOPE_SHOP,
   type ManagementRoleValue,
+  USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   isServiceResponsibleRole,
 } from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
@@ -13,11 +17,26 @@ import type { ServiceRequestBody } from "@/types";
 const SERVICE_SELECT = {
   id: true,
   shopId: true,
+  branchId: true,
   name: true,
   price: true,
   responsibleRole: true,
   isHaircut: true,
+  createdBy: true,
   createdAt: true,
+  branch: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  creator: {
+    select: {
+      id: true,
+      username: true,
+      role: true,
+    },
+  },
 } as const;
 
 function isServiceRequestBody(body: unknown): body is ServiceRequestBody {
@@ -40,22 +59,35 @@ function normalizeServiceInput(body: ServiceRequestBody) {
   };
 }
 
-function formatServiceResponse(service: {
-  id: string;
-  shopId: string;
-  name: string;
-  price: { toString: () => string };
-  responsibleRole: string;
-  isHaircut: boolean;
-  createdAt: Date;
-}) {
+function formatServiceResponse(
+  service: {
+    branch: { id: string; name: string } | null;
+    branchId: string | null;
+    createdBy: string;
+    id: string;
+    isHaircut: boolean;
+    name: string;
+    shopId: string;
+    price: { toString: () => string };
+    responsibleRole: string;
+    createdAt: Date;
+    creator: { id: string; role: string; username: string };
+  },
+  auth: { role: ManagementRoleValue; userId: string },
+) {
+  const isOwner = auth.role === USER_ROLE_OWNER;
+  const isCreator = service.createdBy === auth.userId;
+
   return {
     ...service,
+    canDelete: isOwner || isCreator,
+    canEdit: isCreator,
+    scope: service.branchId ? SERVICE_SCOPE_BRANCH : SERVICE_SCOPE_SHOP,
     price: Number(service.price.toString()),
   };
 }
 
-async function getManagementShopId(request: NextRequest) {
+async function getManagementAuth(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -73,11 +105,20 @@ async function getManagementShopId(request: NextRequest) {
     return { error: serviceTexts.api.errors.forbidden, status: 403 };
   }
 
-  return { shopId: token.shop_id };
+  if (token.role === USER_ROLE_MANAGER && !token.branch_id) {
+    return { error: serviceTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return {
+    branchId: token.role === USER_ROLE_MANAGER ? token.branch_id : null,
+    role: token.role as ManagementRoleValue,
+    shopId: token.shop_id,
+    userId: token.id,
+  };
 }
 
 export async function GET(request: NextRequest) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -87,18 +128,28 @@ export async function GET(request: NextRequest) {
   }
 
   const services = await prisma.service.findMany({
-    where: { shopId: authResult.shopId },
+    where: {
+      deletedAt: null,
+      shopId: authResult.shopId,
+      ...(authResult.branchId
+        ? {
+            OR: [{ branchId: null }, { branchId: authResult.branchId }],
+          }
+        : {}),
+    },
     orderBy: { createdAt: "desc" },
     select: SERVICE_SELECT,
   });
 
   return NextResponse.json({
-    services: services.map(formatServiceResponse),
+    services: services.map((service) =>
+      formatServiceResponse(service, authResult),
+    ),
   });
 }
 
 export async function POST(request: NextRequest) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -151,16 +202,18 @@ export async function POST(request: NextRequest) {
   const service = await prisma.service.create({
     data: {
       shopId: authResult.shopId,
+      branchId: authResult.branchId,
       name: serviceInput.name,
       price: serviceInput.price,
       responsibleRole,
       isHaircut: serviceInput.isHaircut,
+      createdBy: authResult.userId,
     },
     select: SERVICE_SELECT,
   });
 
   return NextResponse.json(
-    { service: formatServiceResponse(service) },
+    { service: formatServiceResponse(service, authResult) },
     { status: 201 },
   );
 }

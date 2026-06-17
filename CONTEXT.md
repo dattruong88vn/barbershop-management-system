@@ -34,6 +34,9 @@ Primary operating model:
 - Use global primitives for buttons, inputs, cards, tables, alerts, skeletons, empty states, feedback, and title/value rows.
 - UI text belongs in `src/constants/texts/`.
 - Navigation uses `ROUTES`; API calls use `API_ROUTES`.
+- UI date display format is `dd/mm/yyyy`; date-time displays keep the date first.
+- Search text inputs show a clear `X` icon when they contain text.
+- Filter/select all-options display exactly `Tất cả`.
 - Every screen needs loading, empty, and error states.
 - Runtime success feedback uses the global Feedback notification flow.
 
@@ -53,6 +56,7 @@ Detailed UI rules:
 - JSON requests use `DEFAULT_JSON_HEADERS`.
 - Optional response data guards use `hasResponseData`.
 - Tenant-owned data must enforce current shop scope.
+- Delete actions are soft delete by default; keep historical data for visits, combos, reports, and audits.
 
 Detailed API/DB rules:
 

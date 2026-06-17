@@ -1,10 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { Prisma } from "@prisma/client";
 
 import {
   MANAGEMENT_ROLES,
+  SERVICE_SCOPE_BRANCH,
+  SERVICE_SCOPE_SHOP,
   type ManagementRoleValue,
+  USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   isServiceResponsibleRole,
 } from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
@@ -18,11 +21,26 @@ type ServiceRouteContext = {
 const SERVICE_SELECT = {
   id: true,
   shopId: true,
+  branchId: true,
   name: true,
   price: true,
   responsibleRole: true,
   isHaircut: true,
+  createdBy: true,
   createdAt: true,
+  branch: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  creator: {
+    select: {
+      id: true,
+      username: true,
+      role: true,
+    },
+  },
 } as const;
 
 function isServiceRequestBody(body: unknown): body is ServiceRequestBody {
@@ -45,17 +63,30 @@ function normalizeServiceInput(body: ServiceRequestBody) {
   };
 }
 
-function formatServiceResponse(service: {
-  id: string;
-  shopId: string;
-  name: string;
-  price: { toString: () => string };
-  responsibleRole: string;
-  isHaircut: boolean;
-  createdAt: Date;
-}) {
+function formatServiceResponse(
+  service: {
+    branch: { id: string; name: string } | null;
+    branchId: string | null;
+    createdBy: string;
+    id: string;
+    isHaircut: boolean;
+    name: string;
+    shopId: string;
+    price: { toString: () => string };
+    responsibleRole: string;
+    createdAt: Date;
+    creator: { id: string; role: string; username: string };
+  },
+  auth: { role: ManagementRoleValue; userId: string },
+) {
+  const isOwner = auth.role === USER_ROLE_OWNER;
+  const isCreator = service.createdBy === auth.userId;
+
   return {
     ...service,
+    canDelete: isOwner || isCreator,
+    canEdit: isCreator,
+    scope: service.branchId ? SERVICE_SCOPE_BRANCH : SERVICE_SCOPE_SHOP,
     price: Number(service.price.toString()),
   };
 }
@@ -65,7 +96,7 @@ async function getServiceId(context: ServiceRouteContext) {
   return typeof params.id === "string" ? params.id : "";
 }
 
-async function getManagementShopId(request: NextRequest) {
+async function getManagementAuth(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -83,21 +114,40 @@ async function getManagementShopId(request: NextRequest) {
     return { error: serviceTexts.api.errors.forbidden, status: 403 };
   }
 
-  return { shopId: token.shop_id };
+  if (token.role === USER_ROLE_MANAGER && !token.branch_id) {
+    return { error: serviceTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return {
+    branchId: token.role === USER_ROLE_MANAGER ? token.branch_id : null,
+    role: token.role as ManagementRoleValue,
+    shopId: token.shop_id,
+    userId: token.id,
+  };
 }
 
-async function findService(serviceId: string, shopId: string) {
+async function findService(
+  serviceId: string,
+  shopId: string,
+  branchId: string | null,
+) {
   return prisma.service.findFirst({
     where: {
       id: serviceId,
+      deletedAt: null,
       shopId,
+      ...(branchId
+        ? {
+            OR: [{ branchId: null }, { branchId }],
+          }
+        : {}),
     },
     select: SERVICE_SELECT,
   });
 }
 
 export async function GET(request: NextRequest, context: ServiceRouteContext) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -115,7 +165,11 @@ export async function GET(request: NextRequest, context: ServiceRouteContext) {
     );
   }
 
-  const service = await findService(serviceId, authResult.shopId);
+  const service = await findService(
+    serviceId,
+    authResult.shopId,
+    authResult.branchId,
+  );
 
   if (!service) {
     return NextResponse.json(
@@ -124,11 +178,13 @@ export async function GET(request: NextRequest, context: ServiceRouteContext) {
     );
   }
 
-  return NextResponse.json({ service: formatServiceResponse(service) });
+  return NextResponse.json({
+    service: formatServiceResponse(service, authResult),
+  });
 }
 
 export async function PATCH(request: NextRequest, context: ServiceRouteContext) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -187,12 +243,23 @@ export async function PATCH(request: NextRequest, context: ServiceRouteContext) 
     );
   }
 
-  const service = await findService(serviceId, authResult.shopId);
+  const service = await findService(
+    serviceId,
+    authResult.shopId,
+    authResult.branchId,
+  );
 
   if (!service) {
     return NextResponse.json(
       { error: serviceTexts.api.errors.notFound },
       { status: 404 },
+    );
+  }
+
+  if (service.createdBy !== authResult.userId) {
+    return NextResponse.json(
+      { error: serviceTexts.api.errors.protectedService },
+      { status: 403 },
     );
   }
 
@@ -208,7 +275,7 @@ export async function PATCH(request: NextRequest, context: ServiceRouteContext) 
   });
 
   return NextResponse.json({
-    service: formatServiceResponse(updatedService),
+    service: formatServiceResponse(updatedService, authResult),
   });
 }
 
@@ -216,7 +283,7 @@ export async function DELETE(
   request: NextRequest,
   context: ServiceRouteContext,
 ) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -234,7 +301,11 @@ export async function DELETE(
     );
   }
 
-  const service = await findService(serviceId, authResult.shopId);
+  const service = await findService(
+    serviceId,
+    authResult.shopId,
+    authResult.branchId,
+  );
 
   if (!service) {
     return NextResponse.json(
@@ -243,23 +314,24 @@ export async function DELETE(
     );
   }
 
-  try {
-    await prisma.service.delete({
-      where: { id: service.id },
-    });
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2003"
-    ) {
-      return NextResponse.json(
-        { error: serviceTexts.api.errors.serviceInUse },
-        { status: 400 },
-      );
-    }
+  const canDelete =
+    authResult.role === USER_ROLE_OWNER ||
+    service.createdBy === authResult.userId;
 
-    throw error;
+  if (!canDelete) {
+    return NextResponse.json(
+      { error: serviceTexts.api.errors.protectedService },
+      { status: 403 },
+    );
   }
 
-  return NextResponse.json({ service: formatServiceResponse(service) });
+  const deletedService = await prisma.service.update({
+    where: { id: service.id },
+    data: { deletedAt: new Date() },
+    select: SERVICE_SELECT,
+  });
+
+  return NextResponse.json({
+    service: formatServiceResponse(deletedService, authResult),
+  });
 }

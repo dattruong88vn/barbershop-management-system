@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { formatDisplayDate } from "@/utils/common";
 
 export { cn };
 
@@ -22,7 +23,7 @@ export function formatRelativeTime(date: Date): string {
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days} ngày trước`;
 
-  return date.toLocaleDateString("vi-VN");
+  return formatDisplayDate(date);
 }
 
 export function middleTruncate(text: string, maxLength: number): string {

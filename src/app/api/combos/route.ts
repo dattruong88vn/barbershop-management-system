@@ -107,6 +107,7 @@ async function getManagementShopId(request: NextRequest) {
 async function validateServiceIds(serviceIds: string[], shopId: string) {
   const services = await prisma.service.findMany({
     where: {
+      deletedAt: null,
       id: { in: serviceIds },
       shopId,
     },

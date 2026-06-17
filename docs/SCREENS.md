@@ -19,6 +19,9 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Client Component / hook dùng `fetchClient` từ `@/lib/fetchClient`. Server Component dùng `fetchServer` từ `@/lib/fetchServer`. Không gọi `fetch` trực tiếp.
 - Client data dùng TanStack Query không được tự refetch khi browser/window focus lại. Dữ liệu chỉ fetch khi vào page, reload browser, query key thay đổi, hoặc được invalidate/refetch chủ động sau mutation/action.
 - Mọi chuỗi UI đặt trong `src/constants/texts/`. Không hardcode text trong component.
+- Mọi ngày hiển thị trong UI dùng format `dd/mm/yyyy`; nếu có giờ thì hiển thị sau ngày.
+- Mọi ô search text phải có nút icon `X` để xoá nhanh khi đã có nội dung.
+- Option mặc định thể hiện tất cả giá trị trong filter/select hiển thị `Tất cả`, không thêm tên field phía sau.
 - Mọi thao tác thành công phải hiển thị success feedback qua global Feedback notification flow; nếu có điều hướng sau thành công, feedback phải được dispatch trước khi điều hướng bằng app router.
 - Type/interface dùng chung đặt trong `src/types/`. Không định nghĩa trong component.
 - Dùng shadcn/ui khi có thể. TypeScript strict, không dùng `any`.
@@ -190,7 +193,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Sections:** bộ lọc, danh sách nhân viên dạng table, modal chi tiết, modal tạo/sửa, confirm modal ngưng làm.
 - **Implementation:** owner và manager dùng chung staff management screen với `mode="owner" | "manager"`; route page chỉ pass mode vào shared component.
 - **Filter:** tìm kiếm theo tên/username, vai trò, trạng thái; owner có thêm chi nhánh, manager không có filter chi nhánh vì bị scope theo chi nhánh hiện tại. Filter chỉ áp dụng khi bấm `Áp dụng`.
-- **Status filter:** `Tất cả trạng thái`, `Khởi tạo`, `Đang làm`.
+- **Status filter:** `Tất cả`, `Khởi tạo`, `Đang làm`.
 - **Actions:** List, Create, Edit, soft Delete/ngưng làm.
 - **Fields:** username, role, branch, display status, createdAt.
 - **Display status:** `Khởi tạo` = `status: active` + `isFirstLogin: true`; `Đang làm` = `status: active` + `isFirstLogin: false`; nhân viên `inactive` là đã nghỉ và không hiển thị trong danh sách active.

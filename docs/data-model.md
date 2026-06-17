@@ -51,11 +51,16 @@
 | ------------ | --------- | ------------------------------------------------------------- |
 | `id`         | uuid      | PK                                                            |
 | `shop_id`    | uuid      | FK → shops                                                    |
+| `branch_id`  | uuid      | FK → branches, nullable; null = áp dụng toàn shop             |
 | `name`       | string    | Tên dịch vụ                                                   |
 | `price`      | decimal   | Giá tiền                                                      |
 | `responsible_role` | enum | `barber`, `skinner` — nhóm nhân sự phụ trách doanh thu dịch vụ |
 | `is_haircut` | boolean   | Đánh dấu nếu là dịch vụ cắt tóc — dùng để trigger warning ảnh |
+| `created_by` | uuid      | FK → users, người tạo dịch vụ                                 |
+| `deleted_at` | timestamp | Soft delete; null = còn sử dụng, có giá trị = đã xoá khỏi catalog |
 | `created_at` | timestamp |                                                               |
+
+> Dịch vụ owner tạo có `branch_id = null` và áp dụng toàn shop. Dịch vụ manager tạo có `branch_id` là chi nhánh của manager và chỉ áp dụng trong chi nhánh đó. Owner chỉ edit dịch vụ owner tạo, nhưng có quyền xoá dịch vụ manager tạo trong cùng shop; manager chỉ edit/xoá dịch vụ do chính mình tạo trong chi nhánh của mình. Xoá dịch vụ là soft delete bằng `deleted_at`, không hard delete, để giữ lịch sử visit/combo/report.
 
 ---
 

@@ -12,6 +12,7 @@ export function VisitCreateCustomerStep({
   customersError,
   isLoadingCustomers,
   onClearSelectedCustomer,
+  onClearSearch,
   onSearch,
   onSearchInputChange,
   onSelectCustomer,
@@ -35,6 +36,7 @@ export function VisitCreateCustomerStep({
         <>
           <VisitCustomerSearchForm
             searchInput={searchInput}
+            onClearSearch={onClearSearch}
             onSearch={onSearch}
             onSearchInputChange={onSearchInputChange}
           />

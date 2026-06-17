@@ -1,8 +1,8 @@
 import type { FormEvent } from "react";
 
-import { Button, Card, Input, Select } from "@/components/global";
+import { Button, Card, SearchInput, Select } from "@/components/global";
 import { STAFF_ROLES } from "@/constants/common";
-import { staffTexts } from "@/constants/texts";
+import { commonTexts, staffTexts } from "@/constants/texts";
 import type { Branch } from "@/types";
 import {
   ALL_FILTER_VALUE,
@@ -38,10 +38,17 @@ export function OwnerStaffFilters({
           <span className="text-sm font-medium text-gray-1000">
             {staffTexts.ownerStaff.searchLabel}
           </span>
-          <Input
+          <SearchInput
             className="mt-2"
+            clearLabel={commonTexts.feedback.clearSearch}
             placeholder={staffTexts.ownerStaff.searchPlaceholder}
             value={draftFilters.search}
+            onClear={() =>
+              onDraftFiltersChange({
+                ...draftFilters,
+                search: "",
+              })
+            }
             onChange={(event) =>
               onDraftFiltersChange({
                 ...draftFilters,
