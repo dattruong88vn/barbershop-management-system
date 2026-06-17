@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 
-import { USER_ROLE_OWNER } from "@/constants/common";
+import { USER_ROLE_MANAGER, USER_ROLE_OWNER } from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
 import { commonTexts } from "@/constants/texts";
 import { cn } from "@/lib/utils";
@@ -58,7 +58,7 @@ const REPORT_NAVIGATION_ITEMS: ManagementNavigationItem[] = [
   },
 ];
 
-const MANAGEMENT_NAVIGATION_ITEMS: ManagementNavigationItem[] = [
+const OWNER_NAVIGATION_ITEMS: ManagementNavigationItem[] = [
   {
     href: ROUTES.dashboard,
     icon: Gauge,
@@ -83,7 +83,29 @@ const MANAGEMENT_NAVIGATION_ITEMS: ManagementNavigationItem[] = [
     href: ROUTES.ownerBranches,
     icon: Building2,
     label: commonTexts.navigation.branches,
-    ownerOnly: true,
+  },
+];
+
+const MANAGER_NAVIGATION_ITEMS: ManagementNavigationItem[] = [
+  {
+    href: ROUTES.dashboard,
+    icon: Gauge,
+    label: commonTexts.navigation.dashboard,
+  },
+  {
+    href: ROUTES.managerServices,
+    icon: Scissors,
+    label: commonTexts.navigation.services,
+  },
+  {
+    href: ROUTES.managerCombos,
+    icon: Package,
+    label: commonTexts.navigation.combos,
+  },
+  {
+    href: ROUTES.managerStaff,
+    icon: Users,
+    label: commonTexts.navigation.staff,
   },
 ];
 
@@ -99,9 +121,10 @@ export function ManagementSidebar() {
   const reportItems = REPORT_NAVIGATION_ITEMS.filter(
     (item) => !item.ownerOnly || role === USER_ROLE_OWNER,
   );
-  const navigationItems = MANAGEMENT_NAVIGATION_ITEMS.filter(
-    (item) => !item.ownerOnly || role === USER_ROLE_OWNER,
-  );
+  const navigationItems =
+    role === USER_ROLE_MANAGER
+      ? MANAGER_NAVIGATION_ITEMS
+      : OWNER_NAVIGATION_ITEMS;
 
   function handleLogout() {
     void signOut({ callbackUrl: ROUTES.login });

@@ -4,7 +4,12 @@ import type { Prisma } from "@prisma/client";
 
 import { customerTexts, visitTexts } from "@/constants/texts";
 import {
+  MANAGEMENT_ROLES,
   STAFF_EDIT_WINDOW_MS,
+  STAFF_ROLES,
+  USER_ROLE_BARBER,
+  USER_ROLE_RECEPTIONIST,
+  USER_ROLE_SKINNER,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
   VISIT_STATUS_COMPLETED,
@@ -23,13 +28,7 @@ import type {
   VisitStatusUpdateRequestBody,
 } from "@/types";
 
-const VISIT_DETAIL_ROLES: UserRole[] = [
-  "owner",
-  "manager",
-  "receptionist",
-  "barber",
-  "skinner",
-];
+const VISIT_DETAIL_ROLES: UserRole[] = [...MANAGEMENT_ROLES, ...STAFF_ROLES];
 const VISIT_SELECT = {
   id: true,
   createdAt: true,
@@ -178,11 +177,11 @@ function normalizeVisitDetailUpdateInput(
 }
 
 function canStartVisit(role: UserRole) {
-  return role === "barber" || role === "skinner";
+  return role === USER_ROLE_BARBER || role === USER_ROLE_SKINNER;
 }
 
 function canCompleteVisit(role: UserRole) {
-  return role === "receptionist";
+  return role === USER_ROLE_RECEPTIONIST;
 }
 
 function canStartVisitStatus(role: UserRole, status: string) {
@@ -333,10 +332,15 @@ async function validateStaff(
   }
 
   const roleFilters = [
-    barberId ? { id: barberId, role: "barber" as const } : null,
-    skinnerId ? { id: skinnerId, role: "skinner" as const } : null,
-  ].filter((filter): filter is { id: string; role: "barber" | "skinner" } =>
-    Boolean(filter),
+    barberId ? { id: barberId, role: USER_ROLE_BARBER } : null,
+    skinnerId ? { id: skinnerId, role: USER_ROLE_SKINNER } : null,
+  ].filter(
+    (
+      filter,
+    ): filter is {
+      id: string;
+      role: typeof USER_ROLE_BARBER | typeof USER_ROLE_SKINNER;
+    } => Boolean(filter),
   );
 
   const staff = await prisma.user.findMany({
@@ -387,7 +391,8 @@ export async function GET(request: NextRequest, context: VisitRouteContext) {
       ),
       canStartVisit: canStartVisitStatus(authResult.role, visit.status),
       canUploadPhotos:
-        authResult.role === "barber" && visit.status !== VISIT_STATUS_COMPLETED,
+        authResult.role === USER_ROLE_BARBER &&
+        visit.status !== VISIT_STATUS_COMPLETED,
     }),
   });
 }
@@ -497,7 +502,7 @@ export async function PATCH(
         ),
         canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
         canUploadPhotos:
-          authResult.role === "barber" &&
+          authResult.role === USER_ROLE_BARBER &&
           updatedVisit.status !== VISIT_STATUS_COMPLETED,
       }),
     });
@@ -633,7 +638,7 @@ export async function PATCH(
         ),
         canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
         canUploadPhotos:
-          authResult.role === "barber" &&
+          authResult.role === USER_ROLE_BARBER &&
           updatedVisit.status !== VISIT_STATUS_COMPLETED,
       }),
     });
@@ -698,7 +703,7 @@ export async function PATCH(
       ),
       canStartVisit: canStartVisitStatus(authResult.role, updatedVisit.status),
       canUploadPhotos:
-        authResult.role === "barber" &&
+        authResult.role === USER_ROLE_BARBER &&
         updatedVisit.status !== VISIT_STATUS_COMPLETED,
     }),
   });

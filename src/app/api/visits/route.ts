@@ -4,6 +4,10 @@ import type { Prisma } from "@prisma/client";
 
 import { customerTexts, visitTexts } from "@/constants/texts";
 import {
+  MANAGEMENT_ROLES,
+  STAFF_ROLES,
+  USER_ROLE_BARBER,
+  USER_ROLE_SKINNER,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
   VISIT_STATUS_IN_PROGRESS,
@@ -19,13 +23,7 @@ import type {
   VisitRequestBody,
 } from "@/types";
 
-const VISIT_ROLES: UserRole[] = [
-  "owner",
-  "manager",
-  "receptionist",
-  "barber",
-  "skinner",
-];
+const VISIT_ROLES: UserRole[] = [...MANAGEMENT_ROLES, ...STAFF_ROLES];
 const VISIT_SELECT = {
   id: true,
   createdAt: true,
@@ -275,10 +273,15 @@ async function validateStaff(
   }
 
   const roleFilters = [
-    barberId ? { id: barberId, role: "barber" as const } : null,
-    skinnerId ? { id: skinnerId, role: "skinner" as const } : null,
-  ].filter((filter): filter is { id: string; role: "barber" | "skinner" } =>
-    Boolean(filter),
+    barberId ? { id: barberId, role: USER_ROLE_BARBER } : null,
+    skinnerId ? { id: skinnerId, role: USER_ROLE_SKINNER } : null,
+  ].filter(
+    (
+      filter,
+    ): filter is {
+      id: string;
+      role: typeof USER_ROLE_BARBER | typeof USER_ROLE_SKINNER;
+    } => Boolean(filter),
   );
 
   const staff = await prisma.user.findMany({
@@ -344,7 +347,7 @@ export async function GET(request: NextRequest) {
     prisma.user.findMany({
       where: {
         shopId: authResult.shopId,
-        role: "barber",
+        role: USER_ROLE_BARBER,
         status: "active",
       },
       orderBy: { username: "asc" },
@@ -357,7 +360,7 @@ export async function GET(request: NextRequest) {
     prisma.user.findMany({
       where: {
         shopId: authResult.shopId,
-        role: "skinner",
+        role: USER_ROLE_SKINNER,
         status: "active",
       },
       orderBy: { username: "asc" },
@@ -450,11 +453,11 @@ export async function POST(request: NextRequest) {
   }
 
   const barberId =
-    authResult.role === "barber" && !visitInput.barberId
+    authResult.role === USER_ROLE_BARBER && !visitInput.barberId
       ? authResult.userId
       : visitInput.barberId;
   const skinnerId =
-    authResult.role === "skinner" && !visitInput.skinnerId
+    authResult.role === USER_ROLE_SKINNER && !visitInput.skinnerId
       ? authResult.userId
       : visitInput.skinnerId;
 

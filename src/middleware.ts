@@ -26,9 +26,9 @@ const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, typeof USER_ROLE_SUPERA
     ],
     [USER_ROLE_MANAGER]: [
       ROUTES.dashboard,
-      ROUTES.ownerServices,
-      ROUTES.ownerCombos,
-      ROUTES.ownerStaff,
+      ROUTES.managerServices,
+      ROUTES.managerCombos,
+      ROUTES.managerStaff,
       ROUTES.reports,
     ],
     [USER_ROLE_RECEPTIONIST]: [ROUTES.visits, ROUTES.customers, ROUTES.reports],

@@ -95,4 +95,7 @@ export const ROUTES = {
   ownerCombos: "/owner/combos",
   ownerStaff: "/owner/staff",
   ownerBranches: "/owner/branches",
+  managerServices: "/manager/services",
+  managerCombos: "/manager/combos",
+  managerStaff: "/manager/staff",
 } as const;

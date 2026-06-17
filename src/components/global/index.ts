@@ -12,6 +12,16 @@ export {
   type GeistTextProps as TextProps,
 } from "./Badge";
 export {
+  Heading,
+  MetricValue,
+  PageTitle,
+  Paragraph,
+  type HeadingProps,
+  type MetricValueProps,
+  type PageTitleProps,
+  type ParagraphProps,
+} from "./Typography";
+export {
   GeistInput as Input,
   GeistTextarea as Textarea,
   GeistSelect as Select,
@@ -138,14 +148,6 @@ export { KeyValueRow } from "./KeyValueRow";
 export { MonthCalendar } from "./MonthCalendar";
 export { Skeleton } from "./Skeleton";
 export { Toast } from "./Toast";
-export {
-  Heading,
-  MetricValue,
-  Paragraph,
-  type HeadingProps,
-  type MetricValueProps,
-  type ParagraphProps,
-} from "./Typography";
 export { colors, radius, shadow, spacing, typography, zIndex } from "./tokens";
 export {
   cn,

@@ -4,14 +4,19 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { nanoid } from "nanoid";
 
+import {
+  USER_ROLE_BARBER,
+  USER_ROLE_RECEPTIONIST,
+  USER_ROLE_SKINNER,
+} from "@/constants/common";
 import { visitTexts } from "@/constants/texts";
 import { R2_BUCKET_NAME, r2Client } from "@/lib/r2";
 import type { UserRole } from "@/types";
 
 const UPLOAD_PRESIGNED_ROLES: UserRole[] = [
-  "barber",
-  "skinner",
-  "receptionist",
+  USER_ROLE_BARBER,
+  USER_ROLE_SKINNER,
+  USER_ROLE_RECEPTIONIST,
 ];
 const PRESIGNED_URL_EXPIRES_IN_SECONDS = 300;
 

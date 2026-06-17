@@ -13,6 +13,9 @@ const MANAGEMENT_NAVIGATION_PATHS = [
   ROUTES.ownerCombos,
   ROUTES.ownerStaff,
   ROUTES.ownerBranches,
+  ROUTES.managerServices,
+  ROUTES.managerCombos,
+  ROUTES.managerStaff,
 ] as const;
 
 const MANAGEMENT_ROLES = [USER_ROLE_OWNER, USER_ROLE_MANAGER] as const;

@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import { USER_ROLE_BARBER, VISIT_STATUS_COMPLETED } from "@/constants/common";
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/common";
 import { getPhotoUrl } from "@/lib/r2";
 import { prisma } from "@/lib/prisma";
 import type { VisitPhotoCreateRequestBody } from "@/types";
@@ -47,7 +47,7 @@ export async function POST(
     );
   }
 
-  if (token.role !== "barber" || !token.shop_id) {
+  if (token.role !== USER_ROLE_BARBER || !token.shop_id) {
     return NextResponse.json(
       { error: visitTexts.api.errors.forbidden },
       { status: 403 },
@@ -132,7 +132,7 @@ export async function DELETE(
     );
   }
 
-  if (token.role !== "barber" || !token.shop_id) {
+  if (token.role !== USER_ROLE_BARBER || !token.shop_id) {
     return NextResponse.json(
       { error: visitTexts.api.errors.forbidden },
       { status: 403 },

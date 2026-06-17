@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
 import {
+  USER_ROLE_BARBER,
+  USER_ROLE_SKINNER,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
 } from "@/constants/common";
@@ -76,7 +78,7 @@ export default function VisitCreateForm({
   );
   const currentUserBarberId = useMemo(
     () =>
-      currentUser?.role === "barber" &&
+      currentUser?.role === USER_ROLE_BARBER &&
       !hasSkippedCurrentBarberDefault &&
       barbers.some((barber) => barber.id === currentUser.id)
         ? currentUser.id
@@ -85,7 +87,7 @@ export default function VisitCreateForm({
   );
   const currentUserSkinnerId = useMemo(
     () =>
-      currentUser?.role === "skinner" &&
+      currentUser?.role === USER_ROLE_SKINNER &&
       !hasSkippedCurrentSkinnerDefault &&
       skinners.some((skinner) => skinner.id === currentUser.id)
         ? currentUser.id

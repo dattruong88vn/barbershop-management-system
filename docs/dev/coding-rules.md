@@ -25,6 +25,7 @@
 
 - Search `src/components/global/` before creating UI.
 - Reuse global primitives instead of local button/input/card/table/alert variants.
+- If the same JSX/style pattern appears in 2+ screens, extract or extend a shared component before duplicating it again. Example: use global `PageTitle` instead of repeating `<h1 className="text-2xl font-semibold">`.
 - Page/component files should keep one module-scope JSX-returning function.
 - Move reusable pure helpers to `src/utils/`.
 - Split large components into focused sections, panels, lists, rows, and fields.
