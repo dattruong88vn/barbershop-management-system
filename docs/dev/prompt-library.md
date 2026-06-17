@@ -187,6 +187,8 @@ Yêu cầu mặc định:
 - Filter nhân viên: tìm kiếm name/username, vai trò, trạng thái; owner có chi nhánh, manager bị scope theo chi nhánh của chính mình.
 - Trạng thái hiển thị: `Khởi tạo` = active + isFirstLogin, `Đang làm` = active + !isFirstLogin. Không thêm enum DB cho `Khởi tạo`.
 - Badge: Khởi tạo danger, Đang làm info; skinner success, barber info, receptionist warning.
+- Route: owner dùng `/owner/staff`, manager dùng `/manager/staff`; dùng chung screen component với `mode="owner" | "manager"`.
+- Route guard: manager không được vào `/owner/*`, owner không được vào `/manager/*`.
 - Manager chỉ thấy/tạo/sửa/ngưng làm nhân viên thuộc branch_id của manager; backend phải enforce, UI chỉ hỗ trợ.
 - Không viết test và không chạy test nếu tôi không yêu cầu.
 ```

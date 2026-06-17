@@ -14,6 +14,8 @@
 
 - Module and screen components must build on global primitives.
 - Do not reimplement existing global primitives such as typography, buttons, inputs, comboboxes, calendars, skeletons, cards, alerts, empty states, or feedback notifications.
+- If a JSX/style pattern appears in 2+ screens, extract it into a shared component before copying it again. Put app-wide patterns in `src/components/global/`; put module-only patterns in `src/components/modules/<module>/`; put one-screen patterns in `src/components/screens/<module-or-route>/`.
+- Page titles must use the global `PageTitle` component instead of repeating `<h1 className="text-2xl font-semibold">`.
 - Title/value display pairs must use a single-row layout with title on the left and value on the right; add or reuse a global component for this pattern.
 - Split large components into focused children: sections, panels, lists, rows, and form fields.
 

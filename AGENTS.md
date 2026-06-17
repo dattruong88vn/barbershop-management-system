@@ -108,6 +108,7 @@ Key ADRs:
 - Before writing or styling UI, search `src/components/global/`.
 - Reuse global components when a pattern exists.
 - If a reusable pattern is missing, add or extend a global component first.
+- If the same JSX/style pattern appears in 2+ screens, extract or extend a shared component before duplicating it again. Example: use global `PageTitle` instead of repeating `<h1 className="text-2xl font-semibold">`.
 - Do not use native/browser controls or hand-rolled visuals when a global component exists.
 - Every successful user action must show success feedback through the global Feedback notification flow.
 - Do not render the global Toast component directly for runtime app notifications.

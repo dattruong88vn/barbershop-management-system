@@ -33,37 +33,41 @@ Ghi chú:
 Owner role:
 
 - `owner`
+- Owner management routes use `/owner/*`.
+- Owner must not access `/manager/*`; middleware redirects forbidden routes to the post-auth default.
 
 Sidebar:
 
-- Tổng quan
+- Tổng quan → `/dashboard`
 - Báo cáo
-  - Doanh thu
-  - Nhân viên
-  - Dịch vụ
-  - Combo
-  - Chi nhánh
-- Dịch vụ
-- Combo
-- Nhân viên
-- Chi nhánh
+  - Doanh thu → `/reports/revenue`
+  - Nhân viên → `/reports/staff`
+  - Dịch vụ → `/reports/services`
+  - Combo → `/reports/combos`
+  - Chi nhánh → `/reports/branches`
+- Dịch vụ → `/owner/services`
+- Combo → `/owner/combos`
+- Nhân viên → `/owner/staff`
+- Chi nhánh → `/owner/branches`
 
 Manager role:
 
 - `manager`
+- Manager management routes use `/manager/*`.
+- Manager must not access `/owner/*`; middleware redirects forbidden routes to the post-auth default.
 - MVP business scope là branch-level reporting.
 - Manager có quyền quản lý dịch vụ, combo, và nhân viên. Branch management remains owner-only.
 - Trong màn Nhân viên, manager chỉ thấy và tạo/sửa nhân viên thuộc chi nhánh của chính manager.
 - Sidebar:
-  - Tổng quan
+  - Tổng quan → `/dashboard`
   - Báo cáo
-    - Doanh thu
-    - Nhân viên
-    - Dịch vụ
-    - Combo
-  - Dịch vụ
-  - Combo
-  - Nhân viên
+    - Doanh thu → `/reports/revenue`
+    - Nhân viên → `/reports/staff`
+    - Dịch vụ → `/reports/services`
+    - Combo → `/reports/combos`
+  - Dịch vụ → `/manager/services`
+  - Combo → `/manager/combos`
+  - Nhân viên → `/manager/staff`
 
 ---
 

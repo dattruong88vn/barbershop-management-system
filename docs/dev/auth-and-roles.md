@@ -25,8 +25,11 @@ Use exported role constants/types from `src/constants/common/roles.ts` for role 
 
 - `owner` and `manager` can manage services, combos, and staff accounts.
 - Branch management is owner-only.
+- Owner management routes use `/owner/*`; owner must not access `/manager/*`.
+- Manager management routes use `/manager/*`; manager must not access `/owner/*`.
 - Owner can manage staff across the whole shop.
 - Manager can manage only staff in the manager's own `branch_id`; staff create/update requests must be scoped to that branch.
+- Shared management screens should use `mode="owner" | "manager"` when owner and manager routes share UI behavior.
 
 ## Layout By Role
 

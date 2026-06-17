@@ -34,6 +34,17 @@ export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
 );
 Heading.displayName = "Heading";
 
+export type PageTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+
+export const PageTitle = React.forwardRef<HTMLHeadingElement, PageTitleProps>(
+  ({ children, className, ...props }, ref) => (
+    <h1 ref={ref} className={cn("text-2xl font-semibold", className)} {...props}>
+      {children}
+    </h1>
+  ),
+);
+PageTitle.displayName = "PageTitle";
+
 export interface ParagraphProps
   extends React.HTMLAttributes<HTMLParagraphElement> {
   size?: "xs" | "sm" | "md" | "lg";

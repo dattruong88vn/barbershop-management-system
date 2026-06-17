@@ -1,4 +1,6 @@
-export type StaffRole = "receptionist" | "barber" | "skinner";
+import type { StaffRoleValue } from "@/constants/common";
+
+export type StaffRole = StaffRoleValue;
 
 export type StaffStatus = "active" | "inactive";
 

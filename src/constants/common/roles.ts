@@ -20,10 +20,7 @@ export const STAFF_ROLES = [
   USER_ROLE_SKINNER,
 ] as const;
 
-export const MANAGEMENT_ROLES = [
-  USER_ROLE_OWNER,
-  USER_ROLE_MANAGER,
-] as const;
+export const MANAGEMENT_ROLES = [USER_ROLE_OWNER, USER_ROLE_MANAGER] as const;
 
 export type UserRoleValue = (typeof USER_ROLES)[number];
 export type StaffRoleValue = (typeof STAFF_ROLES)[number];

@@ -7,6 +7,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Luôn tìm trong `src/components/global/` trước khi viết component hoặc style mới.
 - Reuse global primitive nếu đã có pattern tương ứng.
 - Nếu pattern có thể dùng lại ở nhiều màn hình, thêm hoặc mở rộng global component trước rồi mới compose trong module/screen.
+- Nếu thấy cùng một JSX/style pattern xuất hiện ở từ 2 màn hình trở lên, tự tách thành component dùng chung trước khi tiếp tục nhân bản pattern. Ví dụ: page title dùng `PageTitle` thay vì lặp `<h1 className="text-2xl font-semibold">`.
 - Không dùng native/browser controls trực tiếp khi global component đã tồn tại.
 - Không hardcode UI text trong component; dùng `src/constants/texts/`.
 - Không hardcode colors hoặc custom spacing; dùng Geist/Tailwind design tokens hiện có.
@@ -20,7 +21,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 | --- | --- |
 | Actions | `Button` |
 | Status labels | `Badge`, `StatusDot` |
-| Typography | `Heading`, `Paragraph`, `MetricValue`, `Text`, `Label`, `Description` |
+| Typography | `PageTitle`, `Heading`, `Paragraph`, `MetricValue`, `Text`, `Label`, `Description` |
 | Text input | `Input`, `FormTextField` |
 | Password input | `PasswordField` |
 | Textarea/select | `Textarea`, `Select`, `Combobox`, `MultiSelect` |

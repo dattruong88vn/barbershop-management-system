@@ -3,6 +3,7 @@
 import type { SyntheticEvent } from "react";
 import { useState } from "react";
 
+import { PageTitle } from "@/components/global";
 import { Button } from "@/components/global/ui/button";
 import { branchTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
@@ -110,9 +111,7 @@ export default function OwnerBranchesPage() {
     <div className="min-h-screen bg-zinc-50 px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
       <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[360px_1fr]">
         <section>
-          <h1 className="text-2xl font-semibold">
-            {branchTexts.ownerBranches.title}
-          </h1>
+          <PageTitle>{branchTexts.ownerBranches.title}</PageTitle>
           <p className="mt-2 text-sm leading-6 text-zinc-600">
             {branchTexts.ownerBranches.description}
           </p>

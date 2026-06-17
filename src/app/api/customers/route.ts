@@ -5,6 +5,8 @@ import { Prisma } from "@prisma/client";
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
+  MANAGEMENT_ROLES,
+  STAFF_ROLES,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
   VISIT_STATUS_COMPLETED,
@@ -18,11 +20,8 @@ import type {
 } from "@/types";
 
 const CUSTOMER_ACCESS_ROLES: UserRole[] = [
-  "owner",
-  "manager",
-  "receptionist",
-  "barber",
-  "skinner",
+  ...MANAGEMENT_ROLES,
+  ...STAFF_ROLES,
 ];
 const CUSTOMER_SELECT = {
   id: true,

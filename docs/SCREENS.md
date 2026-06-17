@@ -163,7 +163,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 10. Services
 
-- **Route:** `/owner/services` (`ROUTES.ownerServices`)
+- **Route:** owner `/owner/services` (`ROUTES.ownerServices`), manager `/manager/services` (`ROUTES.managerServices`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
@@ -173,7 +173,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 11. Combos
 
-- **Route:** `/owner/combos` (`ROUTES.ownerCombos`)
+- **Route:** owner `/owner/combos` (`ROUTES.ownerCombos`), manager `/manager/combos` (`ROUTES.managerCombos`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
@@ -183,11 +183,12 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 
 ## 12. Staff
 
-- **Route:** `/owner/staff` (`ROUTES.ownerStaff`)
+- **Route:** owner `/owner/staff` (`ROUTES.ownerStaff`), manager `/manager/staff` (`ROUTES.managerStaff`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Header:** chỉ hiển thị title, không hiển thị description/subtitle.
 - **Sections:** bộ lọc, danh sách nhân viên dạng table, modal chi tiết, modal tạo/sửa, confirm modal ngưng làm.
+- **Implementation:** owner và manager dùng chung staff management screen với `mode="owner" | "manager"`; route page chỉ pass mode vào shared component.
 - **Filter:** tìm kiếm theo tên/username, vai trò, trạng thái; owner có thêm chi nhánh, manager không có filter chi nhánh vì bị scope theo chi nhánh hiện tại. Filter chỉ áp dụng khi bấm `Áp dụng`.
 - **Status filter:** `Tất cả trạng thái`, `Khởi tạo`, `Đang làm`.
 - **Actions:** List, Create, Edit, soft Delete/ngưng làm.
@@ -195,6 +196,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Display status:** `Khởi tạo` = `status: active` + `isFirstLogin: true`; `Đang làm` = `status: active` + `isFirstLogin: false`; nhân viên `inactive` là đã nghỉ và không hiển thị trong danh sách active.
 - **Badge:** `Khởi tạo` dùng danger, `Đang làm` dùng info. Vai trò: skinner success, barber info, receptionist warning.
 - **Business:** owner xem/tạo/sửa nhân viên toàn shop. Manager chỉ xem/tạo/sửa/ngưng làm nhân viên thuộc `branch_id` của manager; khi tạo/sửa, branch bị ép theo chi nhánh của manager.
+- **Route guard:** owner không được truy cập `/manager/*`; manager không được truy cập `/owner/*`.
 - **Detail popup:** click tên nhân viên mở modal chi tiết dạng table 2 cột; không hiển thị riêng thông tin đổi mật khẩu vì đã được thể hiện bằng trạng thái `Khởi tạo`.
 - **States:** loading, empty, error, list, create modal, edit modal, detail modal, confirm delete.
 

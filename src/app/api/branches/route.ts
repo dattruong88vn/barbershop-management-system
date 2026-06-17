@@ -4,11 +4,12 @@ import { getToken } from "next-auth/jwt";
 import {
   MANAGEMENT_ROLES,
   USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   type ManagementRoleValue,
 } from "@/constants/common";
 import { branchTexts } from "@/constants/texts";
 import { prisma } from "@/lib/prisma";
-import type { BranchRequestBody, UserRole } from "@/types";
+import type { BranchRequestBody } from "@/types";
 
 function isBranchRequestBody(body: unknown): body is BranchRequestBody {
   return typeof body === "object" && body !== null;
@@ -31,7 +32,7 @@ async function getOwnerShopId(request: NextRequest) {
     return { error: branchTexts.api.errors.unauthorized, status: 401 };
   }
 
-  if (token.role !== ("owner" satisfies UserRole) || !token.shop_id) {
+  if (token.role !== USER_ROLE_OWNER || !token.shop_id) {
     return { error: branchTexts.api.errors.forbidden, status: 403 };
   }
 
