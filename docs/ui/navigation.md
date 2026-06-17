@@ -53,6 +53,7 @@ Manager role:
 - `manager`
 - MVP business scope là branch-level reporting.
 - Manager có quyền quản lý dịch vụ, combo, và nhân viên. Branch management remains owner-only.
+- Trong màn Nhân viên, manager chỉ thấy và tạo/sửa nhân viên thuộc chi nhánh của chính manager.
 - Sidebar:
   - Tổng quan
   - Báo cáo

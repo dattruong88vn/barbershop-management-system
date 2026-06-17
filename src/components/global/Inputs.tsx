@@ -1,9 +1,12 @@
 import * as React from "react";
+import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const inputBaseStyles =
   "flex min-h-11 w-full rounded-md border border-gray-400 bg-gray-100 px-3 py-2 text-base text-gray-1000 placeholder:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 disabled:cursor-not-allowed disabled:opacity-50";
+const selectBaseStyles =
+  "flex min-h-11 w-full appearance-none rounded-md border border-gray-400 bg-gray-100 py-2 pl-4 pr-12 text-base text-gray-1000 placeholder:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900 disabled:cursor-not-allowed disabled:opacity-50";
 
 export interface GeistInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -55,15 +58,20 @@ export interface GeistSelectProps
 
 export const GeistSelect = React.forwardRef<HTMLSelectElement, GeistSelectProps>(
   ({ className, error = false, ...props }, ref) => (
-    <select
-      ref={ref}
-      className={cn(
-        inputBaseStyles,
-        error && "border-red-900 focus-visible:ring-red-900",
-        className,
-      )}
-      {...props}
-    />
+    <span className={cn("relative block w-full", className)}>
+      <select
+        ref={ref}
+        className={cn(
+          selectBaseStyles,
+          error && "border-red-900 focus-visible:ring-red-900",
+        )}
+        {...props}
+      />
+      <ChevronDown
+        className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-gray-700"
+        aria-hidden="true"
+      />
+    </span>
   ),
 );
 GeistSelect.displayName = "GeistSelect";

@@ -10,6 +10,9 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Không dùng native/browser controls trực tiếp khi global component đã tồn tại.
 - Không hardcode UI text trong component; dùng `src/constants/texts/`.
 - Không hardcode colors hoặc custom spacing; dùng Geist/Tailwind design tokens hiện có.
+- Page header chỉ hiển thị title; không render description/subtitle dưới title.
+- Select/dropdown phải dùng global `Select`; padding trái của text và padding phải của icon phải cân nhau về thị giác, đồng thời chừa đủ khoảng trống để icon không đè text.
+- Table dùng global primitives phải có line ngang giữa các row và line dọc giữa các cell để ô dữ liệu được phân tách rõ.
 
 ## Component Map
 

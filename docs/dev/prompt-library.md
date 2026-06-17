@@ -179,6 +179,18 @@ Không hardcode màu hoặc spacing.
 Không viết test và không chạy test nếu tôi không yêu cầu.
 ```
 
+```text
+FIX UI: Cập nhật màn hình quản lý nhân viên.
+
+Yêu cầu mặc định:
+- Layout gồm title-only header, card bộ lọc, table danh sách, modal chi tiết, modal tạo/sửa, confirm modal ngưng làm.
+- Filter nhân viên: tìm kiếm name/username, vai trò, trạng thái; owner có chi nhánh, manager bị scope theo chi nhánh của chính mình.
+- Trạng thái hiển thị: `Khởi tạo` = active + isFirstLogin, `Đang làm` = active + !isFirstLogin. Không thêm enum DB cho `Khởi tạo`.
+- Badge: Khởi tạo danger, Đang làm info; skinner success, barber info, receptionist warning.
+- Manager chỉ thấy/tạo/sửa/ngưng làm nhân viên thuộc branch_id của manager; backend phải enforce, UI chỉ hỗ trợ.
+- Không viết test và không chạy test nếu tôi không yêu cầu.
+```
+
 ## Tích Hợp Requirements Và v0 Component
 
 ```text

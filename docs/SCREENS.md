@@ -22,6 +22,9 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Mọi thao tác thành công phải hiển thị success feedback qua global Feedback notification flow; nếu có điều hướng sau thành công, feedback phải được dispatch trước khi điều hướng bằng app router.
 - Type/interface dùng chung đặt trong `src/types/`. Không định nghĩa trong component.
 - Dùng shadcn/ui khi có thể. TypeScript strict, không dùng `any`.
+- Header của mọi page chỉ hiển thị title. Không render description/subtitle trong page header.
+- Dropdown/select phải dùng global `Select` primitive. Padding trái của text và padding phải của icon phải cân nhau về thị giác; phần phải vẫn phải đủ rộng để icon không đè text.
+- Table phải dùng global table primitives và hiển thị đủ line ngang giữa row + line dọc giữa cell để phân tách ô rõ ràng.
 - Mỗi bảng thuộc tenant phải enforce `shop_id`.
 - Roles: `superadmin`, `owner`, `manager`, `receptionist`, `barber`, `skinner`.
 - Visit status: `pending`, `in_progress`, `completed`.
@@ -183,9 +186,17 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Route:** `/owner/staff` (`ROUTES.ownerStaff`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
-- **Actions:** List, Create, Edit, Delete
-- **Fields:** name, role, branch, active/inactive
-- **States:** list, create modal, edit modal, confirm delete
+- **Header:** chỉ hiển thị title, không hiển thị description/subtitle.
+- **Sections:** bộ lọc, danh sách nhân viên dạng table, modal chi tiết, modal tạo/sửa, confirm modal ngưng làm.
+- **Filter:** tìm kiếm theo tên/username, vai trò, trạng thái; owner có thêm chi nhánh, manager không có filter chi nhánh vì bị scope theo chi nhánh hiện tại. Filter chỉ áp dụng khi bấm `Áp dụng`.
+- **Status filter:** `Tất cả trạng thái`, `Khởi tạo`, `Đang làm`.
+- **Actions:** List, Create, Edit, soft Delete/ngưng làm.
+- **Fields:** username, role, branch, display status, createdAt.
+- **Display status:** `Khởi tạo` = `status: active` + `isFirstLogin: true`; `Đang làm` = `status: active` + `isFirstLogin: false`; nhân viên `inactive` là đã nghỉ và không hiển thị trong danh sách active.
+- **Badge:** `Khởi tạo` dùng danger, `Đang làm` dùng info. Vai trò: skinner success, barber info, receptionist warning.
+- **Business:** owner xem/tạo/sửa nhân viên toàn shop. Manager chỉ xem/tạo/sửa/ngưng làm nhân viên thuộc `branch_id` của manager; khi tạo/sửa, branch bị ép theo chi nhánh của manager.
+- **Detail popup:** click tên nhân viên mở modal chi tiết dạng table 2 cột; không hiển thị riêng thông tin đổi mật khẩu vì đã được thể hiện bằng trạng thái `Khởi tạo`.
+- **States:** loading, empty, error, list, create modal, edit modal, detail modal, confirm delete.
 
 ## 13. Branches
 

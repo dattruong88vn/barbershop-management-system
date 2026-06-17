@@ -143,7 +143,7 @@ export const GeistTableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "transition-colors",
+      "transition-colors [&>*:last-child]:border-r-0 [&>*]:border-r [&>*]:border-gray-400",
       interactive && "cursor-pointer hover:bg-gray-200",
       className,
     )}

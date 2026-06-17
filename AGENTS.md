@@ -112,6 +112,9 @@ Key ADRs:
 - Every successful user action must show success feedback through the global Feedback notification flow.
 - Do not render the global Toast component directly for runtime app notifications.
 - Every screen needs loading, empty, and error states using global primitives where possible.
+- Page headers show the page title only. Do not render page description/subtitle text.
+- Dropdown/select controls must use the global `Select` primitive; text left padding and icon right padding must be visually equal, with enough right padding so the icon never overlaps text.
+- Tables must show both horizontal row dividers and vertical cell dividers when using the global table primitives.
 
 Component placement:
 
