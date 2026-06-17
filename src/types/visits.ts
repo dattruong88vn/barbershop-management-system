@@ -253,6 +253,7 @@ export type VisitCreatePageViewProps = {
   suggestions?: VisitCreateSuggestions | null;
   returnToCustomerId: string | null;
   onClearSelectedCustomer: () => void;
+  onClearSearch?: () => void;
   onSearch: FormEventHandler<HTMLFormElement>;
   onSearchInputChange: ChangeEventHandler<HTMLInputElement>;
   onSelectCustomer: (customer: Customer) => void;

@@ -61,6 +61,11 @@ export default function VisitCreatePage({ searchParams }: VisitCreatePageProps) 
     setActiveSearch(searchTerm);
   }
 
+  function handleClearSearch() {
+    setSearchInput("");
+    setActiveSearch("");
+  }
+
   return (
     <main aria-label={visitTexts.create.title}>
       <VisitProvider backHref={backHref} returnToCustomerId={returnToCustomerId}>
@@ -75,6 +80,7 @@ export default function VisitCreatePage({ searchParams }: VisitCreatePageProps) 
           selectedCustomer={selectedCustomer}
           suggestions={suggestions}
           onClearSelectedCustomer={() => setSelectedCustomer(null)}
+          onClearSearch={handleClearSearch}
           onSearch={handleSearch}
           onSearchInputChange={(event) => setSearchInput(event.target.value)}
           onSelectCustomer={setSelectedCustomer}

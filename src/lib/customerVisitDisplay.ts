@@ -4,6 +4,7 @@ import type {
   CustomerVisitPhoto,
   CustomerVisitService,
 } from "@/types";
+import { formatDisplayDate, formatDisplayTime } from "@/utils/common";
 
 const MONEY_FORMATTER = new Intl.NumberFormat("vi-VN", {
   maximumFractionDigits: 0,
@@ -34,32 +35,11 @@ export function formatMoney(value: number) {
 }
 
 export function formatRelativeVisitDate(value: string) {
-  const diffMs = Date.now() - new Date(value).getTime();
-  const diffDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
-
-  if (diffDays === 0) {
-    return customerTexts.detail.today;
-  }
-
-  if (diffDays === 1) {
-    return customerTexts.detail.yesterday;
-  }
-
-  if (diffDays < 30) {
-    return customerTexts.detail.daysAgo(diffDays);
-  }
-
-  return new Intl.DateTimeFormat("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-  }).format(new Date(value));
+  return formatDisplayDate(value);
 }
 
 export function formatVisitTime(value: string) {
-  return new Intl.DateTimeFormat("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
+  return formatDisplayTime(value);
 }
 
 export function getVisitCycleDays(visits: CustomerVisit[]) {

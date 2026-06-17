@@ -206,10 +206,12 @@ async function main() {
       create: {
         id: service.id,
         shopId,
+        branchId: null,
         name: service.name,
         price: service.price,
         responsibleRole: service.responsibleRole,
         isHaircut: service.isHaircut,
+        createdBy: ownerId,
       },
     });
   }

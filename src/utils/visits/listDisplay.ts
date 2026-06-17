@@ -4,6 +4,7 @@ import {
   VISIT_STATUS_PENDING,
 } from "@/constants/common";
 import type { CustomerVisitStatus } from "@/types";
+import { formatDisplayDate } from "@/utils/common";
 
 export function getVisitListStatusLabel(status: CustomerVisitStatus) {
   if (status === VISIT_STATUS_PENDING) {
@@ -30,9 +31,5 @@ export function getVisitListStatusClassName(status: CustomerVisitStatus) {
 }
 
 export function formatVisitListDate(value: string) {
-  return new Intl.DateTimeFormat("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(value));
+  return formatDisplayDate(value);
 }

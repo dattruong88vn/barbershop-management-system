@@ -71,6 +71,7 @@ Ví dụ:
 - Every service must declare `responsibleRole` as `barber` or `skinner`.
 - Visit service/combo pricing must be snapshotted into `visit_services`.
 - Reports must use snapshot fields and `allocatedPrice`, never current service/combo names or prices.
+- Delete actions are soft delete by default; do not hard delete business data that can affect visits, combos, reports, or audits.
 - Missing barber/skinner allocation is reported under `Chưa xác định`.
 - Barber/skinner assignment is editable only within 3 hours after `completed_at`.
 - Show warning when `is_haircut = true` and no photos.

@@ -9,10 +9,7 @@ import { comboTexts } from "@/constants/texts";
 import { useCombos } from "@/hooks/useCombos";
 import { useServices } from "@/hooks/useServices";
 import type { Combo } from "@/types";
-
-const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
-  dateStyle: "medium",
-});
+import { formatDisplayDate } from "@/utils/common";
 
 const PRICE_FORMATTER = new Intl.NumberFormat("vi-VN", {
   currency: "VND",
@@ -368,7 +365,7 @@ export default function OwnerCombosPage() {
                       <p className="mt-3 text-xs text-zinc-500">
                         <span>{comboTexts.ownerCombos.createdAtLabel}</span>
                         <span className="ml-1">
-                          {DATE_FORMATTER.format(new Date(combo.createdAt))}
+                          {formatDisplayDate(combo.createdAt)}
                         </span>
                       </p>
                     </div>

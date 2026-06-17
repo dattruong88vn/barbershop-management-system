@@ -127,6 +127,7 @@ async function findCombo(comboId: string, shopId: string) {
 async function validateServiceIds(serviceIds: string[], shopId: string) {
   const services = await prisma.service.findMany({
     where: {
+      deletedAt: null,
       id: { in: serviceIds },
       shopId,
     },

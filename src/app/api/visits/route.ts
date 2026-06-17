@@ -327,7 +327,11 @@ export async function GET(request: NextRequest) {
 
   const [services, combos, barbers, skinners] = await Promise.all([
     prisma.service.findMany({
-      where: { shopId: authResult.shopId },
+      where: {
+        deletedAt: null,
+        shopId: authResult.shopId,
+        OR: [{ branchId: null }, { branchId: authResult.branchId }],
+      },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -464,8 +468,10 @@ export async function POST(request: NextRequest) {
   const [services, combos, isValidStaff] = await Promise.all([
     prisma.service.findMany({
       where: {
+        deletedAt: null,
         id: { in: visitInput.serviceIds },
         shopId: authResult.shopId,
+        OR: [{ branchId: null }, { branchId: authResult.branchId }],
       },
       select: {
         id: true,

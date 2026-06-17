@@ -31,6 +31,7 @@ import type {
 const VISIT_DETAIL_ROLES: UserRole[] = [...MANAGEMENT_ROLES, ...STAFF_ROLES];
 const VISIT_SELECT = {
   id: true,
+  branchId: true,
   createdAt: true,
   completedAt: true,
   lastUpdatedBy: true,
@@ -427,6 +428,7 @@ export async function PATCH(
     },
     select: {
       id: true,
+      branchId: true,
       barberId: true,
       completedAt: true,
       skinnerId: true,
@@ -538,8 +540,10 @@ export async function PATCH(
     const [services, combos, isValidStaff] = await Promise.all([
       prisma.service.findMany({
         where: {
+          deletedAt: null,
           id: { in: visitInput.serviceIds },
           shopId: authResult.shopId,
+          OR: [{ branchId: null }, { branchId: visit.branchId }],
         },
         select: {
           id: true,

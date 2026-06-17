@@ -1,13 +1,30 @@
-import type { ServiceResponsibleRoleValue } from "@/constants/common";
+import type {
+  ServiceResponsibleRoleValue,
+  ServiceScopeValue,
+} from "@/constants/common";
 
 export type Service = {
+  branch: {
+    id: string;
+    name: string;
+  } | null;
+  branchId: string | null;
+  canDelete: boolean;
+  canEdit: boolean;
+  createdAt: string;
+  createdBy: string;
+  creator: {
+    id: string;
+    role: string;
+    username: string;
+  };
   id: string;
-  shopId: string;
+  isHaircut: boolean;
   name: string;
   price: number;
   responsibleRole: ServiceResponsibleRoleValue;
-  isHaircut: boolean;
-  createdAt: string;
+  scope: ServiceScopeValue;
+  shopId: string;
 };
 
 export type ServiceFormInput = {

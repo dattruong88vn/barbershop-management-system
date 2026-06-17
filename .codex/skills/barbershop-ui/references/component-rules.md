@@ -33,6 +33,8 @@
 - Do not hardcode colors or custom spacing; use design tokens only.
 - Page headers must show the title only; do not render page description or subtitle text below the title.
 - Select/dropdown controls must use the global `Select` primitive. Text left padding and icon right padding must be visually equal, and the right padding must still keep the icon from overlapping text.
+- Select/dropdown menus must open below the trigger and must not overlap the selected-value display.
+- Search text inputs must show an `X` clear icon when they contain text. Use the global `SearchInput` primitive when possible.
 - Tables must use the global table primitives with both horizontal row dividers and vertical cell dividers.
 - Staff management display status is derived in UI: `Khởi tạo` = active staff with first-login password change still required; `Đang làm` = active staff that already completed first-login password change. Do not add a DB enum for `Khởi tạo`.
 - Keep UI text fitting within its parent on mobile and desktop.

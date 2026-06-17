@@ -8,10 +8,7 @@ import { Button } from "@/components/global/ui/button";
 import { branchTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
 import type { Branch } from "@/types";
-
-const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
-  dateStyle: "medium",
-});
+import { formatDisplayDate } from "@/utils/common";
 
 export default function OwnerBranchesPage() {
   const [name, setName] = useState("");
@@ -223,7 +220,7 @@ export default function OwnerBranchesPage() {
                       <p className="mt-3 text-xs text-zinc-500">
                         <span>{branchTexts.ownerBranches.createdAtLabel}</span>
                         <span className="ml-1">
-                          {DATE_FORMATTER.format(new Date(branch.createdAt))}
+                          {formatDisplayDate(branch.createdAt)}
                         </span>
                       </p>
                     </div>
