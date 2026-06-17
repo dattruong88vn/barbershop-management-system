@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import {
   MANAGEMENT_ROLES,
   STAFF_ROLES,
+  USER_ROLE_MANAGER,
   type ManagementRoleValue,
 } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
@@ -58,7 +59,7 @@ async function getStaffId(context: StaffRouteContext) {
   return typeof params.id === "string" ? params.id : "";
 }
 
-async function getManagementShopId(request: NextRequest) {
+async function getManagementAuth(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -76,14 +77,27 @@ async function getManagementShopId(request: NextRequest) {
     return { error: staffTexts.api.errors.forbidden, status: 403 };
   }
 
-  return { shopId: token.shop_id };
+  if (token.role === USER_ROLE_MANAGER && !token.branch_id) {
+    return { error: staffTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return {
+    branchId: token.role === USER_ROLE_MANAGER ? token.branch_id : null,
+    role: token.role as ManagementRoleValue,
+    shopId: token.shop_id,
+  };
 }
 
-async function findStaffMember(staffId: string, shopId: string) {
+async function findStaffMember(
+  staffId: string,
+  shopId: string,
+  branchId: string | null,
+) {
   return prisma.user.findFirst({
     where: {
       id: staffId,
       shopId,
+      ...(branchId ? { branchId } : {}),
       role: { in: [...STAFF_ROLES] },
       status: "active",
     },
@@ -108,7 +122,7 @@ async function isBranchValid(branchId: string | null, shopId: string) {
 }
 
 export async function GET(request: NextRequest, context: StaffRouteContext) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -126,7 +140,11 @@ export async function GET(request: NextRequest, context: StaffRouteContext) {
     );
   }
 
-  const staffMember = await findStaffMember(staffId, authResult.shopId);
+  const staffMember = await findStaffMember(
+    staffId,
+    authResult.shopId,
+    authResult.branchId,
+  );
 
   if (!staffMember) {
     return NextResponse.json(
@@ -139,7 +157,7 @@ export async function GET(request: NextRequest, context: StaffRouteContext) {
 }
 
 export async function PATCH(request: NextRequest, context: StaffRouteContext) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -189,7 +207,11 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
     );
   }
 
-  const staffMember = await findStaffMember(staffId, authResult.shopId);
+  const staffMember = await findStaffMember(
+    staffId,
+    authResult.shopId,
+    authResult.branchId,
+  );
 
   if (!staffMember) {
     return NextResponse.json(
@@ -198,7 +220,8 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
     );
   }
 
-  const isValidBranch = await isBranchValid(staffInput.branchId, authResult.shopId);
+  const staffBranchId = authResult.branchId ?? staffInput.branchId;
+  const isValidBranch = await isBranchValid(staffBranchId, authResult.shopId);
 
   if (!isValidBranch) {
     return NextResponse.json(
@@ -220,7 +243,7 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
       data: {
         username: staffInput.username,
         role: staffInput.role,
-        branchId: staffInput.branchId,
+        branchId: staffBranchId,
         ...updatedPasswordData,
       },
       select: STAFF_SELECT,
@@ -246,7 +269,7 @@ export async function DELETE(
   request: NextRequest,
   context: StaffRouteContext,
 ) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -264,7 +287,11 @@ export async function DELETE(
     );
   }
 
-  const staffMember = await findStaffMember(staffId, authResult.shopId);
+  const staffMember = await findStaffMember(
+    staffId,
+    authResult.shopId,
+    authResult.branchId,
+  );
 
   if (!staffMember) {
     return NextResponse.json(

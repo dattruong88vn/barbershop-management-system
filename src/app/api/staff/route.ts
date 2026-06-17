@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import {
   MANAGEMENT_ROLES,
   STAFF_ROLES,
+  USER_ROLE_MANAGER,
   type ManagementRoleValue,
 } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
@@ -49,7 +50,7 @@ function normalizeStaffInput(body: StaffRequestBody) {
   };
 }
 
-async function getManagementShopId(request: NextRequest) {
+async function getManagementAuth(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -67,7 +68,15 @@ async function getManagementShopId(request: NextRequest) {
     return { error: staffTexts.api.errors.forbidden, status: 403 };
   }
 
-  return { shopId: token.shop_id };
+  if (token.role === USER_ROLE_MANAGER && !token.branch_id) {
+    return { error: staffTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return {
+    branchId: token.role === USER_ROLE_MANAGER ? token.branch_id : null,
+    role: token.role as ManagementRoleValue,
+    shopId: token.shop_id,
+  };
 }
 
 async function isBranchValid(branchId: string | null, shopId: string) {
@@ -87,7 +96,7 @@ async function isBranchValid(branchId: string | null, shopId: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -99,6 +108,7 @@ export async function GET(request: NextRequest) {
   const staff = await prisma.user.findMany({
     where: {
       shopId: authResult.shopId,
+      ...(authResult.branchId ? { branchId: authResult.branchId } : {}),
       role: { in: [...STAFF_ROLES] },
       status: "active",
     },
@@ -110,7 +120,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const authResult = await getManagementShopId(request);
+  const authResult = await getManagementAuth(request);
 
   if ("error" in authResult) {
     return NextResponse.json(
@@ -129,6 +139,7 @@ export async function POST(request: NextRequest) {
   }
 
   const staffInput = normalizeStaffInput(body);
+  const staffBranchId = authResult.branchId ?? staffInput.branchId;
 
   if (!staffInput.username) {
     return NextResponse.json(
@@ -158,7 +169,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const isValidBranch = await isBranchValid(staffInput.branchId, authResult.shopId);
+  const isValidBranch = await isBranchValid(staffBranchId, authResult.shopId);
 
   if (!isValidBranch) {
     return NextResponse.json(
@@ -171,7 +182,7 @@ export async function POST(request: NextRequest) {
     const staffMember = await prisma.user.create({
       data: {
         shopId: authResult.shopId,
-        branchId: staffInput.branchId,
+        branchId: staffBranchId,
         username: staffInput.username,
         passwordHash: hashPassword(staffInput.password),
         role: staffInput.role,

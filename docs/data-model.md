@@ -41,6 +41,7 @@
 | `created_at`     | timestamp |                                                                           |
 
 > Nhân viên nghỉ làm được set `status = inactive`, không hiển thị khi chọn barber/skinner cho visit mới. Lịch sử visit vẫn giữ nguyên.
+> Trạng thái hiển thị trên màn quản lý nhân viên không thêm enum DB mới: `Khởi tạo` = `status = active` và `is_first_login = true`; `Đang làm` = `status = active` và `is_first_login = false`; nhân viên đã nghỉ dùng `status = inactive` và bị loại khỏi danh sách active.
 
 ---
 

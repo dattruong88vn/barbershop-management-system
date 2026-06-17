@@ -1,25 +1,106 @@
 "use client";
 
 import type { SyntheticEvent } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Edit2, Plus, Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
-import { Button } from "@/components/global/ui/button";
-import { STAFF_ROLES } from "@/constants/common";
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  Error as FeedbackError,
+  Input,
+  Modal,
+  Pagination,
+  Select,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  type BadgeProps,
+} from "@/components/global";
+import { STAFF_ROLES, USER_ROLE_MANAGER } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
 import { useStaff } from "@/hooks/useStaff";
+import { dispatchAppToast } from "@/lib/toast";
 import type { Staff, StaffRole } from "@/types";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
   dateStyle: "medium",
 });
+const STAFF_PAGE_SIZE = 10;
+const ALL_FILTER_VALUE = "all";
+const STAFF_DISPLAY_STATUS_INITIALIZED = "initialized" as const;
+const STAFF_DISPLAY_STATUS_ACTIVE = "active" as const;
+
+type StaffDisplayStatus =
+  | typeof STAFF_DISPLAY_STATUS_INITIALIZED
+  | typeof STAFF_DISPLAY_STATUS_ACTIVE;
+type StaffStatusFilter = StaffDisplayStatus | typeof ALL_FILTER_VALUE;
+type StaffRoleFilter = StaffRole | typeof ALL_FILTER_VALUE;
+
+type StaffFilters = {
+  branchId: string;
+  role: StaffRoleFilter;
+  search: string;
+  status: StaffStatusFilter;
+};
+type StaffBadgeVariant = NonNullable<BadgeProps["variant"]>;
+
+const DEFAULT_FILTERS: StaffFilters = {
+  branchId: ALL_FILTER_VALUE,
+  role: ALL_FILTER_VALUE,
+  search: "",
+  status: ALL_FILTER_VALUE,
+};
+const STAFF_ROLE_BADGE_VARIANTS: Record<StaffRole, StaffBadgeVariant> = {
+  barber: "info",
+  receptionist: "warning",
+  skinner: "success",
+};
+const STAFF_STATUS_BADGE_VARIANTS: Record<StaffDisplayStatus, StaffBadgeVariant> = {
+  active: "info",
+  initialized: "danger",
+};
+
+function formatPageSummary(start: number, end: number, total: number) {
+  return staffTexts.ownerStaff.pageSummary
+    .replace("{start}", String(start))
+    .replace("{end}", String(end))
+    .replace("{total}", String(total));
+}
+
+function getStaffSearchText(staffMember: Staff) {
+  return [staffMember.username].join(" ").toLowerCase();
+}
+
+function getStaffDisplayStatus(staffMember: Staff): StaffDisplayStatus {
+  return staffMember.isFirstLogin
+    ? STAFF_DISPLAY_STATUS_INITIALIZED
+    : STAFF_DISPLAY_STATUS_ACTIVE;
+}
 
 export default function OwnerStaffPage() {
+  const { data: session } = useSession();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<StaffRole>("receptionist");
   const [branchId, setBranchId] = useState("");
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
+  const [viewingStaff, setViewingStaff] = useState<Staff | null>(null);
+  const [deletingStaff, setDeletingStaff] = useState<Staff | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [draftFilters, setDraftFilters] =
+    useState<StaffFilters>(DEFAULT_FILTERS);
+  const [appliedFilters, setAppliedFilters] =
+    useState<StaffFilters>(DEFAULT_FILTERS);
+  const [page, setPage] = useState(1);
   const [error, setError] = useState("");
   const {
     staff,
@@ -39,6 +120,41 @@ export default function OwnerStaffPage() {
   } = useBranches();
 
   const isSubmitting = isCreating || isUpdating;
+  const managerBranchId =
+    session?.user.role === USER_ROLE_MANAGER ? session.user.branch_id : null;
+  const isBranchLocked = Boolean(managerBranchId);
+
+  const filteredStaff = useMemo(() => {
+    const normalizedSearch = appliedFilters.search.trim().toLowerCase();
+
+    return staff.filter((staffMember) => {
+      const matchesSearch = normalizedSearch
+        ? getStaffSearchText(staffMember).includes(normalizedSearch)
+        : true;
+      const matchesRole =
+        appliedFilters.role === ALL_FILTER_VALUE ||
+        staffMember.role === appliedFilters.role;
+      const matchesBranch =
+        appliedFilters.branchId === ALL_FILTER_VALUE ||
+        (appliedFilters.branchId === ""
+          ? staffMember.branchId === null
+          : staffMember.branchId === appliedFilters.branchId);
+      const matchesStatus =
+        appliedFilters.status === ALL_FILTER_VALUE ||
+        getStaffDisplayStatus(staffMember) === appliedFilters.status;
+
+      return matchesSearch && matchesRole && matchesBranch && matchesStatus;
+    });
+  }, [appliedFilters, staff]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredStaff.length / STAFF_PAGE_SIZE));
+  const pageStartIndex = (page - 1) * STAFF_PAGE_SIZE;
+  const visibleStaff = filteredStaff.slice(
+    pageStartIndex,
+    pageStartIndex + STAFF_PAGE_SIZE,
+  );
+  const pageStart = filteredStaff.length ? pageStartIndex + 1 : 0;
+  const pageEnd = Math.min(pageStartIndex + STAFF_PAGE_SIZE, filteredStaff.length);
 
   function resetForm() {
     setUsername("");
@@ -49,26 +165,51 @@ export default function OwnerStaffPage() {
     setError("");
   }
 
+  function openCreateModal() {
+    resetForm();
+    setBranchId(managerBranchId ?? "");
+    setIsFormOpen(true);
+  }
+
   function handleEdit(staffMember: Staff) {
     setUsername(staffMember.username);
     setPassword("");
     setRole(staffMember.role);
-    setBranchId(staffMember.branchId ?? "");
+    setBranchId(managerBranchId ?? staffMember.branchId ?? "");
     setEditingStaff(staffMember);
+    setViewingStaff(null);
     setError("");
+    setIsFormOpen(true);
   }
 
-  async function handleDelete(staffMember: Staff) {
-    const isConfirmed = window.confirm(staffTexts.ownerStaff.deleteConfirm);
+  function closeFormModal(open: boolean) {
+    setIsFormOpen(open);
 
-    if (!isConfirmed) {
+    if (!open) {
+      resetForm();
+    }
+  }
+
+  function handleApplyFilters(event: SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAppliedFilters(draftFilters);
+    setPage(1);
+  }
+
+  async function handleDelete() {
+    if (!deletingStaff) {
       return;
     }
 
     setError("");
 
     try {
-      await deleteStaff(staffMember.id);
+      await deleteStaff(deletingStaff.id);
+      dispatchAppToast({
+        message: staffTexts.ownerStaff.toast.deleted,
+        type: "success",
+      });
+      setDeletingStaff(null);
     } catch (mutationError) {
       setError(
         mutationError instanceof Error
@@ -110,11 +251,19 @@ export default function OwnerStaffPage() {
           id: editingStaff.id,
           ...staffInput,
         });
+        dispatchAppToast({
+          message: staffTexts.ownerStaff.toast.updated,
+          type: "success",
+        });
       } else {
         await createStaff(staffInput);
+        dispatchAppToast({
+          message: staffTexts.ownerStaff.toast.created,
+          type: "success",
+        });
       }
 
-      resetForm();
+      closeFormModal(false);
     } catch (mutationError) {
       setError(
         mutationError instanceof Error
@@ -125,82 +274,79 @@ export default function OwnerStaffPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
-      <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[360px_1fr]">
-        <section>
+    <div className="min-h-screen bg-gray-200 px-4 py-8 text-gray-1000 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+        <header>
           <h1 className="text-2xl font-semibold">
             {staffTexts.ownerStaff.title}
           </h1>
-          <p className="mt-2 text-sm leading-6 text-zinc-600">
-            {staffTexts.ownerStaff.description}
-          </p>
+        </header>
 
+        <Card padding="lg" title={staffTexts.ownerStaff.filterTitle}>
           <form
-            onSubmit={handleSubmit}
-            className="mt-6 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+            className="grid gap-4 lg:grid-cols-3"
+            onSubmit={handleApplyFilters}
           >
-            <h2 className="text-base font-semibold">
-              {editingStaff
-                ? staffTexts.ownerStaff.editTitle
-                : staffTexts.ownerStaff.createTitle}
-            </h2>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-1000">
+                {staffTexts.ownerStaff.searchLabel}
+              </span>
+              <Input
+                className="mt-2"
+                placeholder={staffTexts.ownerStaff.searchPlaceholder}
+                value={draftFilters.search}
+                onChange={(event) =>
+                  setDraftFilters((currentFilters) => ({
+                    ...currentFilters,
+                    search: event.target.value,
+                  }))
+                }
+              />
+            </label>
 
-            <div className="mt-5 space-y-4">
-              <label className="block">
-                <span className="text-sm font-medium text-zinc-800">
-                  {staffTexts.ownerStaff.usernameLabel}
-                </span>
-                <input
-                  type="text"
-                  value={username}
-                  required
-                  placeholder={staffTexts.ownerStaff.usernamePlaceholder}
-                  onChange={(event) => setUsername(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
-                />
-              </label>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-1000">
+                {staffTexts.ownerStaff.roleLabel}
+              </span>
+              <Select
+                className="mt-2"
+                value={draftFilters.role}
+                onChange={(event) =>
+                  setDraftFilters((currentFilters) => ({
+                    ...currentFilters,
+                    role: event.target.value as StaffRoleFilter,
+                  }))
+                }
+              >
+                <option value={ALL_FILTER_VALUE}>
+                  {staffTexts.ownerStaff.allRolesOption}
+                </option>
+                {STAFF_ROLES.map((staffRole) => (
+                  <option key={staffRole} value={staffRole}>
+                    {staffTexts.ownerStaff.roles[staffRole]}
+                  </option>
+                ))}
+              </Select>
+            </label>
 
+            {!isBranchLocked ? (
               <label className="block">
-                <span className="text-sm font-medium text-zinc-800">
-                  {staffTexts.ownerStaff.passwordLabel}
-                </span>
-                <input
-                  type="password"
-                  value={password}
-                  minLength={editingStaff ? undefined : 8}
-                  required={!editingStaff}
-                  placeholder={staffTexts.ownerStaff.passwordPlaceholder}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-sm font-medium text-zinc-800">
-                  {staffTexts.ownerStaff.roleLabel}
-                </span>
-                <select
-                  value={role}
-                  onChange={(event) => setRole(event.target.value as StaffRole)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
-                >
-                  {STAFF_ROLES.map((staffRole) => (
-                    <option key={staffRole} value={staffRole}>
-                      {staffTexts.ownerStaff.roles[staffRole]}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="block">
-                <span className="text-sm font-medium text-zinc-800">
+                <span className="text-sm font-medium text-gray-1000">
                   {staffTexts.ownerStaff.branchLabel}
                 </span>
-                <select
-                  value={branchId}
-                  onChange={(event) => setBranchId(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
+                <Select
+                  className="mt-2"
+                  value={draftFilters.branchId}
+                  onChange={(event) =>
+                    setDraftFilters((currentFilters) => ({
+                      ...currentFilters,
+                      branchId: event.target.value,
+                    }))
+                  }
                 >
+                  <option value={ALL_FILTER_VALUE}>
+                    {staffTexts.ownerStaff.allBranchesOption}
+                  </option>
                   <option value="">
                     {staffTexts.ownerStaff.noBranchOption}
                   </option>
@@ -209,130 +355,418 @@ export default function OwnerStaffPage() {
                       {branch.name}
                     </option>
                   ))}
-                </select>
-                {isLoadingBranches ? (
-                  <span className="mt-2 block text-sm text-zinc-600">
-                    {staffTexts.ownerStaff.loading}
-                  </span>
-                ) : null}
-                {branchesError ? (
-                  <span className="mt-2 block text-sm text-red-700">
-                    {branchesError instanceof Error
-                      ? branchesError.message
-                      : staffTexts.ownerStaff.errors.generic}
-                  </span>
-                ) : null}
+                </Select>
               </label>
-            </div>
-
-            {error ? (
-              <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-                {error}
-              </p>
             ) : null}
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Button
-                type="submit"
-                variant="primary"
-                className="h-11"
-                disabled={isSubmitting}
+            <label className="block">
+              <span className="text-sm font-medium text-gray-1000">
+                {staffTexts.ownerStaff.statusLabel}
+              </span>
+              <Select
+                className="mt-2"
+                value={draftFilters.status}
+                onChange={(event) =>
+                  setDraftFilters((currentFilters) => ({
+                    ...currentFilters,
+                    status: event.target.value as StaffStatusFilter,
+                  }))
+                }
               >
-                {editingStaff
-                  ? staffTexts.ownerStaff.submitUpdate
-                  : staffTexts.ownerStaff.submitCreate}
-              </Button>
-              {editingStaff ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="h-11"
-                  onClick={resetForm}
-                >
-                  {staffTexts.ownerStaff.cancelEdit}
-                </Button>
-              ) : null}
+                <option value={ALL_FILTER_VALUE}>
+                  {staffTexts.ownerStaff.allStatusesOption}
+                </option>
+                <option value={STAFF_DISPLAY_STATUS_INITIALIZED}>
+                  {staffTexts.ownerStaff.statuses.initialized}
+                </option>
+                <option value={STAFF_DISPLAY_STATUS_ACTIVE}>
+                  {staffTexts.ownerStaff.statuses.active}
+                </option>
+              </Select>
+            </label>
+
+            <div className="flex items-end justify-end lg:col-span-3">
+              <Button type="submit">{staffTexts.ownerStaff.applyFilters}</Button>
             </div>
           </form>
-        </section>
+        </Card>
 
-        <section className="rounded-lg border border-zinc-200 bg-white shadow-sm">
-          {isLoading ? (
-            <p className="p-5 text-sm text-zinc-600">
-              {staffTexts.ownerStaff.loading}
-            </p>
-          ) : null}
-
-          {staffError ? (
-            <p className="m-5 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-              {staffError instanceof Error
-                ? staffError.message
-                : staffTexts.ownerStaff.errors.generic}
-            </p>
-          ) : null}
-
-          {!isLoading && !staffError && staff.length === 0 ? (
-            <p className="p-5 text-sm text-zinc-600">
-              {staffTexts.ownerStaff.empty}
-            </p>
-          ) : null}
-
-          {staff.length ? (
-            <div className="divide-y divide-zinc-200">
-              {staff.map((staffMember) => (
-                <article key={staffMember.id} className="p-5">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <h2 className="text-base font-semibold">
-                        {staffMember.username}
-                      </h2>
-                      <p className="mt-2 text-sm text-zinc-600">
-                        {staffTexts.ownerStaff.roles[staffMember.role]}
-                      </p>
-                      <p className="mt-2 text-sm text-zinc-600">
-                        {staffMember.branch?.name ??
-                          staffTexts.ownerStaff.branchEmpty}
-                      </p>
-                      {staffMember.isFirstLogin ? (
-                        <p className="mt-2 text-sm font-medium text-zinc-800">
-                          {staffTexts.ownerStaff.firstLoginLabel}
-                        </p>
-                      ) : null}
-                      <p className="mt-3 text-xs text-zinc-500">
-                        <span>{staffTexts.ownerStaff.createdAtLabel}</span>
-                        <span className="ml-1">
-                          {DATE_FORMATTER.format(new Date(staffMember.createdAt))}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        className="h-9"
-                        onClick={() => handleEdit(staffMember)}
-                      >
-                        {staffTexts.ownerStaff.edit}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        className="h-9"
-                        disabled={isDeleting}
-                        onClick={() => handleDelete(staffMember)}
-                      >
-                        {isDeleting
-                          ? staffTexts.ownerStaff.deleting
-                          : staffTexts.ownerStaff.delete}
-                      </Button>
-                    </div>
-                  </div>
-                </article>
+        <Card
+          padding="lg"
+          title={staffTexts.ownerStaff.listTitle}
+          action={
+            <Button
+              icon={<Plus className="size-4" aria-hidden="true" />}
+              type="button"
+              onClick={openCreateModal}
+            >
+              {staffTexts.ownerStaff.createAction}
+            </Button>
+          }
+        >
+          {isLoading || isLoadingBranches ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton key={index} className="h-12 w-full" />
               ))}
             </div>
           ) : null}
-        </section>
+
+          {staffError || branchesError ? (
+            <FeedbackError
+              message={
+                staffError instanceof Error
+                  ? staffError.message
+                  : branchesError instanceof Error
+                    ? branchesError.message
+                    : staffTexts.ownerStaff.errors.generic
+              }
+            />
+          ) : null}
+
+          {!isLoading &&
+          !isLoadingBranches &&
+          !staffError &&
+          !branchesError &&
+          filteredStaff.length === 0 ? (
+            <EmptyState title={staffTexts.ownerStaff.empty} />
+          ) : null}
+
+          {!isLoading &&
+          !isLoadingBranches &&
+          !staffError &&
+          !branchesError &&
+          filteredStaff.length > 0 ? (
+            <div className="overflow-x-auto rounded-lg border border-gray-400">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <th className="w-16 px-4 py-3 text-left font-semibold text-gray-1000">
+                      {staffTexts.ownerStaff.table.index}
+                    </th>
+                    <th className="min-w-48 px-4 py-3 text-left font-semibold text-gray-1000">
+                      {staffTexts.ownerStaff.table.username}
+                    </th>
+                    <th className="min-w-36 px-4 py-3 text-left font-semibold text-gray-1000">
+                      {staffTexts.ownerStaff.table.role}
+                    </th>
+                    <th className="min-w-44 px-4 py-3 text-left font-semibold text-gray-1000">
+                      {staffTexts.ownerStaff.table.branch}
+                    </th>
+                    <th className="min-w-32 px-4 py-3 text-left font-semibold text-gray-1000">
+                      {staffTexts.ownerStaff.table.status}
+                    </th>
+                    <th className="min-w-36 px-4 py-3 text-left font-semibold text-gray-1000">
+                      {staffTexts.ownerStaff.table.createdAt}
+                    </th>
+                    <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
+                      {staffTexts.ownerStaff.table.actions}
+                    </th>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {visibleStaff.map((staffMember, index) => {
+                    const displayStatus = getStaffDisplayStatus(staffMember);
+
+                    return (
+                      <TableRow key={staffMember.id}>
+                        <TableCell>{pageStartIndex + index + 1}</TableCell>
+                        <TableCell>
+                          <button
+                            className="min-h-11 cursor-pointer text-left font-bold text-gray-1000 underline-offset-4 hover:underline"
+                            type="button"
+                            onClick={() => setViewingStaff(staffMember)}
+                          >
+                            {staffMember.username}
+                          </button>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            size="sm"
+                            variant={STAFF_ROLE_BADGE_VARIANTS[staffMember.role]}
+                          >
+                            {staffTexts.ownerStaff.roles[staffMember.role]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {staffMember.branch?.name ??
+                            staffTexts.ownerStaff.branchEmpty}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            size="sm"
+                            variant={STAFF_STATUS_BADGE_VARIANTS[displayStatus]}
+                          >
+                            {staffTexts.ownerStaff.statuses[displayStatus]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {DATE_FORMATTER.format(new Date(staffMember.createdAt))}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            <Tooltip content={staffTexts.ownerStaff.edit}>
+                              <Button
+                                aria-label={staffTexts.ownerStaff.edit}
+                                className="size-10 px-0"
+                                icon={
+                                  <Edit2 className="size-4" aria-hidden="true" />
+                                }
+                                type="button"
+                                variant="secondary"
+                                onClick={() => handleEdit(staffMember)}
+                              />
+                            </Tooltip>
+                            <Tooltip content={staffTexts.ownerStaff.delete}>
+                              <Button
+                                aria-label={staffTexts.ownerStaff.delete}
+                                className="size-10 px-0"
+                                icon={
+                                  <Trash2 className="size-4" aria-hidden="true" />
+                                }
+                                type="button"
+                                variant="danger"
+                                onClick={() => setDeletingStaff(staffMember)}
+                              />
+                            </Tooltip>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          ) : null}
+
+          {filteredStaff.length > 0 ? (
+            <div className="mt-4 flex flex-col gap-3 text-sm text-gray-700 sm:flex-row sm:items-center sm:justify-between">
+              <p>{formatPageSummary(pageStart, pageEnd, filteredStaff.length)}</p>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            </div>
+          ) : null}
+        </Card>
       </div>
+
+      <Modal
+        open={isFormOpen}
+        title={
+          editingStaff
+            ? staffTexts.ownerStaff.editTitle
+            : staffTexts.ownerStaff.createTitle
+        }
+        onOpenChange={closeFormModal}
+      >
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-1000">
+              {staffTexts.ownerStaff.usernameLabel}
+            </span>
+            <Input
+              className="mt-2"
+              placeholder={staffTexts.ownerStaff.usernamePlaceholder}
+              required
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-medium text-gray-1000">
+              {staffTexts.ownerStaff.passwordLabel}
+            </span>
+            <Input
+              className="mt-2"
+              minLength={editingStaff ? undefined : 8}
+              placeholder={staffTexts.ownerStaff.passwordPlaceholder}
+              required={!editingStaff}
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-medium text-gray-1000">
+              {staffTexts.ownerStaff.roleLabel}
+            </span>
+            <Select
+              className="mt-2"
+              value={role}
+              onChange={(event) => setRole(event.target.value as StaffRole)}
+            >
+              {STAFF_ROLES.map((staffRole) => (
+                <option key={staffRole} value={staffRole}>
+                  {staffTexts.ownerStaff.roles[staffRole]}
+                </option>
+              ))}
+            </Select>
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-medium text-gray-1000">
+              {staffTexts.ownerStaff.branchLabel}
+            </span>
+            <Select
+              className="mt-2"
+              disabled={isBranchLocked}
+              value={branchId}
+              onChange={(event) => setBranchId(event.target.value)}
+            >
+              {!isBranchLocked ? (
+                <option value="">{staffTexts.ownerStaff.noBranchOption}</option>
+              ) : null}
+              {branches.map((branch) => (
+                <option key={branch.id} value={branch.id}>
+                  {branch.name}
+                </option>
+              ))}
+            </Select>
+          </label>
+
+          {error ? <FeedbackError message={error} /> : null}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => closeFormModal(false)}
+            >
+              {staffTexts.ownerStaff.cancelEdit}
+            </Button>
+            <Button type="submit" loading={isSubmitting}>
+              {editingStaff
+                ? staffTexts.ownerStaff.submitUpdate
+                : staffTexts.ownerStaff.submitCreate}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        open={Boolean(viewingStaff)}
+        title={staffTexts.ownerStaff.detailTitle}
+        onOpenChange={(open) => {
+          if (!open) {
+            setViewingStaff(null);
+          }
+        }}
+      >
+        {viewingStaff ? (
+          <div>
+            <div className="overflow-hidden rounded-lg border border-gray-400">
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="w-1/2 bg-gray-200 font-medium">
+                      {staffTexts.ownerStaff.usernameLabel}
+                    </TableCell>
+                    <TableCell>{viewingStaff.username}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="w-1/2 bg-gray-200 font-medium">
+                      {staffTexts.ownerStaff.roleLabel}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        size="sm"
+                        variant={STAFF_ROLE_BADGE_VARIANTS[viewingStaff.role]}
+                      >
+                        {staffTexts.ownerStaff.roles[viewingStaff.role]}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="w-1/2 bg-gray-200 font-medium">
+                      {staffTexts.ownerStaff.branchLabel}
+                    </TableCell>
+                    <TableCell>
+                      {viewingStaff.branch?.name ??
+                        staffTexts.ownerStaff.branchEmpty}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="w-1/2 bg-gray-200 font-medium">
+                      {staffTexts.ownerStaff.statusLabel}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        size="sm"
+                        variant={
+                          STAFF_STATUS_BADGE_VARIANTS[
+                            getStaffDisplayStatus(viewingStaff)
+                          ]
+                        }
+                      >
+                        {
+                          staffTexts.ownerStaff.statuses[
+                            getStaffDisplayStatus(viewingStaff)
+                          ]
+                        }
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="w-1/2 bg-gray-200 font-medium">
+                      {staffTexts.ownerStaff.createdAtLabel}
+                    </TableCell>
+                    <TableCell>
+                      {DATE_FORMATTER.format(new Date(viewingStaff.createdAt))}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+            <div className="flex justify-end gap-2 pt-3">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => handleEdit(viewingStaff)}
+              >
+                {staffTexts.ownerStaff.edit}
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+
+      <Modal
+        description={staffTexts.ownerStaff.deleteConfirmDescription}
+        open={Boolean(deletingStaff)}
+        title={staffTexts.ownerStaff.deleteConfirmTitle}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeletingStaff(null);
+            setError("");
+          }
+        }}
+      >
+        {error ? <FeedbackError className="mb-4" message={error} /> : null}
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setDeletingStaff(null);
+              setError("");
+            }}
+          >
+            {staffTexts.ownerStaff.deleteCancel}
+          </Button>
+          <Button
+            loading={isDeleting}
+            type="button"
+            variant="danger"
+            onClick={handleDelete}
+          >
+            {staffTexts.ownerStaff.delete}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

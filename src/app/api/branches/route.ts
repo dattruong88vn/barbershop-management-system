@@ -3,6 +3,7 @@ import { getToken } from "next-auth/jwt";
 
 import {
   MANAGEMENT_ROLES,
+  USER_ROLE_MANAGER,
   type ManagementRoleValue,
 } from "@/constants/common";
 import { branchTexts } from "@/constants/texts";
@@ -55,7 +56,14 @@ async function getManagementShopId(request: NextRequest) {
     return { error: branchTexts.api.errors.forbidden, status: 403 };
   }
 
-  return { shopId: token.shop_id };
+  if (token.role === USER_ROLE_MANAGER && !token.branch_id) {
+    return { error: branchTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return {
+    branchId: token.role === USER_ROLE_MANAGER ? token.branch_id : null,
+    shopId: token.shop_id,
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -69,7 +77,10 @@ export async function GET(request: NextRequest) {
   }
 
   const branches = await prisma.branch.findMany({
-    where: { shopId: authResult.shopId },
+    where: {
+      shopId: authResult.shopId,
+      ...(authResult.branchId ? { id: authResult.branchId } : {}),
+    },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
