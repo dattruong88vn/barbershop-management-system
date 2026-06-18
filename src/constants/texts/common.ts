@@ -14,6 +14,7 @@ export const commonTexts = {
     combos: "Combo",
     create: "Tạo",
     dashboard: "Tổng quan",
+    changeBranch: "Đổi chi nhánh",
     logout: "Đăng xuất",
     management: "Điều hướng quản lý",
     reports: "Báo cáo",

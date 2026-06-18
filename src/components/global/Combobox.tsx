@@ -3,7 +3,10 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 
+import { commonTexts } from "@/constants/texts";
 import { cn } from "@/lib/utils";
+
+import { GeistSearchInput } from "./Inputs";
 
 export type ComboboxOption = {
   label: string;
@@ -12,22 +15,35 @@ export type ComboboxOption = {
 
 export function Combobox({
   label,
+  emptyMessage,
   onValueChange,
   options,
   placeholder,
+  searchable = false,
+  searchPlaceholder,
   value,
 }: {
   label: string;
+  emptyMessage?: string;
   onValueChange: (value: string) => void;
   options: ComboboxOption[];
   placeholder: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
   value: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const fieldId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const selectedOption = options.find((option) => option.value === value);
   const displayText = selectedOption?.label ?? placeholder;
+  const normalizedSearch = search.trim().toLowerCase();
+  const visibleOptions = normalizedSearch
+    ? options.filter((option) =>
+        option.label.toLowerCase().includes(normalizedSearch),
+      )
+    : options;
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -45,7 +61,16 @@ export function Combobox({
 
   function handleSelect(nextValue: string) {
     onValueChange(nextValue);
+    setSearch("");
     setOpen(false);
+  }
+
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen);
+
+    if (!nextOpen) {
+      setSearch("");
+    }
   }
 
   return (
@@ -58,7 +83,7 @@ export function Combobox({
         aria-label={label}
         role="combobox"
         className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left text-base text-foreground outline-none transition hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
-        onClick={() => setOpen((currentOpen) => !currentOpen)}
+        onClick={() => handleOpenChange(!open)}
       >
         <span className={selectedOption ? "text-foreground/90" : "text-muted-foreground"}>
           {displayText}
@@ -77,7 +102,20 @@ export function Combobox({
           role="listbox"
           className="absolute inset-x-0 top-full z-50 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-background p-1 shadow-lg"
         >
-          {options.map((option) => (
+          {searchable ? (
+            <div className="border-b border-border p-2">
+              <GeistSearchInput
+                autoFocus
+                clearLabel={commonTexts.feedback.clearSearch}
+                placeholder={searchPlaceholder}
+                value={search}
+                onClear={() => setSearch("")}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </div>
+          ) : null}
+
+          {visibleOptions.map((option) => (
             <button
               key={option.value}
               type="button"
@@ -92,6 +130,12 @@ export function Combobox({
               ) : null}
             </button>
           ))}
+
+          {visibleOptions.length === 0 ? (
+            <p className="px-3 py-4 text-center text-sm text-muted-foreground">
+              {emptyMessage ?? placeholder}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>

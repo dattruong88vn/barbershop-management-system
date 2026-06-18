@@ -55,7 +55,9 @@ Manager role:
 - `manager`
 - Manager management routes use `/manager/*`.
 - Manager must not access `/owner/*`; middleware redirects forbidden routes to the post-auth default.
-- MVP business scope là branch-level reporting.
+- Sau đăng nhập, manager đi qua `/manager/select-branch`. Màn này không có sidebar.
+- Nếu chỉ có một branch active, hệ thống tự chọn; nếu có nhiều branch, manager phải chọn trước khi vào workspace.
+- Branch đã chọn là context cho toàn bộ dữ liệu và API trong phiên làm việc.
 - Manager có quyền quản lý dịch vụ, combo, và nhân viên. Branch management remains owner-only.
 - Trong màn Nhân viên, manager chỉ thấy và tạo/sửa nhân viên thuộc chi nhánh của chính manager.
 - Sidebar:
@@ -68,6 +70,9 @@ Manager role:
   - Dịch vụ → `/manager/services`
   - Combo → `/manager/combos`
   - Nhân viên → `/manager/staff`
+  - Đổi chi nhánh → `/manager/select-branch` (chỉ hiển thị khi manager quản lý nhiều hơn một branch)
+
+`Đổi chi nhánh` quay lại màn chọn không có sidebar. Sau khi chọn branch mới, ứng dụng xoá/invalidate cache dữ liệu branch cũ và mặc định quay về Tổng quan.
 
 ---
 

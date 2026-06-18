@@ -22,8 +22,11 @@
 | `shop_id`    | uuid      | FK → shops        |
 | `name`       | string    | Tên chi nhánh     |
 | `address`    | string    | Địa chỉ chi nhánh |
+| `manager_id` | uuid      | FK → users, nullable; một manager có thể quản lý nhiều chi nhánh |
+| `status`     | enum      | `active`, `inactive` |
 | `created_at` | timestamp |                   |
 
+> Mỗi chi nhánh có tối đa một manager; manager có thể quản lý nhiều chi nhánh. `users.branch_id` tiếp tục là chi nhánh làm việc chính của staff, không dùng để biểu diễn danh sách branch manager quản lý. Không hard delete chi nhánh.
 ---
 
 ## Bảng `users` — tài khoản đăng nhập
@@ -115,6 +118,8 @@
 | `id`              | uuid      | PK                                                       |
 | `customer_id`     | uuid      | FK → customers                                           |
 | `branch_id`       | uuid      | FK → branches, chi nhánh tại thời điểm visit             |
+| `branch_name_snapshot` | string | Tên chi nhánh tại thời điểm tạo visit |
+| `branch_address_snapshot` | string | Địa chỉ chi nhánh tại thời điểm tạo visit |
 | `barber_id`       | uuid      | FK → users, nullable, có thể chọn sau hoặc chỉnh sửa     |
 | `skinner_id`      | uuid      | FK → users, nullable                                     |
 | `status`          | enum      | `pending`, `in_progress`, `completed`                    |
@@ -125,6 +130,7 @@
 | `created_at`      | timestamp |                                                          |
 
 > Cho phép chỉnh sửa barber/skinner trong vòng 3 tiếng kể từ `completed_at`, không gia hạn dù chỉnh bao nhiêu lần. Sau 3 tiếng, toàn bộ dữ liệu visit là bất biến — không được phép thay đổi giá tiền hay dịch vụ đã dùng để bảo vệ tính toàn vẹn của doanh thu và báo cáo.
+> Customer thuộc shop và có thể ghé nhiều branch. Mỗi visit bắt buộc lưu branch relation và snapshot tên/địa chỉ để lịch sử, báo cáo không đổi khi thông tin branch được cập nhật.
 
 ---
 

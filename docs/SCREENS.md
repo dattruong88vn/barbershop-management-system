@@ -211,9 +211,24 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Route:** `/owner/branches` (`ROUTES.ownerBranches`)
 - **Roles:** owner
 - **Ưu tiên:** desktop
-- **Actions:** List, Create, Edit, Delete
-- **Fields:** name, address, số nhân viên, active
-- **States:** list, create modal, edit modal, confirm delete
+- **List:** tìm theo tên hoặc địa chỉ; lọc `Tất cả`, `Đang hoạt động`, `Ngừng hoạt động`; table hiển thị tên, địa chỉ, manager, trạng thái, ngày tạo và thao tác.
+- **Create route:** `/owner/branches/new`; nhập tên, địa chỉ, manager. Section nhân viên hiển thị yêu cầu lưu chi nhánh trước.
+- **Detail route:** `/owner/branches/:id`; click tên chi nhánh từ table để mở. Dùng chung bố cục thông tin với create/edit, hiển thị manager và danh sách nhân viên.
+- **Edit route:** `/owner/branches/:id/edit`; chỉnh tên, địa chỉ, manager. Chi nhánh inactive chỉ được xem, phải active lại trước khi chỉnh sửa.
+- **Manager:** một chi nhánh có tối đa một manager; một manager có thể quản lý nhiều chi nhánh. Dropdown manager hỗ trợ tìm theo username và có `Chưa phân công`.
+- **Staff:** staff thường chỉ thuộc một chi nhánh. Nút `Điều chuyển nhân viên` được đặt ở danh sách nhân viên; popup triển khai sau. Chỉ được chuyển khi nhân viên không còn visit `pending` hoặc `in_progress`; lịch sử visit/report không thay đổi.
+- **Delete:** không hỗ trợ xoá chi nhánh.
+- **Inactive:** flow ngừng/kích hoạt và audit triển khai ở phase sau; UI hiện không được nối action này vào hard delete.
+- **States:** loading, empty, filtered-empty, error, detail not found, create, detail, edit.
+
+## 13b. Manager Branch Selection
+
+- **Route:** `/manager/select-branch` (`ROUTES.managerSelectBranch`)
+- **Roles:** manager
+- **Sidebar:** không hiển thị sidebar trên màn chọn. Chỉ sau khi chọn branch mới đi vào management workspace.
+- **Behavior:** nếu manager chỉ có một branch active thì tự chọn và vào Tổng quan; nếu có nhiều branch thì hiển thị card tên + địa chỉ để chọn; nếu không có branch active thì hiển thị empty state.
+- **Switch:** khi manager quản lý nhiều branch, sidebar hiển thị `Đổi chi nhánh`; action quay lại màn chọn branch và sau khi chọn phải invalidate dữ liệu branch cũ.
+- **Scope:** branch đã chọn trở thành branch context cho staff, service, combo, visit và report. API phải xác minh manager được phân quyền vào branch đó.
 
 ## 14. Reports
 

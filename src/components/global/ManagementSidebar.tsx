@@ -10,6 +10,7 @@ import {
   Gauge,
   LogOut,
   Package,
+  RefreshCcw,
   Scissors,
   Settings,
   Users,
@@ -19,6 +20,7 @@ import type { ComponentType } from "react";
 import { USER_ROLE_MANAGER, USER_ROLE_OWNER } from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
 import { commonTexts } from "@/constants/texts";
+import { useBranches } from "@/hooks/useBranches";
 import { cn } from "@/lib/utils";
 import { isManagementPath, isManagementRole } from "@/utils/common";
 
@@ -113,6 +115,7 @@ export function ManagementSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const role = session?.user.role;
+  const { branches } = useBranches(role === USER_ROLE_MANAGER);
 
   if (!isManagementRole(role) || !isManagementPath(pathname)) {
     return null;
@@ -201,6 +204,15 @@ export function ManagementSidebar() {
       </nav>
 
       <div className="grid gap-1 border-t border-gray-400 p-3">
+        {role === USER_ROLE_MANAGER && branches.length > 1 ? (
+          <Link
+            className="flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 hover:text-gray-1000"
+            href={ROUTES.managerSelectBranch}
+          >
+            <RefreshCcw className="size-4" aria-hidden="true" />
+            {commonTexts.navigation.changeBranch}
+          </Link>
+        ) : null}
         <button
           className="flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 hover:bg-gray-200 hover:text-gray-1000"
           type="button"
