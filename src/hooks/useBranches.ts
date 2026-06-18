@@ -53,6 +53,7 @@ async function updateBranch(input: BranchFormInput & { id: string }) {
       body: JSON.stringify({
         name: input.name,
         address: input.address,
+        managerId: input.managerId,
       }),
     },
   );
@@ -71,9 +72,10 @@ async function deleteBranch(id: string): Promise<Branch> {
   return getBranchResponseData(result);
 }
 
-export function useBranches() {
+export function useBranches(enabled = true) {
   const queryClient = useQueryClient();
   const branchesQuery = useQuery({
+    enabled,
     queryKey: BRANCHES_QUERY_KEY,
     queryFn: getBranches,
   });
