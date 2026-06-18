@@ -18,7 +18,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Select/dropdown menu khi mở phải nằm dưới trigger, không đè lên phần hiển thị đã chọn.
 - Table dùng global primitives phải có line ngang giữa các row và line dọc giữa các cell để ô dữ liệu được phân tách rõ.
 - Cột số thứ tự trong table phải dùng title `#`, width hẹp (`w-10` hoặc tương đương) và canh giữa cả header lẫn cell.
-- Màn hình quản lý catalog có soft delete như dịch vụ/combo phải dùng tabs `Đang hoạt động` và `Đã xoá` nằm trên filter card; tab đã xoá chỉ để xem lại, không hiển thị thao tác tạo/sửa/xoá nếu chưa có flow khôi phục.
+- Màn hình quản lý catalog có soft delete như dịch vụ/combo phải dùng tabs `Đang hoạt động` và `Đã xoá` nằm trên filter card; tab đã xoá chỉ để xem lại, không hiển thị thao tác tạo/sửa/xoá. Nếu entity có flow tạo bản mới từ bản đã xoá như combo, chỉ hiển thị thao tác nhân bản thay vì restore.
 - Date hiển thị trong UI phải dùng format `dd/mm/yyyy`. Nếu cần kèm giờ, đặt giờ sau ngày, ví dụ `17/06/2026 15:30`.
 - Mọi ô search text phải hiển thị nút icon `X` để xoá nhanh khi user đã nhập nội dung.
 - Option mặc định thể hiện "tất cả giá trị" trong filter/select phải hiển thị đúng `Tất cả`, không thêm tên field phía sau.

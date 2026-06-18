@@ -28,7 +28,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Header của mọi page chỉ hiển thị title. Không render description/subtitle trong page header.
 - Dropdown/select phải dùng global `Select` primitive. Padding trái của text và padding phải của icon phải cân nhau về thị giác; phần phải vẫn phải đủ rộng để icon không đè text.
 - Table phải dùng global table primitives và hiển thị đủ line ngang giữa row + line dọc giữa cell để phân tách ô rõ ràng.
-- Catalog soft delete như dịch vụ/combo dùng tabs `Đang hoạt động` và `Đã xoá` phía trên filter card; tab đã xoá là read-only cho tới khi có yêu cầu khôi phục.
+- Catalog soft delete như dịch vụ/combo dùng tabs `Đang hoạt động` và `Đã xoá` phía trên filter card. Tab đã xoá mặc định chỉ để xem lại; riêng combo cho phép nhân bản từ tab đã xoá để tạo bản mới thay vì restore record cũ.
 - Mỗi bảng thuộc tenant phải enforce `shop_id`.
 - Roles: `superadmin`, `owner`, `manager`, `receptionist`, `barber`, `skinner`.
 - Visit status: `pending`, `in_progress`, `completed`.
@@ -180,10 +180,12 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Route:** owner `/owner/combos` (`ROUTES.ownerCombos`), manager `/manager/combos` (`ROUTES.managerCombos`)
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
-- **Actions:** List, Create, Edit, Delete
-- **Fields:** name, danh sách dịch vụ thành phần, price, active
+- **Actions:** List, Create, Edit khi combo chưa có visit, Duplicate, Soft delete
+- **Fields:** name, description, danh sách dịch vụ thành phần, price, scope, creator, createdAt, deletedAt
+- **Tabs:** `Đang hoạt động`, `Đã xoá`; tab đã xoá không restore, chỉ cho xem lại và nhân bản combo.
 - **Business:** giá combo do owner nhập độc lập với tổng giá dịch vụ lẻ. Nếu giá combo cao hơn tổng giá dịch vụ lẻ thì chỉ cảnh báo ở UI, không chặn backend.
-- **States:** list, create modal, edit modal, confirm delete
+- **Duplicate:** dùng để chỉnh sửa gián tiếp combo đã có visit hoặc tạo lại combo đã xoá. Tên bản sao thêm suffix `- copy`; chỉ dịch vụ đang hoạt động và còn thuộc scope hiện tại được checked sẵn. Nếu một phần dịch vụ gốc không thể copy, hiển thị warning tổng quát; nếu không còn dịch vụ nào hợp lệ, hiển thị warning yêu cầu chọn dịch vụ mới.
+- **States:** list, deleted list, create modal, edit modal, duplicate modal, confirm delete
 
 ## 12. Staff
 

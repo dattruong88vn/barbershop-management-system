@@ -32,6 +32,9 @@ type ComboFormModalProps = {
   description: string;
   editingCombo: Combo | null;
   error: string;
+  hasDuplicateNoAvailableServices: boolean;
+  hasDuplicateUnavailableServices: boolean;
+  isDuplicating: boolean;
   isLoadingServices: boolean;
   isOpen: boolean;
   isSubmitting: boolean;
@@ -66,6 +69,9 @@ export function ComboFormModal({
   description,
   editingCombo,
   error,
+  hasDuplicateNoAvailableServices,
+  hasDuplicateUnavailableServices,
+  isDuplicating,
   isLoadingServices,
   isOpen,
   isSubmitting,
@@ -90,6 +96,8 @@ export function ComboFormModal({
       title={
         editingCombo
           ? comboTexts.ownerCombos.editTitle
+          : isDuplicating
+            ? comboTexts.ownerCombos.duplicateTitle
           : comboTexts.ownerCombos.createTitle
       }
       onOpenChange={onOpenChange}
@@ -146,6 +154,20 @@ export function ComboFormModal({
         {priceWarning ? (
           <Feedback
             message={comboTexts.ownerCombos.priceAboveServicesWarning}
+            type={UI_FEEDBACK_TYPE_WARNING}
+          />
+        ) : null}
+
+        {hasDuplicateNoAvailableServices ? (
+          <Feedback
+            message={comboTexts.ownerCombos.duplicateNoAvailableServicesWarning}
+            type={UI_FEEDBACK_TYPE_WARNING}
+          />
+        ) : null}
+
+        {hasDuplicateUnavailableServices ? (
+          <Feedback
+            message={comboTexts.ownerCombos.duplicateUnavailableServicesWarning}
             type={UI_FEEDBACK_TYPE_WARNING}
           />
         ) : null}
@@ -240,6 +262,8 @@ export function ComboFormModal({
           <Button loading={isSubmitting} type="submit">
             {editingCombo
               ? comboTexts.ownerCombos.submitUpdate
+              : isDuplicating
+                ? comboTexts.ownerCombos.submitDuplicate
               : comboTexts.ownerCombos.submitCreate}
           </Button>
         </div>

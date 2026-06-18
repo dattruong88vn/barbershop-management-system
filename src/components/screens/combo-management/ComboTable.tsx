@@ -158,11 +158,9 @@ export function ComboTable({
                 <th className="min-w-44 px-4 py-3 text-left font-semibold text-gray-1000">
                   {comboTexts.ownerCombos.table.scope}
                 </th>
-                {isDeletedTab ? null : (
-                  <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
-                    {comboTexts.ownerCombos.table.actions}
-                  </th>
-                )}
+                <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
+                  {comboTexts.ownerCombos.table.actions}
+                </th>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -224,9 +222,9 @@ export function ComboTable({
                         {getScopeLabel(combo)}
                       </Badge>
                     </TableCell>
-                    {isDeletedTab ? null : (
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        {isDeletedTab ? null : (
                           <Tooltip
                             content={
                               combo.isUsedInVisit
@@ -248,21 +246,23 @@ export function ComboTable({
                               onClick={() => onEdit(combo)}
                             />
                           </Tooltip>
-                          <Tooltip content={comboTexts.ownerCombos.duplicate}>
-                            <Button
-                              aria-label={comboTexts.ownerCombos.duplicate}
-                              className="size-10 px-0"
-                              icon={
-                                <CopyPlus
-                                  className="size-4"
-                                  aria-hidden="true"
-                                />
-                              }
-                              type="button"
-                              variant={UI_VARIANT_SECONDARY}
-                              onClick={() => onDuplicate(combo)}
-                            />
-                          </Tooltip>
+                        )}
+                        <Tooltip content={comboTexts.ownerCombos.duplicate}>
+                          <Button
+                            aria-label={comboTexts.ownerCombos.duplicate}
+                            className="size-10 px-0"
+                            icon={
+                              <CopyPlus
+                                className="size-4"
+                                aria-hidden="true"
+                              />
+                            }
+                            type="button"
+                            variant={UI_VARIANT_SECONDARY}
+                            onClick={() => onDuplicate(combo)}
+                          />
+                        </Tooltip>
+                        {isDeletedTab ? null : (
                           <Tooltip content={comboTexts.ownerCombos.delete}>
                             <Button
                               aria-label={comboTexts.ownerCombos.delete}
@@ -276,9 +276,9 @@ export function ComboTable({
                               onClick={() => onDelete(combo)}
                             />
                           </Tooltip>
-                        </div>
-                      </TableCell>
-                    )}
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 );
               })}
