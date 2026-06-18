@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, type SyntheticEvent } from "react";
+import {
+  UI_VARIANT_GHOST,
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { Button } from "@/components/global/ui/button";
 import { visitTexts } from "@/constants/texts";
@@ -80,10 +84,10 @@ export function VisitStaffEditForm({
       </label>
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="ghost" onClick={onCancel}>
+        <Button type="button" variant={UI_VARIANT_GHOST} onClick={onCancel}>
           {visitTexts.detail.closeEditStaff}
         </Button>
-        <Button type="submit" variant="primary" loading={isUpdatingStaff}>
+        <Button type="submit" variant={UI_VARIANT_PRIMARY} loading={isUpdatingStaff}>
           {visitTexts.staffEdit.submit}
         </Button>
       </div>

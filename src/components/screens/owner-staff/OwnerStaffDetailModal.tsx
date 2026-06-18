@@ -7,6 +7,9 @@ import {
   TableCell,
   TableRow,
 } from "@/components/global";
+import {
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
 import type { Staff } from "@/types";
 import { formatDisplayDate } from "@/utils/common";
@@ -96,7 +99,7 @@ export function OwnerStaffDetailModal({
           <div className="flex justify-end gap-2 pt-3">
             <Button
               type="button"
-              variant="secondary"
+              variant={UI_VARIANT_SECONDARY}
               onClick={() => onEdit(staffMember)}
             >
               {staffTexts.ownerStaff.edit}

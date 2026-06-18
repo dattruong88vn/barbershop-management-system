@@ -1,4 +1,8 @@
 import { X } from "lucide-react";
+import {
+  UI_VARIANT_GHOST,
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { FormTextField } from "@/components/global/FormTextField";
 import { InlineAlert } from "@/components/global/InlineAlert";
@@ -66,10 +70,10 @@ export function CreateCustomerModal({
         {error ? <InlineAlert className="mt-4">{error}</InlineAlert> : null}
 
         <div className="mt-6 flex justify-end gap-3">
-          <Button type="button" variant="ghost" onClick={onClose}>
+          <Button type="button" variant={UI_VARIANT_GHOST} onClick={onClose}>
             {customerTexts.lookup.cancelCreate}
           </Button>
-          <Button type="submit" variant="primary" loading={isCreating}>
+          <Button type="submit" variant={UI_VARIANT_PRIMARY} loading={isCreating}>
             {customerTexts.lookup.submitCreate}
           </Button>
         </div>

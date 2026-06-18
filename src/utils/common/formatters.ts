@@ -4,6 +4,10 @@ const VND_PRICE_FORMATTER = new Intl.NumberFormat("vi-VN", {
   style: "currency",
 });
 
+const CURRENCY_INPUT_FORMATTER = new Intl.NumberFormat("vi-VN", {
+  maximumFractionDigits: 0,
+});
+
 const DISPLAY_DATE_FORMATTER = new Intl.DateTimeFormat("vi-VN", {
   day: "2-digit",
   month: "2-digit",
@@ -21,6 +25,22 @@ function toDate(value: string | number | Date) {
 
 export function formatVndPrice(value: number) {
   return VND_PRICE_FORMATTER.format(value);
+}
+
+export function formatCurrencyInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  return CURRENCY_INPUT_FORMATTER.format(Number(digits));
+}
+
+export function parseCurrencyInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+
+  return digits ? Number(digits) : Number.NaN;
 }
 
 export function formatDisplayDate(value: string | number | Date) {

@@ -28,6 +28,7 @@ const SERVICE_SELECT = {
   isHaircut: true,
   createdBy: true,
   createdAt: true,
+  deletedAt: true,
   branch: {
     select: {
       id: true,
@@ -75,6 +76,7 @@ function formatServiceResponse(
     price: { toString: () => string };
     responsibleRole: string;
     createdAt: Date;
+    deletedAt: Date | null;
     creator: { id: string; role: string; username: string };
   },
   auth: { role: ManagementRoleValue; userId: string },

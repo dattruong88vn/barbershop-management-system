@@ -1,4 +1,7 @@
 import { Search, UserPlus, X } from "lucide-react";
+import {
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { Button } from "@/components/global/ui/button";
 import { Input } from "@/components/global/ui/input";
@@ -51,7 +54,7 @@ export function CustomerSearchForm({
         </div>
         <Button
           type="button"
-          variant="primary"
+          variant={UI_VARIANT_PRIMARY}
           size="lg"
           onClick={onCreateCustomer}
           className="hidden h-11 rounded-xl md:inline-flex"

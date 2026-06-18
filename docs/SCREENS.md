@@ -28,6 +28,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Header của mọi page chỉ hiển thị title. Không render description/subtitle trong page header.
 - Dropdown/select phải dùng global `Select` primitive. Padding trái của text và padding phải của icon phải cân nhau về thị giác; phần phải vẫn phải đủ rộng để icon không đè text.
 - Table phải dùng global table primitives và hiển thị đủ line ngang giữa row + line dọc giữa cell để phân tách ô rõ ràng.
+- Catalog soft delete như dịch vụ/combo dùng tabs `Đang hoạt động` và `Đã xoá` phía trên filter card; tab đã xoá là read-only cho tới khi có yêu cầu khôi phục.
 - Mỗi bảng thuộc tenant phải enforce `shop_id`.
 - Roles: `superadmin`, `owner`, `manager`, `receptionist`, `barber`, `skinner`.
 - Visit status: `pending`, `in_progress`, `completed`.

@@ -2,20 +2,27 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarClock, Plus } from "lucide-react";
+import {
+  CalendarClock,
+  Plus,
+} from "lucide-react";
 
 import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
 import { EmptyState } from "@/components/global/EmptyState";
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
-import { VisitListCard, VisitListSkeleton } from "@/components/modules/visits";
-import { ROUTES } from "@/constants/routes";
-import { visitTexts } from "@/constants/texts";
 import {
-  VISIT_STATUS_COMPLETED,
+  VisitListCard,
+  VisitListSkeleton,
+} from "@/components/modules/visits";
+import {
+  UI_VARIANT_PRIMARY,
   VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
+  VISIT_STATUS_COMPLETED,
 } from "@/constants/common";
+import { ROUTES } from "@/constants/routes";
+import { visitTexts } from "@/constants/texts";
 import { useVisits } from "@/hooks/useVisits";
 import type { CustomerVisitStatus } from "@/types";
 import { getVisitListStatusLabel } from "@/utils/visits";
@@ -45,7 +52,7 @@ export default function VisitsPage() {
             </div>
             <Button
               asChild
-              variant="primary"
+              variant={UI_VARIANT_PRIMARY}
               size="lg"
               className="h-9 shrink-0 rounded-lg px-3 text-sm md:px-4"
             >

@@ -18,6 +18,7 @@ export type Service = {
     role: string;
     username: string;
   };
+  deletedAt: string | null;
   id: string;
   isHaircut: boolean;
   name: string;

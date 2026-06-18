@@ -227,9 +227,11 @@ async function main() {
       create: {
         id: combo.id,
         shopId,
+        branchId: null,
         name: combo.name,
         description: combo.description,
         price: combo.price,
+        createdBy: ownerId,
       },
     });
 

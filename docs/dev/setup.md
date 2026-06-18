@@ -50,6 +50,20 @@ npm run dev
 
 Use `feature/*`, `fix/*`, or `chore/*` depending on the work.
 
+## After DB Schema Changes
+
+When `prisma/schema.prisma` or `prisma/migrations/` changes, update the database
+before checking the app in the browser:
+
+```bash
+npx prisma migrate deploy
+npx prisma generate
+npm run dev
+```
+
+If the dev server is already running and an API fails with a missing column error,
+stop it, run the commands above, then start it again.
+
 ## Useful Docs
 
 - Git flow: [git-flow.md](git-flow.md)

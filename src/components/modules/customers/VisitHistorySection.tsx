@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import {
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 
 import { Button } from "@/components/global/ui/button";
 import { CustomerSectionSkeleton } from "@/components/modules/customers";
@@ -108,7 +111,7 @@ export function VisitHistorySection({
       {shouldShowMore ? (
         <Button
           type="button"
-          variant="secondary"
+          variant={UI_VARIANT_SECONDARY}
           className="mt-4"
           onClick={onShowMore}
         >

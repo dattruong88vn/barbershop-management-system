@@ -15,23 +15,24 @@ import {
   TableRow,
   Tooltip,
 } from "@/components/global";
+import {
+  CATALOG_STATUS_DELETED,
+  type CatalogStatusValue,
+  UI_VARIANT_DANGER,
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
 import type { Service } from "@/types";
-import { formatDisplayDate } from "@/utils/common";
+import { formatDisplayDate, formatVndPrice } from "@/utils/common";
 
 import {
   SERVICE_RESPONSIBLE_ROLE_BADGE_VARIANTS,
   SERVICE_SCOPE_BADGE_VARIANTS,
 } from "./serviceManagementTypes";
 
-const PRICE_FORMATTER = new Intl.NumberFormat("vi-VN", {
-  currency: "VND",
-  maximumFractionDigits: 0,
-  style: "currency",
-});
-
 type ServiceTableProps = {
   currentPage: number;
+  catalogStatus: CatalogStatusValue;
   error: Error | null;
   isLoading: boolean;
   onCreate: () => void;
@@ -68,6 +69,7 @@ function getServiceNameClassName(service: Service) {
 
 export function ServiceTable({
   currentPage,
+  catalogStatus,
   error,
   isLoading,
   onCreate,
@@ -81,16 +83,20 @@ export function ServiceTable({
   totalCount,
   totalPages,
 }: ServiceTableProps) {
+  const isDeletedTab = catalogStatus === CATALOG_STATUS_DELETED;
+
   return (
     <Card
       action={
-        <Button
-          icon={<Plus className="size-4" aria-hidden="true" />}
-          type="button"
-          onClick={onCreate}
-        >
-          {serviceTexts.ownerServices.createAction}
-        </Button>
+        isDeletedTab ? null : (
+          <Button
+            icon={<Plus className="size-4" aria-hidden="true" />}
+            type="button"
+            onClick={onCreate}
+          >
+            {serviceTexts.ownerServices.createAction}
+          </Button>
+        )
       }
       padding="lg"
       title={serviceTexts.ownerServices.listTitle}
@@ -110,7 +116,13 @@ export function ServiceTable({
       ) : null}
 
       {!isLoading && !error && totalCount === 0 ? (
-        <EmptyState title={serviceTexts.ownerServices.empty} />
+        <EmptyState
+          title={
+            isDeletedTab
+              ? serviceTexts.ownerServices.emptyDeleted
+              : serviceTexts.ownerServices.empty
+          }
+        />
       ) : null}
 
       {!isLoading && !error && totalCount > 0 ? (
@@ -118,7 +130,7 @@ export function ServiceTable({
           <Table>
             <TableHead>
               <TableRow>
-                <th className="w-16 px-4 py-3 text-left font-semibold text-gray-1000">
+                <th className="w-10 px-2 py-3 text-center font-semibold text-gray-1000">
                   {serviceTexts.ownerServices.table.index}
                 </th>
                 <th className="min-w-56 px-4 py-3 text-left font-semibold text-gray-1000">
@@ -139,15 +151,19 @@ export function ServiceTable({
                 <th className="min-w-36 px-4 py-3 text-left font-semibold text-gray-1000">
                   {serviceTexts.ownerServices.table.createdAt}
                 </th>
-                <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
-                  {serviceTexts.ownerServices.table.actions}
-                </th>
+                {isDeletedTab ? null : (
+                  <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
+                    {serviceTexts.ownerServices.table.actions}
+                  </th>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
               {services.map((service, index) => (
                 <TableRow key={service.id}>
-                  <TableCell>{pageStartIndex + index + 1}</TableCell>
+                  <TableCell className="px-2 text-center">
+                    {pageStartIndex + index + 1}
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap items-center gap-2">
                       <span
@@ -157,7 +173,7 @@ export function ServiceTable({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>{PRICE_FORMATTER.format(service.price)}</TableCell>
+                  <TableCell>{formatVndPrice(service.price)}</TableCell>
                   <TableCell>
                     <Badge
                       size="sm"
@@ -184,36 +200,46 @@ export function ServiceTable({
                   </TableCell>
                   <TableCell>{service.creator.username}</TableCell>
                   <TableCell>
-                    {formatDisplayDate(service.createdAt)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-2">
-                      <Tooltip content={serviceTexts.ownerServices.edit}>
-                        <Button
-                          aria-label={serviceTexts.ownerServices.edit}
-                          className="size-10 px-0"
-                          disabled={!service.canEdit}
-                          icon={<Edit2 className="size-4" aria-hidden="true" />}
-                          type="button"
-                          variant="secondary"
-                          onClick={() => onEdit(service)}
-                        />
-                      </Tooltip>
-                      <Tooltip content={serviceTexts.ownerServices.delete}>
-                        <Button
-                          aria-label={serviceTexts.ownerServices.delete}
-                          className="size-10 px-0"
-                          disabled={!service.canDelete}
-                          icon={
-                            <Trash2 className="size-4" aria-hidden="true" />
-                          }
-                          type="button"
-                          variant="danger"
-                          onClick={() => onDelete(service)}
-                        />
-                      </Tooltip>
+                    <div className="space-y-1">
+                      <p>{formatDisplayDate(service.createdAt)}</p>
+                      {service.deletedAt ? (
+                        <p className="text-sm text-gray-700">
+                          {serviceTexts.ownerServices.deletedAtLabel}:{" "}
+                          {formatDisplayDate(service.deletedAt)}
+                        </p>
+                      ) : null}
                     </div>
                   </TableCell>
+                  {isDeletedTab ? null : (
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        <Tooltip content={serviceTexts.ownerServices.edit}>
+                          <Button
+                            aria-label={serviceTexts.ownerServices.edit}
+                            className="size-10 px-0"
+                            disabled={!service.canEdit}
+                            icon={<Edit2 className="size-4" aria-hidden="true" />}
+                            type="button"
+                            variant={UI_VARIANT_SECONDARY}
+                            onClick={() => onEdit(service)}
+                          />
+                        </Tooltip>
+                        <Tooltip content={serviceTexts.ownerServices.delete}>
+                          <Button
+                            aria-label={serviceTexts.ownerServices.delete}
+                            className="size-10 px-0"
+                            disabled={!service.canDelete}
+                            icon={
+                              <Trash2 className="size-4" aria-hidden="true" />
+                            }
+                            type="button"
+                            variant={UI_VARIANT_DANGER}
+                            onClick={() => onDelete(service)}
+                          />
+                        </Tooltip>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

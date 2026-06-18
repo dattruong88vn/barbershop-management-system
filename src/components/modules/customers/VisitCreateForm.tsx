@@ -1,13 +1,18 @@
 "use client";
 
 import type { SyntheticEvent } from "react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
 import {
+  UI_VARIANT_PRIMARY,
   USER_ROLE_BARBER,
   USER_ROLE_SKINNER,
   VISIT_ITEM_TYPE_COMBO,
@@ -259,7 +264,7 @@ export default function VisitCreateForm({
         <Button
           type="submit"
           disabled={isCreating}
-          variant="primary"
+          variant={UI_VARIANT_PRIMARY}
           className="h-11 w-full rounded-lg disabled:cursor-not-allowed"
         >
           {isCreating ? visitTexts.create.creating : visitTexts.create.submit}

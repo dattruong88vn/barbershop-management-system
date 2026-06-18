@@ -1,4 +1,8 @@
 import { Edit2, Plus, Trash2 } from "lucide-react";
+import {
+  UI_VARIANT_DANGER,
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 
 import {
   Badge,
@@ -103,7 +107,7 @@ export function OwnerStaffTable({
           <Table>
             <TableHead>
               <TableRow>
-                <th className="w-16 px-4 py-3 text-left font-semibold text-gray-1000">
+                <th className="w-10 px-2 py-3 text-center font-semibold text-gray-1000">
                   {staffTexts.ownerStaff.table.index}
                 </th>
                 <th className="min-w-48 px-4 py-3 text-left font-semibold text-gray-1000">
@@ -132,7 +136,9 @@ export function OwnerStaffTable({
 
                 return (
                   <TableRow key={staffMember.id}>
-                    <TableCell>{pageStartIndex + index + 1}</TableCell>
+                    <TableCell className="px-2 text-center">
+                      {pageStartIndex + index + 1}
+                    </TableCell>
                     <TableCell>
                       <button
                         className="min-h-11 cursor-pointer text-left font-bold text-gray-1000 underline-offset-4 hover:underline"
@@ -175,7 +181,7 @@ export function OwnerStaffTable({
                               <Edit2 className="size-4" aria-hidden="true" />
                             }
                             type="button"
-                            variant="secondary"
+                            variant={UI_VARIANT_SECONDARY}
                             onClick={() => onEdit(staffMember)}
                           />
                         </Tooltip>
@@ -187,7 +193,7 @@ export function OwnerStaffTable({
                               <Trash2 className="size-4" aria-hidden="true" />
                             }
                             type="button"
-                            variant="danger"
+                            variant={UI_VARIANT_DANGER}
                             onClick={() => onDelete(staffMember)}
                           />
                         </Tooltip>

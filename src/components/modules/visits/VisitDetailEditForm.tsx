@@ -1,15 +1,16 @@
 "use client";
 
 import type { SyntheticEvent } from "react";
-import { useMemo, useState } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
 
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
 import {
-  VisitCreateItemSelector,
-  VisitCreateStaffSelect,
-} from "@/components/modules/customers";
-import {
+  UI_VARIANT_GHOST,
+  UI_VARIANT_PRIMARY,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
   VISIT_STATUS_COMPLETED,
@@ -25,6 +26,10 @@ import type {
 } from "@/types";
 import { toggleId } from "@/utils/common/collection";
 import { formatVndPrice } from "@/utils/common/formatters";
+import {
+  VisitCreateItemSelector,
+  VisitCreateStaffSelect,
+} from "@/components/modules/customers/VisitCreateFormFields";
 import {
   calculateVisitTotalPrice,
   getVisitItemIds,
@@ -208,10 +213,10 @@ export function VisitDetailEditForm({
       {error ? <InlineAlert>{error}</InlineAlert> : null}
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="ghost" onClick={onCancel}>
+        <Button type="button" variant={UI_VARIANT_GHOST} onClick={onCancel}>
           {visitTexts.detail.closeEditVisit}
         </Button>
-        <Button type="submit" variant="primary" loading={isSubmitting}>
+        <Button type="submit" variant={UI_VARIANT_PRIMARY} loading={isSubmitting}>
           {visitTexts.detail.saveEditVisit}
         </Button>
       </div>

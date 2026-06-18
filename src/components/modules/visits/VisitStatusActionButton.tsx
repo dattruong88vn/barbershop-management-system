@@ -1,12 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Play } from "lucide-react";
+import {
+  CheckCircle2,
+  Play } from "lucide-react";
 
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
 import { visitTexts } from "@/constants/texts";
-import { VISIT_STATUS_COMPLETED } from "@/constants/common";
+import {
+  UI_FEEDBACK_TYPE_WARNING,
+  UI_VARIANT_SECONDARY,
+  VISIT_STATUS_COMPLETED,
+} from "@/constants/common";
 import { dispatchAppToast } from "@/lib/toast";
 import type { CustomerVisit, VisitStatusUpdateInput } from "@/types";
 import { getMissingCompletionStaffMessage } from "@/utils/visits/visitDetail";
@@ -41,7 +47,7 @@ export function VisitStatusActionButton({
       if (missingCompletionStaffMessage) {
         dispatchAppToast({
           message: missingCompletionStaffMessage,
-          type: "warning",
+          type: UI_FEEDBACK_TYPE_WARNING,
         });
         return;
       }
@@ -91,7 +97,7 @@ export function VisitStatusActionButton({
     <div>
       <Button
         type="button"
-        variant="secondary"
+        variant={UI_VARIANT_SECONDARY}
         loading={isUpdatingStatus}
         className="w-full md:w-auto"
         onClick={handleUpdateStatus}

@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, PencilLine, Plus } from "lucide-react";
+import {
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { Button } from "@/components/global/ui/button";
 import { ROUTES } from "@/constants/routes";
@@ -53,7 +56,7 @@ export function VisitDetailHeader({
             {visitTexts.detail.title}
           </h1>
           {createNewVisitHref ? (
-            <Button asChild variant="primary" className="shrink-0 md:hidden">
+            <Button asChild variant={UI_VARIANT_PRIMARY} className="shrink-0 md:hidden">
               <Link href={createNewVisitHref}>
                 <Plus className="size-4" aria-hidden="true" />
                 {visitTexts.detail.createNewVisit}
@@ -65,7 +68,7 @@ export function VisitDetailHeader({
           {createNewVisitHref ? (
             <Button
               asChild
-              variant="primary"
+              variant={UI_VARIANT_PRIMARY}
               className="hidden w-full md:inline-flex md:w-auto"
             >
               <Link href={createNewVisitHref}>
@@ -77,7 +80,7 @@ export function VisitDetailHeader({
           {canEditDetail ? (
             <Button
               type="button"
-              variant="primary"
+              variant={UI_VARIANT_PRIMARY}
               className="w-full md:w-auto"
               onClick={onOpenEditDetail}
             >

@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Calendar, ImageIcon, Phone, Plus, Repeat } from "lucide-react";
+import {
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { CustomerProfileSkeleton } from "@/components/modules/customers";
 import { Button } from "@/components/global/ui/button";
@@ -76,7 +79,7 @@ export function ProfileSummarySection({
         {createVisitHref ? (
           <Button
             asChild
-            variant="primary"
+            variant={UI_VARIANT_PRIMARY}
             size="lg"
             className="h-9 shrink-0 rounded-lg px-3 text-sm md:px-4"
           >

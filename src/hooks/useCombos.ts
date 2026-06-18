@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import {
+  CATALOG_STATUS_ACTIVE,
+  type CatalogStatusValue,
+} from "@/constants/common";
 import { API_ROUTES } from "@/constants/routes";
 import { comboTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
@@ -28,14 +32,16 @@ function getComboResponseData(result: ComboApiResponse): Combo {
   return result.combo;
 }
 
-async function getCombos(): Promise<Combo[]> {
-  const result = await fetchClient<ComboListApiResponse>(API_ROUTES.combos);
+async function getCombos(status: CatalogStatusValue): Promise<Combo[]> {
+  const result = await fetchClient<ComboListApiResponse>(
+    API_ROUTES.combos({ status }),
+  );
 
   return result.combos;
 }
 
 async function createCombo(input: ComboFormInput): Promise<Combo> {
-  const result = await fetchClient<ComboApiResponse>(API_ROUTES.combos, {
+  const result = await fetchClient<ComboApiResponse>(API_ROUTES.combos(), {
     method: "POST",
     headers: DEFAULT_JSON_HEADERS,
     body: JSON.stringify(input),
@@ -73,11 +79,11 @@ async function deleteCombo(id: string): Promise<Combo> {
   return getComboResponseData(result);
 }
 
-export function useCombos() {
+export function useCombos(status: CatalogStatusValue = CATALOG_STATUS_ACTIVE) {
   const queryClient = useQueryClient();
   const combosQuery = useQuery({
-    queryKey: COMBOS_QUERY_KEY,
-    queryFn: getCombos,
+    queryKey: [...COMBOS_QUERY_KEY, status],
+    queryFn: () => getCombos(status),
   });
 
   const createComboMutation = useMutation({

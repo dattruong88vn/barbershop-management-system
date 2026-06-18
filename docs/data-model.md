@@ -60,7 +60,7 @@
 | `deleted_at` | timestamp | Soft delete; null = còn sử dụng, có giá trị = đã xoá khỏi catalog |
 | `created_at` | timestamp |                                                               |
 
-> Dịch vụ owner tạo có `branch_id = null` và áp dụng toàn shop. Dịch vụ manager tạo có `branch_id` là chi nhánh của manager và chỉ áp dụng trong chi nhánh đó. Owner chỉ edit dịch vụ owner tạo, nhưng có quyền xoá dịch vụ manager tạo trong cùng shop; manager chỉ edit/xoá dịch vụ do chính mình tạo trong chi nhánh của mình. Xoá dịch vụ là soft delete bằng `deleted_at`, không hard delete, để giữ lịch sử visit/combo/report.
+> Dịch vụ owner tạo có `branch_id = null` và áp dụng toàn shop. Dịch vụ manager tạo có `branch_id` là chi nhánh của manager và chỉ áp dụng trong chi nhánh đó. Owner chỉ edit dịch vụ owner tạo, nhưng có quyền xoá dịch vụ manager tạo trong cùng shop; manager chỉ edit/xoá dịch vụ do chính mình tạo trong chi nhánh của mình. Xoá dịch vụ là soft delete bằng `deleted_at`, không hard delete, để giữ lịch sử visit/combo/report. Owner/manager xem lại dịch vụ đã xoá qua tab `Đã xoá`.
 
 ---
 
@@ -70,10 +70,15 @@
 | ------------- | --------- | ------------------------------------------ |
 | `id`          | uuid      | PK                                         |
 | `shop_id`     | uuid      | FK → shops                                 |
+| `branch_id`   | uuid      | FK → branches, nullable; null = áp dụng toàn shop |
 | `name`        | string    | Tên combo                                  |
 | `description` | string    | Mô tả combo                                |
 | `price`       | decimal   | Giá combo, độc lập với tổng giá dịch vụ lẻ |
+| `created_by`  | uuid      | FK → users, người tạo combo                |
+| `deleted_at`  | timestamp | Soft delete; null = còn sử dụng, có giá trị = đã xoá khỏi catalog |
 | `created_at`  | timestamp |                                            |
+
+> Combo owner tạo có `branch_id = null` và áp dụng toàn shop. Combo manager tạo có `branch_id` là chi nhánh của manager. Combo đã có visit sử dụng không sửa trực tiếp; muốn thay đổi thì nhân bản thành combo mới. Xoá combo là soft delete bằng `deleted_at`; owner/manager xem lại combo đã xoá qua tab `Đã xoá`. Visit/report vẫn luôn dùng snapshot trong `visit_services`.
 
 ---
 

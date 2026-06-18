@@ -4,6 +4,9 @@ import type { SyntheticEvent } from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import {
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { AuthFormShell } from "@/components/screens/auth/AuthFormShell";
 import { InlineAlert } from "@/components/global/InlineAlert";
@@ -137,7 +140,7 @@ export default function ChangePasswordPage() {
 
       <Button
         type="submit"
-        variant="primary"
+        variant={UI_VARIANT_PRIMARY}
         size="lg"
         disabled={!isFormValid || changePassword.isPending}
         loading={changePassword.isPending}
