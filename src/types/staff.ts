@@ -1,6 +1,6 @@
-import type { StaffRoleValue } from "@/constants/common";
+import type { OwnerStaffRoleValue } from "@/constants/common";
 
-export type StaffRole = StaffRoleValue;
+export type StaffRole = OwnerStaffRoleValue;
 
 export type StaffStatus = "active" | "inactive" | "branch_suspended";
 
@@ -19,6 +19,7 @@ export type Staff = {
   isFirstLogin: boolean;
   createdAt: string;
   branch: StaffBranch | null;
+  managedBranches?: StaffBranch[];
 };
 
 export type StaffFormInput = {
@@ -26,6 +27,7 @@ export type StaffFormInput = {
   password?: string;
   role: StaffRole;
   branchId: string | null;
+  managedBranchIds?: string[];
 };
 
 export type StaffRequestBody = {
@@ -33,6 +35,7 @@ export type StaffRequestBody = {
   password?: unknown;
   role?: unknown;
   branchId?: unknown;
+  managedBranchIds?: unknown;
 };
 
 export type StaffListApiResponse = {

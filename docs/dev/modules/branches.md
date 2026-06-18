@@ -29,6 +29,17 @@ Owner branch management, manager branch selection, branch-scoped API access, bra
 - Manager assignment is represented by `branches.manager_id`, not by `users.branch_id`.
 - Branches are never hard deleted.
 
+## Owner Creates Manager Accounts
+
+- Owner creates manager accounts from the staff management create/edit form.
+- The owner staff form may create roles `manager`, `receptionist`, `barber`, and `skinner`; it must not create `owner` or `superadmin`.
+- When role is `manager`, the form shows a searchable multi-select/dropdown of active branches managed by that manager.
+- When role is `manager`, do not require the regular staff working branch field.
+- Saving a manager updates selected branches to point `manager_id` at that user.
+- If a selected branch already has another manager, assigning the new manager replaces the old manager for that branch.
+- When changing a manager into a regular staff role, remove old branch manager assignments and require one working branch through `users.branch_id`.
+- When changing a regular staff user into a manager, stop using `users.branch_id` for manager permissions and require at least one active managed branch when the business flow requires immediate access.
+
 ## Create, Detail, Edit
 
 - Create branch uses a dedicated route, not a popup.
@@ -40,6 +51,7 @@ Owner branch management, manager branch selection, branch-scoped API access, bra
 ## Inactive And Reactivate
 
 - Owner can deactivate a branch only when it has no `pending` or `in_progress` visits.
+- Deactivate/reactivate actions must show the global `FullScreenLoading` until the status API finishes.
 - Deactivation sets branch status to `inactive`, records `deactivated_at` and `deactivated_by`, and moves related staff/manager users to `branch_suspended`.
 - After deactivation, operational actions for that branch are locked.
 - Users in `branch_suspended` can authenticate, but middleware redirects them to `/branch-unavailable`.
@@ -58,6 +70,7 @@ Owner branch management, manager branch selection, branch-scoped API access, bra
 
 - Managers with multiple active branches must choose a branch before entering the management workspace.
 - Managers with exactly one active branch may be auto-selected.
+- Auto-selection for exactly one active branch must render `FullScreenLoading` and redirect without flashing the selection cards.
 - The selection screen has no sidebar.
 - Sidebar shows `Đổi chi nhánh` only when the manager has more than one active branch.
 - Selected branch is stored in session as `active_branch_id` and used as the scope for staff, service, combo, visit, and report APIs.

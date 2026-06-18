@@ -4,8 +4,10 @@ import { Prisma } from "@prisma/client";
 
 import {
   MANAGEMENT_ROLES,
+  OWNER_STAFF_ROLES,
   STAFF_ROLES,
   USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   type ManagementRoleValue,
 } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
@@ -32,6 +34,12 @@ const STAFF_SELECT = {
       name: true,
     },
   },
+  managedBranches: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
 } as const;
 
 function isStaffRequestBody(body: unknown): body is StaffRequestBody {
@@ -39,7 +47,9 @@ function isStaffRequestBody(body: unknown): body is StaffRequestBody {
 }
 
 function isStaffRole(role: unknown): role is StaffRole {
-  return typeof role === "string" && STAFF_ROLES.includes(role as StaffRole);
+  return (
+    typeof role === "string" && OWNER_STAFF_ROLES.includes(role as StaffRole)
+  );
 }
 
 function normalizeStaffInput(body: StaffRequestBody) {
@@ -51,6 +61,12 @@ function normalizeStaffInput(body: StaffRequestBody) {
       typeof body.branchId === "string" && body.branchId.trim()
         ? body.branchId.trim()
         : null,
+    managedBranchIds: Array.isArray(body.managedBranchIds)
+      ? body.managedBranchIds.filter(
+          (branchId): branchId is string =>
+            typeof branchId === "string" && Boolean(branchId.trim()),
+        )
+      : [],
   };
 }
 
@@ -114,7 +130,7 @@ async function findStaffMember(
       id: staffId,
       shopId,
       ...(branchId ? { branchId } : {}),
-      role: { in: [...STAFF_ROLES] },
+      role: { in: branchId ? [...STAFF_ROLES] : [...OWNER_STAFF_ROLES] },
       status: "active",
     },
     select: STAFF_SELECT,
@@ -130,11 +146,30 @@ async function isBranchValid(branchId: string | null, shopId: string) {
     where: {
       id: branchId,
       shopId,
+      status: "active",
     },
     select: { id: true },
   });
 
   return Boolean(branch);
+}
+
+async function areManagedBranchesValid(branchIds: string[], shopId: string) {
+  if (branchIds.length === 0) {
+    return false;
+  }
+
+  const uniqueBranchIds = Array.from(new Set(branchIds));
+  const branches = await prisma.branch.findMany({
+    where: {
+      id: { in: uniqueBranchIds },
+      shopId,
+      status: "active",
+    },
+    select: { id: true },
+  });
+
+  return branches.length === uniqueBranchIds.length;
 }
 
 export async function GET(request: NextRequest, context: StaffRouteContext) {
@@ -236,8 +271,24 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
     );
   }
 
-  const staffBranchId = authResult.branchId ?? staffInput.branchId;
-  const isValidBranch = await isBranchValid(staffBranchId, authResult.shopId);
+  const isManagerRole = staffInput.role === USER_ROLE_MANAGER;
+  const staffBranchId = isManagerRole
+    ? null
+    : authResult.branchId ?? staffInput.branchId;
+
+  if (isManagerRole && authResult.role !== USER_ROLE_OWNER) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.forbidden },
+      { status: 403 },
+    );
+  }
+
+  const isValidBranch = isManagerRole
+    ? await areManagedBranchesValid(
+        staffInput.managedBranchIds,
+        authResult.shopId,
+      )
+    : await isBranchValid(staffBranchId, authResult.shopId);
 
   if (!isValidBranch) {
     return NextResponse.json(
@@ -254,15 +305,43 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
     : {};
 
   try {
-    const updatedStaffMember = await prisma.user.update({
-      where: { id: staffMember.id },
-      data: {
-        username: staffInput.username,
-        role: staffInput.role,
-        branchId: staffBranchId,
-        ...updatedPasswordData,
-      },
-      select: STAFF_SELECT,
+    const updatedStaffMember = await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: staffMember.id },
+        data: {
+          username: staffInput.username,
+          role: staffInput.role,
+          branchId: staffBranchId,
+          ...updatedPasswordData,
+        },
+        select: { id: true },
+      });
+
+      if (authResult.role === USER_ROLE_OWNER) {
+        await tx.branch.updateMany({
+          where: {
+            managerId: staffMember.id,
+            shopId: authResult.shopId,
+          },
+          data: { managerId: null },
+        });
+      }
+
+      if (isManagerRole) {
+        await tx.branch.updateMany({
+          where: {
+            id: { in: Array.from(new Set(staffInput.managedBranchIds)) },
+            shopId: authResult.shopId,
+            status: "active",
+          },
+          data: { managerId: staffMember.id },
+        });
+      }
+
+      return tx.user.findUniqueOrThrow({
+        where: { id: staffMember.id },
+        select: STAFF_SELECT,
+      });
     });
 
     return NextResponse.json({ staffMember: updatedStaffMember });
@@ -316,10 +395,20 @@ export async function DELETE(
     );
   }
 
-  const inactiveStaffMember = await prisma.user.update({
-    where: { id: staffMember.id },
-    data: { status: "inactive" },
-    select: STAFF_SELECT,
+  const inactiveStaffMember = await prisma.$transaction(async (tx) => {
+    await tx.branch.updateMany({
+      where: {
+        managerId: staffMember.id,
+        shopId: authResult.shopId,
+      },
+      data: { managerId: null },
+    });
+
+    return tx.user.update({
+      where: { id: staffMember.id },
+      data: { status: "inactive" },
+      select: STAFF_SELECT,
+    });
   });
 
   return NextResponse.json({ staffMember: inactiveStaffMember });

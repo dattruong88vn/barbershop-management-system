@@ -63,6 +63,7 @@ export const branchTexts = {
     deactivateUnavailable: "Chỉ có thể ngừng khi tất cả lượt ghé đã hoàn thành",
     statusActionUnavailable: "Tính năng sẽ khả dụng sau khi API trạng thái chi nhánh được hoàn thiện",
     loading: "Đang tải chi nhánh...",
+    statusUpdating: "Đang cập nhật trạng thái chi nhánh...",
     empty: "Chưa có chi nhánh nào.",
     emptySearch: "Không tìm thấy chi nhánh phù hợp.",
     unassignedManager: "Chưa phân công",
@@ -87,6 +88,7 @@ export const branchTexts = {
       empty: "Bạn chưa được phân công chi nhánh đang hoạt động.",
       description: "Chọn chi nhánh để bắt đầu phiên làm việc.",
       action: "Làm việc tại chi nhánh này",
+      redirecting: "Đang mở chi nhánh của bạn...",
     },
     unavailable: {
       title: "Chi nhánh đã ngừng hoạt động",

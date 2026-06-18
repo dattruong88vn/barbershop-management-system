@@ -4,8 +4,10 @@ import { Prisma } from "@prisma/client";
 
 import {
   MANAGEMENT_ROLES,
+  OWNER_STAFF_ROLES,
   STAFF_ROLES,
   USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   type ManagementRoleValue,
 } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
@@ -28,6 +30,12 @@ const STAFF_SELECT = {
       name: true,
     },
   },
+  managedBranches: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
 } as const;
 
 function isStaffRequestBody(body: unknown): body is StaffRequestBody {
@@ -35,7 +43,9 @@ function isStaffRequestBody(body: unknown): body is StaffRequestBody {
 }
 
 function isStaffRole(role: unknown): role is StaffRole {
-  return typeof role === "string" && STAFF_ROLES.includes(role as StaffRole);
+  return (
+    typeof role === "string" && OWNER_STAFF_ROLES.includes(role as StaffRole)
+  );
 }
 
 function normalizeStaffInput(body: StaffRequestBody) {
@@ -47,6 +57,12 @@ function normalizeStaffInput(body: StaffRequestBody) {
       typeof body.branchId === "string" && body.branchId.trim()
         ? body.branchId.trim()
         : null,
+    managedBranchIds: Array.isArray(body.managedBranchIds)
+      ? body.managedBranchIds.filter(
+          (branchId): branchId is string =>
+            typeof branchId === "string" && Boolean(branchId.trim()),
+        )
+      : [],
   };
 }
 
@@ -104,11 +120,30 @@ async function isBranchValid(branchId: string | null, shopId: string) {
     where: {
       id: branchId,
       shopId,
+      status: "active",
     },
     select: { id: true },
   });
 
   return Boolean(branch);
+}
+
+async function areManagedBranchesValid(branchIds: string[], shopId: string) {
+  if (branchIds.length === 0) {
+    return false;
+  }
+
+  const uniqueBranchIds = Array.from(new Set(branchIds));
+  const branches = await prisma.branch.findMany({
+    where: {
+      id: { in: uniqueBranchIds },
+      shopId,
+      status: "active",
+    },
+    select: { id: true },
+  });
+
+  return branches.length === uniqueBranchIds.length;
 }
 
 export async function GET(request: NextRequest) {
@@ -125,7 +160,9 @@ export async function GET(request: NextRequest) {
     where: {
       shopId: authResult.shopId,
       ...(authResult.branchId ? { branchId: authResult.branchId } : {}),
-      role: { in: [...STAFF_ROLES] },
+      role: {
+        in: authResult.branchId ? [...STAFF_ROLES] : [...OWNER_STAFF_ROLES],
+      },
       status: "active",
     },
     orderBy: { createdAt: "desc" },
@@ -155,7 +192,10 @@ export async function POST(request: NextRequest) {
   }
 
   const staffInput = normalizeStaffInput(body);
-  const staffBranchId = authResult.branchId ?? staffInput.branchId;
+  const isManagerRole = staffInput.role === USER_ROLE_MANAGER;
+  const staffBranchId = isManagerRole
+    ? null
+    : authResult.branchId ?? staffInput.branchId;
 
   if (!staffInput.username) {
     return NextResponse.json(
@@ -185,7 +225,19 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const isValidBranch = await isBranchValid(staffBranchId, authResult.shopId);
+  if (isManagerRole && authResult.role !== USER_ROLE_OWNER) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.forbidden },
+      { status: 403 },
+    );
+  }
+
+  const isValidBranch = isManagerRole
+    ? await areManagedBranchesValid(
+        staffInput.managedBranchIds,
+        authResult.shopId,
+      )
+    : await isBranchValid(staffBranchId, authResult.shopId);
 
   if (!isValidBranch) {
     return NextResponse.json(
@@ -195,17 +247,35 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const staffMember = await prisma.user.create({
-      data: {
-        shopId: authResult.shopId,
-        branchId: staffBranchId,
-        username: staffInput.username,
-        passwordHash: hashPassword(staffInput.password),
-        role: staffInput.role,
-        status: "active",
-        isFirstLogin: true,
-      },
-      select: STAFF_SELECT,
+    const staffMember = await prisma.$transaction(async (tx) => {
+      const createdStaffMember = await tx.user.create({
+        data: {
+          shopId: authResult.shopId,
+          branchId: staffBranchId,
+          username: staffInput.username,
+          passwordHash: hashPassword(staffInput.password),
+          role: staffInput.role,
+          status: "active",
+          isFirstLogin: true,
+        },
+        select: { id: true },
+      });
+
+      if (isManagerRole) {
+        await tx.branch.updateMany({
+          where: {
+            id: { in: Array.from(new Set(staffInput.managedBranchIds)) },
+            shopId: authResult.shopId,
+            status: "active",
+          },
+          data: { managerId: createdStaffMember.id },
+        });
+      }
+
+      return tx.user.findUniqueOrThrow({
+        where: { id: createdStaffMember.id },
+        select: STAFF_SELECT,
+      });
     });
 
     return NextResponse.json({ staffMember }, { status: 201 });

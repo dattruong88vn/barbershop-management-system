@@ -307,6 +307,8 @@ export interface GeistMultiSelectProps
   onChange?: (values: string[]) => void;
   options: { label: string; value: string }[];
   placeholder?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
   value?: string[];
 }
 
@@ -320,12 +322,21 @@ export const GeistMultiSelect = React.forwardRef<
       onChange,
       options,
       placeholder = designSystemTexts.form.selectItems,
+      searchable = false,
+      searchPlaceholder,
       value = [],
       ...props
     },
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
+    const [search, setSearch] = React.useState("");
+    const normalizedSearch = search.trim().toLowerCase();
+    const visibleOptions = normalizedSearch
+      ? options.filter((option) =>
+          option.label.toLowerCase().includes(normalizedSearch),
+        )
+      : options;
 
     const handleToggleOption = (optionValue: string) => {
       const nextValue = value.includes(optionValue)
@@ -356,7 +367,18 @@ export const GeistMultiSelect = React.forwardRef<
         </button>
         {open ? (
           <div className="absolute inset-x-0 top-full z-50 mt-1 rounded-xl border border-gray-400 bg-gray-100">
-            {options.map((option) => (
+            {searchable ? (
+              <div className="border-b border-gray-400 p-2">
+                <input
+                  className="flex min-h-10 w-full rounded-md border border-gray-400 bg-gray-100 px-3 py-2 text-sm text-gray-1000 placeholder:text-gray-700 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+                  placeholder={searchPlaceholder}
+                  type="text"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+              </div>
+            ) : null}
+            {visibleOptions.map((option) => (
               <label
                 key={option.value}
                 className="flex min-h-11 cursor-pointer items-center gap-2 px-4 py-2 hover:bg-gray-200"
@@ -370,6 +392,9 @@ export const GeistMultiSelect = React.forwardRef<
                 <span>{option.label}</span>
               </label>
             ))}
+            {visibleOptions.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-gray-700">{placeholder}</p>
+            ) : null}
           </div>
         ) : null}
       </div>

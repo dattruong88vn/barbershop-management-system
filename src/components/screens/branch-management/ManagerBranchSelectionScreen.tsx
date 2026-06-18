@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,8 +11,8 @@ import {
   Card,
   EmptyState,
   Error as FeedbackError,
+  FullScreenLoading,
   PageTitle,
-  Skeleton,
 } from "@/components/global";
 import { BRANCH_STATUS_ACTIVE } from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
@@ -24,6 +24,8 @@ export function ManagerBranchSelectionScreen() {
   const queryClient = useQueryClient();
   const { update: updateSession } = useSession();
   const { branches, error, isLoading } = useBranches();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const autoSelectedBranchIdRef = useRef<string | null>(null);
   const activeBranches = useMemo(
     () =>
       branches.filter(
@@ -35,22 +37,61 @@ export function ManagerBranchSelectionScreen() {
 
   const selectBranch = useCallback(
     (branchId: string) => {
+      setIsRedirecting(true);
       void updateSession({ user: { active_branch_id: branchId } }).then(
         (updatedSession) => {
-          if (updatedSession?.user.active_branch_id !== branchId) return;
+          if (updatedSession?.user.active_branch_id !== branchId) {
+            setIsRedirecting(false);
+            return;
+          }
           void queryClient.invalidateQueries();
           router.replace(ROUTES.dashboard);
         },
+        () => setIsRedirecting(false),
       );
     },
     [queryClient, router, updateSession],
   );
 
   useEffect(() => {
-    if (!isLoading && activeBranches.length === 1) {
-      selectBranch(activeBranches[0].id);
+    if (!isLoading && !error && activeBranches.length === 1) {
+      const branchId = activeBranches[0].id;
+
+      if (autoSelectedBranchIdRef.current === branchId) {
+        return;
+      }
+
+      autoSelectedBranchIdRef.current = branchId;
+      void updateSession({ user: { active_branch_id: branchId } }).then(
+        (updatedSession) => {
+          if (updatedSession?.user.active_branch_id !== branchId) {
+            autoSelectedBranchIdRef.current = null;
+            return;
+          }
+          void queryClient.invalidateQueries();
+          router.replace(ROUTES.dashboard);
+        },
+        () => {
+          autoSelectedBranchIdRef.current = null;
+        },
+      );
     }
-  }, [activeBranches, isLoading, selectBranch]);
+  }, [activeBranches, error, isLoading, queryClient, router, updateSession]);
+
+  const shouldShowFullScreenLoading =
+    isLoading || isRedirecting || (!error && activeBranches.length === 1);
+
+  if (shouldShowFullScreenLoading) {
+    return (
+      <FullScreenLoading
+        message={
+          isLoading
+            ? branchTexts.ownerBranches.loading
+            : branchTexts.ownerBranches.selectBranch.redirecting
+        }
+      />
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-200 px-4 py-10 text-gray-1000 sm:px-6">
@@ -58,14 +99,6 @@ export function ManagerBranchSelectionScreen() {
         <header>
           <PageTitle>{branchTexts.ownerBranches.selectBranch.title}</PageTitle>
         </header>
-
-        {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton className="h-40 w-full" key={index} />
-            ))}
-          </div>
-        ) : null}
 
         {error ? (
           <FeedbackError

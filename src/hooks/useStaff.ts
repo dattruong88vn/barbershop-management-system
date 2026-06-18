@@ -57,6 +57,7 @@ async function updateStaff(input: StaffFormInput & { id: string }) {
         password: input.password,
         role: input.role,
         branchId: input.branchId,
+        managedBranchIds: input.managedBranchIds,
       }),
     },
   );

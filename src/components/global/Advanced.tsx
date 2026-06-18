@@ -43,11 +43,9 @@ export const GeistModal = React.forwardRef<HTMLDivElement, GeistModalProps>(
 
     return (
       <>
-        <button
-          aria-label="Close modal"
+        <div
+          aria-hidden="true"
           className="fixed inset-0 z-40 bg-black/50"
-          type="button"
-          onClick={() => onOpenChange(false)}
         />
         <div
           className={cn(
@@ -64,12 +62,26 @@ export const GeistModal = React.forwardRef<HTMLDivElement, GeistModalProps>(
             onClick={(event) => event.stopPropagation()}
             {...props}
           >
-            {title ? (
-              <h2 className="text-lg font-semibold text-gray-1000">{title}</h2>
-            ) : null}
-            {description ? (
-              <p className="mt-1 text-sm text-gray-700">{description}</p>
-            ) : null}
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                {title ? (
+                  <h2 className="text-lg font-semibold text-gray-1000">
+                    {title}
+                  </h2>
+                ) : null}
+                {description ? (
+                  <p className="mt-1 text-sm text-gray-700">{description}</p>
+                ) : null}
+              </div>
+              <button
+                aria-label={designSystemTexts.actions.close}
+                className="flex size-10 shrink-0 items-center justify-center rounded-md text-gray-700 hover:bg-gray-200 hover:text-gray-1000"
+                type="button"
+                onClick={() => onOpenChange(false)}
+              >
+                <X className="size-4" aria-hidden="true" />
+              </button>
+            </div>
             <div className="mt-4">{children}</div>
             {actions ? (
               <div className="mt-6 flex justify-end gap-2">

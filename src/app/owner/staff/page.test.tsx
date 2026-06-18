@@ -21,6 +21,16 @@ vi.mock("@/hooks/useStaff", () => ({
   useStaff: mocks.useStaff,
 }));
 
+vi.mock("next-auth/react", () => ({
+  useSession: () => ({
+    data: {
+      user: {
+        branch_id: null,
+      },
+    },
+  }),
+}));
+
 import OwnerStaffPage from "@/app/owner/staff/page";
 
 const branch: Branch = {
@@ -75,6 +85,17 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
+function getLastFieldByLabel(label: string) {
+  const fields = screen.getAllByLabelText(label);
+  const field = fields.at(-1);
+
+  if (!field) {
+    throw new Error(`Missing field: ${label}`);
+  }
+
+  return field;
+}
+
 describe("OwnerStaffPage", () => {
   it("should render empty state when there is no staff", () => {
     mockStaffHooks();
@@ -96,6 +117,11 @@ describe("OwnerStaffPage", () => {
 
     render(<OwnerStaffPage />);
 
+    await user.click(
+      screen.getByRole("button", {
+        name: staffTexts.ownerStaff.createAction,
+      }),
+    );
     await user.type(
       screen.getByLabelText(staffTexts.ownerStaff.usernameLabel),
       staffMember.username,
@@ -105,11 +131,11 @@ describe("OwnerStaffPage", () => {
       "Secret123!",
     );
     await user.selectOptions(
-      screen.getByLabelText(staffTexts.ownerStaff.roleLabel),
+      getLastFieldByLabel(staffTexts.ownerStaff.roleLabel),
       staffMember.role,
     );
     await user.selectOptions(
-      screen.getByLabelText(staffTexts.ownerStaff.branchLabel),
+      getLastFieldByLabel(staffTexts.ownerStaff.branchLabel),
       branch.id,
     );
     await user.click(
@@ -124,6 +150,57 @@ describe("OwnerStaffPage", () => {
         password: "Secret123!",
         role: staffMember.role,
         branchId: branch.id,
+        managedBranchIds: [],
+      });
+    });
+  });
+
+  it("should create manager with managed branches", async () => {
+    const user = userEvent.setup();
+    mockStaffHooks();
+    mocks.createStaff.mockResolvedValue({
+      ...staffMember,
+      branchId: null,
+      role: "manager",
+      managedBranches: [{ id: branch.id, name: branch.name }],
+    });
+
+    render(<OwnerStaffPage />);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: staffTexts.ownerStaff.createAction,
+      }),
+    );
+    await user.type(
+      screen.getByLabelText(staffTexts.ownerStaff.usernameLabel),
+      "manager01",
+    );
+    await user.type(
+      screen.getByLabelText(staffTexts.ownerStaff.passwordLabel),
+      "Secret123!",
+    );
+    await user.selectOptions(
+      getLastFieldByLabel(staffTexts.ownerStaff.roleLabel),
+      "manager",
+    );
+    await user.click(
+      screen.getByText(staffTexts.ownerStaff.managedBranchesPlaceholder),
+    );
+    await user.click(screen.getByLabelText(branch.name));
+    await user.click(
+      screen.getByRole("button", {
+        name: staffTexts.ownerStaff.submitCreate,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mocks.createStaff).toHaveBeenCalledWith({
+        username: "manager01",
+        password: "Secret123!",
+        role: "manager",
+        branchId: null,
+        managedBranchIds: [branch.id],
       });
     });
   });
@@ -144,7 +221,7 @@ describe("OwnerStaffPage", () => {
       }),
     );
     await user.selectOptions(
-      screen.getByLabelText(staffTexts.ownerStaff.branchLabel),
+      getLastFieldByLabel(staffTexts.ownerStaff.branchLabel),
       secondBranch.id,
     );
     await user.click(
@@ -160,6 +237,7 @@ describe("OwnerStaffPage", () => {
         password: undefined,
         role: staffMember.role,
         branchId: secondBranch.id,
+        managedBranchIds: [],
       });
     });
   });
@@ -176,6 +254,11 @@ describe("OwnerStaffPage", () => {
       screen.getByRole("button", {
         name: staffTexts.ownerStaff.delete,
       }),
+    );
+    await user.click(
+      screen.getAllByRole("button", {
+        name: staffTexts.ownerStaff.delete,
+      }).at(-1) as HTMLElement,
     );
 
     await waitFor(() => {

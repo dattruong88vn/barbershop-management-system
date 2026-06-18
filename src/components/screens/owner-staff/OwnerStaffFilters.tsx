@@ -1,9 +1,9 @@
 import type { FormEvent } from "react";
 
 import { Button, Card, SearchInput, Select } from "@/components/global";
-import { STAFF_ROLES } from "@/constants/common";
 import { commonTexts, staffTexts } from "@/constants/texts";
 import type { Branch } from "@/types";
+import type { StaffRole } from "@/types";
 import {
   ALL_FILTER_VALUE,
   STAFF_DISPLAY_STATUS_ACTIVE,
@@ -22,6 +22,7 @@ type OwnerStaffFiltersProps = {
   isBranchLocked: boolean;
   onApplyFilters: (event: FormEvent<HTMLFormElement>) => void;
   onDraftFiltersChange: (filters: StaffFilters) => void;
+  roleOptions: StaffRole[];
 };
 
 export function OwnerStaffFilters({
@@ -30,6 +31,7 @@ export function OwnerStaffFilters({
   isBranchLocked,
   onApplyFilters,
   onDraftFiltersChange,
+  roleOptions,
 }: OwnerStaffFiltersProps) {
   return (
     <Card padding="lg" title={staffTexts.ownerStaff.filterTitle}>
@@ -75,7 +77,7 @@ export function OwnerStaffFilters({
             <option value={ALL_FILTER_VALUE}>
               {staffTexts.ownerStaff.allRolesOption}
             </option>
-            {STAFF_ROLES.map((staffRole) => (
+            {roleOptions.map((staffRole) => (
               <option key={staffRole} value={staffRole}>
                 {staffTexts.ownerStaff.roles[staffRole]}
               </option>

@@ -48,6 +48,7 @@
 
 > Nhân viên nghỉ làm được set `status = inactive`, không hiển thị khi chọn barber/skinner cho visit mới. Lịch sử visit vẫn giữ nguyên.
 > `branch_suspended` dùng khi chi nhánh bị ngừng hoạt động. User vẫn còn record và lịch sử, nhưng không được thao tác API vận hành cho đến khi owner chuyển/khôi phục phân công phù hợp.
+> Với staff thường (`receptionist`, `barber`, `skinner`), `branch_id` là chi nhánh làm việc. Với `manager`, danh sách chi nhánh quản lý lấy từ `branches.manager_id`; không dùng `users.branch_id` để xác định quyền quản lý nhiều chi nhánh.
 > Trạng thái hiển thị trên màn quản lý nhân viên: `Khởi tạo` = `status = active` và `is_first_login = true`; `Đang làm` = `status = active` và `is_first_login = false`; `inactive` là đã nghỉ; `branch_suspended` là tạm treo do chi nhánh ngừng hoạt động.
 
 ---

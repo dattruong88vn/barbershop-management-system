@@ -30,6 +30,9 @@ Use exported role constants/types from `src/constants/common/roles.ts` for role 
 - Manager management routes use `/manager/*`; manager must not access `/owner/*`.
 - Owner can manage staff across the whole shop.
 - Owner can create `manager` accounts and assign them to one or more active branches through `branches.manager_id`.
+- Owner staff creation can only create `manager`, `receptionist`, `barber`, and `skinner`; owner/superadmin accounts are not created from the staff management screen.
+- For manager accounts, branch permissions come from the selected active branches assigned to `branches.manager_id`. Do not use `users.branch_id` to decide which branches a manager manages.
+- For regular staff accounts, working branch comes from `users.branch_id`.
 - Each branch can have at most one manager, while one manager can manage many branches.
 - Manager must operate inside an active branch context selected at `/manager/select-branch`; staff create/update requests must be scoped to that active branch.
 - Shared management screens should use `mode="owner" | "manager"` when owner and manager routes share UI behavior.

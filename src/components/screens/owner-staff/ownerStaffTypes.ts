@@ -19,6 +19,7 @@ export const STAFF_ROLE_BADGE_VARIANTS: Record<
   StaffBadgeVariant
 > = {
   barber: "info",
+  manager: "default",
   receptionist: "warning",
   skinner: "success",
 };

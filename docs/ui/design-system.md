@@ -18,6 +18,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Select/dropdown menu khi mở phải nằm dưới trigger, không đè lên phần hiển thị đã chọn.
 - Table dùng global primitives phải có line ngang giữa các row và line dọc giữa các cell để ô dữ liệu được phân tách rõ.
 - Modal/popup phải giới hạn chiều cao theo viewport (mặc định tối đa `90dvh`) và cho phép cuộn dọc phần nội dung khi form dài; không để nội dung hoặc action bị che ngoài màn hình.
+- Modal/popup không được đóng khi click overlay. Chỉ đóng bằng nút huỷ/đóng trong nội dung hoặc nút dấu `X`.
 - Cột số thứ tự trong table phải dùng title `#`, width hẹp (`w-10` hoặc tương đương) và canh giữa cả header lẫn cell.
 - Màn hình quản lý catalog có soft delete như dịch vụ/combo phải dùng tabs `Đang hoạt động` và `Đã xoá` nằm trên filter card; tab đã xoá chỉ để xem lại, không hiển thị thao tác tạo/sửa/xoá. Nếu entity có flow tạo bản mới từ bản đã xoá như combo, chỉ hiển thị thao tác nhân bản thay vì restore.
 - Date hiển thị trong UI phải dùng format `dd/mm/yyyy`. Nếu cần kèm giờ, đặt giờ sau ngày, ví dụ `17/06/2026 15:30`.
@@ -41,7 +42,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 | Tables | `Table`, `TableHead`, `TableBody`, `TableRow`, `TableCell` |
 | Title/value rows | `KeyValueRow` |
 | Empty state | `EmptyState` |
-| Loading state | `Skeleton`, `Spinner`, `LoadingDots` |
+| Loading state | `Skeleton`, `Spinner`, `LoadingDots`, `FullScreenLoading` |
 | Inline alert | `InlineAlert`, `Banner`, `Note`, `Error` |
 | Runtime feedback | Global Feedback notification flow, `AppFeedbackNotification` |
 | Modal flows | `Modal`, `Sheet`, `Drawer` |
@@ -97,6 +98,7 @@ src/app/design-system/page.tsx
 Every screen must have loading, empty, and error states:
 
 - Loading: use `Skeleton`, `Spinner`, or `LoadingDots`.
+- Full-screen blocking operations, such as route auto-select/redirect or destructive/branch status mutations, use `FullScreenLoading`.
 - Empty: use `EmptyState`.
 - Error/warning: use `InlineAlert`, `Error`, `Banner`, or `Note`.
 

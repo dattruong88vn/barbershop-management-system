@@ -1,5 +1,6 @@
 import { Edit2, Plus, Trash2 } from "lucide-react";
 import {
+  USER_ROLE_MANAGER,
   UI_VARIANT_DANGER,
   UI_VARIANT_SECONDARY,
 } from "@/constants/common";
@@ -31,6 +32,16 @@ import {
   STAFF_ROLE_BADGE_VARIANTS,
   STAFF_STATUS_BADGE_VARIANTS,
 } from "./ownerStaffTypes";
+
+function getStaffBranchLabel(staffMember: Staff) {
+  if (staffMember.role === USER_ROLE_MANAGER) {
+    return staffMember.managedBranches?.length
+      ? staffMember.managedBranches.map((branch) => branch.name).join(", ")
+      : staffTexts.ownerStaff.branchEmpty;
+  }
+
+  return staffMember.branch?.name ?? staffTexts.ownerStaff.branchEmpty;
+}
 
 type OwnerStaffTableProps = {
   branchesError: Error | null;
@@ -157,8 +168,7 @@ export function OwnerStaffTable({
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {staffMember.branch?.name ??
-                        staffTexts.ownerStaff.branchEmpty}
+                      {getStaffBranchLabel(staffMember)}
                     </TableCell>
                     <TableCell>
                       <Badge

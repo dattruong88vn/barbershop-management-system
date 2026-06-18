@@ -28,6 +28,8 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Header của mọi page chỉ hiển thị title. Không render description/subtitle trong page header.
 - Dropdown/select phải dùng global `Select` primitive. Padding trái của text và padding phải của icon phải cân nhau về thị giác; phần phải vẫn phải đủ rộng để icon không đè text.
 - Table phải dùng global table primitives và hiển thị đủ line ngang giữa row + line dọc giữa cell để phân tách ô rõ ràng.
+- Popup/modal không đóng khi click overlay; chỉ đóng bằng nút huỷ/đóng trong modal hoặc dấu `X`.
+- Thao tác blocking toàn màn hình, ví dụ auto-select branch/redirect hoặc ngừng/kích hoạt chi nhánh, dùng global `FullScreenLoading`.
 - Catalog soft delete như dịch vụ/combo dùng tabs `Đang hoạt động` và `Đã xoá` phía trên filter card. Tab đã xoá mặc định chỉ để xem lại; riêng combo cho phép nhân bản từ tab đã xoá để tạo bản mới thay vì restore record cũ.
 - Mỗi bảng thuộc tenant phải enforce `shop_id`.
 - Roles: `superadmin`, `owner`, `manager`, `receptionist`, `barber`, `skinner`.
@@ -200,9 +202,11 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Status filter:** `Tất cả`, `Khởi tạo`, `Đang làm`.
 - **Actions:** List, Create, Edit, soft Delete/ngưng làm.
 - **Fields:** username, role, branch hoặc danh sách chi nhánh quản lý, display status, createdAt.
+- **Create/Edit form:** owner được chọn role `manager`, `receptionist`, `barber`, `skinner`; không cho tạo `owner` hoặc `superadmin` từ màn nhân viên. Manager chỉ được tạo staff thường trong branch context hiện tại.
 - **Display status:** `Khởi tạo` = `status: active` + `isFirstLogin: true`; `Đang làm` = `status: active` + `isFirstLogin: false`; `branch_suspended` = tạm treo do chi nhánh ngừng hoạt động; nhân viên `inactive` là đã nghỉ và không hiển thị trong danh sách active.
 - **Badge:** `Khởi tạo` dùng danger, `Đang làm` dùng info. Vai trò: skinner success, barber info, receptionist warning.
-- **Manager role creation:** owner có thể tạo user role `manager`. Khi role là manager, form hiển thị field chọn một hoặc nhiều chi nhánh active để manager quản lý; một manager có thể quản lý nhiều chi nhánh, nhưng mỗi chi nhánh chỉ có một manager tại một thời điểm. Nếu gán manager mới vào branch đã có manager, manager cũ bị thay thế ở branch đó.
+- **Manager role creation:** owner có thể tạo user role `manager`. Khi role là manager, form ẩn field chi nhánh làm việc của staff thường và hiển thị field chọn một hoặc nhiều chi nhánh active để manager quản lý. Field này dùng searchable multi-select/dropdown và chỉ hiển thị chi nhánh active. Một manager có thể quản lý nhiều chi nhánh, nhưng mỗi chi nhánh chỉ có một manager tại một thời điểm. Nếu gán manager mới vào branch đã có manager, manager cũ bị thay thế ở branch đó.
+- **Role switch on edit:** nếu đổi staff thường sang `manager`, bỏ/không dùng `users.branch_id` cho phân quyền quản lý và yêu cầu chọn danh sách chi nhánh quản lý. Nếu đổi `manager` sang staff thường, phải chọn một branch làm việc và gỡ các branch manager assignment cũ.
 - **Business:** owner xem/tạo/sửa nhân viên toàn shop. Manager chỉ xem/tạo/sửa/ngưng làm nhân viên thuộc branch active đã chọn; khi tạo/sửa staff thường, branch bị ép theo branch context hiện tại của manager.
 - **Route guard:** owner không được truy cập `/manager/*`; manager không được truy cập `/owner/*`.
 - **Detail popup:** click tên nhân viên mở modal chi tiết dạng table 2 cột; không hiển thị riêng thông tin đổi mật khẩu vì đã được thể hiện bằng trạng thái `Khởi tạo`.
@@ -220,7 +224,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Manager:** một chi nhánh có tối đa một manager; một manager có thể quản lý nhiều chi nhánh. Dropdown manager hỗ trợ tìm theo username và có `Chưa phân công`.
 - **Staff:** staff thường chỉ thuộc một chi nhánh. Nút `Điều chuyển nhân viên` nằm ở danh sách nhân viên trong detail; owner chọn nhân viên, mở popup chọn chi nhánh active đích, rồi chuyển hàng loạt. Chỉ được chuyển khi toàn bộ nhân viên được chọn không còn visit `pending` hoặc `in_progress`; lịch sử visit/report không thay đổi.
 - **Delete:** không hỗ trợ xoá chi nhánh.
-- **Inactive:** owner có thể ngừng/kích hoạt lại chi nhánh. Ngừng hoạt động chỉ cho phép khi chi nhánh không còn visit `pending` hoặc `in_progress`; sau khi ngừng thì khoá thao tác vận hành, lưu audit `deactivatedAt/deactivatedBy`, và đưa staff/manager liên quan về `branch_suspended`. Chi nhánh inactive chỉ được xem; phải active lại trước khi chỉnh sửa. Khi active lại, service/combo còn dữ liệu nhưng nhân viên phải được owner thêm/chuyển lại.
+- **Inactive:** owner có thể ngừng/kích hoạt lại chi nhánh. Ngừng hoạt động chỉ cho phép khi chi nhánh không còn visit `pending` hoặc `in_progress`; sau khi bấm action phải đóng băng màn hình bằng `FullScreenLoading` cho đến khi API hoàn tất. Sau khi ngừng thì khoá thao tác vận hành, lưu audit `deactivatedAt/deactivatedBy`, và đưa staff/manager liên quan về `branch_suspended`. Chi nhánh inactive chỉ được xem; phải active lại trước khi chỉnh sửa. Khi active lại, service/combo còn dữ liệu nhưng nhân viên phải được owner thêm/chuyển lại.
 - **States:** loading, empty, filtered-empty, error, detail not found, create, detail, edit.
 
 ## 13b. Manager Branch Selection
@@ -228,7 +232,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Route:** `/manager/select-branch` (`ROUTES.managerSelectBranch`)
 - **Roles:** manager
 - **Sidebar:** không hiển thị sidebar trên màn chọn. Chỉ sau khi chọn branch mới đi vào management workspace.
-- **Behavior:** nếu manager chỉ có một branch active thì tự chọn và vào Tổng quan; nếu có nhiều branch thì hiển thị card tên + địa chỉ để chọn; nếu không có branch active thì hiển thị empty state.
+- **Behavior:** nếu manager chỉ có một branch active thì hiển thị `FullScreenLoading`, tự chọn branch và điều hướng vào Tổng quan; không flash màn chọn chi nhánh. Nếu có nhiều branch thì hiển thị card tên + địa chỉ để chọn; nếu không có branch active thì hiển thị empty state.
 - **Switch:** khi manager quản lý nhiều branch, sidebar hiển thị `Đổi chi nhánh`; action quay lại màn chọn branch và sau khi chọn phải invalidate dữ liệu branch cũ.
 - **Scope:** branch đã chọn trở thành branch context cho staff, service, combo, visit và report. API phải xác minh manager được phân quyền vào branch đó.
 - **Suspended:** nếu user ở trạng thái `branch_suspended`, middleware đưa về màn thông báo chi nhánh đã ngừng hoạt động thay vì vào workspace.
