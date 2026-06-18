@@ -139,6 +139,7 @@ export {
   type GeistWindowProps as WindowProps,
 } from "./Specialized";
 export { EmptyState } from "./EmptyState";
+export { FullScreenLoading } from "./FullScreenLoading";
 export {
   ChartContainer,
   ChartTooltipContent,

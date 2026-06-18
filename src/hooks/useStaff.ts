@@ -10,6 +10,8 @@ import type {
   StaffApiResponse,
   StaffFormInput,
   StaffListApiResponse,
+  StaffTransferApiResponse,
+  StaffTransferInput,
 } from "@/types";
 
 const STAFF_QUERY_KEY = ["staff"] as const;
@@ -55,6 +57,7 @@ async function updateStaff(input: StaffFormInput & { id: string }) {
         password: input.password,
         role: input.role,
         branchId: input.branchId,
+        managedBranchIds: input.managedBranchIds,
       }),
     },
   );
@@ -71,6 +74,14 @@ async function deleteStaff(id: string): Promise<Staff> {
   );
 
   return getStaffResponseData(result);
+}
+
+async function transferStaff(input: StaffTransferInput) {
+  return fetchClient<StaffTransferApiResponse>(API_ROUTES.staffTransfer, {
+    method: "PATCH",
+    headers: DEFAULT_JSON_HEADERS,
+    body: JSON.stringify(input),
+  });
 }
 
 export function useStaff() {
@@ -97,6 +108,10 @@ export function useStaff() {
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: STAFF_QUERY_KEY }),
   });
+  const transferStaffMutation = useMutation({
+    mutationFn: transferStaff,
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
 
   return {
     staff: staffQuery.data ?? [],
@@ -105,8 +120,10 @@ export function useStaff() {
     isDeleting: deleteStaffMutation.isPending,
     isLoading: staffQuery.isLoading,
     isUpdating: updateStaffMutation.isPending,
+    isTransferring: transferStaffMutation.isPending,
     createStaff: createStaffMutation.mutateAsync,
     deleteStaff: deleteStaffMutation.mutateAsync,
     updateStaff: updateStaffMutation.mutateAsync,
+    transferStaff: transferStaffMutation.mutateAsync,
   };
 }

@@ -1,5 +1,6 @@
 import { Edit2, Plus, Trash2 } from "lucide-react";
 import {
+  USER_ROLE_MANAGER,
   UI_VARIANT_DANGER,
   UI_VARIANT_SECONDARY,
 } from "@/constants/common";
@@ -31,6 +32,16 @@ import {
   STAFF_ROLE_BADGE_VARIANTS,
   STAFF_STATUS_BADGE_VARIANTS,
 } from "./ownerStaffTypes";
+
+function getStaffBranchLabel(staffMember: Staff) {
+  if (staffMember.role === USER_ROLE_MANAGER) {
+    return staffMember.managedBranches?.length
+      ? staffMember.managedBranches.map((branch) => branch.name).join(", ")
+      : staffTexts.ownerStaff.branchEmpty;
+  }
+
+  return staffMember.branch?.name ?? staffTexts.ownerStaff.branchEmpty;
+}
 
 type OwnerStaffTableProps = {
   branchesError: Error | null;
@@ -125,7 +136,7 @@ export function OwnerStaffTable({
                 <th className="min-w-36 px-4 py-3 text-left font-semibold text-gray-1000">
                   {staffTexts.ownerStaff.table.createdAt}
                 </th>
-                <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
+                <th className="w-28 px-3 py-3 text-right font-semibold text-gray-1000">
                   {staffTexts.ownerStaff.table.actions}
                 </th>
               </TableRow>
@@ -157,8 +168,7 @@ export function OwnerStaffTable({
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {staffMember.branch?.name ??
-                        staffTexts.ownerStaff.branchEmpty}
+                      {getStaffBranchLabel(staffMember)}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -171,7 +181,7 @@ export function OwnerStaffTable({
                     <TableCell>
                       {formatDisplayDate(staffMember.createdAt)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="w-28 px-3">
                       <div className="flex justify-end gap-2">
                         <Tooltip content={staffTexts.ownerStaff.edit}>
                           <Button

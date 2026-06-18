@@ -5,11 +5,13 @@ import {
   Error as FeedbackError,
   Input,
   Modal,
+  MultiSelect,
   Select,
 } from "@/components/global";
 import {
-  STAFF_ROLES,
+  BRANCH_STATUS_ACTIVE,
   UI_VARIANT_SECONDARY,
+  USER_ROLE_MANAGER,
 } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
 import type { Branch, Staff, StaffRole } from "@/types";
@@ -22,7 +24,9 @@ type OwnerStaffFormModalProps = {
   isBranchLocked: boolean;
   isOpen: boolean;
   isSubmitting: boolean;
+  managedBranchIds: string[];
   onBranchIdChange: (branchId: string) => void;
+  onManagedBranchIdsChange: (branchIds: string[]) => void;
   onOpenChange: (open: boolean) => void;
   onPasswordChange: (password: string) => void;
   onRoleChange: (role: StaffRole) => void;
@@ -30,6 +34,7 @@ type OwnerStaffFormModalProps = {
   onUsernameChange: (username: string) => void;
   password: string;
   role: StaffRole;
+  roleOptions: StaffRole[];
   username: string;
 };
 
@@ -41,7 +46,9 @@ export function OwnerStaffFormModal({
   isBranchLocked,
   isOpen,
   isSubmitting,
+  managedBranchIds,
   onBranchIdChange,
+  onManagedBranchIdsChange,
   onOpenChange,
   onPasswordChange,
   onRoleChange,
@@ -49,8 +56,15 @@ export function OwnerStaffFormModal({
   onUsernameChange,
   password,
   role,
+  roleOptions,
   username,
 }: OwnerStaffFormModalProps) {
+  const isManagerRole = role === USER_ROLE_MANAGER;
+  const activeBranches = branches.filter(
+    (branch) =>
+      (branch.status ?? BRANCH_STATUS_ACTIVE) === BRANCH_STATUS_ACTIVE,
+  );
+
   return (
     <Modal
       open={isOpen}
@@ -99,7 +113,7 @@ export function OwnerStaffFormModal({
             value={role}
             onChange={(event) => onRoleChange(event.target.value as StaffRole)}
           >
-            {STAFF_ROLES.map((staffRole) => (
+            {roleOptions.map((staffRole) => (
               <option key={staffRole} value={staffRole}>
                 {staffTexts.ownerStaff.roles[staffRole]}
               </option>
@@ -107,27 +121,49 @@ export function OwnerStaffFormModal({
           </Select>
         </label>
 
-        <label className="block">
-          <span className="text-sm font-medium text-gray-1000">
-            {staffTexts.ownerStaff.branchLabel}
-          </span>
-          <Select
-            className="mt-2"
-            disabled={isBranchLocked}
-            required
-            value={branchId}
-            onChange={(event) => onBranchIdChange(event.target.value)}
-          >
-            <option disabled value="">
-              {staffTexts.ownerStaff.branchPlaceholder}
-            </option>
-            {branches.map((branch) => (
-              <option key={branch.id} value={branch.id}>
-                {branch.name}
+        {isManagerRole ? (
+          <label className="block">
+            <span className="text-sm font-medium text-gray-1000">
+              {staffTexts.ownerStaff.managedBranchesLabel}
+            </span>
+            <MultiSelect
+              className="mt-2"
+              options={activeBranches.map((branch) => ({
+                label: branch.name,
+                value: branch.id,
+              }))}
+              placeholder={staffTexts.ownerStaff.managedBranchesPlaceholder}
+              searchable
+              searchPlaceholder={
+                staffTexts.ownerStaff.managedBranchesPlaceholder
+              }
+              value={managedBranchIds}
+              onChange={onManagedBranchIdsChange}
+            />
+          </label>
+        ) : (
+          <label className="block">
+            <span className="text-sm font-medium text-gray-1000">
+              {staffTexts.ownerStaff.branchLabel}
+            </span>
+            <Select
+              className="mt-2"
+              disabled={isBranchLocked}
+              required
+              value={branchId}
+              onChange={(event) => onBranchIdChange(event.target.value)}
+            >
+              <option disabled value="">
+                {staffTexts.ownerStaff.branchPlaceholder}
               </option>
-            ))}
-          </Select>
-        </label>
+              {activeBranches.map((branch) => (
+                <option key={branch.id} value={branch.id}>
+                  {branch.name}
+                </option>
+              ))}
+            </Select>
+          </label>
+        )}
 
         {error ? <FeedbackError message={error} /> : null}
 

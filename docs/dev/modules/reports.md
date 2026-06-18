@@ -21,7 +21,8 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 ## Business Rules
 
 - Reports use snapshot fields and `allocatedPrice`.
-- Reports must not use current service/combo names or prices for historical revenue.
+- Reports must not use current service/combo/branch names or prices for historical revenue.
+- Branch grouping should use the visit branch snapshot for historical display and the visit `branch_id` for stable drill-down.
 - Combo allocated line totals must equal combo price.
 - Staff revenue attribution follows each service `responsibleRole`.
 - Staff allocation roles are `barber` and `skinner`.

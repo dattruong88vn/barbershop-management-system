@@ -9,6 +9,7 @@ import {
 export const ROUTES = {
   login: "/login",
   changePassword: "/change-password",
+  branchUnavailable: "/branch-unavailable",
   dashboard: "/dashboard",
   designSystem: "/design-system",
   notFound: "/not-found",

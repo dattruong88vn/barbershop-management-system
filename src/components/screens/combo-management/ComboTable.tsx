@@ -158,7 +158,7 @@ export function ComboTable({
                 <th className="min-w-44 px-4 py-3 text-left font-semibold text-gray-1000">
                   {comboTexts.ownerCombos.table.scope}
                 </th>
-                <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
+                <th className="w-40 px-3 py-3 text-right font-semibold text-gray-1000">
                   {comboTexts.ownerCombos.table.actions}
                 </th>
               </TableRow>
@@ -222,7 +222,7 @@ export function ComboTable({
                         {getScopeLabel(combo)}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="w-40 px-3">
                       <div className="flex justify-end gap-2">
                         {isDeletedTab ? null : (
                           <Tooltip

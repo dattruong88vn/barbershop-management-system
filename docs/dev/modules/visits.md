@@ -27,6 +27,8 @@ Visit creation, visit list/detail, status changes, service/combo selection, barb
 - Every visit belongs to one branch. Staff use their assigned branch; manager uses the active branch selected before entering the management workspace.
 - Customers remain shop-level and may have visits across multiple branches.
 - Snapshot branch name and address on the visit so historical display and reports do not change when branch information is edited.
+- Visit creation must use an active branch. Inactive branches and `branch_suspended` users cannot create visits.
+- Service, combo, barber, and skinner selections must belong to the same effective branch scope: shop-wide catalog items (`branch_id = null`) or items/staff available in the active branch.
 - Barber/skinner assignment is editable only within 3 hours after `completed_at`.
 
 ## Pricing Snapshot

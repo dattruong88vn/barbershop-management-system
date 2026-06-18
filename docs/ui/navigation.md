@@ -57,9 +57,9 @@ Manager role:
 - Manager must not access `/owner/*`; middleware redirects forbidden routes to the post-auth default.
 - Sau đăng nhập, manager đi qua `/manager/select-branch`. Màn này không có sidebar.
 - Nếu chỉ có một branch active, hệ thống tự chọn; nếu có nhiều branch, manager phải chọn trước khi vào workspace.
-- Branch đã chọn là context cho toàn bộ dữ liệu và API trong phiên làm việc.
-- Manager có quyền quản lý dịch vụ, combo, và nhân viên. Branch management remains owner-only.
-- Trong màn Nhân viên, manager chỉ thấy và tạo/sửa nhân viên thuộc chi nhánh của chính manager.
+- Branch đã chọn được lưu trong session là `active_branch_id` và là context cho toàn bộ dữ liệu/API trong phiên làm việc.
+- Manager có quyền quản lý dịch vụ, combo, và nhân viên. Quản lý chi nhánh chỉ dành cho owner.
+- Trong màn Nhân viên, manager chỉ thấy và tạo/sửa nhân viên thuộc branch active đã chọn.
 - Sidebar:
   - Tổng quan → `/dashboard`
   - Báo cáo
@@ -73,6 +73,8 @@ Manager role:
   - Đổi chi nhánh → `/manager/select-branch` (chỉ hiển thị khi manager quản lý nhiều hơn một branch)
 
 `Đổi chi nhánh` quay lại màn chọn không có sidebar. Sau khi chọn branch mới, ứng dụng xoá/invalidate cache dữ liệu branch cũ và mặc định quay về Tổng quan.
+
+Nếu user ở trạng thái `branch_suspended`, middleware đưa về `/branch-unavailable` để hiển thị thông báo chi nhánh đã ngừng hoạt động. Màn này không cho vào workspace vận hành cho đến khi owner khôi phục/chuyển phân công.
 
 ---
 

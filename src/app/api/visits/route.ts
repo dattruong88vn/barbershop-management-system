@@ -2,11 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { Prisma } from "@prisma/client";
 
-import { customerTexts, visitTexts } from "@/constants/texts";
+import { branchTexts, customerTexts, visitTexts } from "@/constants/texts";
 import {
   MANAGEMENT_ROLES,
   STAFF_ROLES,
   USER_ROLE_BARBER,
+  USER_ROLE_MANAGER,
   USER_ROLE_SKINNER,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
@@ -26,6 +27,9 @@ import type {
 const VISIT_ROLES: UserRole[] = [...MANAGEMENT_ROLES, ...STAFF_ROLES];
 const VISIT_SELECT = {
   id: true,
+  branchId: true,
+  branchNameSnapshot: true,
+  branchAddressSnapshot: true,
   createdAt: true,
   completedAt: true,
   lastUpdatedBy: true,
@@ -179,6 +183,11 @@ function formatVisitResponse(visit: VisitRecord): CustomerVisit {
 
   return {
     id: visit.id,
+    branch: {
+      id: visit.branchId,
+      name: visit.branchNameSnapshot,
+      address: visit.branchAddressSnapshot,
+    },
     createdAt: visit.createdAt.toISOString(),
     completedAt: visit.completedAt?.toISOString() ?? null,
     lastUpdatedBy: visit.lastUpdatedBy,
@@ -224,6 +233,22 @@ async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
     return { error: visitTexts.api.errors.missingBranch, status: 400 };
   }
 
+  if (token.role === USER_ROLE_MANAGER) {
+    const managedBranch = await prisma.branch.findFirst({
+      where: {
+        id: token.branch_id,
+        managerId: token.id,
+        shopId: token.shop_id,
+        status: "active",
+      },
+      select: { id: true },
+    });
+
+    if (!managedBranch) {
+      return { error: visitTexts.api.errors.forbidden, status: 403 };
+    }
+  }
+
   return {
     role: token.role as UserRole,
     userId: token.id,
@@ -263,6 +288,7 @@ async function validateStaff(
   barberId: string | null,
   skinnerId: string | null,
   shopId: string,
+  branchId: string,
 ) {
   const staffIds = [barberId, skinnerId].filter(
     (staffId): staffId is string => Boolean(staffId),
@@ -288,6 +314,7 @@ async function validateStaff(
     where: {
       id: { in: staffIds },
       shopId,
+      branchId,
       status: "active",
       OR: roleFilters,
     },
@@ -307,11 +334,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const statusFilter = request.nextUrl.searchParams.get("status");
+  const searchParams = request.nextUrl?.searchParams ?? new URL(request.url).searchParams;
+  const statusFilter = searchParams.get("status");
 
   if (isVisitStatus(statusFilter)) {
     const visits = await prisma.visit.findMany({
       where: {
+        branchId: authResult.branchId,
         shopId: authResult.shopId,
         status: statusFilter,
       },
@@ -340,7 +369,11 @@ export async function GET(request: NextRequest) {
       },
     }),
     prisma.combo.findMany({
-      where: { shopId: authResult.shopId },
+      where: {
+        deletedAt: null,
+        shopId: authResult.shopId,
+        OR: [{ branchId: null }, { branchId: authResult.branchId }],
+      },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -351,6 +384,7 @@ export async function GET(request: NextRequest) {
     prisma.user.findMany({
       where: {
         shopId: authResult.shopId,
+        branchId: authResult.branchId,
         role: USER_ROLE_BARBER,
         status: "active",
       },
@@ -364,6 +398,7 @@ export async function GET(request: NextRequest) {
     prisma.user.findMany({
       where: {
         shopId: authResult.shopId,
+        branchId: authResult.branchId,
         role: USER_ROLE_SKINNER,
         status: "active",
       },
@@ -465,7 +500,7 @@ export async function POST(request: NextRequest) {
       ? authResult.userId
       : visitInput.skinnerId;
 
-  const [services, combos, isValidStaff] = await Promise.all([
+  const [services, combos, isValidStaff, branch] = await Promise.all([
     prisma.service.findMany({
       where: {
         deletedAt: null,
@@ -482,8 +517,10 @@ export async function POST(request: NextRequest) {
     }),
     prisma.combo.findMany({
       where: {
+        deletedAt: null,
         id: { in: visitInput.comboIds },
         shopId: authResult.shopId,
+        OR: [{ branchId: null }, { branchId: authResult.branchId }],
       },
       select: {
         id: true,
@@ -503,8 +540,32 @@ export async function POST(request: NextRequest) {
         },
       },
     }),
-    validateStaff(barberId, skinnerId, authResult.shopId),
+    validateStaff(
+      barberId,
+      skinnerId,
+      authResult.shopId,
+      authResult.branchId,
+    ),
+    prisma.branch.findFirst({
+      where: {
+        id: authResult.branchId,
+        shopId: authResult.shopId,
+        status: "active",
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+      },
+    }),
   ]);
+
+  if (!branch) {
+    return NextResponse.json(
+      { error: branchTexts.api.errors.inactiveBranch },
+      { status: 400 },
+    );
+  }
 
   if (services.length !== visitInput.serviceIds.length) {
     return NextResponse.json(
@@ -545,6 +606,8 @@ export async function POST(request: NextRequest) {
       shopId: authResult.shopId,
       customerId: visitInput.customerId,
       branchId: authResult.branchId,
+      branchNameSnapshot: branch.name,
+      branchAddressSnapshot: branch.address,
       barberId,
       skinnerId,
       status: VISIT_STATUS_PENDING,

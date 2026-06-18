@@ -1,6 +1,12 @@
 export const API_ROUTES = {
   branches: "/api/branches",
   branchDetail: (id: string) => `/api/branches/${id}`,
+  branchManagers: (search = "") => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    const query = params.toString();
+    return query ? `/api/managers?${query}` : "/api/managers";
+  },
   changePassword: "/api/change-password",
   combos: ({ status }: { status?: string } = {}) => {
     const params = new URLSearchParams();
@@ -49,6 +55,8 @@ export const API_ROUTES = {
   serviceDetail: (id: string) => `/api/services/${id}`,
   staff: "/api/staff",
   staffDetail: (id: string) => `/api/staff/${id}`,
+  staffTransfer: "/api/staff/transfer",
+  branchStatus: (id: string) => `/api/branches/${id}/status`,
   uploadPresigned: "/api/upload/presigned",
   visits: "/api/visits",
   visitDetail: (id: string) => `/api/visits/${id}`,

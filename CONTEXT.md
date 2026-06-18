@@ -20,6 +20,7 @@ Primary operating model:
 - Navigation: `docs/ui/navigation.md`
 - Data model: `docs/data-model.md`
 - Git flow: `docs/dev/git-flow.md`
+- Branch module: `docs/dev/modules/branches.md`
 - Visit module: `docs/dev/modules/visits.md`
 - Reports module: `docs/dev/modules/reports.md`
 - ADRs: `docs/dev/decisions/`
@@ -70,6 +71,9 @@ Detailed API/DB rules:
 ## Business-Critical Rules
 
 - Visits use services or combos, never both.
+- Every visit belongs to one active branch and snapshots branch name/address.
+- Branch management is owner-only; branches are never hard deleted.
+- Manager branch scope comes from the active branch selected in session.
 - Visit pricing is snapshotted into `visit_services`.
 - Combo revenue allocation must preserve integer VND totals and assign final rounding difference to the last line.
 - Reports use snapshot fields and `allocatedPrice`, never current catalog prices.
@@ -79,6 +83,7 @@ Detailed API/DB rules:
 Detailed module rules:
 
 - `docs/dev/modules/visits.md`
+- `docs/dev/modules/branches.md`
 - `docs/dev/modules/reports.md`
 - `.codex/skills/barbershop-visits/`
 - `.codex/skills/barbershop-reports/`

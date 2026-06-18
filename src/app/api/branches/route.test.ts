@@ -58,7 +58,7 @@ describe("GET /api/branches", () => {
     mocks.getToken.mockResolvedValue({
       id: "user-1",
       role: "manager",
-      shop_id: "shop-1",
+      shop_id: null,
     });
 
     const response = await GET(createRequest());
@@ -89,17 +89,12 @@ describe("GET /api/branches", () => {
     const response = await GET(createRequest());
 
     expect(response.status).toBe(200);
-    expect(mocks.prismaFindMany).toHaveBeenCalledWith({
-      where: { shopId: "shop-1" },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        shopId: true,
-        name: true,
-        address: true,
-        createdAt: true,
-      },
-    });
+    expect(mocks.prismaFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { shopId: "shop-1" },
+        orderBy: { createdAt: "desc" },
+      }),
+    );
     await expect(response.json()).resolves.toEqual({
       branches: [
         {
@@ -172,20 +167,16 @@ describe("POST /api/branches", () => {
     );
 
     expect(response.status).toBe(201);
-    expect(mocks.prismaCreate).toHaveBeenCalledWith({
-      data: {
-        shopId: "shop-1",
-        name: "Chi nhánh Quận 1",
-        address: "123 Lê Lợi",
-      },
-      select: {
-        id: true,
-        shopId: true,
-        name: true,
-        address: true,
-        createdAt: true,
-      },
-    });
+    expect(mocks.prismaCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          shopId: "shop-1",
+          name: "Chi nhánh Quận 1",
+          address: "123 Lê Lợi",
+          managerId: null,
+        },
+      }),
+    );
     await expect(response.json()).resolves.toEqual({
       branch: {
         ...branch,

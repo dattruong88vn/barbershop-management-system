@@ -39,6 +39,7 @@ const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, typeof USER_ROLE_SUPERA
 
 const LOGIN_PATH = ROUTES.login;
 const CHANGE_PASSWORD_PATH = ROUTES.changePassword;
+const BRANCH_UNAVAILABLE_PATH = ROUTES.branchUnavailable;
 const PUBLIC_ROUTES = [ROUTES.designSystem] as const;
 
 function isUserRole(role: unknown): role is UserRole {
@@ -97,6 +98,30 @@ export async function middleware(request: NextRequest) {
 
   if (role === USER_ROLE_SUPERADMIN) {
     return NextResponse.next();
+  }
+
+  if (token.status === "branch_suspended") {
+    if (matchesRoute(request.nextUrl.pathname, BRANCH_UNAVAILABLE_PATH)) {
+      return NextResponse.next();
+    }
+
+    return NextResponse.redirect(new URL(BRANCH_UNAVAILABLE_PATH, request.url));
+  }
+
+  if (matchesRoute(request.nextUrl.pathname, BRANCH_UNAVAILABLE_PATH)) {
+    return NextResponse.redirect(
+      new URL(getPostAuthRedirectPath(role), request.url),
+    );
+  }
+
+  if (
+    role === USER_ROLE_MANAGER &&
+    !token.active_branch_id &&
+    !matchesRoute(request.nextUrl.pathname, ROUTES.managerSelectBranch)
+  ) {
+    return NextResponse.redirect(
+      new URL(ROUTES.managerSelectBranch, request.url),
+    );
   }
 
   const allowedRoutes = PROTECTED_ROUTES_BY_ROLE[role];

@@ -3,6 +3,7 @@ export const designSystemTexts = {
     cancel: "Hủy",
     copied: "Đã sao chép",
     copy: "Sao chép",
+    close: "Đóng",
     next: "Tiếp",
     previous: "Trước",
   },

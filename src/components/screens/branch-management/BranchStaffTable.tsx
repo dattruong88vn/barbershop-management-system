@@ -10,6 +10,7 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  Checkbox,
 } from "@/components/global";
 import { UI_VARIANT_SECONDARY } from "@/constants/common";
 import { branchTexts, staffTexts } from "@/constants/texts";
@@ -26,20 +27,31 @@ type BranchStaffTableProps = {
   isCreateMode: boolean;
   isLoading: boolean;
   staff: Staff[];
+  selectedStaffIds: string[];
+  onSelectedStaffIdsChange: (ids: string[]) => void;
+  onTransfer: () => void;
 };
 
 export function BranchStaffTable({
   isCreateMode,
   isLoading,
   staff,
+  selectedStaffIds,
+  onSelectedStaffIdsChange,
+  onTransfer,
 }: BranchStaffTableProps) {
   return (
     <Card
       padding="lg"
       title={branchTexts.ownerBranches.staffTitle}
       action={
-        <Tooltip content={branchTexts.ownerBranches.transferStaffPending}>
-          <Button disabled type="button" variant={UI_VARIANT_SECONDARY}>
+        <Tooltip content={branchTexts.ownerBranches.transferStaff}>
+          <Button
+            disabled={selectedStaffIds.length === 0}
+            type="button"
+            variant={UI_VARIANT_SECONDARY}
+            onClick={onTransfer}
+          >
             {branchTexts.ownerBranches.transferStaff}
           </Button>
         </Tooltip>
@@ -66,6 +78,17 @@ export function BranchStaffTable({
           <Table>
             <TableHead>
               <TableRow>
+                <th className="w-12 px-3 py-3 text-center">
+                  <Checkbox
+                    aria-label={branchTexts.ownerBranches.transferStaff}
+                    checked={staff.length > 0 && selectedStaffIds.length === staff.length}
+                    onChange={(event) =>
+                      onSelectedStaffIdsChange(
+                        event.target.checked ? staff.map((item) => item.id) : [],
+                      )
+                    }
+                  />
+                </th>
                 <th className="w-10 px-2 py-3 text-center font-semibold text-gray-1000">
                   {branchTexts.ownerBranches.staffTable.index}
                 </th>
@@ -89,6 +112,19 @@ export function BranchStaffTable({
 
                 return (
                   <TableRow key={staffMember.id}>
+                    <TableCell className="w-12 text-center">
+                      <Checkbox
+                        aria-label={staffMember.username}
+                        checked={selectedStaffIds.includes(staffMember.id)}
+                        onChange={(event) =>
+                          onSelectedStaffIdsChange(
+                            event.target.checked
+                              ? [...selectedStaffIds, staffMember.id]
+                              : selectedStaffIds.filter((id) => id !== staffMember.id),
+                          )
+                        }
+                      />
+                    </TableCell>
                     <TableCell className="w-10 px-2 text-center">
                       {index + 1}
                     </TableCell>

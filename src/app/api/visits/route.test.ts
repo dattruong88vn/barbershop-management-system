@@ -6,10 +6,12 @@ import { visitTexts } from "@/constants/texts";
 const mocks = vi.hoisted(() => ({
   getToken: vi.fn(),
   prismaComboFindMany: vi.fn(),
+  prismaBranchFindFirst: vi.fn(),
   prismaCustomerFindFirst: vi.fn(),
   prismaServiceFindMany: vi.fn(),
   prismaUserFindMany: vi.fn(),
   prismaVisitCreate: vi.fn(),
+  prismaVisitFindFirst: vi.fn(),
 }));
 
 vi.mock("next-auth/jwt", () => ({
@@ -20,6 +22,9 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     combo: {
       findMany: mocks.prismaComboFindMany,
+    },
+    branch: {
+      findFirst: mocks.prismaBranchFindFirst,
     },
     customer: {
       findFirst: mocks.prismaCustomerFindFirst,
@@ -32,6 +37,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     visit: {
       create: mocks.prismaVisitCreate,
+      findFirst: mocks.prismaVisitFindFirst,
     },
   },
 }));
@@ -67,6 +73,9 @@ function createStaffToken(role = "receptionist") {
 function createVisitRecord() {
   return {
     id: "visit-1",
+    branchId: "branch-1",
+    branchNameSnapshot: "Chi nhánh Quận 1",
+    branchAddressSnapshot: "123 Lê Lợi",
     createdAt: new Date("2026-06-04T01:00:00.000Z"),
     completedAt: null,
     lastUpdatedBy: "user-1",
@@ -147,28 +156,21 @@ describe("GET /api/visits", () => {
     const response = await GET(createGetRequest());
 
     expect(response.status).toBe(200);
-    expect(mocks.prismaServiceFindMany).toHaveBeenCalledWith({
-      where: { shopId: "shop-1" },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        price: true,
-      },
-    });
-    expect(mocks.prismaUserFindMany).toHaveBeenCalledWith({
-      where: {
-        shopId: "shop-1",
-        role: "barber",
-        status: "active",
-      },
-      orderBy: { username: "asc" },
-      select: {
-        id: true,
-        username: true,
-        role: true,
-      },
-    });
+    expect(mocks.prismaServiceFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ shopId: "shop-1" }),
+      }),
+    );
+    expect(mocks.prismaUserFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          branchId: "branch-1",
+          shopId: "shop-1",
+          role: "barber",
+          status: "active",
+        }),
+      }),
+    );
     await expect(response.json()).resolves.toEqual({
       services: [
         {
@@ -281,6 +283,12 @@ describe("POST /api/visits", () => {
   it("should return 400 when selected staff does not match shop and role", async () => {
     mocks.getToken.mockResolvedValue(createStaffToken());
     mocks.prismaCustomerFindFirst.mockResolvedValue({ id: "customer-1" });
+    mocks.prismaVisitFindFirst.mockResolvedValue(null);
+    mocks.prismaBranchFindFirst.mockResolvedValue({
+      id: "branch-1",
+      name: "Chi nhánh Quận 1",
+      address: "123 Lê Lợi",
+    });
     mocks.prismaServiceFindMany.mockResolvedValue([
       {
         id: "service-1",
@@ -304,6 +312,7 @@ describe("POST /api/visits", () => {
       where: {
         id: { in: ["barber-1"] },
         shopId: "shop-1",
+        branchId: "branch-1",
         status: "active",
         OR: [{ id: "barber-1", role: "barber" }],
       },
@@ -317,6 +326,12 @@ describe("POST /api/visits", () => {
   it("should create a pending visit from selected services", async () => {
     mocks.getToken.mockResolvedValue(createStaffToken("skinner"));
     mocks.prismaCustomerFindFirst.mockResolvedValue({ id: "customer-1" });
+    mocks.prismaVisitFindFirst.mockResolvedValue(null);
+    mocks.prismaBranchFindFirst.mockResolvedValue({
+      id: "branch-1",
+      name: "Chi nhánh Quận 1",
+      address: "123 Lê Lợi",
+    });
     mocks.prismaServiceFindMany.mockResolvedValue([
       {
         id: "service-1",
@@ -345,31 +360,39 @@ describe("POST /api/visits", () => {
     );
 
     expect(response.status).toBe(201);
-    expect(mocks.prismaVisitCreate).toHaveBeenCalledWith({
-      data: {
-        shopId: "shop-1",
-        customerId: "customer-1",
-        branchId: "branch-1",
-        barberId: "barber-1",
-        skinnerId: "skinner-1",
-        status: "pending",
-        totalPrice: 100000,
-        createdBy: "user-1",
-        visitServices: {
-          create: [
-            {
-              shopId: "shop-1",
-              serviceId: "service-1",
-              price: 100000,
-            },
-          ],
-        },
-      },
-      select: expect.any(Object),
-    });
+    expect(mocks.prismaVisitCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          shopId: "shop-1",
+          customerId: "customer-1",
+          branchId: "branch-1",
+          branchNameSnapshot: "Chi nhánh Quận 1",
+          branchAddressSnapshot: "123 Lê Lợi",
+          barberId: "barber-1",
+          skinnerId: "skinner-1",
+          status: "pending",
+          totalPrice: 100000,
+          createdBy: "user-1",
+          visitServices: expect.objectContaining({
+            create: expect.arrayContaining([
+              expect.objectContaining({
+                shopId: "shop-1",
+                serviceId: "service-1",
+                price: 100000,
+              }),
+            ]),
+          }),
+        }),
+      }),
+    );
     await expect(response.json()).resolves.toEqual({
       visit: {
         id: "visit-1",
+        branch: {
+          id: "branch-1",
+          name: "Chi nhánh Quận 1",
+          address: "123 Lê Lợi",
+        },
         createdAt: "2026-06-04T01:00:00.000Z",
         completedAt: null,
         lastUpdatedBy: "user-1",

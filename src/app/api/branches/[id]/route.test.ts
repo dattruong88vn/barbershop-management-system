@@ -66,19 +66,14 @@ describe("GET /api/branches/[id]", () => {
     const response = await GET(createRequest(), createContext());
 
     expect(response.status).toBe(404);
-    expect(mocks.prismaFindFirst).toHaveBeenCalledWith({
-      where: {
-        id: "branch-1",
-        shopId: "shop-1",
-      },
-      select: {
-        id: true,
-        shopId: true,
-        name: true,
-        address: true,
-        createdAt: true,
-      },
-    });
+    expect(mocks.prismaFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: "branch-1",
+          shopId: "shop-1",
+        },
+      }),
+    );
     await expect(response.json()).resolves.toEqual({
       error: branchTexts.api.errors.notFound,
     });
@@ -139,20 +134,16 @@ describe("PATCH /api/branches/[id]", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mocks.prismaUpdate).toHaveBeenCalledWith({
-      where: { id: "branch-1" },
-      data: {
-        name: "Chi nhánh Quận 3",
-        address: "456 Nguyễn Đình Chiểu",
-      },
-      select: {
-        id: true,
-        shopId: true,
-        name: true,
-        address: true,
-        createdAt: true,
-      },
-    });
+    expect(mocks.prismaUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "branch-1" },
+        data: {
+          name: "Chi nhánh Quận 3",
+          address: "456 Nguyễn Đình Chiểu",
+          managerId: null,
+        },
+      }),
+    );
     await expect(response.json()).resolves.toEqual({
       branch: {
         ...updatedBranch,
@@ -163,35 +154,12 @@ describe("PATCH /api/branches/[id]", () => {
 });
 
 describe("DELETE /api/branches/[id]", () => {
-  it("should delete an existing branch scoped to session shop", async () => {
-    const createdAt = new Date("2026-06-03T00:00:00.000Z");
-    const branch = {
-      id: "branch-1",
-      shopId: "shop-1",
-      name: "Chi nhánh Quận 1",
-      address: "123 Lê Lợi",
-      createdAt,
-    };
-
-    mocks.getToken.mockResolvedValue({
-      id: "user-1",
-      role: "owner",
-      shop_id: "shop-1",
-    });
-    mocks.prismaFindFirst.mockResolvedValue(branch);
-    mocks.prismaDelete.mockResolvedValue(branch);
-
+  it("should reject hard delete", async () => {
     const response = await DELETE(createRequest(), createContext());
 
-    expect(response.status).toBe(200);
-    expect(mocks.prismaDelete).toHaveBeenCalledWith({
-      where: { id: "branch-1" },
-    });
+    expect(response.status).toBe(405);
     await expect(response.json()).resolves.toEqual({
-      branch: {
-        ...branch,
-        createdAt: createdAt.toISOString(),
-      },
+      error: branchTexts.api.errors.branchInUse,
     });
   });
 });

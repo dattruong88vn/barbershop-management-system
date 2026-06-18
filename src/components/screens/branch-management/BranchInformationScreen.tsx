@@ -27,6 +27,7 @@ import { useStaff } from "@/hooks/useStaff";
 import { dispatchAppToast } from "@/lib/toast";
 
 import { BranchStaffTable } from "./BranchStaffTable";
+import { BranchStaffTransferModal } from "./BranchStaffTransferModal";
 
 export type BranchInformationMode = "create" | "detail" | "edit";
 
@@ -44,38 +45,42 @@ export function BranchInformationScreen({
   const [address, setAddress] = useState("");
   const [managerId, setManagerId] = useState("");
   const [formError, setFormError] = useState("");
+  const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
+  const [targetBranchId, setTargetBranchId] = useState("");
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [transferError, setTransferError] = useState("");
   const {
+    branch: branchDetail,
     branches,
     createBranch,
     error: branchesError,
     isCreating,
     isLoading,
     isUpdating,
+    managers,
     updateBranch,
-  } = useBranches();
-  const { staff, isLoading: isLoadingStaff } = useStaff();
-  const branch = branches.find((item) => item.id === branchId) ?? null;
+  } = useBranches(true, true, branchId);
+  const { isTransferring, transferStaff } = useStaff();
+  const branch = branchDetail ?? branches.find((item) => item.id === branchId) ?? null;
   const isCreateMode = mode === "create";
   const isDetailMode = mode === "detail";
   const status = branch?.status ?? BRANCH_STATUS_ACTIVE;
   const isInactive = status === BRANCH_STATUS_INACTIVE;
   const isReadOnly = isDetailMode || isInactive;
-  const branchStaff = useMemo(
-    () => staff.filter((staffMember) => staffMember.branchId === branchId),
-    [branchId, staff],
-  );
-  const managerOptions = useMemo(() => {
-    const managers = new Map<string, string>();
-
-    branches.forEach((item) => {
-      if (item.manager) managers.set(item.manager.id, item.manager.username);
-    });
-
-    return [
+  const branchStaff = branch?.staff ?? [];
+  const managerOptions = useMemo(
+    () => [
       { label: branchTexts.ownerBranches.noManagerOption, value: "" },
-      ...Array.from(managers, ([value, label]) => ({ label, value })),
-    ];
-  }, [branches]);
+      ...managers.map((manager) => ({
+        label: manager.username,
+        value: manager.id,
+      })),
+    ],
+    [managers],
+  );
+  const transferBranches = branches.filter(
+    (item) => item.id !== branchId && (item.status ?? BRANCH_STATUS_ACTIVE) === BRANCH_STATUS_ACTIVE,
+  );
 
   useEffect(() => {
     if (!branch) return;
@@ -122,6 +127,28 @@ export function BranchInformationScreen({
       setFormError(
         mutationError instanceof Error
           ? mutationError.message
+          : branchTexts.ownerBranches.errors.generic,
+      );
+    }
+  }
+
+  async function handleTransferStaff() {
+    if (!targetBranchId || selectedStaffIds.length === 0) return;
+    setTransferError("");
+
+    try {
+      await transferStaff({ staffIds: selectedStaffIds, targetBranchId });
+      dispatchAppToast({
+        message: branchTexts.ownerBranches.transferSuccess,
+        type: "success",
+      });
+      setSelectedStaffIds([]);
+      setTargetBranchId("");
+      setIsTransferOpen(false);
+    } catch (error) {
+      setTransferError(
+        error instanceof Error
+          ? error.message
           : branchTexts.ownerBranches.errors.generic,
       );
     }
@@ -282,10 +309,24 @@ export function BranchInformationScreen({
 
         <BranchStaffTable
           isCreateMode={isCreateMode}
-          isLoading={isLoadingStaff}
+          isLoading={isLoading}
           staff={branchStaff}
+          selectedStaffIds={selectedStaffIds}
+          onSelectedStaffIdsChange={setSelectedStaffIds}
+          onTransfer={() => setIsTransferOpen(true)}
         />
       </div>
+
+      <BranchStaffTransferModal
+        branches={transferBranches}
+        error={transferError}
+        isOpen={isTransferOpen}
+        isTransferring={isTransferring}
+        targetBranchId={targetBranchId}
+        onConfirm={handleTransferStaff}
+        onOpenChange={setIsTransferOpen}
+        onTargetBranchIdChange={setTargetBranchId}
+      />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/global";
 import {
+  USER_ROLE_MANAGER,
   UI_VARIANT_SECONDARY,
 } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
@@ -19,6 +20,16 @@ import {
   STAFF_ROLE_BADGE_VARIANTS,
   STAFF_STATUS_BADGE_VARIANTS,
 } from "./ownerStaffTypes";
+
+function getStaffBranchLabel(staffMember: Staff) {
+  if (staffMember.role === USER_ROLE_MANAGER) {
+    return staffMember.managedBranches?.length
+      ? staffMember.managedBranches.map((branch) => branch.name).join(", ")
+      : staffTexts.ownerStaff.branchEmpty;
+  }
+
+  return staffMember.branch?.name ?? staffTexts.ownerStaff.branchEmpty;
+}
 
 type OwnerStaffDetailModalProps = {
   onEdit: (staffMember: Staff) => void;
@@ -32,6 +43,10 @@ export function OwnerStaffDetailModal({
   staffMember,
 }: OwnerStaffDetailModalProps) {
   const displayStatus = staffMember ? getStaffDisplayStatus(staffMember) : null;
+  const branchLabel =
+    staffMember?.role === USER_ROLE_MANAGER
+      ? staffTexts.ownerStaff.managedBranchesLabel
+      : staffTexts.ownerStaff.branchLabel;
 
   return (
     <Modal
@@ -65,11 +80,10 @@ export function OwnerStaffDetailModal({
                 </TableRow>
                 <TableRow>
                   <TableCell className="w-1/2 bg-gray-200 font-medium">
-                    {staffTexts.ownerStaff.branchLabel}
+                    {branchLabel}
                   </TableCell>
                   <TableCell>
-                    {staffMember.branch?.name ??
-                      staffTexts.ownerStaff.branchEmpty}
+                    {getStaffBranchLabel(staffMember)}
                   </TableCell>
                 </TableRow>
                 <TableRow>

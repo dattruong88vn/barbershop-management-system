@@ -14,7 +14,10 @@ import {
   type StaffFilters,
 } from "@/components/screens/owner-staff";
 import {
+  OWNER_STAFF_ROLES,
+  STAFF_ROLES,
   USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   USER_ROLE_RECEPTIONIST,
   type ManagementRoleValue,
 } from "@/constants/common";
@@ -49,6 +52,7 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<StaffRole>(USER_ROLE_RECEPTIONIST);
   const [branchId, setBranchId] = useState("");
+  const [managedBranchIds, setManagedBranchIds] = useState<string[]>([]);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [viewingStaff, setViewingStaff] = useState<Staff | null>(null);
   const [deletingStaff, setDeletingStaff] = useState<Staff | null>(null);
@@ -78,6 +82,8 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
 
   const isSubmitting = isCreating || isUpdating;
   const isManagerMode = mode === USER_ROLE_MANAGER;
+  const roleOptions =
+    mode === USER_ROLE_OWNER ? [...OWNER_STAFF_ROLES] : [...STAFF_ROLES];
   const managerBranchId = isManagerMode ? session?.user.branch_id : null;
   const effectiveBranchId = managerBranchId ?? branchId;
   const isBranchLocked = isManagerMode;
@@ -95,7 +101,10 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
       const matchesBranch =
         isManagerMode ||
         appliedFilters.branchId === ALL_FILTER_VALUE ||
-        staffMember.branchId === appliedFilters.branchId;
+        staffMember.branchId === appliedFilters.branchId ||
+        staffMember.managedBranches?.some(
+          (branch) => branch.id === appliedFilters.branchId,
+        );
       const matchesStatus =
         appliedFilters.status === ALL_FILTER_VALUE ||
         getStaffDisplayStatus(staffMember) === appliedFilters.status;
@@ -124,6 +133,7 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
     setPassword("");
     setRole(USER_ROLE_RECEPTIONIST);
     setBranchId("");
+    setManagedBranchIds([]);
     setEditingStaff(null);
     setError("");
   }
@@ -139,6 +149,9 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
     setPassword("");
     setRole(staffMember.role);
     setBranchId(managerBranchId ?? staffMember.branchId ?? "");
+    setManagedBranchIds(
+      staffMember.managedBranches?.map((branch) => branch.id) ?? [],
+    );
     setEditingStaff(staffMember);
     setViewingStaff(null);
     setError("");
@@ -193,11 +206,13 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
     event.preventDefault();
     setError("");
 
+    const isManagerRole = role === USER_ROLE_MANAGER;
     const staffInput = {
       username: username.trim(),
       password: password.trim() || undefined,
       role,
-      branchId: effectiveBranchId,
+      branchId: isManagerRole ? null : effectiveBranchId,
+      managedBranchIds: isManagerRole ? managedBranchIds : [],
     };
 
     if (!staffInput.username) {
@@ -215,7 +230,12 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
       return;
     }
 
-    if (!staffInput.branchId) {
+    if (isManagerRole && staffInput.managedBranchIds.length === 0) {
+      setError(staffTexts.ownerStaff.errors.missingBranch);
+      return;
+    }
+
+    if (!isManagerRole && !staffInput.branchId) {
       setError(staffTexts.ownerStaff.errors.missingBranch);
       return;
     }
@@ -259,6 +279,7 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
           branches={branches}
           draftFilters={draftFilters}
           isBranchLocked={isBranchLocked}
+          roleOptions={roleOptions}
           onApplyFilters={handleApplyFilters}
           onDraftFiltersChange={setDraftFilters}
         />
@@ -290,10 +311,13 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
         isBranchLocked={isBranchLocked}
         isOpen={isFormOpen}
         isSubmitting={isSubmitting}
+        managedBranchIds={managedBranchIds}
         password={password}
         role={role}
+        roleOptions={roleOptions}
         username={username}
         onBranchIdChange={setBranchId}
+        onManagedBranchIdsChange={setManagedBranchIds}
         onOpenChange={closeFormModal}
         onPasswordChange={setPassword}
         onRoleChange={setRole}

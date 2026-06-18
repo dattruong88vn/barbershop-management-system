@@ -27,6 +27,7 @@ Developer handbook cho Barber Shop SaaS. Dùng thư mục này khi cần hiểu 
 
 ## Module Docs
 
+- Branches: [modules/branches.md](modules/branches.md)
 - Visits: [modules/visits.md](modules/visits.md)
 - Reports: [modules/reports.md](modules/reports.md)
 

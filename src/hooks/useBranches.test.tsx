@@ -163,7 +163,7 @@ describe("useBranches", () => {
     );
   });
 
-  it("should delete a branch by id", async () => {
+  it("should update a branch status by id", async () => {
     const branch: Branch = {
       id: "branch-1",
       shopId: "shop-1",
@@ -181,14 +181,21 @@ describe("useBranches", () => {
     });
 
     await act(async () => {
-      const mutationResult = await result.current.deleteBranch(branch.id);
+      const mutationResult = await result.current.updateBranchStatus({
+        id: branch.id,
+        status: "inactive",
+      });
       expect(mutationResult).toEqual(branch);
     });
 
     expect(mocks.fetchClient).toHaveBeenCalledWith(
-      API_ROUTES.branchDetail(branch.id),
+      API_ROUTES.branchStatus(branch.id),
       {
-        method: "DELETE",
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "inactive" }),
       },
     );
   });

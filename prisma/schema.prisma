@@ -31,6 +31,12 @@ enum UserRole {
 enum UserStatus {
   active
   inactive
+  branch_suspended
+}
+
+enum BranchStatus {
+  active
+  inactive
 }
 
 enum VisitStatus {
@@ -67,19 +73,28 @@ model Shop {
 }
 
 model Branch {
-  id        String   @id @default(uuid()) @db.Uuid
-  shopId    String   @map("shop_id") @db.Uuid
-  name      String
-  address   String
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id            String       @id @default(uuid()) @db.Uuid
+  shopId        String       @map("shop_id") @db.Uuid
+  managerId     String?      @map("manager_id") @db.Uuid
+  name          String
+  address       String
+  status        BranchStatus @default(active)
+  deactivatedAt DateTime?    @map("deactivated_at") @db.Timestamptz(6)
+  deactivatedBy String?      @map("deactivated_by") @db.Uuid
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  shop     Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  users    User[]
-  services Service[]
-  combos   Combo[]
-  visits   Visit[]
+  shop        Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  manager     User?     @relation("ManagedBranches", fields: [managerId], references: [id], onDelete: SetNull)
+  deactivator User?     @relation("DeactivatedBranches", fields: [deactivatedBy], references: [id], onDelete: SetNull)
+  users       User[]
+  services    Service[]
+  combos      Combo[]
+  visits      Visit[]
 
   @@index([shopId])
+  @@index([shopId, status])
+  @@index([managerId])
+  @@index([deactivatedBy])
   @@map("branches")
 }
 
@@ -94,15 +109,17 @@ model User {
   isFirstLogin Boolean    @default(true) @map("is_first_login")
   createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  shop              Shop?        @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  branch            Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  barberVisits      Visit[]      @relation("VisitBarber")
-  skinnerVisits     Visit[]      @relation("VisitSkinner")
-  createdVisits     Visit[]      @relation("VisitCreatedBy")
-  createdServices   Service[]    @relation("ServiceCreatedBy")
-  createdCombos     Combo[]      @relation("ComboCreatedBy")
-  lastUpdatedVisits Visit[]      @relation("VisitLastUpdatedBy")
-  uploadedPhotos    VisitPhoto[] @relation("VisitPhotoUploadedBy")
+  shop                Shop?        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  branch              Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  barberVisits        Visit[]      @relation("VisitBarber")
+  skinnerVisits       Visit[]      @relation("VisitSkinner")
+  createdVisits       Visit[]      @relation("VisitCreatedBy")
+  createdServices     Service[]    @relation("ServiceCreatedBy")
+  createdCombos       Combo[]      @relation("ComboCreatedBy")
+  lastUpdatedVisits   Visit[]      @relation("VisitLastUpdatedBy")
+  uploadedPhotos      VisitPhoto[] @relation("VisitPhotoUploadedBy")
+  managedBranches     Branch[]     @relation("ManagedBranches")
+  deactivatedBranches Branch[]     @relation("DeactivatedBranches")
 
   @@unique([shopId, username])
   @@index([branchId])
@@ -192,20 +209,22 @@ model Customer {
 }
 
 model Visit {
-  id               String      @id @default(uuid()) @db.Uuid
-  shopId           String      @map("shop_id") @db.Uuid
-  customerId       String      @map("customer_id") @db.Uuid
-  branchId         String      @map("branch_id") @db.Uuid
-  barberId         String?     @map("barber_id") @db.Uuid
-  skinnerId        String?     @map("skinner_id") @db.Uuid
-  noHaircut        Boolean     @default(false) @map("no_haircut")
-  noSkinnerService Boolean     @default(false) @map("no_skinner_service")
-  status           VisitStatus @default(pending)
-  totalPrice       Decimal     @map("total_price") @db.Decimal(12, 2)
-  createdBy        String      @map("created_by") @db.Uuid
-  completedAt      DateTime?   @map("completed_at") @db.Timestamptz(6)
-  lastUpdatedBy    String?     @map("last_updated_by") @db.Uuid
-  createdAt        DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  id                    String      @id @default(uuid()) @db.Uuid
+  shopId                String      @map("shop_id") @db.Uuid
+  customerId            String      @map("customer_id") @db.Uuid
+  branchId              String      @map("branch_id") @db.Uuid
+  branchNameSnapshot    String      @map("branch_name_snapshot")
+  branchAddressSnapshot String      @map("branch_address_snapshot")
+  barberId              String?     @map("barber_id") @db.Uuid
+  skinnerId             String?     @map("skinner_id") @db.Uuid
+  noHaircut             Boolean     @default(false) @map("no_haircut")
+  noSkinnerService      Boolean     @default(false) @map("no_skinner_service")
+  status                VisitStatus @default(pending)
+  totalPrice            Decimal     @map("total_price") @db.Decimal(12, 2)
+  createdBy             String      @map("created_by") @db.Uuid
+  completedAt           DateTime?   @map("completed_at") @db.Timestamptz(6)
+  lastUpdatedBy         String?     @map("last_updated_by") @db.Uuid
+  createdAt             DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
 
   shop          Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
   customer      Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)

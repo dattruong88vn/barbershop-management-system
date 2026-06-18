@@ -89,6 +89,7 @@ export function VisitHistorySection({
                     {" "}
                     · {visit.barber?.username ?? customerTexts.detail.noStaff}
                   </span>
+                  {visit.branch ? <span> · {visit.branch.name}</span> : null}
                   <span> · {formatMoney(visit.totalPrice)}</span>
                 </p>
               </div>

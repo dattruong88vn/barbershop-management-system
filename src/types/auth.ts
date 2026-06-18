@@ -3,15 +3,17 @@ import type { UserRoleValue } from "@/constants/common";
 
 export type UserRole = UserRoleValue;
 
-export type UserStatus = "active" | "inactive";
+export type UserStatus = "active" | "inactive" | "branch_suspended";
 
 export type AuthUserFields = {
   id: string;
   role: UserRole;
   shop_id: string | null;
   branch_id: string | null;
+  active_branch_id: string | null;
   username: string;
   is_first_login: boolean;
+  status: UserStatus;
 };
 
 export type ChangePasswordRequestBody = {
