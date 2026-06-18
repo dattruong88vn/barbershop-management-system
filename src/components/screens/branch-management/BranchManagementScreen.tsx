@@ -9,6 +9,7 @@ import { BRANCH_STATUS_ACTIVE, BRANCH_STATUS_ALL } from "@/constants/common";
 import { branchTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
 import { ROUTES } from "@/constants/routes";
+import { dispatchAppToast } from "@/lib/toast";
 
 import { BranchFilters } from "./BranchFilters";
 import { BranchTable } from "./BranchTable";
@@ -20,7 +21,12 @@ export function BranchManagementScreen() {
   const router = useRouter();
   const [draftFilters, setDraftFilters] = useState<BranchFiltersValue>(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState<BranchFiltersValue>(DEFAULT_FILTERS);
-  const { branches, error: branchesError, isLoading } = useBranches();
+  const {
+    branches,
+    error: branchesError,
+    isLoading,
+    updateBranchStatus,
+  } = useBranches();
 
   const filteredBranches = useMemo(() => {
     const search = appliedFilters.search.trim().toLowerCase();
@@ -51,6 +57,16 @@ export function BranchManagementScreen() {
           hasFilters={hasFilters}
           isLoading={isLoading}
           onCreate={() => router.push(ROUTES.ownerBranchCreate)}
+          onStatusChange={async (branch, status) => {
+            await updateBranchStatus({ id: branch.id, status });
+            dispatchAppToast({
+              message:
+                status === BRANCH_STATUS_ACTIVE
+                  ? branchTexts.ownerBranches.toast.activated
+                  : branchTexts.ownerBranches.toast.deactivated,
+              type: "success",
+            });
+          }}
         />
       </div>
     </div>

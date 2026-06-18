@@ -125,7 +125,7 @@ export function OwnerStaffTable({
                 <th className="min-w-36 px-4 py-3 text-left font-semibold text-gray-1000">
                   {staffTexts.ownerStaff.table.createdAt}
                 </th>
-                <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
+                <th className="w-28 px-3 py-3 text-right font-semibold text-gray-1000">
                   {staffTexts.ownerStaff.table.actions}
                 </th>
               </TableRow>
@@ -171,7 +171,7 @@ export function OwnerStaffTable({
                     <TableCell>
                       {formatDisplayDate(staffMember.createdAt)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="w-28 px-3">
                       <div className="flex justify-end gap-2">
                         <Tooltip content={staffTexts.ownerStaff.edit}>
                           <Button

@@ -16,17 +16,20 @@
 
 ## Bảng `branches` — chi nhánh
 
-| Trường       | Kiểu      | Ghi chú           |
-| ------------ | --------- | ----------------- |
-| `id`         | uuid      | PK                |
-| `shop_id`    | uuid      | FK → shops        |
-| `name`       | string    | Tên chi nhánh     |
-| `address`    | string    | Địa chỉ chi nhánh |
-| `manager_id` | uuid      | FK → users, nullable; một manager có thể quản lý nhiều chi nhánh |
-| `status`     | enum      | `active`, `inactive` |
-| `created_at` | timestamp |                   |
+| Trường             | Kiểu      | Ghi chú                                                        |
+| ------------------ | --------- | -------------------------------------------------------------- |
+| `id`               | uuid      | PK                                                             |
+| `shop_id`          | uuid      | FK → shops                                                     |
+| `name`             | string    | Tên chi nhánh; không bắt buộc unique trong shop                |
+| `address`          | string    | Địa chỉ chi nhánh                                              |
+| `manager_id`       | uuid      | FK → users, nullable; một manager có thể quản lý nhiều chi nhánh |
+| `status`           | enum      | `active`, `inactive`                                           |
+| `deactivated_at`   | timestamp | Nullable, thời điểm owner ngừng hoạt động chi nhánh            |
+| `deactivated_by`   | uuid      | FK → users, nullable, owner thực hiện ngừng hoạt động          |
+| `created_at`       | timestamp |                                                                |
 
-> Mỗi chi nhánh có tối đa một manager; manager có thể quản lý nhiều chi nhánh. `users.branch_id` tiếp tục là chi nhánh làm việc chính của staff, không dùng để biểu diễn danh sách branch manager quản lý. Không hard delete chi nhánh.
+> Mỗi chi nhánh có tối đa một manager; manager có thể quản lý nhiều chi nhánh. `users.branch_id` tiếp tục là chi nhánh làm việc chính của staff thường, không dùng để biểu diễn danh sách branch manager quản lý. Không hard delete chi nhánh.
+> Chi nhánh inactive bị khoá chỉnh sửa dữ liệu vận hành. Owner có thể xem detail và kích hoạt lại; staff/manager bị ảnh hưởng được đưa về trạng thái `branch_suspended` và phải được owner phân công/chuyển lại khi cần.
 ---
 
 ## Bảng `users` — tài khoản đăng nhập
@@ -39,12 +42,13 @@
 | `username`       | string    | Unique trong phạm vi shop                                                 |
 | `password_hash`  | string    |                                                                           |
 | `role`           | enum      | `superadmin`, `owner`, `manager`, `receptionist`, `barber`, `skinner`     |
-| `status`         | enum      | `active`, `inactive` — inactive khi nhân viên nghỉ làm, không xoá khỏi DB |
+| `status`         | enum      | `active`, `inactive`, `branch_suspended`                                  |
 | `is_first_login` | boolean   | Bắt buộc đổi mật khẩu nếu true                                            |
 | `created_at`     | timestamp |                                                                           |
 
 > Nhân viên nghỉ làm được set `status = inactive`, không hiển thị khi chọn barber/skinner cho visit mới. Lịch sử visit vẫn giữ nguyên.
-> Trạng thái hiển thị trên màn quản lý nhân viên không thêm enum DB mới: `Khởi tạo` = `status = active` và `is_first_login = true`; `Đang làm` = `status = active` và `is_first_login = false`; nhân viên đã nghỉ dùng `status = inactive` và bị loại khỏi danh sách active.
+> `branch_suspended` dùng khi chi nhánh bị ngừng hoạt động. User vẫn còn record và lịch sử, nhưng không được thao tác API vận hành cho đến khi owner chuyển/khôi phục phân công phù hợp.
+> Trạng thái hiển thị trên màn quản lý nhân viên: `Khởi tạo` = `status = active` và `is_first_login = true`; `Đang làm` = `status = active` và `is_first_login = false`; `inactive` là đã nghỉ; `branch_suspended` là tạm treo do chi nhánh ngừng hoạt động.
 
 ---
 

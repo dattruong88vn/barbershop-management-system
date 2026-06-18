@@ -90,6 +90,11 @@ export type CustomerVisit = {
   canUploadPhotos?: boolean;
   customer?: CustomerVisitHistoryCustomer;
   id: string;
+  branch?: {
+    id: string;
+    name: string;
+    address: string;
+  };
   createdAt: string;
   completedAt: string | null;
   lastUpdatedBy: string | null;

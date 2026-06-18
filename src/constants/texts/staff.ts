@@ -86,6 +86,8 @@ export const staffTexts = {
       generic: "Có lỗi xảy ra, vui lòng thử lại",
       invalidRole: "Vai trò nhân viên không hợp lệ",
       missingBranch: "Vui lòng chọn chi nhánh",
+      openVisits: "Nhân viên phải hoàn thành toàn bộ lượt ghé trước khi điều chuyển",
+      invalidTransfer: "Danh sách nhân viên hoặc chi nhánh đích không hợp lệ",
       missingPassword: "Vui lòng nhập mật khẩu",
       missingUsername: "Vui lòng nhập tên đăng nhập",
       passwordTooShort: "Mật khẩu phải có ít nhất 8 ký tự",

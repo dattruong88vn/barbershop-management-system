@@ -21,6 +21,7 @@ import {
   UI_VARIANT_DANGER,
   UI_VARIANT_SECONDARY,
 } from "@/constants/common";
+import type { BranchStatusValue } from "@/constants/common";
 import { branchTexts } from "@/constants/texts";
 import { ROUTES } from "@/constants/routes";
 import type { Branch } from "@/types";
@@ -32,9 +33,10 @@ type BranchTableProps = {
   hasFilters: boolean;
   isLoading: boolean;
   onCreate: () => void;
+  onStatusChange: (branch: Branch, status: BranchStatusValue) => void;
 };
 
-export function BranchTable({ branches, error, hasFilters, isLoading, onCreate }: BranchTableProps) {
+export function BranchTable({ branches, error, hasFilters, isLoading, onCreate, onStatusChange }: BranchTableProps) {
   return (
     <Card
       padding="lg"
@@ -67,8 +69,8 @@ export function BranchTable({ branches, error, hasFilters, isLoading, onCreate }
                 <th className="min-w-64 px-4 py-3 text-left font-semibold text-gray-1000">{branchTexts.ownerBranches.table.address}</th>
                 <th className="min-w-44 px-4 py-3 text-left font-semibold text-gray-1000">{branchTexts.ownerBranches.table.manager}</th>
                 <th className="min-w-40 px-4 py-3 text-left font-semibold text-gray-1000">{branchTexts.ownerBranches.table.status}</th>
-                <th className="min-w-36 px-4 py-3 text-left font-semibold text-gray-1000">{branchTexts.ownerBranches.table.createdAt}</th>
-                <th className="min-w-40 px-4 py-3 text-right font-semibold text-gray-1000">{branchTexts.ownerBranches.table.actions}</th>
+                <th className="w-28 px-3 py-3 text-left font-semibold text-gray-1000">{branchTexts.ownerBranches.table.createdAt}</th>
+                <th className="w-28 px-3 py-3 text-right font-semibold text-gray-1000">{branchTexts.ownerBranches.table.actions}</th>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -92,25 +94,31 @@ export function BranchTable({ branches, error, hasFilters, isLoading, onCreate }
                         {status === BRANCH_STATUS_INACTIVE ? branchTexts.ownerBranches.statuses.inactive : branchTexts.ownerBranches.statuses.active}
                       </Badge>
                     </TableCell>
-                    <TableCell>{formatDisplayDate(branch.createdAt)}</TableCell>
-                    <TableCell>
+                    <TableCell className="w-28 px-3 whitespace-nowrap">{formatDisplayDate(branch.createdAt)}</TableCell>
+                    <TableCell className="w-28 px-3">
                       <div className="flex justify-end gap-2">
                         <Tooltip content={branchTexts.ownerBranches.edit}>
                           <Link
                             aria-label={branchTexts.ownerBranches.edit}
-                            className="inline-flex min-h-11 items-center justify-center rounded-md bg-gray-200 px-4 text-gray-1000 hover:bg-gray-300"
+                            className="inline-flex size-10 min-h-11 items-center justify-center rounded-md bg-gray-200 px-0 text-gray-1000 hover:bg-gray-300"
                             href={ROUTES.ownerBranchEdit(branch.id)}
                           >
                             <Edit2 className="size-4" aria-hidden="true" />
                           </Link>
                         </Tooltip>
-                        <Tooltip content={branchTexts.ownerBranches.statusActionUnavailable}>
+                        <Tooltip content={statusActionLabel}>
                           <Button
                             aria-label={statusActionLabel}
-                            disabled
+                            className="size-10 px-0"
                             icon={<Power className="size-4" aria-hidden="true" />}
                             type="button"
                             variant={isActive ? UI_VARIANT_DANGER : UI_VARIANT_SECONDARY}
+                            onClick={() =>
+                              onStatusChange(
+                                branch,
+                                isActive ? BRANCH_STATUS_INACTIVE : BRANCH_STATUS_ACTIVE,
+                              )
+                            }
                           />
                         </Tooltip>
                       </div>

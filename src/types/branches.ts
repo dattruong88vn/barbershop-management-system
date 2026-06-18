@@ -1,10 +1,12 @@
 import type { BranchStatusValue } from "@/constants/common";
+import type { Staff } from "./staff";
 
 export type Branch = {
   id: string;
   shopId: string;
   name: string;
   address: string;
+  managerId?: string | null;
   createdAt: string;
   manager?: {
     id: string;
@@ -12,6 +14,7 @@ export type Branch = {
   } | null;
   status?: BranchStatusValue;
   canDeactivate?: boolean;
+  staff?: Staff[];
 };
 
 export type BranchFormInput = {
@@ -28,6 +31,15 @@ export type BranchRequestBody = {
 
 export type BranchListApiResponse = {
   branches: Branch[];
+};
+
+export type BranchManager = {
+  id: string;
+  username: string;
+};
+
+export type BranchManagerListApiResponse = {
+  managers: BranchManager[];
 };
 
 export type BranchApiResponse = {

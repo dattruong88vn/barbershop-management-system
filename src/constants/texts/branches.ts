@@ -7,6 +7,10 @@ export const branchTexts = {
       missingBranchId: "Thiếu mã chi nhánh",
       missingName: "Vui lòng nhập tên chi nhánh",
       missingAddress: "Vui lòng nhập địa chỉ chi nhánh",
+      invalidManager: "Manager không hợp lệ hoặc không thuộc tiệm của bạn",
+      inactiveBranch: "Chi nhánh đã ngừng hoạt động",
+      openVisits: "Cần hoàn thành toàn bộ lượt ghé trước khi ngừng chi nhánh",
+      invalidStatus: "Trạng thái chi nhánh không hợp lệ",
       notFound: "Không tìm thấy chi nhánh",
       unauthorized: "Vui lòng đăng nhập để tiếp tục",
     },
@@ -30,6 +34,12 @@ export const branchTexts = {
     cancel: "Hủy",
     transferStaff: "Điều chuyển nhân viên",
     transferStaffPending: "Tính năng điều chuyển nhân viên sẽ được hoàn thiện sau",
+    transferTitle: "Điều chuyển nhân viên",
+    transferTargetLabel: "Chi nhánh đích",
+    transferTargetPlaceholder: "Chọn chi nhánh",
+    transferConfirm: "Điều chuyển",
+    transferSuccess: "Đã điều chuyển nhân viên thành công",
+    selectStaffToTransfer: "Chọn ít nhất một nhân viên để điều chuyển",
     saveBeforeStaff: "Lưu chi nhánh trước khi thêm nhân viên.",
     staffEmpty: "Chi nhánh chưa có nhân viên.",
     branchNotFound: "Không tìm thấy chi nhánh.",
@@ -78,6 +88,10 @@ export const branchTexts = {
       description: "Chọn chi nhánh để bắt đầu phiên làm việc.",
       action: "Làm việc tại chi nhánh này",
     },
+    unavailable: {
+      title: "Chi nhánh đã ngừng hoạt động",
+      message: "Tài khoản của bạn đang tạm khóa. Vui lòng liên hệ owner để được chuyển sang chi nhánh khác.",
+    },
     statuses: {
       all: "Tất cả",
       active: "Đang hoạt động",
@@ -86,6 +100,8 @@ export const branchTexts = {
     toast: {
       created: "Đã tạo chi nhánh thành công",
       updated: "Đã cập nhật chi nhánh thành công",
+      activated: "Đã kích hoạt chi nhánh",
+      deactivated: "Đã ngừng hoạt động chi nhánh",
     },
     errors: {
       generic: "Có lỗi xảy ra, vui lòng thử lại",

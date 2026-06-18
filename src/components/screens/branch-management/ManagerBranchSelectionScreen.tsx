@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, MapPin } from "lucide-react";
 
@@ -13,10 +14,7 @@ import {
   PageTitle,
   Skeleton,
 } from "@/components/global";
-import {
-  ACTIVE_MANAGER_BRANCH_STORAGE_KEY,
-  BRANCH_STATUS_ACTIVE,
-} from "@/constants/common";
+import { BRANCH_STATUS_ACTIVE } from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
 import { branchTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
@@ -24,6 +22,7 @@ import { useBranches } from "@/hooks/useBranches";
 export function ManagerBranchSelectionScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { update: updateSession } = useSession();
   const { branches, error, isLoading } = useBranches();
   const activeBranches = useMemo(
     () =>
@@ -36,14 +35,15 @@ export function ManagerBranchSelectionScreen() {
 
   const selectBranch = useCallback(
     (branchId: string) => {
-      window.sessionStorage.setItem(
-        ACTIVE_MANAGER_BRANCH_STORAGE_KEY,
-        branchId,
+      void updateSession({ user: { active_branch_id: branchId } }).then(
+        (updatedSession) => {
+          if (updatedSession?.user.active_branch_id !== branchId) return;
+          void queryClient.invalidateQueries();
+          router.replace(ROUTES.dashboard);
+        },
       );
-      void queryClient.invalidateQueries();
-      router.replace(ROUTES.dashboard);
     },
-    [queryClient, router],
+    [queryClient, router, updateSession],
   );
 
   useEffect(() => {

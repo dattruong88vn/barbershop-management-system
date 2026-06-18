@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { API_ROUTES } from "@/constants/routes";
+import type { BranchStatusValue } from "@/constants/common";
 import { branchTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
 import { hasResponseData } from "@/lib/apiResponse";
@@ -10,10 +11,12 @@ import type {
   BranchApiResponse,
   BranchFormInput,
   BranchListApiResponse,
+  BranchManagerListApiResponse,
 } from "@/types";
 
 const BRANCHES_QUERY_KEY = ["branches"] as const;
 const BRANCH_RESPONSE_DATA_KEY = "branch";
+const BRANCH_MANAGERS_QUERY_KEY = ["branch-managers"] as const;
 
 function getBranchResponseData(result: BranchApiResponse): Branch {
   if (
@@ -32,6 +35,22 @@ async function getBranches(): Promise<Branch[]> {
   const result = await fetchClient<BranchListApiResponse>(API_ROUTES.branches);
 
   return result.branches;
+}
+
+async function getBranch(id: string): Promise<Branch> {
+  const result = await fetchClient<BranchApiResponse>(
+    API_ROUTES.branchDetail(id),
+  );
+
+  return getBranchResponseData(result);
+}
+
+async function getBranchManagers() {
+  const result = await fetchClient<BranchManagerListApiResponse>(
+    API_ROUTES.branchManagers(),
+  );
+
+  return result.managers;
 }
 
 async function createBranch(input: BranchFormInput): Promise<Branch> {
@@ -61,23 +80,42 @@ async function updateBranch(input: BranchFormInput & { id: string }) {
   return getBranchResponseData(result);
 }
 
-async function deleteBranch(id: string): Promise<Branch> {
+async function updateBranchStatus(input: {
+  id: string;
+  status: BranchStatusValue;
+}): Promise<Branch> {
   const result = await fetchClient<BranchApiResponse>(
-    API_ROUTES.branchDetail(id),
+    API_ROUTES.branchStatus(input.id),
     {
-      method: "DELETE",
+      method: "PATCH",
+      headers: DEFAULT_JSON_HEADERS,
+      body: JSON.stringify({ status: input.status }),
     },
   );
 
   return getBranchResponseData(result);
 }
 
-export function useBranches(enabled = true) {
+export function useBranches(
+  enabled = true,
+  includeManagers = false,
+  branchId?: string,
+) {
   const queryClient = useQueryClient();
   const branchesQuery = useQuery({
     enabled,
     queryKey: BRANCHES_QUERY_KEY,
     queryFn: getBranches,
+  });
+  const managersQuery = useQuery({
+    enabled: enabled && includeManagers,
+    queryKey: BRANCH_MANAGERS_QUERY_KEY,
+    queryFn: getBranchManagers,
+  });
+  const branchDetailQuery = useQuery({
+    enabled: enabled && Boolean(branchId),
+    queryKey: [...BRANCHES_QUERY_KEY, branchId],
+    queryFn: () => getBranch(branchId ?? ""),
   });
 
   const createBranchMutation = useMutation({
@@ -92,21 +130,24 @@ export function useBranches(enabled = true) {
       queryClient.invalidateQueries({ queryKey: BRANCHES_QUERY_KEY }),
   });
 
-  const deleteBranchMutation = useMutation({
-    mutationFn: deleteBranch,
+  const updateBranchStatusMutation = useMutation({
+    mutationFn: updateBranchStatus,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: BRANCHES_QUERY_KEY }),
   });
 
   return {
     branches: branchesQuery.data ?? [],
+    branch: branchDetailQuery.data ?? null,
     error: branchesQuery.error,
     isCreating: createBranchMutation.isPending,
-    isDeleting: deleteBranchMutation.isPending,
-    isLoading: branchesQuery.isLoading,
+    isUpdatingStatus: updateBranchStatusMutation.isPending,
+    isLoading: branchesQuery.isLoading || branchDetailQuery.isLoading,
+    isLoadingManagers: managersQuery.isLoading,
     isUpdating: updateBranchMutation.isPending,
     createBranch: createBranchMutation.mutateAsync,
-    deleteBranch: deleteBranchMutation.mutateAsync,
+    updateBranchStatus: updateBranchStatusMutation.mutateAsync,
     updateBranch: updateBranchMutation.mutateAsync,
+    managers: managersQuery.data ?? [],
   };
 }

@@ -2,7 +2,7 @@ import type { StaffRoleValue } from "@/constants/common";
 
 export type StaffRole = StaffRoleValue;
 
-export type StaffStatus = "active" | "inactive";
+export type StaffStatus = "active" | "inactive" | "branch_suspended";
 
 export type StaffBranch = {
   id: string;
@@ -41,5 +41,15 @@ export type StaffListApiResponse = {
 
 export type StaffApiResponse = {
   staffMember?: Staff;
+  error?: string;
+};
+
+export type StaffTransferInput = {
+  staffIds: string[];
+  targetBranchId: string;
+};
+
+export type StaffTransferApiResponse = {
+  transferredCount?: number;
   error?: string;
 };

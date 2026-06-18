@@ -158,6 +158,22 @@ async function getManagementAuth(request: NextRequest) {
     return { error: comboTexts.api.errors.forbidden, status: 403 };
   }
 
+  if (token.role === USER_ROLE_MANAGER) {
+    const managedBranch = await prisma.branch.findFirst({
+      where: {
+        id: token.branch_id as string,
+        managerId: token.id,
+        shopId: token.shop_id,
+        status: "active",
+      },
+      select: { id: true },
+    });
+
+    if (!managedBranch) {
+      return { error: comboTexts.api.errors.forbidden, status: 403 };
+    }
+  }
+
   return {
     branchId: token.role === USER_ROLE_MANAGER ? token.branch_id : null,
     role: token.role as ManagementRoleValue,

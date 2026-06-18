@@ -36,7 +36,10 @@ export const authOptions: NextAuthOptions = {
         }
 
         const user = await prisma.user.findFirst({
-          where: { username, status: "active" },
+          where: {
+            username,
+            status: { in: ["active", "branch_suspended"] },
+          },
           select: {
             id: true,
             role: true,
@@ -45,6 +48,13 @@ export const authOptions: NextAuthOptions = {
             username: true,
             passwordHash: true,
             isFirstLogin: true,
+            status: true,
+            managedBranches: {
+              where: { status: "active" },
+              orderBy: { createdAt: "asc" },
+              take: 2,
+              select: { id: true },
+            },
           },
         });
 
@@ -52,13 +62,25 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const activeBranchId =
+          user.status === "branch_suspended"
+            ? null
+            :
+          user.role === "manager" && user.managedBranches.length === 1
+            ? user.managedBranches[0].id
+            : user.role === "manager"
+              ? null
+              : user.branchId;
+
         return {
           id: user.id,
           role: user.role,
           shop_id: user.shopId,
-          branch_id: user.branchId,
+          branch_id: activeBranchId,
+          active_branch_id: activeBranchId,
           username: user.username,
           is_first_login: user.isFirstLogin,
+          status: user.status,
         };
       },
     }),
@@ -70,12 +92,35 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role;
         token.shop_id = user.shop_id;
         token.branch_id = user.branch_id;
+        token.active_branch_id = user.active_branch_id;
         token.username = user.username;
         token.is_first_login = user.is_first_login;
+        token.status = user.status;
       }
 
       if (trigger === "update" && session?.user?.is_first_login !== undefined) {
         token.is_first_login = session.user.is_first_login;
+      }
+
+      if (
+        trigger === "update" &&
+        token.role === "manager" &&
+        typeof token.id === "string" &&
+        typeof token.shop_id === "string" &&
+        typeof session?.user?.active_branch_id === "string"
+      ) {
+        const branch = await prisma.branch.findFirst({
+          where: {
+            id: session.user.active_branch_id,
+            managerId: token.id,
+            shopId: token.shop_id,
+            status: "active",
+          },
+          select: { id: true },
+        });
+
+        token.active_branch_id = branch?.id ?? null;
+        token.branch_id = branch?.id ?? null;
       }
 
       return token;
@@ -87,8 +132,10 @@ export const authOptions: NextAuthOptions = {
         role: token.role,
         shop_id: token.shop_id,
         branch_id: token.branch_id,
+        active_branch_id: token.active_branch_id,
         username: token.username,
         is_first_login: token.is_first_login,
+        status: token.status,
       };
 
       return session;

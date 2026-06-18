@@ -152,7 +152,7 @@ export function ServiceTable({
                   {serviceTexts.ownerServices.table.createdAt}
                 </th>
                 {isDeletedTab ? null : (
-                  <th className="w-32 px-4 py-3 text-right font-semibold text-gray-1000">
+                  <th className="w-28 px-3 py-3 text-right font-semibold text-gray-1000">
                     {serviceTexts.ownerServices.table.actions}
                   </th>
                 )}
@@ -211,7 +211,7 @@ export function ServiceTable({
                     </div>
                   </TableCell>
                   {isDeletedTab ? null : (
-                    <TableCell>
+                    <TableCell className="w-28 px-3">
                       <div className="flex justify-end gap-2">
                         <Tooltip content={serviceTexts.ownerServices.edit}>
                           <Button

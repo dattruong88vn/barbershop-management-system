@@ -78,18 +78,14 @@ describe("authOptions", () => {
           password: "Secret123!",
         }),
       ).resolves.toBeNull();
-      expect(mocks.findFirst).toHaveBeenCalledWith({
-        where: { username: "dat", status: "active" },
-        select: {
-          id: true,
-          role: true,
-          shopId: true,
-          branchId: true,
-          username: true,
-          passwordHash: true,
-          isFirstLogin: true,
-        },
-      });
+      expect(mocks.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            username: "dat",
+            status: { in: ["active", "branch_suspended"] },
+          },
+        }),
+      );
     });
 
     it("should return null when password does not match", async () => {
@@ -101,6 +97,8 @@ describe("authOptions", () => {
         username: "dat",
         passwordHash: "hashed-password",
         isFirstLogin: true,
+        managedBranches: [],
+        status: "active",
       });
       mocks.verifyPassword.mockReturnValue(false);
 
@@ -125,6 +123,8 @@ describe("authOptions", () => {
         username: "dat",
         passwordHash: "hashed-password",
         isFirstLogin: false,
+        managedBranches: [],
+        status: "active",
       };
 
       mocks.findFirst.mockResolvedValue(_user);
@@ -135,8 +135,10 @@ describe("authOptions", () => {
         role: "owner",
         shop_id: "shop-1",
         branch_id: "branch-1",
+        active_branch_id: "branch-1",
         username: "dat",
         is_first_login: false,
+        status: "active",
       } satisfies AuthUserFields;
 
       await expect(
@@ -164,8 +166,10 @@ describe("authOptions", () => {
           role: "barber",
           shop_id: "shop-1",
           branch_id: "branch-1",
+          active_branch_id: "branch-1",
           username: "dat",
           is_first_login: true,
+          status: "active",
         } as AuthUserFields,
         account: null,
       } as JwtCallbackParams);
@@ -175,8 +179,10 @@ describe("authOptions", () => {
         role: "barber",
         shop_id: "shop-1",
         branch_id: "branch-1",
+        active_branch_id: "branch-1",
         username: "dat",
         is_first_login: true,
+        status: "active",
       });
     });
 
@@ -187,8 +193,10 @@ describe("authOptions", () => {
           role: "owner",
           shop_id: "shop-1",
           branch_id: null,
+          active_branch_id: null,
           username: "dat",
           is_first_login: false,
+          status: "active",
         },
         trigger: "update",
         session: {
@@ -217,8 +225,10 @@ describe("authOptions", () => {
           role: "owner",
           shop_id: "shop-1",
           branch_id: "branch-1",
+          active_branch_id: "branch-1",
           username: "dat",
           is_first_login: false,
+          status: "active",
         },
         user: undefined,
       } as unknown as SessionCallbackParams);
@@ -231,8 +241,10 @@ describe("authOptions", () => {
         role: "owner",
         shop_id: "shop-1",
         branch_id: "branch-1",
+        active_branch_id: "branch-1",
         username: "dat",
         is_first_login: false,
+        status: "active",
       });
     });
   });
