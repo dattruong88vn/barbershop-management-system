@@ -1,3 +1,4 @@
+export * from "./catalogStatuses";
 export * from "./pagination";
 export * from "./reportKinds";
 export * from "./reportPeriods";
@@ -5,6 +6,7 @@ export * from "./roles";
 export * from "./serviceResponsibleRoles";
 export * from "./serviceScopes";
 export * from "./staff";
+export * from "./uiVariants";
 export * from "./visitCreateOrigins";
 export * from "./visitItems";
 export * from "./visitStaff";

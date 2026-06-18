@@ -3,14 +3,25 @@
 import type { FormEvent } from "react";
 import { useMemo, useState } from "react";
 
-import { Button, Card, PageTitle, SearchInput, Select } from "@/components/global";
 import {
+  Button,
+  Card,
+  PageTitle,
+  SearchInput,
+  Select,
+  Tabs,
+} from "@/components/global";
+import {
+  CATALOG_STATUS_ACTIVE,
+  CATALOG_STATUS_DELETED,
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
   SERVICE_RESPONSIBLE_ROLE_BARBER,
   SERVICE_RESPONSIBLE_ROLES,
   SERVICE_SCOPE_BRANCH,
   SERVICE_SCOPE_SHOP,
+  UI_FEEDBACK_TYPE_SUCCESS,
+  type CatalogStatusValue,
   type ManagementRoleValue,
   type ServiceResponsibleRoleValue,
   type ServiceScopeValue,
@@ -19,6 +30,7 @@ import { commonTexts, serviceTexts } from "@/constants/texts";
 import { useServices } from "@/hooks/useServices";
 import { dispatchAppToast } from "@/lib/toast";
 import type { Service } from "@/types";
+import { formatCurrencyInput, parseCurrencyInput } from "@/utils/common";
 
 import { ServiceDeleteModal } from "./ServiceDeleteModal";
 import {
@@ -28,10 +40,6 @@ import {
 import { ServiceTable } from "./ServiceTable";
 
 const ALL_FILTER_VALUE = "all";
-const CURRENCY_INPUT_FORMATTER = new Intl.NumberFormat("vi-VN", {
-  maximumFractionDigits: 0,
-});
-
 type ServiceScopeFilterValue = ServiceScopeValue | typeof ALL_FILTER_VALUE;
 type ServiceResponsibleRoleFilterValue =
   | ServiceResponsibleRoleValue
@@ -53,6 +61,17 @@ const DEFAULT_FILTERS: ServiceFilters = {
   search: "",
 };
 
+const CATALOG_STATUS_TABS = [
+  {
+    label: serviceTexts.ownerServices.statusTabs.active,
+    value: CATALOG_STATUS_ACTIVE,
+  },
+  {
+    label: serviceTexts.ownerServices.statusTabs.deleted,
+    value: CATALOG_STATUS_DELETED,
+  },
+];
+
 function getServiceSearchText(service: Service) {
   return [
     service.name,
@@ -61,22 +80,6 @@ function getServiceSearchText(service: Service) {
   ]
     .join(" ")
     .toLowerCase();
-}
-
-function formatCurrencyInput(value: string) {
-  const digits = value.replace(/\D/g, "");
-
-  if (!digits) {
-    return "";
-  }
-
-  return CURRENCY_INPUT_FORMATTER.format(Number(digits));
-}
-
-function parseCurrencyInput(value: string) {
-  const digits = value.replace(/\D/g, "");
-
-  return digits ? Number(digits) : Number.NaN;
 }
 
 export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) {
@@ -91,6 +94,8 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
     useState<ServiceFilters>(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] =
     useState<ServiceFilters>(DEFAULT_FILTERS);
+  const [catalogStatus, setCatalogStatus] =
+    useState<CatalogStatusValue>(CATALOG_STATUS_ACTIVE);
   const [page, setPage] = useState(DEFAULT_PAGE);
   const [error, setError] = useState("");
   const {
@@ -103,7 +108,7 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
     isLoading,
     isUpdating,
     updateService,
-  } = useServices();
+  } = useServices(catalogStatus);
 
   const filteredServices = useMemo(() => {
     const normalizedSearch = appliedFilters.search.trim().toLowerCase();
@@ -194,6 +199,11 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
     setPage(DEFAULT_PAGE);
   }
 
+  function handleCatalogStatusChange(value: string) {
+    setCatalogStatus(value as CatalogStatusValue);
+    setPage(DEFAULT_PAGE);
+  }
+
   async function handleDelete() {
     if (!deletingService) {
       return;
@@ -205,7 +215,7 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
       await deleteService(deletingService.id);
       dispatchAppToast({
         message: serviceTexts.ownerServices.toast.deleted,
-        type: "success",
+        type: UI_FEEDBACK_TYPE_SUCCESS,
       });
       setDeletingService(null);
     } catch (mutationError) {
@@ -259,7 +269,7 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
         });
         dispatchAppToast({
           message: serviceTexts.ownerServices.toast.updated,
-          type: "success",
+          type: UI_FEEDBACK_TYPE_SUCCESS,
         });
       } else {
         await createService({
@@ -270,7 +280,7 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
         });
         dispatchAppToast({
           message: serviceTexts.ownerServices.toast.created,
-          type: "success",
+          type: UI_FEEDBACK_TYPE_SUCCESS,
         });
       }
 
@@ -293,6 +303,12 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
         <header>
           <PageTitle>{serviceTexts.ownerServices.title}</PageTitle>
         </header>
+
+        <Tabs
+          tabs={CATALOG_STATUS_TABS}
+          defaultValue={catalogStatus}
+          onValueChange={handleCatalogStatusChange}
+        />
 
         <Card padding="lg">
           <form
@@ -384,6 +400,7 @@ export function ServiceManagementScreen({ mode }: ServiceManagementScreenProps) 
         </Card>
 
         <ServiceTable
+          catalogStatus={catalogStatus}
           currentPage={page}
           error={servicesError}
           isLoading={isLoading}

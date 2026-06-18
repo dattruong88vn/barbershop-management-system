@@ -2,9 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 import {
+  CATALOG_STATUS_ACTIVE,
+  CATALOG_STATUS_DELETED,
   MANAGEMENT_ROLES,
   SERVICE_SCOPE_BRANCH,
   SERVICE_SCOPE_SHOP,
+  isCatalogStatus,
   type ManagementRoleValue,
   USER_ROLE_MANAGER,
   USER_ROLE_OWNER,
@@ -23,6 +26,7 @@ const SERVICE_SELECT = {
   responsibleRole: true,
   isHaircut: true,
   createdBy: true,
+  deletedAt: true,
   createdAt: true,
   branch: {
     select: {
@@ -64,6 +68,7 @@ function formatServiceResponse(
     branch: { id: string; name: string } | null;
     branchId: string | null;
     createdBy: string;
+    deletedAt: Date | null;
     id: string;
     isHaircut: boolean;
     name: string;
@@ -77,14 +82,21 @@ function formatServiceResponse(
 ) {
   const isOwner = auth.role === USER_ROLE_OWNER;
   const isCreator = service.createdBy === auth.userId;
+  const isDeleted = service.deletedAt !== null;
 
   return {
     ...service,
-    canDelete: isOwner || isCreator,
-    canEdit: isCreator,
+    canDelete: !isDeleted && (isOwner || isCreator),
+    canEdit: !isDeleted && isCreator,
     scope: service.branchId ? SERVICE_SCOPE_BRANCH : SERVICE_SCOPE_SHOP,
     price: Number(service.price.toString()),
   };
+}
+
+function getCatalogStatus(request: NextRequest) {
+  const status = request.nextUrl.searchParams.get("status");
+
+  return isCatalogStatus(status) ? status : CATALOG_STATUS_ACTIVE;
 }
 
 async function getManagementAuth(request: NextRequest) {
@@ -127,9 +139,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const status = getCatalogStatus(request);
   const services = await prisma.service.findMany({
     where: {
-      deletedAt: null,
+      deletedAt:
+        status === CATALOG_STATUS_DELETED
+          ? { not: null }
+          : null,
       shopId: authResult.shopId,
       ...(authResult.branchId
         ? {

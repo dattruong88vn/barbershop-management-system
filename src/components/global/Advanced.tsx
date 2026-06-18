@@ -15,6 +15,7 @@ type Action = {
 
 export interface GeistModalProps extends React.HTMLAttributes<HTMLDivElement> {
   actions?: Action[];
+  containerClassName?: string;
   description?: string;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -27,6 +28,7 @@ export const GeistModal = React.forwardRef<HTMLDivElement, GeistModalProps>(
       actions,
       children,
       className,
+      containerClassName,
       description,
       onOpenChange,
       open,
@@ -47,7 +49,12 @@ export const GeistModal = React.forwardRef<HTMLDivElement, GeistModalProps>(
           type="button"
           onClick={() => onOpenChange(false)}
         />
-        <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 px-4">
+        <div
+          className={cn(
+            "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 px-4",
+            containerClassName,
+          )}
+        >
           <div
             ref={ref}
             className={cn(
@@ -258,20 +265,95 @@ export interface GeistTooltipProps
 }
 
 export const GeistTooltip = React.forwardRef<HTMLDivElement, GeistTooltipProps>(
-  ({ children, className, content, ...props }, ref) => {
+  ({ children, className, content, side = "top", ...props }, ref) => {
     const [visible, setVisible] = React.useState(false);
+    const [position, setPosition] = React.useState({ left: 0, top: 0 });
+    const triggerRef = React.useRef<HTMLDivElement | null>(null);
+
+    function updatePosition() {
+      const trigger = triggerRef.current;
+
+      if (!trigger) {
+        return;
+      }
+
+      const rect = trigger.getBoundingClientRect();
+      const gap = 8;
+
+      if (side === "right") {
+        setPosition({
+          left: rect.right + gap,
+          top: rect.top + rect.height / 2,
+        });
+        return;
+      }
+
+      if (side === "bottom") {
+        setPosition({
+          left: rect.left + rect.width / 2,
+          top: rect.bottom + gap,
+        });
+        return;
+      }
+
+      if (side === "left") {
+        setPosition({
+          left: rect.left - gap,
+          top: rect.top + rect.height / 2,
+        });
+        return;
+      }
+
+      setPosition({
+        left: rect.left + rect.width / 2,
+        top: rect.top - gap,
+      });
+    }
+
+    const tooltipPlacement = {
+      bottom: "-translate-x-1/2",
+      left: "-translate-x-full -translate-y-1/2",
+      right: "-translate-y-1/2",
+      top: "-translate-x-1/2 -translate-y-full",
+    };
 
     return (
       <div
-        ref={ref}
+        ref={(node) => {
+          triggerRef.current = node;
+
+          if (typeof ref === "function") {
+            ref(node);
+          } else if (ref) {
+            ref.current = node;
+          }
+        }}
         className={cn("relative inline-block", className)}
-        onMouseEnter={() => setVisible(true)}
+        onFocus={() => {
+          updatePosition();
+          setVisible(true);
+        }}
+        onMouseEnter={() => {
+          updatePosition();
+          setVisible(true);
+        }}
+        onMouseMove={updatePosition}
+        onBlur={() => setVisible(false)}
         onMouseLeave={() => setVisible(false)}
         {...props}
       >
         {children}
         {visible ? (
-          <div className="absolute z-50 whitespace-nowrap rounded-md bg-gray-1000 px-2 py-1 text-xs text-background-100">
+          <div
+            className={cn(
+              "fixed z-[100] whitespace-nowrap rounded-md bg-gray-1000 px-2 py-1 text-xs text-background-100",
+              tooltipPlacement[side],
+            )}
+            style={{
+              left: position.left,
+              top: position.top,
+            }}
+          >
             {content}
           </div>
         ) : null}

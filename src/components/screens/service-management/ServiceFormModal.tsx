@@ -10,6 +10,7 @@ import {
 import {
   SERVICE_RESPONSIBLE_ROLE_BARBER,
   SERVICE_RESPONSIBLE_ROLE_SKINNER,
+  UI_VARIANT_SECONDARY,
   type ServiceResponsibleRoleValue,
 } from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
@@ -123,7 +124,7 @@ export function ServiceFormModal({
         <div className="flex justify-end gap-2 pt-2">
           <Button
             type="button"
-            variant="secondary"
+            variant={UI_VARIANT_SECONDARY}
             onClick={() => onOpenChange(false)}
           >
             {serviceTexts.ownerServices.cancelEdit}

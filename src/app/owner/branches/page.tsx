@@ -2,6 +2,10 @@
 
 import type { SyntheticEvent } from "react";
 import { useState } from "react";
+import {
+  UI_VARIANT_PRIMARY,
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 
 import { PageTitle } from "@/components/global";
 import { Button } from "@/components/global/ui/button";
@@ -162,7 +166,7 @@ export default function OwnerBranchesPage() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Button
                 type="submit"
-                variant="primary"
+                variant={UI_VARIANT_PRIMARY}
                 className="h-11"
                 disabled={isSubmitting}
               >
@@ -173,7 +177,7 @@ export default function OwnerBranchesPage() {
               {editingBranch ? (
                 <Button
                   type="button"
-                  variant="secondary"
+                  variant={UI_VARIANT_SECONDARY}
                   className="h-11"
                   onClick={resetForm}
                 >
@@ -227,7 +231,7 @@ export default function OwnerBranchesPage() {
                     <div className="flex gap-2">
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant={UI_VARIANT_SECONDARY}
                         className="h-9"
                         onClick={() => handleEdit(branch)}
                       >

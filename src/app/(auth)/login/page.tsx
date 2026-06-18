@@ -4,6 +4,9 @@ import { use, type SyntheticEvent } from "react";
 import { useState } from "react";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import {
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { AuthFormShell } from "@/components/screens/auth/AuthFormShell";
 import { FormTextField } from "@/components/global/FormTextField";
@@ -108,7 +111,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
 
       <Button
         type="submit"
-        variant="primary"
+        variant={UI_VARIANT_PRIMARY}
         size="lg"
         disabled={isSubmitting}
         loading={isSubmitting}

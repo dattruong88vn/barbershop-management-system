@@ -1,6 +1,9 @@
 "use client";
 
 import { X } from "lucide-react";
+import {
+  UI_VARIANT_GHOST,
+} from "@/constants/common";
 
 import { Button } from "@/components/global/ui/button";
 import { visitTexts } from "@/constants/texts";
@@ -53,7 +56,7 @@ export function VisitDetailEditModal({
             type="button"
             aria-label={visitTexts.detail.closeEditVisit}
             size="icon"
-            variant="ghost"
+            variant={UI_VARIANT_GHOST}
             onClick={onClose}
           >
             <X className="size-4" aria-hidden="true" />

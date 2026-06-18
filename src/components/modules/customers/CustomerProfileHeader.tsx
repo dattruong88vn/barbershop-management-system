@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/global/ui/button";
+import {
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
 import { customerTexts } from "@/constants/texts";
 
@@ -49,7 +52,7 @@ export function CustomerProfileHeader({
       <div className="hidden items-center gap-3 md:flex">
         <Button
           type="button"
-          variant="secondary"
+          variant={UI_VARIANT_SECONDARY}
           size="lg"
           className="h-9 rounded-lg border-border bg-background px-4 text-sm hover:bg-muted"
           onClick={onEdit}

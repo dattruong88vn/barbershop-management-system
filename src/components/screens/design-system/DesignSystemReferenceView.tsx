@@ -16,6 +16,11 @@ import {
 } from "lucide-react";
 
 import {
+  UI_FEEDBACK_TYPE_WARNING,
+  UI_VARIANT_GHOST,
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
+import {
   Avatar,
   Badge,
   Banner,
@@ -229,7 +234,7 @@ export function DesignSystemReferenceView() {
               ))}
               <SwatchGrid>
                 <Button disabled>{texts.labels.primary}</Button>
-                <Button icon={<Download className="size-4" />} variant="secondary">
+                <Button icon={<Download className="size-4" />} variant={UI_VARIANT_SECONDARY}>
                   {texts.labels.secondary}
                 </Button>
               </SwatchGrid>
@@ -335,7 +340,7 @@ export function DesignSystemReferenceView() {
                 </Banner>
               ))}
               <Note title={texts.labels.note}>{texts.samples.description}</Note>
-              <Note title={texts.labels.warning} type="warning">
+              <Note title={texts.labels.warning} type={UI_FEEDBACK_TYPE_WARNING}>
                 {texts.samples.description}
               </Note>
               <Error
@@ -453,25 +458,25 @@ export function DesignSystemReferenceView() {
           <ReferenceGroup title={texts.groups.overlays}>
             <SwatchGrid>
               <Button onClick={() => setIsModalOpen(true)}>{texts.actions.openModal}</Button>
-              <Button variant="secondary" onClick={() => setIsLeftDrawerOpen(true)}>
+              <Button variant={UI_VARIANT_SECONDARY} onClick={() => setIsLeftDrawerOpen(true)}>
                 {texts.actions.openDrawerLeft}
               </Button>
-              <Button variant="secondary" onClick={() => setIsRightDrawerOpen(true)}>
+              <Button variant={UI_VARIANT_SECONDARY} onClick={() => setIsRightDrawerOpen(true)}>
                 {texts.actions.openDrawerRight}
               </Button>
-              <Button variant="ghost" onClick={() => setIsSheetOpen(true)}>
+              <Button variant={UI_VARIANT_GHOST} onClick={() => setIsSheetOpen(true)}>
                 {texts.actions.openSheet}
               </Button>
               <Button icon={<Command className="size-4" />} onClick={() => setIsCommandOpen(true)}>
                 {texts.actions.openCommandMenu}
               </Button>
               <Popover
-                trigger={<Button variant="secondary">{texts.labels.popover}</Button>}
+                trigger={<Button variant={UI_VARIANT_SECONDARY}>{texts.labels.popover}</Button>}
               >
                 <Text size="sm">{texts.samples.description}</Text>
               </Popover>
               <Tooltip content={texts.labels.tooltip}>
-                <Button variant="ghost">{texts.labels.tooltip}</Button>
+                <Button variant={UI_VARIANT_GHOST}>{texts.labels.tooltip}</Button>
               </Tooltip>
             </SwatchGrid>
             <div className="mt-4">
@@ -570,7 +575,7 @@ export function DesignSystemReferenceView() {
                 onClose={noop}
               />
               <Button
-                variant="secondary"
+                variant={UI_VARIANT_SECONDARY}
                 onClick={() => setLightboxUrl(texts.samples.image)}
               >
                 {texts.actions.openLightbox}

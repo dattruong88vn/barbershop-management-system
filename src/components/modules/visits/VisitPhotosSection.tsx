@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  UI_VARIANT_PRIMARY,
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 /* eslint-disable @next/next/no-img-element */
 
 import type { ChangeEvent } from "react";
@@ -61,7 +65,7 @@ export function VisitPhotosSection({
       <Button
         type="button"
         loading={isRefreshingDetail}
-        variant="primary"
+        variant={UI_VARIANT_PRIMARY}
         className="h-9 rounded-lg disabled:cursor-not-allowed"
         onClick={onRefreshDetail}
       >
@@ -114,7 +118,7 @@ export function VisitPhotosSection({
                   }
                   disabled={isDeletingPhoto}
                   size="icon"
-                  variant="secondary"
+                  variant={UI_VARIANT_SECONDARY}
                   className="absolute right-1 top-1 size-7 rounded-full border border-border bg-background/90 text-foreground shadow-sm hover:bg-destructive hover:text-destructive-foreground disabled:cursor-not-allowed"
                   onClick={() => onDeletePhoto(photo)}
                 >

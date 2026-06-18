@@ -1,4 +1,7 @@
 import { Search, X } from "lucide-react";
+import {
+  UI_VARIANT_PRIMARY,
+} from "@/constants/common";
 
 import { Button } from "@/components/global/ui/button";
 import { commonTexts, visitTexts } from "@/constants/texts";
@@ -45,7 +48,7 @@ export function VisitCustomerSearchForm({
             </button>
           ) : null}
         </div>
-        <Button type="submit" variant="primary" className="h-11 shrink-0">
+        <Button type="submit" variant={UI_VARIANT_PRIMARY} className="h-11 shrink-0">
           {visitTexts.create.customerSearchButton}
         </Button>
       </div>

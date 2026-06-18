@@ -39,8 +39,10 @@ export const serviceTexts = {
     deleting: "Đang xoá...",
     loading: "Đang tải dịch vụ...",
     empty: "Chưa có dịch vụ nào.",
+    emptyDeleted: "Chưa có dịch vụ đã xoá.",
     createdAtLabel: "Ngày tạo",
     creatorLabel: "Người tạo",
+    deletedAtLabel: "Ngày xoá",
     branchEmpty: "Toàn shop",
     applyFilters: "Áp dụng",
     filterResponsibleRoleAll: "Tất cả",
@@ -60,6 +62,10 @@ export const serviceTexts = {
     scopes: {
       branch: "Chi nhánh",
       shop: "Hệ thống",
+    },
+    statusTabs: {
+      active: "Đang hoạt động",
+      deleted: "Đã xoá",
     },
     toast: {
       created: "Đã tạo dịch vụ",

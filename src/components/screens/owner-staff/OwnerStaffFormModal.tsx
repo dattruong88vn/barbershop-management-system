@@ -7,7 +7,10 @@ import {
   Modal,
   Select,
 } from "@/components/global";
-import { STAFF_ROLES } from "@/constants/common";
+import {
+  STAFF_ROLES,
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
 import type { Branch, Staff, StaffRole } from "@/types";
 
@@ -131,7 +134,7 @@ export function OwnerStaffFormModal({
         <div className="flex justify-end gap-2 pt-2">
           <Button
             type="button"
-            variant="secondary"
+            variant={UI_VARIANT_SECONDARY}
             onClick={() => onOpenChange(false)}
           >
             {staffTexts.ownerStaff.cancelEdit}

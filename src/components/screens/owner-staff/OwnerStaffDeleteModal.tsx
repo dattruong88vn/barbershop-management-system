@@ -1,6 +1,10 @@
 import { Button, Error as FeedbackError, Modal } from "@/components/global";
 import { staffTexts } from "@/constants/texts";
 import type { Staff } from "@/types";
+import {
+  UI_VARIANT_DANGER,
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 
 type OwnerStaffDeleteModalProps = {
   error: string;
@@ -28,7 +32,7 @@ export function OwnerStaffDeleteModal({
       <div className="flex justify-end gap-2">
         <Button
           type="button"
-          variant="secondary"
+          variant={UI_VARIANT_SECONDARY}
           onClick={() => onOpenChange(false)}
         >
           {staffTexts.ownerStaff.deleteCancel}
@@ -36,7 +40,7 @@ export function OwnerStaffDeleteModal({
         <Button
           loading={isDeleting}
           type="button"
-          variant="danger"
+          variant={UI_VARIANT_DANGER}
           onClick={onConfirm}
         >
           {staffTexts.ownerStaff.delete}

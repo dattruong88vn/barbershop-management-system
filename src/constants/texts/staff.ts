@@ -62,7 +62,7 @@ export const staffTexts = {
       actions: "Tùy chỉnh",
       branch: "Chi nhánh",
       createdAt: "Ngày tạo",
-      index: "STT",
+      index: "#",
       role: "Vai trò",
       status: "Trạng thái",
       username: "Tên nhân viên",

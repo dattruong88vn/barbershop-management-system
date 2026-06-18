@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Pencil, X } from "lucide-react";
+import {
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 
 import { InlineAlert } from "@/components/global/InlineAlert";
 import { Button } from "@/components/global/ui/button";
@@ -30,7 +33,7 @@ export function VisitStaffEditPanel({
       {isStaffEditable ? (
         <Button
           type="button"
-          variant="secondary"
+          variant={UI_VARIANT_SECONDARY}
           className="w-full"
           onClick={() => {
             onError("");

@@ -1,11 +1,14 @@
 "use client";
 
-import { BadgeButton, Card } from "@/components/global";
+import {
+  BadgeButton,
+  Card } from "@/components/global";
 import {
   REPORT_PERIOD_ALL,
   REPORT_PERIOD_MONTH,
   REPORT_PERIOD_YEAR,
   type ReportPeriodValue,
+  UI_VARIANT_WARNING,
 } from "@/constants/common";
 import { dashboardTexts } from "@/constants/texts";
 import { cn } from "@/lib/utils";
@@ -67,7 +70,7 @@ export function DashboardPeriodFilter({
             className="min-h-0 py-0.5"
             outline
             size="sm"
-            variant="warning"
+            variant={UI_VARIANT_WARNING}
             onClick={onMonthPickerOpen}
           >
             {dashboardTexts.filters.chooseSpecificMonth}

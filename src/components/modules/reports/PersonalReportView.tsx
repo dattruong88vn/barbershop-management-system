@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { BarChart3 } from "lucide-react";
 
+import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
+import { EmptyState } from "@/components/global/EmptyState";
+import { InlineAlert } from "@/components/global/InlineAlert";
 import {
   BadgeButton,
   Checkbox,
@@ -12,15 +15,13 @@ import {
   MonthCalendar,
   Skeleton,
 } from "@/components/global";
-import { AppMobileBottomNav } from "@/components/mobile/AppMobileBottomNav";
-import { EmptyState } from "@/components/global/EmptyState";
-import { InlineAlert } from "@/components/global/InlineAlert";
 import {
   REPORT_PERIOD_ALL,
   REPORT_PERIOD_CURRENT_MONTH,
   REPORT_PERIOD_MONTH,
   REPORT_PERIOD_YEAR,
   type ReportPeriodValue,
+  UI_VARIANT_WARNING,
 } from "@/constants/common";
 import { reportTexts } from "@/constants/texts";
 import { usePersonalReport } from "@/hooks/usePersonalReport";
@@ -132,7 +133,7 @@ export function PersonalReportView() {
                         className="min-h-0 py-0.5"
                         outline
                         size="sm"
-                        variant="warning"
+                        variant={UI_VARIANT_WARNING}
                         onClick={handleSpecificMonthOpen}
                       >
                         {reportTexts.personal.chooseSpecificMonth}

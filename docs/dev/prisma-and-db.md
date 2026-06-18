@@ -35,6 +35,16 @@ npx prisma db seed
 npx prisma studio
 ```
 
+After changing `prisma/schema.prisma` or adding a migration, apply the database
+change before verifying API/UI behavior:
+
+```bash
+npx prisma migrate deploy
+npx prisma generate
+```
+
+Run `npm run dev` again after these commands if the dev server was already open.
+
 Do not upgrade Prisma without testing.
 
 ## Data Model

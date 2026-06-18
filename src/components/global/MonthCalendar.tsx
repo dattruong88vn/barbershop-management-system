@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  UI_VARIANT_GHOST,
+} from "@/constants/common";
 
 import { Button } from "@/components/global/ui/button";
 import { cn } from "@/lib/utils";
@@ -45,7 +48,7 @@ export function MonthCalendar({
           disabled={!canGoPrevious}
           size="icon-sm"
           type="button"
-          variant="ghost"
+          variant={UI_VARIANT_GHOST}
           onClick={() => setVisibleYear((currentYear) => currentYear - 1)}
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
@@ -58,7 +61,7 @@ export function MonthCalendar({
           disabled={!canGoNext}
           size="icon-sm"
           type="button"
-          variant="ghost"
+          variant={UI_VARIANT_GHOST}
           onClick={() => setVisibleYear((currentYear) => currentYear + 1)}
         >
           <ChevronRight className="size-4" aria-hidden="true" />

@@ -1,4 +1,7 @@
 import { SearchX, Users } from "lucide-react";
+import {
+  UI_VARIANT_SECONDARY,
+} from "@/constants/common";
 
 import { CustomerCard } from "./CustomerCard";
 import { CustomerSearchSkeleton } from "./CustomerSearchSkeleton";
@@ -47,7 +50,7 @@ export function CustomerSearchResults({
           icon={SearchX}
           text={customerTexts.lookup.emptyAfterSearch}
           action={
-            <Button type="button" variant="secondary" onClick={onCreateCustomer}>
+            <Button type="button" variant={UI_VARIANT_SECONDARY} onClick={onCreateCustomer}>
               {customerTexts.lookup.createOption}
             </Button>
           }

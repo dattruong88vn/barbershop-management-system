@@ -76,6 +76,7 @@ model Branch {
   shop     Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
   users    User[]
   services Service[]
+  combos   Combo[]
   visits   Visit[]
 
   @@index([shopId])
@@ -99,6 +100,7 @@ model User {
   skinnerVisits     Visit[]      @relation("VisitSkinner")
   createdVisits     Visit[]      @relation("VisitCreatedBy")
   createdServices   Service[]    @relation("ServiceCreatedBy")
+  createdCombos     Combo[]      @relation("ComboCreatedBy")
   lastUpdatedVisits Visit[]      @relation("VisitLastUpdatedBy")
   uploadedPhotos    VisitPhoto[] @relation("VisitPhotoUploadedBy")
 
@@ -134,18 +136,27 @@ model Service {
 }
 
 model Combo {
-  id          String   @id @default(uuid()) @db.Uuid
-  shopId      String   @map("shop_id") @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
+  shopId      String    @map("shop_id") @db.Uuid
+  branchId    String?   @map("branch_id") @db.Uuid
   name        String
   description String
-  price       Decimal  @db.Decimal(12, 2)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  price       Decimal   @db.Decimal(12, 2)
+  createdBy   String    @map("created_by") @db.Uuid
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   shop          Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  branch        Branch?        @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator       User           @relation("ComboCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
   comboServices ComboService[]
   visitServices VisitService[]
 
   @@index([shopId])
+  @@index([shopId, deletedAt])
+  @@index([shopId, branchId])
+  @@index([branchId])
+  @@index([createdBy])
   @@map("combos")
 }
 

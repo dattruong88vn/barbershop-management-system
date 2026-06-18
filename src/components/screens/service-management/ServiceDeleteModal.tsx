@@ -1,4 +1,5 @@
 import { Button, Error as FeedbackError, Modal } from "@/components/global";
+import { UI_VARIANT_DANGER, UI_VARIANT_SECONDARY } from "@/constants/common";
 import { serviceTexts } from "@/constants/texts";
 import type { Service } from "@/types";
 
@@ -26,19 +27,19 @@ export function ServiceDeleteModal({
     >
       {error ? <FeedbackError className="mb-4" message={error} /> : null}
       <div className="flex justify-end gap-2">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => onOpenChange(false)}
-        >
+          <Button
+            type="button"
+            variant={UI_VARIANT_SECONDARY}
+            onClick={() => onOpenChange(false)}
+          >
           {serviceTexts.ownerServices.deleteCancel}
         </Button>
-        <Button
-          loading={isDeleting}
-          type="button"
-          variant="danger"
-          onClick={onConfirm}
-        >
+          <Button
+            loading={isDeleting}
+            type="button"
+            variant={UI_VARIANT_DANGER}
+            onClick={onConfirm}
+          >
           {serviceTexts.ownerServices.delete}
         </Button>
       </div>

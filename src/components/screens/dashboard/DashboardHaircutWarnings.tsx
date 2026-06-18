@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { AlertTriangle, ArrowRight } from "lucide-react";
+import {
+  UI_VARIANT_WARNING,
+} from "@/constants/common";
 
 import { Badge, Heading, Paragraph } from "@/components/global";
 import { ROUTES } from "@/constants/routes";
@@ -18,7 +21,7 @@ export function DashboardHaircutWarnings({
           {dashboardTexts.sections.haircutWarnings}
         </Heading>
         {warnings.length ? (
-          <Badge size="sm" variant="warning">
+          <Badge size="sm" variant={UI_VARIANT_WARNING}>
             <AlertTriangle className="size-3" aria-hidden="true" />
             {dashboardTexts.alerts.count(warnings.length)}
           </Badge>

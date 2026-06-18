@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import {
+  CATALOG_STATUS_ACTIVE,
+  type CatalogStatusValue,
+} from "@/constants/common";
 import { API_ROUTES } from "@/constants/routes";
 import { serviceTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
@@ -28,14 +32,16 @@ function getServiceResponseData(result: ServiceApiResponse): Service {
   return result.service;
 }
 
-async function getServices(): Promise<Service[]> {
-  const result = await fetchClient<ServiceListApiResponse>(API_ROUTES.services);
+async function getServices(status: CatalogStatusValue): Promise<Service[]> {
+  const result = await fetchClient<ServiceListApiResponse>(
+    API_ROUTES.services({ status }),
+  );
 
   return result.services;
 }
 
 async function createService(input: ServiceFormInput): Promise<Service> {
-  const result = await fetchClient<ServiceApiResponse>(API_ROUTES.services, {
+  const result = await fetchClient<ServiceApiResponse>(API_ROUTES.services(), {
     method: "POST",
     headers: DEFAULT_JSON_HEADERS,
     body: JSON.stringify(input),
@@ -73,11 +79,11 @@ async function deleteService(id: string): Promise<Service> {
   return getServiceResponseData(result);
 }
 
-export function useServices() {
+export function useServices(status: CatalogStatusValue = CATALOG_STATUS_ACTIVE) {
   const queryClient = useQueryClient();
   const servicesQuery = useQuery({
-    queryKey: SERVICES_QUERY_KEY,
-    queryFn: getServices,
+    queryKey: [...SERVICES_QUERY_KEY, status],
+    queryFn: () => getServices(status),
   });
 
   const createServiceMutation = useMutation({
