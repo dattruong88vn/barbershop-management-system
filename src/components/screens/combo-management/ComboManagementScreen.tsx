@@ -85,6 +85,11 @@ export function ComboManagementScreen({ mode }: ComboManagementScreenProps) {
   const [price, setPrice] = useState("");
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [editingCombo, setEditingCombo] = useState<Combo | null>(null);
+  const [duplicatingCombo, setDuplicatingCombo] = useState<Combo | null>(null);
+  const [hasDuplicateUnavailableServices, setHasDuplicateUnavailableServices] =
+    useState(false);
+  const [hasDuplicateNoAvailableServices, setHasDuplicateNoAvailableServices] =
+    useState(false);
   const [deletingCombo, setDeletingCombo] = useState<Combo | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [draftFilters, setDraftFilters] =
@@ -174,6 +179,9 @@ export function ComboManagementScreen({ mode }: ComboManagementScreenProps) {
     setPrice("");
     setSelectedServiceIds([]);
     setEditingCombo(null);
+    setDuplicatingCombo(null);
+    setHasDuplicateUnavailableServices(false);
+    setHasDuplicateNoAvailableServices(false);
     setError("");
   }
 
@@ -200,6 +208,9 @@ export function ComboManagementScreen({ mode }: ComboManagementScreenProps) {
         .filter((serviceId) => availableServiceIds.has(serviceId)),
     );
     setEditingCombo(combo);
+    setDuplicatingCombo(null);
+    setHasDuplicateUnavailableServices(false);
+    setHasDuplicateNoAvailableServices(false);
     setError("");
     setIsFormOpen(true);
   }
@@ -212,12 +223,19 @@ export function ComboManagementScreen({ mode }: ComboManagementScreenProps) {
     setName(`${combo.name}${comboTexts.ownerCombos.copySuffix}`);
     setDescription(combo.description);
     setPrice(formatCurrencyInput(String(combo.price)));
-    setSelectedServiceIds(
-      combo.services
-        .map((service) => service.id)
-        .filter((serviceId) => availableServiceIds.has(serviceId)),
+    const comboServiceIds = combo.services.map((service) => service.id);
+    const duplicateServiceIds = comboServiceIds.filter((serviceId) =>
+      availableServiceIds.has(serviceId),
     );
+
+    setSelectedServiceIds(duplicateServiceIds);
     setEditingCombo(null);
+    setDuplicatingCombo(combo);
+    setHasDuplicateUnavailableServices(
+      duplicateServiceIds.length > 0 &&
+        duplicateServiceIds.length !== comboServiceIds.length,
+    );
+    setHasDuplicateNoAvailableServices(duplicateServiceIds.length === 0);
     setError("");
     setIsFormOpen(true);
   }
@@ -451,6 +469,9 @@ export function ComboManagementScreen({ mode }: ComboManagementScreenProps) {
 
       <ComboFormModal
         description={description}
+        hasDuplicateNoAvailableServices={hasDuplicateNoAvailableServices}
+        hasDuplicateUnavailableServices={hasDuplicateUnavailableServices}
+        isDuplicating={duplicatingCombo !== null}
         editingCombo={editingCombo}
         error={error}
         isLoadingServices={isLoadingServices}

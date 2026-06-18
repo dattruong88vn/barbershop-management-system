@@ -23,6 +23,7 @@ export const comboTexts = {
     listTitle: "Danh sách combo",
     createAction: "Thêm combo",
     createTitle: "Thêm combo",
+    duplicateTitle: "Nhân bản combo",
     editTitle: "Cập nhật combo",
     nameLabel: "Tên combo",
     descriptionLabel: "Mô tả combo",
@@ -34,6 +35,7 @@ export const comboTexts = {
     pricePlaceholder: "Nhập giá combo",
     copyPlaceholder: "Chọn combo để copy dịch vụ",
     submitCreate: "Tạo combo",
+    submitDuplicate: "Tạo bản sao",
     submitUpdate: "Lưu thay đổi",
     cancelEdit: "Huỷ chỉnh sửa",
     edit: "Sửa",
@@ -59,7 +61,11 @@ export const comboTexts = {
       "Giá combo đang cao hơn tổng giá dịch vụ lẻ. Vẫn có thể lưu nếu đây là giá bạn muốn áp dụng.",
     comboInUseEditBlocked:
       "Combo đã có visit sử dụng. Vui lòng nhân bản combo để chỉnh sửa thông tin mới.",
-    copySuffix: " copy",
+    duplicateUnavailableServicesWarning:
+      "Một số dịch vụ trong combo gốc đã bị xoá hoặc không còn thuộc phạm vi hiện tại nên không được thêm vào bản sao.",
+    duplicateNoAvailableServicesWarning:
+      "Không có dịch vụ nào trong combo gốc còn hoạt động hoặc thuộc phạm vi hiện tại. Vui lòng chọn dịch vụ mới cho bản sao.",
+    copySuffix: " - copy",
     table: {
       actions: "Thao tác",
       createdAt: "Ngày tạo",

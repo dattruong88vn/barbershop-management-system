@@ -78,7 +78,7 @@
 | `deleted_at`  | timestamp | Soft delete; null = còn sử dụng, có giá trị = đã xoá khỏi catalog |
 | `created_at`  | timestamp |                                            |
 
-> Combo owner tạo có `branch_id = null` và áp dụng toàn shop. Combo manager tạo có `branch_id` là chi nhánh của manager. Combo đã có visit sử dụng không sửa trực tiếp; muốn thay đổi thì nhân bản thành combo mới. Xoá combo là soft delete bằng `deleted_at`; owner/manager xem lại combo đã xoá qua tab `Đã xoá`. Visit/report vẫn luôn dùng snapshot trong `visit_services`.
+> Combo owner tạo có `branch_id = null` và áp dụng toàn shop. Combo manager tạo có `branch_id` là chi nhánh của manager. Combo đã có visit sử dụng không sửa trực tiếp; muốn thay đổi thì nhân bản thành combo mới. Khi nhân bản, tên bản sao thêm suffix `- copy`, chỉ dịch vụ đang hoạt động và còn thuộc phạm vi hiện tại được chọn sẵn. Nếu một phần dịch vụ gốc không thể copy thì UI hiển thị cảnh báo tổng quát; nếu không còn dịch vụ nào hợp lệ thì UI cảnh báo user chọn dịch vụ mới. Xoá combo là soft delete bằng `deleted_at`; owner/manager xem lại và có thể nhân bản combo đã xoá qua tab `Đã xoá`. Không restore combo đã xoá; nhân bản là flow tạo bản mới an toàn hơn. Visit/report vẫn luôn dùng snapshot trong `visit_services`.
 
 ---
 
