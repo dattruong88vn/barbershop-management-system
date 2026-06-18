@@ -17,6 +17,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Select/dropdown phải dùng global `Select`; padding trái của text và padding phải của icon phải cân nhau về thị giác, đồng thời chừa đủ khoảng trống để icon không đè text.
 - Select/dropdown menu khi mở phải nằm dưới trigger, không đè lên phần hiển thị đã chọn.
 - Table dùng global primitives phải có line ngang giữa các row và line dọc giữa các cell để ô dữ liệu được phân tách rõ.
+- Modal/popup phải giới hạn chiều cao theo viewport (mặc định tối đa `90dvh`) và cho phép cuộn dọc phần nội dung khi form dài; không để nội dung hoặc action bị che ngoài màn hình.
 - Cột số thứ tự trong table phải dùng title `#`, width hẹp (`w-10` hoặc tương đương) và canh giữa cả header lẫn cell.
 - Màn hình quản lý catalog có soft delete như dịch vụ/combo phải dùng tabs `Đang hoạt động` và `Đã xoá` nằm trên filter card; tab đã xoá chỉ để xem lại, không hiển thị thao tác tạo/sửa/xoá. Nếu entity có flow tạo bản mới từ bản đã xoá như combo, chỉ hiển thị thao tác nhân bản thay vì restore.
 - Date hiển thị trong UI phải dùng format `dd/mm/yyyy`. Nếu cần kèm giờ, đặt giờ sau ngày, ví dụ `17/06/2026 15:30`.

@@ -58,7 +58,7 @@ export const GeistModal = React.forwardRef<HTMLDivElement, GeistModalProps>(
           <div
             ref={ref}
             className={cn(
-              "rounded-xl border border-gray-400 bg-gray-100 p-6",
+              "max-h-[90dvh] overflow-y-auto rounded-xl border border-gray-400 bg-gray-100 p-6",
               className,
             )}
             onClick={(event) => event.stopPropagation()}
