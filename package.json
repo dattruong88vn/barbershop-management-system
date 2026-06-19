@@ -9,7 +9,11 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "location:generate": "prisma generate --config infrastructure/shared-location-db/prisma.config.ts",
+    "location:migrate": "prisma migrate deploy --config infrastructure/shared-location-db/prisma.config.ts",
+    "location:sync": "tsx --env-file=.env.shared-location infrastructure/shared-location-db/sync.ts",
+    "location:verify": "tsx --env-file=.env.shared-location infrastructure/shared-location-db/verify.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1064.0",

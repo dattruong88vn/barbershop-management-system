@@ -16,6 +16,7 @@ Developer handbook cho Barber Shop SaaS. Dùng thư mục này khi cần hiểu 
 - Tenancy: [tenancy.md](tenancy.md)
 - API conventions: [api-conventions.md](api-conventions.md)
 - Prisma và database: [prisma-and-db.md](prisma-and-db.md)
+- Shared location database: [shared-location-db.md](shared-location-db.md)
 - Testing: [testing.md](testing.md)
 
 ## Product/UI Docs

@@ -93,6 +93,7 @@ export const branchTexts = {
     unavailable: {
       title: "Chi nhánh đã ngừng hoạt động",
       message: "Tài khoản của bạn đang tạm khóa. Vui lòng liên hệ owner để được chuyển sang chi nhánh khác.",
+      logout: "Đăng xuất để dùng tài khoản khác",
     },
     statuses: {
       all: "Tất cả",

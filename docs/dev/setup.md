@@ -30,11 +30,13 @@ DATABASE_URL="postgresql://..."
 DIRECT_URL="postgresql://..."
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-secret-key"
+R2_PRIVATE_BUCKET_NAME="private-documents-bucket"
 ```
 
 - `DATABASE_URL`: Supabase Transaction pooler, port `6543`.
 - `DIRECT_URL`: Supabase Session pooler, port `5432`.
 - Do not use Supabase Direct connection string with Prisma.
+- `R2_PRIVATE_BUCKET_NAME` lưu tài liệu nhạy cảm như ảnh CCCD. Bucket này không được bật public access; upload và xem ảnh phải dùng signed URL có thời hạn ngắn.
 
 ## Daily Start
 
@@ -68,4 +70,5 @@ stop it, run the commands above, then start it again.
 
 - Git flow: [git-flow.md](git-flow.md)
 - Prisma and DB: [prisma-and-db.md](prisma-and-db.md)
+- Shared location DB, migrate/sync, and FDW: [shared-location-db.md](shared-location-db.md)
 - Testing: [testing.md](testing.md)

@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { Prisma } from "@prisma/client";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 import {
   MANAGEMENT_ROLES,
   OWNER_STAFF_ROLES,
+  STAFF_GENDERS,
   STAFF_ROLES,
   USER_ROLE_MANAGER,
   USER_ROLE_OWNER,
@@ -13,6 +15,7 @@ import {
 import { staffTexts } from "@/constants/texts";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
+import { R2_PRIVATE_BUCKET_NAME, r2Client } from "@/lib/r2";
 import type { StaffRequestBody, StaffRole } from "@/types";
 
 type StaffRouteContext = {
@@ -24,6 +27,12 @@ const STAFF_SELECT = {
   shopId: true,
   branchId: true,
   username: true,
+  fullName: true,
+  phone: true,
+  dateOfBirth: true,
+  gender: true,
+  hometown: true,
+  currentAddress: true,
   role: true,
   status: true,
   isFirstLogin: true,
@@ -42,6 +51,12 @@ const STAFF_SELECT = {
   },
 } as const;
 
+const STAFF_INTERNAL_SELECT = {
+  ...STAFF_SELECT,
+  identityCardFrontKey: true,
+  identityCardBackKey: true,
+} as const;
+
 function isStaffRequestBody(body: unknown): body is StaffRequestBody {
   return typeof body === "object" && body !== null;
 }
@@ -53,8 +68,28 @@ function isStaffRole(role: unknown): role is StaffRole {
 }
 
 function normalizeStaffInput(body: StaffRequestBody) {
+  const dateOfBirth =
+    typeof body.dateOfBirth === "string" && body.dateOfBirth.trim()
+      ? new Date(`${body.dateOfBirth.trim()}T00:00:00.000Z`)
+      : null;
+
   return {
     username: typeof body.username === "string" ? body.username.trim() : "",
+    fullName: typeof body.fullName === "string" ? body.fullName.trim() : "",
+    phone: typeof body.phone === "string" ? body.phone.trim() : "",
+    dateOfBirth,
+    gender:
+      typeof body.gender === "string" &&
+      STAFF_GENDERS.includes(body.gender as (typeof STAFF_GENDERS)[number])
+        ? (body.gender as (typeof STAFF_GENDERS)[number])
+        : null,
+    hometown: typeof body.hometown === "string" ? body.hometown.trim() : "",
+    currentAddress:
+      typeof body.currentAddress === "string" ? body.currentAddress.trim() : "",
+    identityCardFrontKey:
+      typeof body.identityCardFrontKey === "string" ? body.identityCardFrontKey.trim() : "",
+    identityCardBackKey:
+      typeof body.identityCardBackKey === "string" ? body.identityCardBackKey.trim() : "",
     password: typeof body.password === "string" ? body.password.trim() : "",
     role: isStaffRole(body.role) ? body.role : null,
     branchId:
@@ -133,7 +168,7 @@ async function findStaffMember(
       role: { in: branchId ? [...STAFF_ROLES] : [...OWNER_STAFF_ROLES] },
       status: "active",
     },
-    select: STAFF_SELECT,
+    select: STAFF_INTERNAL_SELECT,
   });
 }
 
@@ -204,7 +239,19 @@ export async function GET(request: NextRequest, context: StaffRouteContext) {
     );
   }
 
-  return NextResponse.json({ staffMember });
+  const {
+    identityCardFrontKey,
+    identityCardBackKey,
+    ...publicStaffMember
+  } = staffMember;
+
+  return NextResponse.json({
+    staffMember: {
+      ...publicStaffMember,
+      hasIdentityCardFront: Boolean(identityCardFrontKey),
+      hasIdentityCardBack: Boolean(identityCardBackKey),
+    },
+  });
 }
 
 export async function PATCH(request: NextRequest, context: StaffRouteContext) {
@@ -244,12 +291,42 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
     );
   }
 
+  if (!staffInput.fullName) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingFullName },
+      { status: 400 },
+    );
+  }
+
+  if (!staffInput.phone) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingPhone },
+      { status: 400 },
+    );
+  }
+
+  if (!staffInput.dateOfBirth || Number.isNaN(staffInput.dateOfBirth.getTime())) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidDateOfBirth },
+      { status: 400 },
+    );
+  }
+
+  if (!staffInput.gender) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidGender },
+      { status: 400 },
+    );
+  }
+
   if (!staffInput.role) {
     return NextResponse.json(
       { error: staffTexts.api.errors.invalidRole },
       { status: 400 },
     );
   }
+
+  const staffRole = staffInput.role;
 
   if (staffInput.password && staffInput.password.length < 8) {
     return NextResponse.json(
@@ -268,6 +345,22 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
     return NextResponse.json(
       { error: staffTexts.api.errors.notFound },
       { status: 404 },
+    );
+  }
+
+  const identityCardFrontKey =
+    staffInput.identityCardFrontKey || staffMember.identityCardFrontKey || "";
+  const identityCardBackKey =
+    staffInput.identityCardBackKey || staffMember.identityCardBackKey || "";
+  const identityKeyPrefix = `staff-documents/${authResult.shopId}/`;
+
+  if (
+    (identityCardFrontKey && !identityCardFrontKey.startsWith(identityKeyPrefix)) ||
+    (identityCardBackKey && !identityCardBackKey.startsWith(identityKeyPrefix))
+  ) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidIdentityImage },
+      { status: 400 },
     );
   }
 
@@ -310,7 +403,15 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
         where: { id: staffMember.id },
         data: {
           username: staffInput.username,
-          role: staffInput.role,
+          fullName: staffInput.fullName,
+          phone: staffInput.phone,
+          dateOfBirth: staffInput.dateOfBirth,
+          gender: staffInput.gender,
+          hometown: staffInput.hometown || null,
+          currentAddress: staffInput.currentAddress || null,
+          identityCardFrontKey: identityCardFrontKey || null,
+          identityCardBackKey: identityCardBackKey || null,
+          role: staffRole,
           branchId: staffBranchId,
           ...updatedPasswordData,
         },
@@ -343,6 +444,23 @@ export async function PATCH(request: NextRequest, context: StaffRouteContext) {
         select: STAFF_SELECT,
       });
     });
+
+    const staleIdentityKeys = [
+      staffMember.identityCardFrontKey !== identityCardFrontKey
+        ? staffMember.identityCardFrontKey
+        : null,
+      staffMember.identityCardBackKey !== identityCardBackKey
+        ? staffMember.identityCardBackKey
+        : null,
+    ].filter((key): key is string => Boolean(key));
+
+    await Promise.allSettled(
+      staleIdentityKeys.map((key) =>
+        r2Client.send(
+          new DeleteObjectCommand({ Bucket: R2_PRIVATE_BUCKET_NAME, Key: key }),
+        ),
+      ),
+    );
 
     return NextResponse.json({ staffMember: updatedStaffMember });
   } catch (error) {

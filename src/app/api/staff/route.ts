@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import {
   MANAGEMENT_ROLES,
   OWNER_STAFF_ROLES,
+  STAFF_GENDERS,
   STAFF_ROLES,
   USER_ROLE_MANAGER,
   USER_ROLE_OWNER,
@@ -20,6 +21,12 @@ const STAFF_SELECT = {
   shopId: true,
   branchId: true,
   username: true,
+  fullName: true,
+  phone: true,
+  dateOfBirth: true,
+  gender: true,
+  hometown: true,
+  currentAddress: true,
   role: true,
   status: true,
   isFirstLogin: true,
@@ -49,8 +56,28 @@ function isStaffRole(role: unknown): role is StaffRole {
 }
 
 function normalizeStaffInput(body: StaffRequestBody) {
+  const dateOfBirth =
+    typeof body.dateOfBirth === "string" && body.dateOfBirth.trim()
+      ? new Date(`${body.dateOfBirth.trim()}T00:00:00.000Z`)
+      : null;
+
   return {
     username: typeof body.username === "string" ? body.username.trim() : "",
+    fullName: typeof body.fullName === "string" ? body.fullName.trim() : "",
+    phone: typeof body.phone === "string" ? body.phone.trim() : "",
+    dateOfBirth,
+    gender:
+      typeof body.gender === "string" &&
+      STAFF_GENDERS.includes(body.gender as (typeof STAFF_GENDERS)[number])
+        ? (body.gender as (typeof STAFF_GENDERS)[number])
+        : null,
+    hometown: typeof body.hometown === "string" ? body.hometown.trim() : "",
+    currentAddress:
+      typeof body.currentAddress === "string" ? body.currentAddress.trim() : "",
+    identityCardFrontKey:
+      typeof body.identityCardFrontKey === "string" ? body.identityCardFrontKey.trim() : "",
+    identityCardBackKey:
+      typeof body.identityCardBackKey === "string" ? body.identityCardBackKey.trim() : "",
     password: typeof body.password === "string" ? body.password.trim() : "",
     role: isStaffRole(body.role) ? body.role : null,
     branchId:
@@ -204,6 +231,47 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (!staffInput.fullName) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingFullName },
+      { status: 400 },
+    );
+  }
+
+  if (!staffInput.phone) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.missingPhone },
+      { status: 400 },
+    );
+  }
+
+  if (!staffInput.dateOfBirth || Number.isNaN(staffInput.dateOfBirth.getTime())) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidDateOfBirth },
+      { status: 400 },
+    );
+  }
+
+  if (!staffInput.gender) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidGender },
+      { status: 400 },
+    );
+  }
+
+  const identityKeyPrefix = `staff-documents/${authResult.shopId}/`;
+  if (
+    (staffInput.identityCardFrontKey &&
+      !staffInput.identityCardFrontKey.startsWith(identityKeyPrefix)) ||
+    (staffInput.identityCardBackKey &&
+      !staffInput.identityCardBackKey.startsWith(identityKeyPrefix))
+  ) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.invalidIdentityImage },
+      { status: 400 },
+    );
+  }
+
   if (!staffInput.password) {
     return NextResponse.json(
       { error: staffTexts.api.errors.missingPassword },
@@ -224,6 +292,8 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
+
+  const staffRole = staffInput.role;
 
   if (isManagerRole && authResult.role !== USER_ROLE_OWNER) {
     return NextResponse.json(
@@ -253,8 +323,16 @@ export async function POST(request: NextRequest) {
           shopId: authResult.shopId,
           branchId: staffBranchId,
           username: staffInput.username,
+          fullName: staffInput.fullName,
+          phone: staffInput.phone,
+          dateOfBirth: staffInput.dateOfBirth,
+          gender: staffInput.gender,
+          hometown: staffInput.hometown || null,
+          currentAddress: staffInput.currentAddress || null,
+          identityCardFrontKey: staffInput.identityCardFrontKey || null,
+          identityCardBackKey: staffInput.identityCardBackKey || null,
           passwordHash: hashPassword(staffInput.password),
-          role: staffInput.role,
+          role: staffRole,
           status: "active",
           isFirstLogin: true,
         },

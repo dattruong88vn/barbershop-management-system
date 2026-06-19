@@ -5,10 +5,13 @@ import { staffTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
 import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
+import { uploadFileToPresignedUrl } from "@/lib/r2UploadClient";
 import type {
   Staff,
   StaffApiResponse,
   StaffFormInput,
+  StaffIdentityUploadApiResponse,
+  StaffIdentityUploadInput,
   StaffListApiResponse,
   StaffTransferApiResponse,
   StaffTransferInput,
@@ -36,6 +39,35 @@ async function getStaff(): Promise<Staff[]> {
   return result.staff;
 }
 
+async function getStaffMember(id: string): Promise<Staff> {
+  const result = await fetchClient<StaffApiResponse>(API_ROUTES.staffDetail(id));
+  return getStaffResponseData(result);
+}
+
+async function uploadStaffIdentityImage(
+  input: StaffIdentityUploadInput & { file: File },
+) {
+  const result = await fetchClient<StaffIdentityUploadApiResponse>(
+    API_ROUTES.staffIdentityUpload,
+    {
+      method: "POST",
+      headers: DEFAULT_JSON_HEADERS,
+      body: JSON.stringify({
+        draftId: input.draftId,
+        fileType: input.file.type,
+        side: input.side,
+      }),
+    },
+  );
+
+  if (typeof result.key !== "string" || typeof result.url !== "string") {
+    throw new Error(result.error ?? staffTexts.ownerStaff.errors.generic);
+  }
+
+  await uploadFileToPresignedUrl(result.url, input.file);
+  return result.key;
+}
+
 async function createStaff(input: StaffFormInput): Promise<Staff> {
   const result = await fetchClient<StaffApiResponse>(API_ROUTES.staff, {
     method: "POST",
@@ -54,6 +86,14 @@ async function updateStaff(input: StaffFormInput & { id: string }) {
       headers: DEFAULT_JSON_HEADERS,
       body: JSON.stringify({
         username: input.username,
+        fullName: input.fullName,
+        phone: input.phone,
+        dateOfBirth: input.dateOfBirth,
+        gender: input.gender,
+        hometown: input.hometown,
+        currentAddress: input.currentAddress,
+        identityCardFrontKey: input.identityCardFrontKey,
+        identityCardBackKey: input.identityCardBackKey,
         password: input.password,
         role: input.role,
         branchId: input.branchId,
@@ -84,11 +124,16 @@ async function transferStaff(input: StaffTransferInput) {
   });
 }
 
-export function useStaff() {
+export function useStaff(staffId?: string) {
   const queryClient = useQueryClient();
   const staffQuery = useQuery({
     queryKey: STAFF_QUERY_KEY,
     queryFn: getStaff,
+  });
+  const staffMemberQuery = useQuery({
+    queryKey: [...STAFF_QUERY_KEY, staffId],
+    queryFn: () => getStaffMember(staffId ?? ""),
+    enabled: Boolean(staffId),
   });
 
   const createStaffMutation = useMutation({
@@ -112,18 +157,25 @@ export function useStaff() {
     mutationFn: transferStaff,
     onSuccess: () => queryClient.invalidateQueries(),
   });
+  const identityUploadMutation = useMutation({
+    mutationFn: uploadStaffIdentityImage,
+  });
 
   return {
     staff: staffQuery.data ?? [],
+    staffMember: staffMemberQuery.data ?? null,
     error: staffQuery.error,
     isCreating: createStaffMutation.isPending,
     isDeleting: deleteStaffMutation.isPending,
     isLoading: staffQuery.isLoading,
     isUpdating: updateStaffMutation.isPending,
     isTransferring: transferStaffMutation.isPending,
+    isLoadingStaffMember: staffMemberQuery.isLoading,
+    isUploadingIdentity: identityUploadMutation.isPending,
     createStaff: createStaffMutation.mutateAsync,
     deleteStaff: deleteStaffMutation.mutateAsync,
     updateStaff: updateStaffMutation.mutateAsync,
     transferStaff: transferStaffMutation.mutateAsync,
+    uploadIdentityImage: identityUploadMutation.mutateAsync,
   };
 }

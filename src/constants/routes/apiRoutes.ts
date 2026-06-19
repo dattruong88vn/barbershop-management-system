@@ -56,6 +56,9 @@ export const API_ROUTES = {
   staff: "/api/staff",
   staffDetail: (id: string) => `/api/staff/${id}`,
   staffTransfer: "/api/staff/transfer",
+  staffIdentityUpload: "/api/staff/identity-upload",
+  staffIdentityImage: (id: string, side: "front" | "back") =>
+    `/api/staff/${id}/identity-image?side=${side}`,
   branchStatus: (id: string) => `/api/branches/${id}/status`,
   uploadPresigned: "/api/upload/presigned",
   visits: "/api/visits",

@@ -9,7 +9,7 @@
 - Staff accounts are created by owner/manager flows.
 - Staff must change password after first login when required by account state.
 - Staff account display status is derived from account fields: `Khởi tạo` means `status = active` and `isFirstLogin = true`; `Đang làm` means `status = active` and `isFirstLogin = false`; `branch_suspended` means access is paused because the assigned/managed branch is inactive; inactive staff are former staff and remain in history.
-- Users with `branch_suspended` can authenticate, but middleware redirects them to the branch unavailable screen and operational APIs must not allow branch-scoped mutations.
+- Non-owner users with `branch_suspended` can authenticate, but middleware redirects them to the branch unavailable screen and operational APIs must not allow branch-scoped mutations. Owner must still access the owner workspace to reactivate branches or reassign staff.
 
 ## Roles
 
@@ -36,6 +36,8 @@ Use exported role constants/types from `src/constants/common/roles.ts` for role 
 - Each branch can have at most one manager, while one manager can manage many branches.
 - Manager must operate inside an active branch context selected at `/manager/select-branch`; staff create/update requests must be scoped to that active branch.
 - Shared management screens should use `mode="owner" | "manager"` when owner and manager routes share UI behavior.
+- Owner được upload/xem/thay ảnh CCCD của staff trong cùng shop. Manager chỉ được upload/xem/thay ảnh CCCD của staff thuộc active branch hiện tại.
+- Ảnh CCCD là dữ liệu nhạy cảm: không dùng public URL, không trả object key ngoài API quản lý nhân viên, và URL xem/tải phải là signed URL có thời hạn ngắn.
 
 ## Manager Branch Context
 

@@ -95,6 +95,8 @@ export const ROUTES = {
   ownerServices: "/owner/services",
   ownerCombos: "/owner/combos",
   ownerStaff: "/owner/staff",
+  ownerStaffCreate: "/owner/staff/new",
+  ownerStaffEdit: (id: string) => `/owner/staff/${id}/edit`,
   ownerBranches: "/owner/branches",
   ownerBranchCreate: "/owner/branches/new",
   ownerBranchDetail: (id: string) => `/owner/branches/${id}`,
@@ -103,4 +105,6 @@ export const ROUTES = {
   managerServices: "/manager/services",
   managerCombos: "/manager/combos",
   managerStaff: "/manager/staff",
+  managerStaffCreate: "/manager/staff/new",
+  managerStaffEdit: (id: string) => `/manager/staff/${id}/edit`,
 } as const;

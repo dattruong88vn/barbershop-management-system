@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("LOCATION_DATABASE_URL")
+  directUrl = env("LOCATION_DIRECT_URL")
+}
+
+model Province {
+  code          String    @id @db.VarChar(20)
+  name          String
+  fullName      String    @map("full_name")
+  type          String
+  isActive      Boolean   @default(true) @map("is_active")
+  effectiveFrom DateTime? @map("effective_from") @db.Date
+  effectiveTo   DateTime? @map("effective_to") @db.Date
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wards Ward[]
+
+  @@index([isActive, name])
+  @@map("provinces")
+}
+
+model Ward {
+  code          String    @id @db.VarChar(20)
+  provinceCode  String    @map("province_code") @db.VarChar(20)
+  name          String
+  fullName      String    @map("full_name")
+  type          String
+  isActive      Boolean   @default(true) @map("is_active")
+  effectiveFrom DateTime? @map("effective_from") @db.Date
+  effectiveTo   DateTime? @map("effective_to") @db.Date
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  province Province @relation(fields: [provinceCode], references: [code], onDelete: Restrict)
+
+  @@index([provinceCode, isActive, name])
+  @@map("wards")
+}
+
+model DatasetVersion {
+  id            String   @id @default(uuid()) @db.Uuid
+  sourceName    String   @map("source_name")
+  sourceUrl     String   @map("source_url")
+  sourceVersion String   @map("source_version")
+  checksum      String
+  provinceCount Int      @map("province_count")
+  wardCount     Int      @map("ward_count")
+  importedAt    DateTime @default(now()) @map("imported_at") @db.Timestamptz(6)
+
+  @@unique([sourceName, sourceVersion, checksum])
+  @@map("dataset_versions")
+}

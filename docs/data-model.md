@@ -40,6 +40,18 @@
 | `shop_id`        | uuid      | FK → shops (null nếu là superadmin)                                       |
 | `branch_id`      | uuid      | FK → branches, có thể thay đổi bởi owner                                  |
 | `username`       | string    | Unique trong phạm vi shop                                                 |
+| `full_name`      | string    | Họ tên đầy đủ; nullable cho tài khoản legacy                              |
+| `phone`          | string    | Số điện thoại; nullable cho tài khoản legacy                              |
+| `date_of_birth`  | date      | Ngày sinh; nullable cho tài khoản legacy                                  |
+| `gender`         | enum      | `male`, `female`, `other`; nullable cho tài khoản legacy                  |
+| `hometown`       | string    | Quê quán, nullable                                                         |
+| `current_address` | string   | Nơi ở hiện tại, nullable                                                   |
+| `hometown_province_code` | string | Mã tỉnh/thành quê quán, nullable; tham chiếu logic tới Shared Location DB |
+| `current_province_code` | string | Mã tỉnh/thành nơi ở hiện tại, nullable; tham chiếu logic tới Shared Location DB |
+| `current_ward_code` | string | Mã phường/xã nơi ở hiện tại, nullable; phải thuộc `current_province_code` |
+| `current_address_line` | string | Số nhà, tên đường và phần địa chỉ chi tiết, nullable |
+| `identity_card_front_key` | string | Object key ảnh CCCD mặt trước trong R2 private, không bắt buộc |
+| `identity_card_back_key` | string | Object key ảnh CCCD mặt sau trong R2 private, không bắt buộc |
 | `password_hash`  | string    |                                                                           |
 | `role`           | enum      | `superadmin`, `owner`, `manager`, `receptionist`, `barber`, `skinner`     |
 | `status`         | enum      | `active`, `inactive`, `branch_suspended`                                  |
@@ -50,6 +62,8 @@
 > `branch_suspended` dùng khi chi nhánh bị ngừng hoạt động. User vẫn còn record và lịch sử, nhưng không được thao tác API vận hành cho đến khi owner chuyển/khôi phục phân công phù hợp.
 > Với staff thường (`receptionist`, `barber`, `skinner`), `branch_id` là chi nhánh làm việc. Với `manager`, danh sách chi nhánh quản lý lấy từ `branches.manager_id`; không dùng `users.branch_id` để xác định quyền quản lý nhiều chi nhánh.
 > Trạng thái hiển thị trên màn quản lý nhân viên: `Khởi tạo` = `status = active` và `is_first_login = true`; `Đang làm` = `status = active` và `is_first_login = false`; `inactive` là đã nghỉ; `branch_suspended` là tạm treo do chi nhánh ngừng hoạt động.
+> Ảnh CCCD không lưu public URL trong DB. Khi thay ảnh, hệ thống upload object mới và cập nhật key trong DB trước, sau đó mới xoá object cũ; nếu cập nhật thất bại thì giữ key/object cũ và dọn object mới chưa được sử dụng.
+> Các mã tỉnh/thành và phường/xã không có foreign key vật lý vì dữ liệu nằm trong Shared Location DB. API phải validate code và quan hệ ward-province trước khi lưu. `hometown` và `current_address` được giữ tạm thời cho dữ liệu legacy, không tự suy đoán mã hành chính từ chuỗi cũ.
 
 ---
 

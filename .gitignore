@@ -33,6 +33,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+!.env.shared-location.example
 
 
 # vercel
@@ -43,3 +44,4 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+/infrastructure/shared-location-db/generated

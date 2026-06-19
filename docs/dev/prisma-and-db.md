@@ -50,3 +50,5 @@ Do not upgrade Prisma without testing.
 ## Data Model
 
 The full product data model remains in [../data-model.md](../data-model.md).
+
+Shared province/ward schema, dataset sync, and Supabase FDW configuration live in [shared-location-db.md](shared-location-db.md). This document and the main `prisma/` directory remain scoped to Barbershop DB only.

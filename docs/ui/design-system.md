@@ -24,6 +24,8 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Date hiển thị trong UI phải dùng format `dd/mm/yyyy`. Nếu cần kèm giờ, đặt giờ sau ngày, ví dụ `17/06/2026 15:30`.
 - Mọi ô search text phải hiển thị nút icon `X` để xoá nhanh khi user đã nhập nội dung.
 - Option mặc định thể hiện "tất cả giá trị" trong filter/select phải hiển thị đúng `Tất cả`, không thêm tên field phía sau.
+- Label của field bắt buộc phải có dấu `*` màu đỏ và control phải giữ semantic `required`/`aria-required`. Field không bắt buộc chỉ hiển thị label, không thêm hậu tố như `(không bắt buộc)`.
+- Mọi control chọn ảnh dùng trực tiếp vùng upload/preview làm trigger mở file picker bằng click hoặc bàn phím. Không đặt thêm nút chữ `Chọn ảnh`/`Chọn ảnh khác` bên dưới vùng ảnh.
 
 ## Component Map
 
@@ -98,7 +100,8 @@ src/app/design-system/page.tsx
 Every screen must have loading, empty, and error states:
 
 - Loading: use `Skeleton`, `Spinner`, or `LoadingDots`.
-- Full-screen blocking operations, such as route auto-select/redirect or destructive/branch status mutations, use `FullScreenLoading`.
+- Với page có nhiều section/card, giữ page shell và header hiển thị ngay; dùng skeleton theo từng section với kích thước, grid và aspect ratio gần nội dung thật thay vì một skeleton block phủ toàn content.
+- Full-screen blocking operations, such as route auto-select/redirect or destructive/branch status mutations, use `FullScreenLoading`. Its translucent fixed overlay covers the entire viewport, including management navigation, while keeping background context visible.
 - Empty: use `EmptyState`.
 - Error/warning: use `InlineAlert`, `Error`, `Banner`, or `Note`.
 

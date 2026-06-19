@@ -1,4 +1,4 @@
-import type { OwnerStaffRoleValue } from "@/constants/common";
+import type { OwnerStaffRoleValue, StaffGenderValue } from "@/constants/common";
 
 export type StaffRole = OwnerStaffRoleValue;
 
@@ -14,6 +14,16 @@ export type Staff = {
   shopId: string;
   branchId: string | null;
   username: string;
+  fullName?: string | null;
+  phone?: string | null;
+  dateOfBirth?: string | null;
+  gender?: StaffGenderValue | null;
+  hometown?: string | null;
+  currentAddress?: string | null;
+  identityCardFrontUrl?: string | null;
+  identityCardBackUrl?: string | null;
+  hasIdentityCardFront?: boolean;
+  hasIdentityCardBack?: boolean;
   role: StaffRole;
   status: StaffStatus;
   isFirstLogin: boolean;
@@ -24,6 +34,14 @@ export type Staff = {
 
 export type StaffFormInput = {
   username: string;
+  fullName?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  gender?: StaffGenderValue;
+  hometown?: string;
+  currentAddress?: string;
+  identityCardFrontKey?: string;
+  identityCardBackKey?: string;
   password?: string;
   role: StaffRole;
   branchId: string | null;
@@ -32,10 +50,32 @@ export type StaffFormInput = {
 
 export type StaffRequestBody = {
   username?: unknown;
+  fullName?: unknown;
+  phone?: unknown;
+  dateOfBirth?: unknown;
+  gender?: unknown;
+  hometown?: unknown;
+  currentAddress?: unknown;
+  identityCardFrontKey?: unknown;
+  identityCardBackKey?: unknown;
   password?: unknown;
   role?: unknown;
   branchId?: unknown;
   managedBranchIds?: unknown;
+};
+
+export type StaffIdentitySide = "front" | "back";
+
+export type StaffIdentityUploadInput = {
+  draftId: string;
+  fileType: string;
+  side: StaffIdentitySide;
+};
+
+export type StaffIdentityUploadApiResponse = {
+  error?: string;
+  key?: string;
+  url?: string;
 };
 
 export type StaffListApiResponse = {

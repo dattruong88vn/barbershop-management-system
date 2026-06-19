@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
             shopId: true,
             branchId: true,
             username: true,
+            fullName: true,
             passwordHash: true,
             isFirstLogin: true,
             status: true,
@@ -79,6 +80,7 @@ export const authOptions: NextAuthOptions = {
           branch_id: activeBranchId,
           active_branch_id: activeBranchId,
           username: user.username,
+          full_name: user.fullName,
           is_first_login: user.isFirstLogin,
           status: user.status,
         };
@@ -94,6 +96,7 @@ export const authOptions: NextAuthOptions = {
         token.branch_id = user.branch_id;
         token.active_branch_id = user.active_branch_id;
         token.username = user.username;
+        token.full_name = user.full_name;
         token.is_first_login = user.is_first_login;
         token.status = user.status;
       }
@@ -134,6 +137,7 @@ export const authOptions: NextAuthOptions = {
         branch_id: token.branch_id,
         active_branch_id: token.active_branch_id,
         username: token.username,
+        full_name: token.full_name,
         is_first_login: token.is_first_login,
         status: token.status,
       };
