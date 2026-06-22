@@ -5,8 +5,8 @@ import { comboTexts } from "@/constants/texts";
 import type { ComboFormInput } from "@/types";
 
 const mocks = vi.hoisted(() => ({
+  branchFindFirst: vi.fn(),
   getToken: vi.fn(),
-  prismaComboDelete: vi.fn(),
   prismaComboFindFirst: vi.fn(),
   prismaComboUpdate: vi.fn(),
   prismaServiceFindMany: vi.fn(),
@@ -18,8 +18,8 @@ vi.mock("next-auth/jwt", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    branch: { findFirst: mocks.branchFindFirst },
     combo: {
-      delete: mocks.prismaComboDelete,
       findFirst: mocks.prismaComboFindFirst,
       update: mocks.prismaComboUpdate,
     },
@@ -58,10 +58,16 @@ function createCombo() {
   return {
     id: "combo-1",
     shopId: "shop-1",
+    branchId: null,
+    branch: null,
     name: "Combo cắt gội",
     description: "Cắt tóc và gội đầu",
     price: { toString: () => "120000" },
+    createdBy: "user-1",
+    creator: { id: "user-1", role: "owner", username: "owner" },
     createdAt: new Date("2026-06-03T00:00:00.000Z"),
+    deletedAt: null,
+    _count: { visitServices: 0 },
     comboServices: [
       {
         service: {
@@ -81,10 +87,19 @@ function createExpectedCombo() {
   return {
     id: combo.id,
     shopId: combo.shopId,
+    branchId: null,
+    branch: null,
+    canDelete: true,
+    canEdit: true,
+    createdBy: "user-1",
+    creator: combo.creator,
+    isUsedInVisit: false,
+    scope: "shop",
     name: combo.name,
     description: combo.description,
     price: 120000,
     createdAt: combo.createdAt.toISOString(),
+    deletedAt: null,
     services: [
       {
         id: "service-1",
@@ -112,23 +127,34 @@ describe("GET /api/combos/[id]", () => {
     const response = await GET(createRequest(), createContext());
 
     expect(response.status).toBe(404);
-    expect(mocks.prismaComboFindFirst).toHaveBeenCalledWith({
-      where: {
-        id: "combo-1",
-        shopId: "shop-1",
-      },
-      select: expect.objectContaining({
-        id: true,
-        shopId: true,
-        name: true,
-        description: true,
-        price: true,
-        createdAt: true,
+    expect(mocks.prismaComboFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: "combo-1",
+          deletedAt: null,
+          shopId: "shop-1",
+        },
       }),
-    });
+    );
     await expect(response.json()).resolves.toEqual({
       error: comboTexts.api.errors.notFound,
     });
+  });
+
+  it("should reject a manager whose selected branch is no longer managed", async () => {
+    mocks.getToken.mockResolvedValue({
+      id: "manager-1",
+      role: "manager",
+      shop_id: "shop-1",
+      branch_id: "branch-2",
+    });
+    mocks.branchFindFirst.mockResolvedValue(null);
+
+    const response = await GET(createRequest(), createContext());
+
+    expect(response.status).toBe(403);
+    expect(mocks.prismaComboFindFirst).not.toHaveBeenCalled();
+    await expect(response.json()).resolves.toEqual({ error: comboTexts.api.errors.forbidden });
   });
 });
 
@@ -217,8 +243,12 @@ describe("PATCH /api/combos/[id]", () => {
 });
 
 describe("DELETE /api/combos/[id]", () => {
-  it("should delete an existing combo scoped to session shop", async () => {
+  it("should soft delete an existing combo scoped to session shop", async () => {
     const combo = createCombo();
+    const deletedCombo = {
+      ...combo,
+      deletedAt: new Date("2026-06-22T00:00:00.000Z"),
+    };
 
     mocks.getToken.mockResolvedValue({
       id: "user-1",
@@ -226,16 +256,21 @@ describe("DELETE /api/combos/[id]", () => {
       shop_id: "shop-1",
     });
     mocks.prismaComboFindFirst.mockResolvedValue(combo);
-    mocks.prismaComboDelete.mockResolvedValue(combo);
+    mocks.prismaComboUpdate.mockResolvedValue(deletedCombo);
 
     const response = await DELETE(createRequest(), createContext());
 
     expect(response.status).toBe(200);
-    expect(mocks.prismaComboDelete).toHaveBeenCalledWith({
+    expect(mocks.prismaComboUpdate).toHaveBeenCalledWith({
       where: { id: "combo-1" },
+      data: { deletedAt: expect.any(Date) },
+      select: expect.objectContaining({ id: true, deletedAt: true }),
     });
     await expect(response.json()).resolves.toEqual({
-      combo: createExpectedCombo(),
+      combo: {
+        ...createExpectedCombo(),
+        deletedAt: deletedCombo.deletedAt.toISOString(),
+      },
     });
   });
 });

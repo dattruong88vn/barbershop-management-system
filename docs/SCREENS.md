@@ -177,7 +177,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Roles:** owner, manager
 - **Ưu tiên:** desktop
 - **Actions:** List, Create, Edit, Delete
-- **Fields:** name, price, responsibleRole (`barber` hoặc `skinner`), duration, active
+- **Fields:** name, price, responsibleRole (`barber` hoặc `skinner`), active
 - **Reporting:** mỗi service phải có `responsibleRole` để phân bổ doanh thu báo cáo.
 - **States:** list, create modal, edit modal, confirm delete
 
