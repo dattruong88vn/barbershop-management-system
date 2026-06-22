@@ -25,6 +25,13 @@ export function getStaffSearchText(staffMember: Staff) {
   return `${staffMember.fullName ?? ""} ${staffMember.username}`.toLowerCase();
 }
 
+export function getStaffDisplayName(staffMember: {
+  fullName?: string | null;
+  username: string;
+}) {
+  return staffMember.fullName?.trim() || staffMember.username;
+}
+
 export function getStaffDisplayStatus(
   staffMember: Staff,
 ): StaffDisplayStatus {

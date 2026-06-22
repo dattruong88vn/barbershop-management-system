@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "infrastructure/shared-location-db/generated/**",
+    "src/generated/reference-data/**",
   ]),
 ]);
 

@@ -31,6 +31,7 @@ import { useServices } from "@/hooks/useServices";
 import { dispatchAppToast } from "@/lib/toast";
 import type { Service } from "@/types";
 import { formatCurrencyInput, parseCurrencyInput } from "@/utils/common";
+import { getStaffDisplayName } from "@/utils/staff";
 
 import { ServiceDeleteModal } from "./ServiceDeleteModal";
 import {
@@ -75,7 +76,7 @@ const CATALOG_STATUS_TABS = [
 function getServiceSearchText(service: Service) {
   return [
     service.name,
-    service.creator.username,
+    getStaffDisplayName(service.creator),
     service.branch?.name ?? serviceTexts.ownerServices.scopes.shop,
   ]
     .join(" ")

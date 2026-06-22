@@ -1,5 +1,6 @@
 -- Run on Barbershop DB.
--- Replace placeholders with Shared Location DB direct/session endpoint and read-only credentials.
+-- Replace placeholders with Shared Data DB session pooler endpoint and location read-only credentials.
+-- Supavisor requires the remote username in the form <readonly-role>.<shared-project-ref>.
 
 create extension if not exists postgres_fdw with schema extensions;
 
@@ -19,7 +20,7 @@ create server shared_location_server
 create user mapping for postgres
   server shared_location_server
   options (
-    user '<shared-location-readonly-user>',
+    user '<shared-location-readonly-user>.<shared-project-ref>',
     password '<shared-location-readonly-password>'
   );
 

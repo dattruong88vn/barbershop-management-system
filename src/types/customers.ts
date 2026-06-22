@@ -12,6 +12,7 @@ export type CustomerLastVisitService = {
 };
 
 export type CustomerLastVisitStaff = {
+  fullName?: string | null;
   id: string;
   username: string;
 } | null;
@@ -73,6 +74,7 @@ export type CustomerVisitService = {
 };
 
 export type CustomerVisitStaff = {
+  fullName?: string | null;
   id: string;
   username: string;
 } | null;

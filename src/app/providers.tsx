@@ -112,7 +112,12 @@ export function Providers({ children }: ProvidersProps) {
 }
 
 function RoleAwareAppShell({ children }: ProvidersProps) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <>{children}</>;
+  }
+
   const role = session?.user.role;
   const isStaffRole = STAFF_ROLES.some((staffRole) => staffRole === role);
 

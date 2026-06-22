@@ -10,6 +10,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Nếu thấy cùng một JSX/style pattern xuất hiện ở từ 2 màn hình trở lên, tự tách thành component dùng chung trước khi tiếp tục nhân bản pattern. Ví dụ: page title dùng `PageTitle` thay vì lặp `<h1 className="text-2xl font-semibold">`.
 - Không dùng native/browser controls trực tiếp khi global component đã tồn tại.
 - Không hardcode UI text trong component; dùng `src/constants/texts/`.
+- Hiển thị nhân viên/người dùng trong UI nghiệp vụ bằng họ tên đầy đủ trước, fallback username khi thiếu dữ liệu cũ; không dùng username làm tên hiển thị chính trong bảng/danh sách/dropdown/report.
 - Không hardcode colors hoặc custom spacing; dùng Geist/Tailwind design tokens hiện có.
 - Không hardcode role, scope, status, variant (`primary`, `warning`, `danger`, ...) hoặc finite values trong JSX; dùng constants từ `src/constants/common/`.
 - Format/parse dùng lại nhiều nơi, như tiền VND hoặc currency input, phải đặt trong `src/utils/`.

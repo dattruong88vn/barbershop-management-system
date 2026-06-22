@@ -32,11 +32,17 @@ export async function GET(request: NextRequest) {
       role: USER_ROLE_MANAGER,
       status: "active",
       ...(search
-        ? { username: { contains: search, mode: "insensitive" } }
+        ? {
+            OR: [
+              { fullName: { contains: search, mode: "insensitive" } },
+              { username: { contains: search, mode: "insensitive" } },
+            ],
+          }
         : {}),
     },
     orderBy: { username: "asc" },
     select: {
+      fullName: true,
       id: true,
       username: true,
     },

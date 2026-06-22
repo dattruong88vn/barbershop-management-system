@@ -9,6 +9,7 @@ export type Branch = {
   managerId?: string | null;
   createdAt: string;
   manager?: {
+    fullName?: string | null;
     id: string;
     username: string;
   } | null;
@@ -34,6 +35,7 @@ export type BranchListApiResponse = {
 };
 
 export type BranchManager = {
+  fullName?: string | null;
   id: string;
   username: string;
 };

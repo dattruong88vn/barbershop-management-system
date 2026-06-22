@@ -6,9 +6,10 @@ import {
   UI_VARIANT_PRIMARY,
 } from "@/constants/common";
 
-import { Button } from "@/components/global/ui/button";
+import { Button, Select } from "@/components/global";
 import { visitTexts } from "@/constants/texts";
 import type { VisitStaffEditFormProps, VisitStaffUpdateInput } from "@/types";
+import { getStaffDisplayName } from "@/utils/staff";
 
 export function VisitStaffEditForm({
   barbers,
@@ -51,36 +52,36 @@ export function VisitStaffEditForm({
         <span className="text-sm font-medium text-foreground">
           {visitTexts.create.barberLabel}
         </span>
-        <select
+        <Select
+          className="mt-2"
           value={barberId}
           onChange={(event) => setBarberId(event.target.value)}
-          className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-base text-foreground outline-none transition focus:border-ring"
         >
           <option value="">{visitTexts.create.barberPlaceholder}</option>
           {barbers.map((barber) => (
             <option key={barber.id} value={barber.id}>
-              {barber.username}
+              {getStaffDisplayName(barber)}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       <label className="block">
         <span className="text-sm font-medium text-foreground">
           {visitTexts.create.skinnerLabel}
         </span>
-        <select
+        <Select
+          className="mt-2"
           value={skinnerId}
           onChange={(event) => setSkinnerId(event.target.value)}
-          className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-base text-foreground outline-none transition focus:border-ring"
         >
           <option value="">{visitTexts.create.skinnerPlaceholder}</option>
           {skinners.map((skinner) => (
             <option key={skinner.id} value={skinner.id}>
-              {skinner.username}
+              {getStaffDisplayName(skinner)}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       <div className="flex justify-end gap-3">

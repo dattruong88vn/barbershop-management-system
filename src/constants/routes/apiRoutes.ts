@@ -32,6 +32,11 @@ export const API_ROUTES = {
 
     return `/api/dashboard?${params.toString()}`;
   },
+  locationProvinces: "/api/locations/provinces",
+  locationWards: (provinceCode: string) => {
+    const params = new URLSearchParams({ provinceCode });
+    return `/api/locations/wards?${params.toString()}`;
+  },
   personalReport: ({ month, period }: { month?: string; period: string }) => {
     const params = new URLSearchParams({ period });
 

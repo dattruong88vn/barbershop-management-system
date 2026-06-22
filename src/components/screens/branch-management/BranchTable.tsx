@@ -26,6 +26,7 @@ import { branchTexts } from "@/constants/texts";
 import { ROUTES } from "@/constants/routes";
 import type { Branch } from "@/types";
 import { formatDisplayDate } from "@/utils/common";
+import { getStaffDisplayName } from "@/utils/staff";
 
 type BranchTableProps = {
   branches: Branch[];
@@ -88,7 +89,11 @@ export function BranchTable({ branches, error, hasFilters, isLoading, onCreate, 
                       </Link>
                     </TableCell>
                     <TableCell>{branch.address}</TableCell>
-                    <TableCell>{branch.manager?.username ?? branchTexts.ownerBranches.unassignedManager}</TableCell>
+                    <TableCell>
+                      {branch.manager
+                        ? getStaffDisplayName(branch.manager)
+                        : branchTexts.ownerBranches.unassignedManager}
+                    </TableCell>
                     <TableCell>
                       <Badge variant={status === BRANCH_STATUS_INACTIVE ? "default" : "success"}>
                         {status === BRANCH_STATUS_INACTIVE ? branchTexts.ownerBranches.statuses.inactive : branchTexts.ownerBranches.statuses.active}

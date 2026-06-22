@@ -19,6 +19,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { buildVisitServiceSnapshots } from "@/utils/visits";
 import { isVisitStatus } from "@/utils/visits/visitStatus";
+import { getStaffDisplayName } from "@/utils/staff";
 import type {
   CustomerVisit,
   UserRole,
@@ -37,6 +38,7 @@ const VISIT_SELECT = {
   lastUpdatedBy: true,
   lastUpdater: {
     select: {
+      fullName: true,
       username: true,
     },
   },
@@ -52,12 +54,14 @@ const VISIT_SELECT = {
   totalPrice: true,
   barber: {
     select: {
+      fullName: true,
       id: true,
       username: true,
     },
   },
   skinner: {
     select: {
+      fullName: true,
       id: true,
       username: true,
     },
@@ -264,7 +268,9 @@ function formatVisitResponse(
     createdAt: visit.createdAt.toISOString(),
     completedAt: visit.completedAt?.toISOString() ?? null,
     lastUpdatedBy: visit.lastUpdatedBy,
-    lastUpdatedByName: visit.lastUpdater?.username ?? null,
+    lastUpdatedByName: visit.lastUpdater
+      ? getStaffDisplayName(visit.lastUpdater)
+      : null,
     noHaircut: false,
     noSkinnerService: false,
     status: visit.status,

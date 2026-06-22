@@ -19,6 +19,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Client Component / hook dùng `fetchClient` từ `@/lib/fetchClient`. Server Component dùng `fetchServer` từ `@/lib/fetchServer`. Không gọi `fetch` trực tiếp.
 - Client data dùng TanStack Query không được tự refetch khi browser/window focus lại. Dữ liệu chỉ fetch khi vào page, reload browser, query key thay đổi, hoặc được invalidate/refetch chủ động sau mutation/action.
 - Mọi chuỗi UI đặt trong `src/constants/texts/`. Không hardcode text trong component.
+- Khi hiển thị người dùng/nhân viên trong bảng, chip, dropdown, báo cáo hoặc thông tin chi tiết nghiệp vụ, ưu tiên họ tên đầy đủ (`fullName`/`full_name`); chỉ fallback về `username` cho tài khoản/dữ liệu cũ chưa có họ tên. Riêng form đăng nhập và field tên đăng nhập vẫn hiển thị `username`.
 - Mọi ngày hiển thị trong UI dùng format `dd/mm/yyyy`; nếu có giờ thì hiển thị sau ngày.
 - Mọi ô search text phải có nút icon `X` để xoá nhanh khi đã có nội dung.
 - Mọi vùng chọn ảnh phải click/keyboard trực tiếp được để mở file picker; không hiển thị nút `Chọn ảnh` riêng bên cạnh hoặc bên dưới.
@@ -147,7 +148,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Desktop staff fallback:** receptionist, barber, skinner thấy fallback toàn cục thay vì Visit List UI khi viewport từ 1024px.
 - **Header:** chỉ hiển thị title, không hiển thị description/subtitle.
 - **Sections:** filter trạng thái, danh sách visit
-- **Filter:** thứ tự `completed`, `in_progress`, `pending`; mặc định `completed`.
+- **Filter:** tab Hôm nay hiển thị visit tạo trong ngày hiện tại hoặc visit chưa hoàn thành từ các ngày trước. Thứ tự status filter là `pending` hiển thị `Khởi tạo`, `in_progress` hiển thị `Đang làm`, `completed` hiển thị `Hoàn thành`; mặc định `pending`.
 - **Actions:** mở Visit Detail, tạo visit mới
 - **Indicator:** badge cảnh báo thiếu ảnh trên các visit haircut chưa có ảnh
 - **States:** loading, danh sách, empty
@@ -205,7 +206,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Filter:** tìm kiếm theo tên/username, vai trò, trạng thái; owner có thêm chi nhánh, manager không có filter chi nhánh vì bị scope theo chi nhánh hiện tại. Filter chỉ áp dụng khi bấm `Áp dụng`.
 - **Status filter:** `Tất cả`, `Khởi tạo`, `Đang làm`.
 - **Actions:** List, Create, Edit, soft Delete/ngưng làm.
-- **Fields:** username, role, branch hoặc danh sách chi nhánh quản lý, display status, createdAt.
+- **Fields:** tên nhân viên hiển thị bằng họ tên đầy đủ, role, branch hoặc danh sách chi nhánh quản lý, display status, createdAt.
 - **Create/Edit form:** bắt buộc tên đăng nhập, mật khẩu khi tạo, họ tên đầy đủ, số điện thoại, ngày tháng năm sinh, giới tính, vai trò và phân công chi nhánh; quê quán, nơi ở hiện tại, ảnh CCCD mặt trước và ảnh CCCD mặt sau không bắt buộc. Label field bắt buộc hiển thị dấu `*` màu đỏ; field không bắt buộc chỉ hiển thị label, không thêm hậu tố `(không bắt buộc)`. Owner được chọn role `manager`, `receptionist`, `barber`, `skinner`; không cho tạo `owner` hoặc `superadmin` từ màn nhân viên. Manager chỉ được tạo staff thường trong branch context hiện tại.
 - **CCCD upload:** ảnh CCCD chỉ được chọn từ file trên máy tính; không dùng camera/capture. Click hoặc dùng bàn phím trực tiếp trên vùng upload/preview để chọn hoặc thay ảnh, không có nút `Chọn ảnh` riêng. Ảnh lưu trong R2 private và UI chỉ nhận URL xem tạm thời có thời hạn, không lưu hoặc hiển thị public URL.
 - **CCCD replacement:** khi thay một mặt CCCD, upload object mới trước; chỉ sau khi cập nhật object key mới vào DB thành công mới xoá object cũ. Nếu upload hoặc lưu DB thất bại, giữ nguyên ảnh cũ và dọn object mới chưa được sử dụng.
@@ -228,7 +229,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Create route:** `/owner/branches/new`; nhập tên, địa chỉ, manager. Section nhân viên hiển thị yêu cầu lưu chi nhánh trước.
 - **Detail route:** `/owner/branches/:id`; click tên chi nhánh từ table để mở. Dùng chung bố cục thông tin với create/edit, hiển thị manager và danh sách nhân viên.
 - **Edit route:** `/owner/branches/:id/edit`; chỉnh tên, địa chỉ, manager. Chi nhánh inactive chỉ được xem, phải active lại trước khi chỉnh sửa.
-- **Manager:** một chi nhánh có tối đa một manager; một manager có thể quản lý nhiều chi nhánh. Dropdown manager hỗ trợ tìm theo username và có `Chưa phân công`.
+- **Manager:** một chi nhánh có tối đa một manager; một manager có thể quản lý nhiều chi nhánh. Dropdown manager hiển thị/tìm theo họ tên đầy đủ, fallback username, và có `Chưa phân công`.
 - **Staff:** staff thường chỉ thuộc một chi nhánh. Nút `Điều chuyển nhân viên` nằm ở danh sách nhân viên trong detail; owner chọn nhân viên, mở popup chọn chi nhánh active đích, rồi chuyển hàng loạt. Chỉ được chuyển khi toàn bộ nhân viên được chọn không còn visit `pending` hoặc `in_progress`; lịch sử visit/report không thay đổi.
 - **Delete:** không hỗ trợ xoá chi nhánh.
 - **Inactive:** owner có thể ngừng/kích hoạt lại chi nhánh. Ngừng hoạt động chỉ cho phép khi chi nhánh không còn visit `pending` hoặc `in_progress`; sau khi bấm action phải đóng băng màn hình bằng `FullScreenLoading` cho đến khi API hoàn tất. Sau khi ngừng thì khoá thao tác vận hành, lưu audit `deactivatedAt/deactivatedBy`, và đưa staff/manager liên quan về `branch_suspended`. Chi nhánh inactive chỉ được xem; phải active lại trước khi chỉnh sửa. Khi active lại, service/combo còn dữ liệu nhưng nhân viên phải được owner thêm/chuyển lại.

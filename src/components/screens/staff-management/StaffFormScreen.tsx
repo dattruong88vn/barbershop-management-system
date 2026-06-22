@@ -21,12 +21,14 @@ import {
 import { API_ROUTES, ROUTES } from "@/constants/routes";
 import { staffTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
+import { useLocations } from "@/hooks/useLocations";
 import { useStaff } from "@/hooks/useStaff";
 import { dispatchAppToast } from "@/lib/toast";
 import type { StaffRole } from "@/types";
 
 import type { StaffManagementMode } from "./StaffManagementScreen";
 import { StaffFormSkeleton } from "./StaffFormSkeleton";
+import { StaffLocationFields } from "./StaffLocationFields";
 
 const MAX_IDENTITY_IMAGE_BYTES = 10 * 1024 * 1024;
 
@@ -37,11 +39,15 @@ type StaffFormScreenProps = {
 
 type StaffFormDraft = {
   branchId?: string;
+  currentAddressLine?: string;
   currentAddress?: string;
+  currentProvinceCode?: string;
+  currentWardCode?: string;
   dateOfBirth?: string;
   fullName?: string;
   gender?: StaffGenderValue | "";
   hometown?: string;
+  hometownProvinceCode?: string;
   managedBranchIds?: string[];
   password?: string;
   phone?: string;
@@ -85,9 +91,26 @@ export function StaffFormScreen({ mode, staffId }: StaffFormScreenProps) {
   const gender = draft.gender ?? staffMember?.gender ?? "";
   const hometown = draft.hometown ?? staffMember?.hometown ?? "";
   const currentAddress = draft.currentAddress ?? staffMember?.currentAddress ?? "";
+  const hometownProvinceCode =
+    draft.hometownProvinceCode ?? staffMember?.hometownProvinceCode ?? "";
+  const currentProvinceCode =
+    draft.currentProvinceCode ?? staffMember?.currentProvinceCode ?? "";
+  const currentWardCode =
+    draft.currentWardCode ?? staffMember?.currentWardCode ?? "";
+  const currentAddressLine =
+    draft.currentAddressLine ?? staffMember?.currentAddressLine ?? "";
+  const {
+    provinces,
+    provincesError,
+    isLoadingProvinces,
+    wards,
+    wardsError,
+    isLoadingWards,
+  } = useLocations(currentProvinceCode);
   const password = draft.password ?? "";
   const role = draft.role ?? staffMember?.role ?? USER_ROLE_RECEPTIONIST;
-  const branchId = draft.branchId ?? managerBranchId || staffMember?.branchId || "";
+  const branchId =
+    draft.branchId ?? (managerBranchId || staffMember?.branchId || "");
   const managedBranchIds =
     draft.managedBranchIds ?? staffMember?.managedBranches?.map((branch) => branch.id) ?? [];
 
@@ -132,6 +155,10 @@ export function StaffFormScreen({ mode, staffId }: StaffFormScreenProps) {
         gender,
         hometown: hometown.trim(),
         currentAddress: currentAddress.trim(),
+        hometownProvinceCode: hometownProvinceCode || null,
+        currentProvinceCode: currentProvinceCode || null,
+        currentWardCode: currentWardCode || null,
+        currentAddressLine: currentAddressLine.trim() || null,
         password: password.trim() || undefined,
         role,
         branchId: isManagerRole ? null : managerBranchId || branchId,
@@ -173,8 +200,32 @@ export function StaffFormScreen({ mode, staffId }: StaffFormScreenProps) {
               <label><span className="text-sm font-medium">{staffTexts.ownerStaff.phoneLabel} <span className="text-red-700">*</span></span><Input className="mt-2" required type="tel" value={phone} onChange={(e) => updateDraft({ phone: e.target.value })} /></label>
               <label><span className="text-sm font-medium">{staffTexts.ownerStaff.dateOfBirthLabel} <span className="text-red-700">*</span></span><Input className="mt-2" required type="date" value={dateOfBirth} onChange={(e) => updateDraft({ dateOfBirth: e.target.value })} /></label>
               <label><span className="text-sm font-medium">{staffTexts.ownerStaff.genderLabel} <span className="text-red-700">*</span></span><Select className="mt-2" required value={gender} onChange={(e) => updateDraft({ gender: e.target.value as StaffGenderValue })}><option disabled value="">{staffTexts.ownerStaff.genderPlaceholder}</option>{Object.entries(staffTexts.ownerStaff.genders).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select></label>
-              <label><span className="text-sm font-medium">{staffTexts.ownerStaff.hometownLabel}</span><Input className="mt-2" value={hometown} onChange={(e) => updateDraft({ hometown: e.target.value })} /></label>
-              <label className="sm:col-span-2"><span className="text-sm font-medium">{staffTexts.ownerStaff.currentAddressLabel}</span><Input className="mt-2" value={currentAddress} onChange={(e) => updateDraft({ currentAddress: e.target.value })} /></label>
+              <StaffLocationFields
+                currentAddressLine={currentAddressLine}
+                currentProvinceCode={currentProvinceCode}
+                currentWardCode={currentWardCode}
+                hometownProvinceCode={hometownProvinceCode}
+                isLoadingProvinces={isLoadingProvinces}
+                isLoadingWards={isLoadingWards}
+                locationError={Boolean(provincesError || wardsError)}
+                provinces={provinces}
+                wards={wards}
+                onCurrentAddressLineChange={(value) =>
+                  updateDraft({ currentAddressLine: value })
+                }
+                onCurrentProvinceChange={(value) =>
+                  updateDraft({
+                    currentProvinceCode: value,
+                    currentWardCode: "",
+                  })
+                }
+                onCurrentWardChange={(value) =>
+                  updateDraft({ currentWardCode: value })
+                }
+                onHometownProvinceChange={(value) =>
+                  updateDraft({ hometownProvinceCode: value })
+                }
+              />
             </div>
           </Card>
 

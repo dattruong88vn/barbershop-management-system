@@ -5,8 +5,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("LOCATION_DATABASE_URL")
-  directUrl = env("LOCATION_DIRECT_URL")
+  url       = env("SHARED_DATABASE_URL")
+  directUrl = env("SHARED_DIRECT_URL")
 }
 
 model Province {

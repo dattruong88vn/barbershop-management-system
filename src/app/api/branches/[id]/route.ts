@@ -21,7 +21,7 @@ const BRANCH_DETAIL_SELECT = {
   address: true,
   status: true,
   createdAt: true,
-  manager: { select: { id: true, username: true } },
+  manager: { select: { fullName: true, id: true, username: true } },
   users: {
     where: { role: { in: [...STAFF_ROLES] }, status: "active" as const },
     orderBy: { createdAt: "desc" as const },
@@ -29,6 +29,7 @@ const BRANCH_DETAIL_SELECT = {
       id: true,
       shopId: true,
       branchId: true,
+      fullName: true,
       username: true,
       role: true,
       status: true,

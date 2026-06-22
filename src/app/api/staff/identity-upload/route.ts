@@ -37,6 +37,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: staffTexts.api.errors.invalidIdentityImage }, { status: 400 });
   }
 
+  if (!R2_PRIVATE_BUCKET_NAME) {
+    return NextResponse.json(
+      { error: staffTexts.api.errors.identityStorageUnavailable },
+      { status: 503 },
+    );
+  }
+
   const key = `staff-documents/${token.shop_id}/${draftId}/${side}-${nanoid()}`;
   const url = await getSignedUrl(
     r2Client,

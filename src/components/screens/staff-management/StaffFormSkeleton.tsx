@@ -10,7 +10,7 @@ export function StaffFormSkeleton() {
             <Skeleton className="w-32" variant="text" />
             <Skeleton />
           </div>
-          {Array.from({ length: 4 }).map((_, index) => (
+          {Array.from({ length: 6 }).map((_, index) => (
             <div className="space-y-2" key={index}>
               <Skeleton className="w-24" variant="text" />
               <Skeleton />

@@ -20,6 +20,10 @@ export type Staff = {
   gender?: StaffGenderValue | null;
   hometown?: string | null;
   currentAddress?: string | null;
+  hometownProvinceCode?: string | null;
+  currentProvinceCode?: string | null;
+  currentWardCode?: string | null;
+  currentAddressLine?: string | null;
   identityCardFrontUrl?: string | null;
   identityCardBackUrl?: string | null;
   hasIdentityCardFront?: boolean;
@@ -40,6 +44,10 @@ export type StaffFormInput = {
   gender?: StaffGenderValue;
   hometown?: string;
   currentAddress?: string;
+  hometownProvinceCode?: string | null;
+  currentProvinceCode?: string | null;
+  currentWardCode?: string | null;
+  currentAddressLine?: string | null;
   identityCardFrontKey?: string;
   identityCardBackKey?: string;
   password?: string;
@@ -56,6 +64,10 @@ export type StaffRequestBody = {
   gender?: unknown;
   hometown?: unknown;
   currentAddress?: unknown;
+  hometownProvinceCode?: unknown;
+  currentProvinceCode?: unknown;
+  currentWardCode?: unknown;
+  currentAddressLine?: unknown;
   identityCardFrontKey?: unknown;
   identityCardBackKey?: unknown;
   password?: unknown;

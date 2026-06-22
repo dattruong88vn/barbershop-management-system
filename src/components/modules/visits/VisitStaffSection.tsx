@@ -3,6 +3,7 @@ import { Scissors, User } from "lucide-react";
 import { VisitSectionShell } from "./VisitSectionShell";
 import { visitTexts } from "@/constants/texts";
 import type { CustomerVisit } from "@/types";
+import { getStaffDisplayName } from "@/utils/staff";
 
 export function VisitStaffSection({ visit }: { visit: CustomerVisit }) {
   return (
@@ -16,7 +17,9 @@ export function VisitStaffSection({ visit }: { visit: CustomerVisit }) {
           <span className="font-medium">
             {visit.noHaircut
               ? visitTexts.create.noHaircutOption
-              : visit.barber?.username ?? visitTexts.detail.noStaff}
+              : visit.barber
+                ? getStaffDisplayName(visit.barber)
+                : visitTexts.detail.noStaff}
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -27,7 +30,9 @@ export function VisitStaffSection({ visit }: { visit: CustomerVisit }) {
           <span className="font-medium">
             {visit.noSkinnerService
               ? visitTexts.create.noSkinnerServiceOption
-              : visit.skinner?.username ?? visitTexts.detail.noStaff}
+              : visit.skinner
+                ? getStaffDisplayName(visit.skinner)
+                : visitTexts.detail.noStaff}
           </span>
         </div>
       </div>

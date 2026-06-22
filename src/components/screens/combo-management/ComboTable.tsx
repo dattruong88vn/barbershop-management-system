@@ -27,6 +27,7 @@ import {
 import { comboTexts } from "@/constants/texts";
 import type { Combo } from "@/types";
 import { formatDisplayDate, formatVndPrice } from "@/utils/common";
+import { getStaffDisplayName } from "@/utils/staff";
 
 import { COMBO_SCOPE_BADGE_VARIANTS } from "./comboManagementTypes";
 
@@ -73,7 +74,9 @@ function getScopeLabel(combo: Combo) {
 }
 
 function getCreatorLabel(combo: Combo) {
-  return combo.creator?.username ?? comboTexts.ownerCombos.scopes.unknown;
+  return combo.creator
+    ? getStaffDisplayName(combo.creator)
+    : comboTexts.ownerCombos.scopes.unknown;
 }
 
 export function ComboTable({

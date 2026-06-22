@@ -73,6 +73,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (!R2_BUCKET_NAME) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.photoStorageUnavailable },
+      { status: 503 },
+    );
+  }
+
   const key = `visits/${visitId}/${nanoid()}.webp`;
   const command = new PutObjectCommand({
     Bucket: R2_BUCKET_NAME,

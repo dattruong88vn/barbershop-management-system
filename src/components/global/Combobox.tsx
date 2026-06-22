@@ -15,6 +15,7 @@ export type ComboboxOption = {
 
 export function Combobox({
   label,
+  disabled = false,
   emptyMessage,
   onValueChange,
   options,
@@ -24,6 +25,7 @@ export function Combobox({
   value,
 }: {
   label: string;
+  disabled?: boolean;
   emptyMessage?: string;
   onValueChange: (value: string) => void;
   options: ComboboxOption[];
@@ -82,7 +84,8 @@ export function Combobox({
         aria-haspopup="listbox"
         aria-label={label}
         role="combobox"
-        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left text-base text-foreground outline-none transition hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left text-base text-foreground outline-none transition hover:border-ring focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50"
+        disabled={disabled}
         onClick={() => handleOpenChange(!open)}
       >
         <span className={selectedOption ? "text-foreground/90" : "text-muted-foreground"}>

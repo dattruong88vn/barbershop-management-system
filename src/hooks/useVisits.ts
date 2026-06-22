@@ -38,9 +38,24 @@ async function getVisitOptions(): Promise<VisitCreateOptions> {
   return fetchClient<VisitCreateOptionsApiResponse>(API_ROUTES.visits);
 }
 
-async function getVisits(status: VisitListStatusFilter): Promise<VisitListApiResponse> {
+type VisitListScope = "today";
+
+type UseVisitsOptions = {
+  scope?: VisitListScope;
+};
+
+async function getVisits(
+  status: VisitListStatusFilter,
+  options?: UseVisitsOptions,
+): Promise<VisitListApiResponse> {
+  const params = new URLSearchParams({ status });
+
+  if (options?.scope) {
+    params.set("scope", options.scope);
+  }
+
   return fetchClient<VisitListApiResponse>(
-    `${API_ROUTES.visits}?status=${status}`,
+    `${API_ROUTES.visits}?${params.toString()}`,
   );
 }
 
@@ -74,7 +89,10 @@ async function updateVisitStaff(
   return getVisitResponseData(result);
 }
 
-export function useVisits(status?: VisitListStatusFilter) {
+export function useVisits(
+  status?: VisitListStatusFilter,
+  options?: UseVisitsOptions,
+) {
   const queryClient = useQueryClient();
   const visitOptionsQuery = useQuery({
     queryKey: VISIT_OPTIONS_QUERY_KEY,
@@ -82,8 +100,8 @@ export function useVisits(status?: VisitListStatusFilter) {
   });
   const visitsQuery = useQuery({
     enabled: Boolean(status),
-    queryKey: [...VISIT_LIST_QUERY_KEY, status],
-    queryFn: () => getVisits(status as VisitListStatusFilter),
+    queryKey: [...VISIT_LIST_QUERY_KEY, status, options?.scope],
+    queryFn: () => getVisits(status as VisitListStatusFilter, options),
   });
 
   const createVisitMutation = useMutation({

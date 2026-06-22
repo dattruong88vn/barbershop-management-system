@@ -15,6 +15,8 @@ git clone repo-url
 cd project
 npm install
 cp .env.example .env.local
+npx prisma generate
+npm run reference:generate
 npx prisma migrate deploy
 npm run dev
 ```
@@ -46,6 +48,7 @@ git pull origin develop
 git checkout -b feature/name
 npm install
 npx prisma generate
+npm run reference:generate
 npx prisma migrate deploy
 npm run dev
 ```
@@ -60,6 +63,7 @@ before checking the app in the browser:
 ```bash
 npx prisma migrate deploy
 npx prisma generate
+npm run reference:generate
 npm run dev
 ```
 
@@ -68,7 +72,8 @@ stop it, run the commands above, then start it again.
 
 ## Useful Docs
 
+- New environment deployment runbook: [new-environment-runbook.md](new-environment-runbook.md)
 - Git flow: [git-flow.md](git-flow.md)
 - Prisma and DB: [prisma-and-db.md](prisma-and-db.md)
-- Shared location DB, migrate/sync, and FDW: [shared-location-db.md](shared-location-db.md)
+- Shared Data DB, location sync, and FDW: [shared-location-db.md](shared-location-db.md)
 - Testing: [testing.md](testing.md)

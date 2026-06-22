@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { defineConfig, env } from "prisma/config";
 
-config({ path: ".env.shared-location" });
+config({ path: ".env.shared-data" });
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -9,6 +9,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("LOCATION_DIRECT_URL"),
+    url: env("SHARED_DIRECT_URL"),
   },
 });

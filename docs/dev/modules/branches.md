@@ -44,6 +44,7 @@ Owner branch management, manager branch selection, branch-scoped API access, bra
 
 - Create branch uses a dedicated route, not a popup.
 - Detail and edit share the same information layout: name, address, manager, and staff list.
+- Branch manager and staff names shown in tables, dropdowns, and read-only fields must prefer the staff full name, with username only as fallback for legacy records.
 - Clicking the branch name in the table opens detail.
 - Inactive branches are view-only; owner must reactivate before editing branch information.
 - Manager dropdown/search only shows active manager accounts in the same shop and supports an unassigned state.

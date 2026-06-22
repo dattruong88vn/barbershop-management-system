@@ -102,7 +102,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       address: true,
       status: true,
       createdAt: true,
-      manager: { select: { id: true, username: true } },
+      manager: { select: { fullName: true, id: true, username: true } },
     },
   });
 

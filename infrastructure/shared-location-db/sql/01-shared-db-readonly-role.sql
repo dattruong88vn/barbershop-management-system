@@ -1,4 +1,4 @@
--- Run on Shared Location DB.
+-- Run on Shared Data DB.
 -- Replace placeholders before running.
 
 create role "<shared-location-readonly-user>" with

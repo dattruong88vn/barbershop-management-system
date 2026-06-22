@@ -30,6 +30,7 @@ datasource db {
 
 ```bash
 npx prisma generate
+npm run reference:generate
 npx prisma migrate deploy
 npx prisma db seed
 npx prisma studio
@@ -47,8 +48,10 @@ Run `npm run dev` again after these commands if the dev server was already open.
 
 Do not upgrade Prisma without testing.
 
+`prisma/schema.prisma` và `prisma/migrations/` chỉ quản lý Barbershop DB. `prisma/reference-data.prisma` chỉ generate read-only client cho foreign tables trong schema `reference_data`; không tạo migration từ schema này.
+
 ## Data Model
 
 The full product data model remains in [../data-model.md](../data-model.md).
 
-Shared province/ward schema, dataset sync, and Supabase FDW configuration live in [shared-location-db.md](shared-location-db.md). This document and the main `prisma/` directory remain scoped to Barbershop DB only.
+Shared Data DB schema for province/ward, location dataset sync, and Supabase FDW configuration live in [shared-location-db.md](shared-location-db.md). This document and the main `prisma/` directory remain scoped to Barbershop DB only.

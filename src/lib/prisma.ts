@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-const PRISMA_CLIENT_SCHEMA_VERSION = "20260617000000_add_service_creator_scope";
+const PRISMA_CLIENT_SCHEMA_VERSION = "20260619040000_add_user_location_codes";
 
 const GLOBAL_FOR_PRISMA = globalThis as unknown as {
   prisma?: PrismaClient;

@@ -11,10 +11,14 @@ import {
   USER_ROLE_OWNER,
   type ManagementRoleValue,
 } from "@/constants/common";
-import { staffTexts } from "@/constants/texts";
+import { locationTexts, staffTexts } from "@/constants/texts";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import type { StaffRequestBody, StaffRole } from "@/types";
+import {
+  validateStaffLocationSelection,
+  type StaffLocationValidationError,
+} from "@/utils/locations";
 
 const STAFF_SELECT = {
   id: true,
@@ -27,6 +31,10 @@ const STAFF_SELECT = {
   gender: true,
   hometown: true,
   currentAddress: true,
+  hometownProvinceCode: true,
+  currentProvinceCode: true,
+  currentWardCode: true,
+  currentAddressLine: true,
   role: true,
   status: true,
   isFirstLogin: true,
@@ -55,6 +63,18 @@ function isStaffRole(role: unknown): role is StaffRole {
   );
 }
 
+function normalizeOptionalLocationValue(value: unknown) {
+  if (value === null) return null;
+  if (typeof value !== "string") return undefined;
+  return value.trim() || null;
+}
+
+function getLocationValidationMessage(error: StaffLocationValidationError) {
+  return error === "invalidCurrentWard"
+    ? locationTexts.api.errors.invalidWard
+    : locationTexts.api.errors.invalidProvince;
+}
+
 function normalizeStaffInput(body: StaffRequestBody) {
   const dateOfBirth =
     typeof body.dateOfBirth === "string" && body.dateOfBirth.trim()
@@ -74,6 +94,14 @@ function normalizeStaffInput(body: StaffRequestBody) {
     hometown: typeof body.hometown === "string" ? body.hometown.trim() : "",
     currentAddress:
       typeof body.currentAddress === "string" ? body.currentAddress.trim() : "",
+    hometownProvinceCode: normalizeOptionalLocationValue(
+      body.hometownProvinceCode,
+    ),
+    currentProvinceCode: normalizeOptionalLocationValue(
+      body.currentProvinceCode,
+    ),
+    currentWardCode: normalizeOptionalLocationValue(body.currentWardCode),
+    currentAddressLine: normalizeOptionalLocationValue(body.currentAddressLine),
     identityCardFrontKey:
       typeof body.identityCardFrontKey === "string" ? body.identityCardFrontKey.trim() : "",
     identityCardBackKey:
@@ -259,6 +287,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  let locationValidationError: StaffLocationValidationError | null;
+  try {
+    locationValidationError = await validateStaffLocationSelection({
+      hometownProvinceCode: staffInput.hometownProvinceCode ?? null,
+      currentProvinceCode: staffInput.currentProvinceCode ?? null,
+      currentWardCode: staffInput.currentWardCode ?? null,
+    });
+  } catch (error) {
+    console.error("Failed to validate staff location", error);
+    return NextResponse.json(
+      { error: locationTexts.api.errors.unavailable },
+      { status: 500 },
+    );
+  }
+
+  if (locationValidationError) {
+    return NextResponse.json(
+      { error: getLocationValidationMessage(locationValidationError) },
+      { status: 400 },
+    );
+  }
+
   const identityKeyPrefix = `staff-documents/${authResult.shopId}/`;
   if (
     (staffInput.identityCardFrontKey &&
@@ -329,6 +379,10 @@ export async function POST(request: NextRequest) {
           gender: staffInput.gender,
           hometown: staffInput.hometown || null,
           currentAddress: staffInput.currentAddress || null,
+          hometownProvinceCode: staffInput.hometownProvinceCode ?? null,
+          currentProvinceCode: staffInput.currentProvinceCode ?? null,
+          currentWardCode: staffInput.currentWardCode ?? null,
+          currentAddressLine: staffInput.currentAddressLine ?? null,
           identityCardFrontKey: staffInput.identityCardFrontKey || null,
           identityCardBackKey: staffInput.identityCardBackKey || null,
           passwordHash: hashPassword(staffInput.password),

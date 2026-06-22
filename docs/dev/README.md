@@ -5,6 +5,7 @@ Developer handbook cho Barber Shop SaaS. Dùng thư mục này khi cần hiểu 
 ## Start Here
 
 - Setup môi trường: [setup.md](setup.md)
+- Runbook triển khai môi trường mới: [new-environment-runbook.md](new-environment-runbook.md)
 - Kiến trúc: [architecture.md](architecture.md)
 - Coding rules: [coding-rules.md](coding-rules.md)
 - Data fetching: [data-fetching.md](data-fetching.md)
@@ -16,7 +17,7 @@ Developer handbook cho Barber Shop SaaS. Dùng thư mục này khi cần hiểu 
 - Tenancy: [tenancy.md](tenancy.md)
 - API conventions: [api-conventions.md](api-conventions.md)
 - Prisma và database: [prisma-and-db.md](prisma-and-db.md)
-- Shared location database: [shared-location-db.md](shared-location-db.md)
+- Shared data database and location sync: [shared-location-db.md](shared-location-db.md)
 - Testing: [testing.md](testing.md)
 
 ## Product/UI Docs

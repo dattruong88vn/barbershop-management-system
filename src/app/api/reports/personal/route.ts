@@ -34,8 +34,8 @@ type PersonalReportAuthResult =
   | {
       role: (typeof STAFF_ROLES)[number];
       shopId: string;
+      staffName: string;
       userId: string;
-      username: string;
     }
   | {
       error: string;
@@ -77,7 +77,7 @@ async function getPersonalReportAuth(
     role: token.role as (typeof STAFF_ROLES)[number],
     shopId: token.shop_id,
     userId: token.id,
-    username: token.username,
+    staffName: token.full_name || token.username,
   };
 }
 
@@ -283,7 +283,7 @@ export async function GET(request: NextRequest) {
         periodLabel: getReportPeriodLabel(period, monthDate),
         roleLabel: reportTexts.roles[authResult.role],
         serviceCount: String(serviceCount),
-        staffName: authResult.username,
+        staffName: authResult.staffName,
         topCustomers: getTopCustomers(customerCounts),
         topItems: getTopItems(serviceCounts),
       },
