@@ -41,12 +41,14 @@ const CUSTOMER_SELECT = {
       completedAt: true,
       barber: {
         select: {
+          fullName: true,
           id: true,
           username: true,
         },
       },
       skinner: {
         select: {
+          fullName: true,
           id: true,
           username: true,
         },

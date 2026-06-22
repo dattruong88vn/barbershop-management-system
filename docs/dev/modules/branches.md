@@ -44,6 +44,7 @@ Owner branch management, manager branch selection, branch-scoped API access, bra
 
 - Create branch uses a dedicated route, not a popup.
 - Detail and edit share the same information layout: name, address, manager, and staff list.
+- Branch manager and staff names shown in tables, dropdowns, and read-only fields must prefer the staff full name, with username only as fallback for legacy records.
 - Clicking the branch name in the table opens detail.
 - Inactive branches are view-only; owner must reactivate before editing branch information.
 - Manager dropdown/search only shows active manager accounts in the same shop and supports an unassigned state.
@@ -54,7 +55,7 @@ Owner branch management, manager branch selection, branch-scoped API access, bra
 - Deactivate/reactivate actions must show the global `FullScreenLoading` until the status API finishes.
 - Deactivation sets branch status to `inactive`, records `deactivated_at` and `deactivated_by`, and moves related staff/manager users to `branch_suspended`.
 - After deactivation, operational actions for that branch are locked.
-- Users in `branch_suspended` can authenticate, but middleware redirects them to `/branch-unavailable`.
+- Non-owner users in `branch_suspended` can authenticate, but middleware redirects them to `/branch-unavailable`. Owner must not be redirected because owner needs access to reactivate branches or reassign staff.
 - Reactivating a branch sets status back to `active` and clears deactivation audit fields.
 - Reactivation does not automatically restore staff to active; owner must transfer/assign staff again.
 

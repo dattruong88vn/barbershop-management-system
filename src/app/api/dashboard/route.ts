@@ -21,6 +21,7 @@ import {
   getReportMonthDate,
   getReportMonthKey,
 } from "@/utils/reports";
+import { getStaffDisplayName } from "@/utils/staff";
 
 const DASHBOARD_RESPONSE_DATA_KEY = "dashboard";
 const DASHBOARD_TOP_ITEM_LIMIT = 5;
@@ -72,11 +73,13 @@ const DASHBOARD_VISIT_SELECT = {
   },
   barber: {
     select: {
+      fullName: true,
       username: true,
     },
   },
   skinner: {
     select: {
+      fullName: true,
       username: true,
     },
   },
@@ -365,7 +368,9 @@ function applyVisitServicesToTopItems({
     if (visitService.responsibleRoleSnapshot === SERVICE_RESPONSIBLE_ROLE_BARBER) {
       addTopItem(
         topBarbers,
-        visit.barber?.username ?? dashboardTexts.unknownStaff,
+        visit.barber
+          ? getStaffDisplayName(visit.barber)
+          : dashboardTexts.unknownStaff,
         allocatedRevenue,
       );
     }
@@ -373,7 +378,9 @@ function applyVisitServicesToTopItems({
     if (visitService.responsibleRoleSnapshot === SERVICE_RESPONSIBLE_ROLE_SKINNER) {
       addTopItem(
         topSkinners,
-        visit.skinner?.username ?? dashboardTexts.unknownStaff,
+        visit.skinner
+          ? getStaffDisplayName(visit.skinner)
+          : dashboardTexts.unknownStaff,
         allocatedRevenue,
       );
     }

@@ -30,6 +30,7 @@ import { useServices } from "@/hooks/useServices";
 import { dispatchAppToast } from "@/lib/toast";
 import type { Combo } from "@/types";
 import { formatCurrencyInput, parseCurrencyInput } from "@/utils/common";
+import { getStaffDisplayName } from "@/utils/staff";
 
 import { ComboDeleteModal } from "./ComboDeleteModal";
 import { ComboFormModal } from "./ComboFormModal";
@@ -71,7 +72,7 @@ function getComboSearchText(combo: Combo) {
   return [
     combo.name,
     combo.description,
-    combo.creator?.username ?? "",
+    combo.creator ? getStaffDisplayName(combo.creator) : "",
     combo.branch?.name ?? comboTexts.ownerCombos.scopes.shop,
     ...combo.services.map((service) => service.name),
   ]

@@ -19,6 +19,7 @@ const BRANCH_SELECT = {
   createdAt: true,
   manager: {
     select: {
+      fullName: true,
       id: true,
       username: true,
     },

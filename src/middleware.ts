@@ -100,7 +100,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (token.status === "branch_suspended") {
+  const shouldBlockForSuspendedBranch =
+    token.status === "branch_suspended" && role !== USER_ROLE_OWNER;
+
+  if (shouldBlockForSuspendedBranch) {
     if (matchesRoute(request.nextUrl.pathname, BRANCH_UNAVAILABLE_PATH)) {
       return NextResponse.next();
     }

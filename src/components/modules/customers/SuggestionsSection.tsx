@@ -7,6 +7,7 @@ import {
   formatSuggestionStaffName,
 } from "@/lib/customerVisitDisplay";
 import type { CustomerVisitSuggestion } from "@/types";
+import { getStaffDisplayName } from "@/utils/staff";
 
 export function SuggestionsSection({
   isLoading,
@@ -46,11 +47,11 @@ export function SuggestionsSection({
           <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground">
             <User className="size-4" aria-hidden="true" />
             <span className="md:hidden">
-              {formatSuggestionStaffName(suggestions.barber.username)}
+              {formatSuggestionStaffName(getStaffDisplayName(suggestions.barber))}
             </span>
             <span className="hidden md:inline">
               {customerTexts.detail.barberLabelShort}:{" "}
-              {suggestions.barber.username}
+              {getStaffDisplayName(suggestions.barber)}
             </span>
           </span>
         ) : null}
@@ -58,7 +59,7 @@ export function SuggestionsSection({
           <span className="hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground md:inline-flex">
             <User className="size-4" aria-hidden="true" />
             {customerTexts.detail.skinnerLabel}:{" "}
-            {suggestions.skinner.username}
+            {getStaffDisplayName(suggestions.skinner)}
           </span>
         ) : null}
       </div>

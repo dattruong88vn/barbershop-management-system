@@ -35,6 +35,7 @@ const COMBO_SELECT = {
   },
   creator: {
     select: {
+      fullName: true,
       id: true,
       role: true,
       username: true,

@@ -11,6 +11,7 @@ import {
   USER_ROLE_SKINNER,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
+  VISIT_STATUS_COMPLETED,
   VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
 } from "@/constants/common";
@@ -44,12 +45,14 @@ const VISIT_SELECT = {
   },
   barber: {
     select: {
+      fullName: true,
       id: true,
       username: true,
     },
   },
   skinner: {
     select: {
+      fullName: true,
       id: true,
       username: true,
     },
@@ -120,6 +123,16 @@ function normalizeStringArray(value: unknown): string[] {
 
 function normalizeNullableId(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function getTodayDateRange() {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+
+  return { end, start };
 }
 
 function normalizeVisitInput(body: VisitRequestBody): VisitCreateInput {
@@ -336,13 +349,30 @@ export async function GET(request: NextRequest) {
 
   const searchParams = request.nextUrl?.searchParams ?? new URL(request.url).searchParams;
   const statusFilter = searchParams.get("status");
+  const scope = searchParams.get("scope");
 
   if (isVisitStatus(statusFilter)) {
+    const todayRange = scope === "today" ? getTodayDateRange() : null;
     const visits = await prisma.visit.findMany({
       where: {
         branchId: authResult.branchId,
         shopId: authResult.shopId,
         status: statusFilter,
+        ...(todayRange && statusFilter === VISIT_STATUS_COMPLETED
+          ? {
+              createdAt: {
+                gte: todayRange.start,
+                lt: todayRange.end,
+              },
+            }
+          : {}),
+        ...(todayRange && statusFilter !== VISIT_STATUS_COMPLETED
+          ? {
+              createdAt: {
+                lt: todayRange.end,
+              },
+            }
+          : {}),
       },
       orderBy: { createdAt: "desc" },
       take: 50,
@@ -390,6 +420,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { username: "asc" },
       select: {
+        fullName: true,
         id: true,
         username: true,
         role: true,
@@ -404,6 +435,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { username: "asc" },
       select: {
+        fullName: true,
         id: true,
         username: true,
         role: true,

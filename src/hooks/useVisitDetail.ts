@@ -5,18 +5,14 @@ import { visitTexts } from "@/constants/texts";
 import { DEFAULT_JSON_HEADERS } from "@/lib/apiConfig";
 import { hasResponseData } from "@/lib/apiResponse";
 import { fetchClient } from "@/lib/fetchClient";
-import { uploadFileToPresignedUrl } from "@/lib/r2UploadClient";
 import type {
   CustomerVisit,
   CustomerVisitPhoto,
   VisitDetailApiResponse,
   VisitDetailUpdateInput,
   VisitPhotoApiResponse,
-  VisitPhotoCreateInput,
   VisitPhotoDeleteInput,
   VisitPhotoUploadInput,
-  VisitPresignedUploadApiResponse,
-  VisitPresignedUploadInput,
   VisitStaffUpdateInput,
   VisitStatusUpdateInput,
 } from "@/types";
@@ -55,17 +51,6 @@ function getVisitPhotoResponseData(
   return result.photo;
 }
 
-function getPresignedUploadData(result: VisitPresignedUploadApiResponse) {
-  if (typeof result.url !== "string" || typeof result.key !== "string") {
-    throw new Error(result.error ?? visitTexts.detail.errors.generic);
-  }
-
-  return {
-    key: result.key,
-    url: result.url,
-  };
-}
-
 async function getVisitDetail(visitId: string): Promise<CustomerVisit> {
   const result = await fetchClient<VisitDetailApiResponse>(
     API_ROUTES.visitDetail(visitId),
@@ -74,53 +59,22 @@ async function getVisitDetail(visitId: string): Promise<CustomerVisit> {
   return getVisitResponseData(result);
 }
 
-async function getPresignedUploadUrl(
-  input: VisitPresignedUploadInput,
-): Promise<{ key: string; url: string }> {
-  const result = await fetchClient<VisitPresignedUploadApiResponse>(
-    API_ROUTES.uploadPresigned,
-    {
-      method: "POST",
-      headers: DEFAULT_JSON_HEADERS,
-      body: JSON.stringify(input),
-    },
-  );
+async function createVisitPhoto({
+  file,
+  visitId,
+}: VisitPhotoUploadInput): Promise<CustomerVisitPhoto> {
+  const formData = new FormData();
+  formData.set("file", file);
 
-  return getPresignedUploadData(result);
-}
-
-async function createVisitPhoto(
-  input: VisitPhotoCreateInput,
-): Promise<CustomerVisitPhoto> {
   const result = await fetchClient<VisitPhotoApiResponse>(
-    API_ROUTES.visitPhotos(input.visitId),
+    API_ROUTES.visitPhotos(visitId),
     {
       method: "POST",
-      headers: DEFAULT_JSON_HEADERS,
-      body: JSON.stringify({
-        key: input.key,
-      }),
+      body: formData,
     },
   );
 
   return getVisitPhotoResponseData(result);
-}
-
-async function uploadVisitPhoto({
-  file,
-  visitId,
-}: VisitPhotoUploadInput): Promise<CustomerVisitPhoto> {
-  const { key, url } = await getPresignedUploadUrl({
-    fileType: file.type,
-    visitId,
-  });
-
-  await uploadFileToPresignedUrl(url, file);
-
-  return createVisitPhoto({
-    key,
-    visitId,
-  });
 }
 
 async function deleteVisitPhoto(
@@ -259,7 +213,7 @@ export function useVisitDetail(visitId: string) {
     },
   });
   const uploadVisitPhotoMutation = useMutation({
-    mutationFn: uploadVisitPhoto,
+    mutationFn: createVisitPhoto,
     onSuccess: (photo, input) =>
       queryClient.setQueryData<CustomerVisit | null>(
         [VISIT_DETAIL_QUERY_KEY, input.visitId],

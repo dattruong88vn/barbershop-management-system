@@ -99,15 +99,27 @@ model Branch {
 }
 
 model User {
-  id           String     @id @default(uuid()) @db.Uuid
-  shopId       String?    @map("shop_id") @db.Uuid
-  branchId     String?    @map("branch_id") @db.Uuid
-  username     String
-  passwordHash String     @map("password_hash")
-  role         UserRole
-  status       UserStatus @default(active)
-  isFirstLogin Boolean    @default(true) @map("is_first_login")
-  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  id                   String      @id @default(uuid()) @db.Uuid
+  shopId               String?     @map("shop_id") @db.Uuid
+  branchId             String?     @map("branch_id") @db.Uuid
+  username             String
+  fullName             String?     @map("full_name")
+  phone                String?
+  dateOfBirth          DateTime?   @map("date_of_birth") @db.Date
+  gender               UserGender?
+  hometown             String?
+  currentAddress       String?     @map("current_address")
+  hometownProvinceCode String?     @map("hometown_province_code") @db.VarChar(20)
+  currentProvinceCode  String?     @map("current_province_code") @db.VarChar(20)
+  currentWardCode      String?     @map("current_ward_code") @db.VarChar(20)
+  currentAddressLine   String?     @map("current_address_line")
+  identityCardFrontKey String?     @map("identity_card_front_key")
+  identityCardBackKey  String?     @map("identity_card_back_key")
+  passwordHash         String      @map("password_hash")
+  role                 UserRole
+  status               UserStatus  @default(active)
+  isFirstLogin         Boolean     @default(true) @map("is_first_login")
+  createdAt            DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
 
   shop                Shop?        @relation(fields: [shopId], references: [id], onDelete: Cascade)
   branch              Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
@@ -124,6 +136,14 @@ model User {
   @@unique([shopId, username])
   @@index([branchId])
   @@map("users")
+}
+
+enum UserGender {
+  male
+  female
+  other
+
+  @@map("user_gender")
 }
 
 model Service {

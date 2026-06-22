@@ -61,10 +61,40 @@ export function OwnerStaffDetailModal({
               <TableBody>
                 <TableRow>
                   <TableCell className="w-1/2 bg-gray-200 font-medium">
+                    {staffTexts.ownerStaff.fullNameLabel}
+                  </TableCell>
+                  <TableCell>{staffMember.fullName}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="w-1/2 bg-gray-200 font-medium">
                     {staffTexts.ownerStaff.usernameLabel}
                   </TableCell>
                   <TableCell>{staffMember.username}</TableCell>
                 </TableRow>
+                <TableRow>
+                  <TableCell className="w-1/2 bg-gray-200 font-medium">{staffTexts.ownerStaff.phoneLabel}</TableCell>
+                  <TableCell>{staffMember.phone}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="w-1/2 bg-gray-200 font-medium">{staffTexts.ownerStaff.dateOfBirthLabel}</TableCell>
+                  <TableCell>{staffMember.dateOfBirth ? formatDisplayDate(staffMember.dateOfBirth) : ""}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="w-1/2 bg-gray-200 font-medium">{staffTexts.ownerStaff.genderLabel}</TableCell>
+                  <TableCell>{staffMember.gender ? staffTexts.ownerStaff.genders[staffMember.gender] : ""}</TableCell>
+                </TableRow>
+                {staffMember.hometown ? (
+                  <TableRow>
+                    <TableCell className="w-1/2 bg-gray-200 font-medium">{staffTexts.ownerStaff.hometownLabel}</TableCell>
+                    <TableCell>{staffMember.hometown}</TableCell>
+                  </TableRow>
+                ) : null}
+                {staffMember.currentAddress ? (
+                  <TableRow>
+                    <TableCell className="w-1/2 bg-gray-200 font-medium">{staffTexts.ownerStaff.currentAddressLabel}</TableCell>
+                    <TableCell>{staffMember.currentAddress}</TableCell>
+                  </TableRow>
+                ) : null}
                 <TableRow>
                   <TableCell className="w-1/2 bg-gray-200 font-medium">
                     {staffTexts.ownerStaff.roleLabel}

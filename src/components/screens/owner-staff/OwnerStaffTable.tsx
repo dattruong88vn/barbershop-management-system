@@ -25,6 +25,7 @@ import type { Staff } from "@/types";
 import { formatDisplayDate } from "@/utils/common";
 import {
   formatStaffPageSummary,
+  getStaffDisplayName,
   getStaffDisplayStatus,
 } from "@/utils/staff";
 
@@ -156,7 +157,7 @@ export function OwnerStaffTable({
                         type="button"
                         onClick={() => onView(staffMember)}
                       >
-                        {staffMember.username}
+                        {getStaffDisplayName(staffMember)}
                       </button>
                     </TableCell>
                     <TableCell>

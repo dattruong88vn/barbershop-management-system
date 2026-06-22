@@ -27,6 +27,7 @@ const CUSTOMER_VISITS_SELECT = {
       totalPrice: true,
       barber: {
         select: {
+          fullName: true,
           id: true,
           username: true,
           status: true,
@@ -34,6 +35,7 @@ const CUSTOMER_VISITS_SELECT = {
       },
       skinner: {
         select: {
+          fullName: true,
           id: true,
           username: true,
           status: true,
@@ -89,6 +91,7 @@ type CustomerVisitsRouteContext = {
 function formatVisitStaff(staff: CustomerVisitStaffRecord) {
   return staff
     ? {
+        fullName: staff.fullName,
         id: staff.id,
         username: staff.username,
       }

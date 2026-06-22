@@ -15,6 +15,7 @@ export type VisitCreateItem = {
 };
 
 export type VisitCreateStaff = {
+  fullName?: string | null;
   id: string;
   username: string;
   role: StaffRole;

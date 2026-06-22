@@ -38,17 +38,21 @@ Owner role:
 
 Sidebar:
 
+- Phần đầu sidebar hiển thị `Xin chào, <họ tên đầy đủ>`; fallback về username cho tài khoản cũ chưa có họ tên.
+
 - Tổng quan → `/dashboard`
-- Báo cáo
+- Báo cáo (collapse, mặc định đóng)
   - Doanh thu → `/reports/revenue`
   - Nhân viên → `/reports/staff`
   - Dịch vụ → `/reports/services`
   - Combo → `/reports/combos`
   - Chi nhánh → `/reports/branches`
-- Dịch vụ → `/owner/services`
-- Combo → `/owner/combos`
-- Nhân viên → `/owner/staff`
-- Chi nhánh → `/owner/branches`
+- Quản lý dịch vụ → `/owner/services`
+- Quản lý combo → `/owner/combos`
+- Quản lý nhân viên → `/owner/staff`
+  - Thêm nhân viên → `/owner/staff/new`
+  - Cập nhật nhân viên → `/owner/staff/:id/edit`
+- Quản lý chi nhánh → `/owner/branches`
 
 Manager role:
 
@@ -62,19 +66,21 @@ Manager role:
 - Trong màn Nhân viên, manager chỉ thấy và tạo/sửa nhân viên thuộc branch active đã chọn.
 - Sidebar:
   - Tổng quan → `/dashboard`
-  - Báo cáo
+  - Báo cáo (collapse, mặc định đóng)
     - Doanh thu → `/reports/revenue`
     - Nhân viên → `/reports/staff`
     - Dịch vụ → `/reports/services`
     - Combo → `/reports/combos`
-  - Dịch vụ → `/manager/services`
-  - Combo → `/manager/combos`
-  - Nhân viên → `/manager/staff`
+  - Quản lý dịch vụ → `/manager/services`
+  - Quản lý combo → `/manager/combos`
+  - Quản lý nhân viên → `/manager/staff`
+    - Thêm nhân viên → `/manager/staff/new`
+    - Cập nhật nhân viên → `/manager/staff/:id/edit`
   - Đổi chi nhánh → `/manager/select-branch` (chỉ hiển thị khi manager quản lý nhiều hơn một branch)
 
 `Đổi chi nhánh` quay lại màn chọn không có sidebar. Sau khi chọn branch mới, ứng dụng xoá/invalidate cache dữ liệu branch cũ và mặc định quay về Tổng quan.
 
-Nếu user ở trạng thái `branch_suspended`, middleware đưa về `/branch-unavailable` để hiển thị thông báo chi nhánh đã ngừng hoạt động. Màn này không cho vào workspace vận hành cho đến khi owner khôi phục/chuyển phân công.
+Nếu user không phải owner ở trạng thái `branch_suspended`, middleware đưa về `/branch-unavailable` để hiển thị thông báo chi nhánh đã ngừng hoạt động. Manager có nút đăng xuất tại màn này để đăng nhập bằng tài khoản khác. Owner vẫn được vào workspace owner để kích hoạt lại chi nhánh hoặc điều phối nhân viên.
 
 ---
 

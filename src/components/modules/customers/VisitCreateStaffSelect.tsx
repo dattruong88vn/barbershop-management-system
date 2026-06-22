@@ -2,6 +2,7 @@ import { useId } from "react";
 
 import { Combobox, type ComboboxOption } from "@/components/global";
 import type { VisitCreateStaff } from "@/types";
+import { getStaffDisplayName } from "@/utils/staff";
 
 export function VisitCreateStaffSelect({
   isSkipped = false,
@@ -26,7 +27,7 @@ export function VisitCreateStaffSelect({
   const staffOptions: ComboboxOption[] = [
     { label: placeholder, value: "" },
     ...staff.map((staffMember) => ({
-      label: staffMember.username,
+      label: getStaffDisplayName(staffMember),
       value: staffMember.id,
     })),
   ];

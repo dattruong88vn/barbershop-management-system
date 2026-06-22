@@ -24,6 +24,7 @@ import {
 import { serviceTexts } from "@/constants/texts";
 import type { Service } from "@/types";
 import { formatDisplayDate, formatVndPrice } from "@/utils/common";
+import { getStaffDisplayName } from "@/utils/staff";
 
 import {
   SERVICE_RESPONSIBLE_ROLE_BADGE_VARIANTS,
@@ -198,7 +199,7 @@ export function ServiceTable({
                       {getScopeLabel(service)}
                     </Badge>
                   </TableCell>
-                  <TableCell>{service.creator.username}</TableCell>
+                  <TableCell>{getStaffDisplayName(service.creator)}</TableCell>
                   <TableCell>
                     <div className="space-y-1">
                       <p>{formatDisplayDate(service.createdAt)}</p>

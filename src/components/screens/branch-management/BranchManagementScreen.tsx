@@ -58,47 +58,46 @@ export function BranchManagementScreen() {
     appliedFilters.search.trim().length > 0 ||
     appliedFilters.status !== BRANCH_STATUS_ALL;
 
-  if (isStatusUpdating) {
-    return (
-      <FullScreenLoading message={branchTexts.ownerBranches.statusUpdating} />
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-200 px-4 py-8 text-gray-1000 sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-        <header>
-          <PageTitle>{branchTexts.ownerBranches.title}</PageTitle>
-        </header>
-        <BranchFilters
-          filters={draftFilters}
-          onApply={applyFilters}
-          onChange={setDraftFilters}
-        />
-        <BranchTable
-          branches={filteredBranches}
-          error={branchesError}
-          hasFilters={hasFilters}
-          isLoading={isLoading}
-          onCreate={() => router.push(ROUTES.ownerBranchCreate)}
-          onStatusChange={async (branch, status) => {
-            setIsStatusUpdating(true);
+    <>
+      <div className="min-h-screen bg-gray-200 px-4 py-8 text-gray-1000 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+          <header>
+            <PageTitle>{branchTexts.ownerBranches.title}</PageTitle>
+          </header>
+          <BranchFilters
+            filters={draftFilters}
+            onApply={applyFilters}
+            onChange={setDraftFilters}
+          />
+          <BranchTable
+            branches={filteredBranches}
+            error={branchesError}
+            hasFilters={hasFilters}
+            isLoading={isLoading}
+            onCreate={() => router.push(ROUTES.ownerBranchCreate)}
+            onStatusChange={async (branch, status) => {
+              setIsStatusUpdating(true);
 
-            try {
-              await updateBranchStatus({ id: branch.id, status });
-              dispatchAppToast({
-                message:
-                  status === BRANCH_STATUS_ACTIVE
-                    ? branchTexts.ownerBranches.toast.activated
-                    : branchTexts.ownerBranches.toast.deactivated,
-                type: "success",
-              });
-            } finally {
-              setIsStatusUpdating(false);
-            }
-          }}
-        />
+              try {
+                await updateBranchStatus({ id: branch.id, status });
+                dispatchAppToast({
+                  message:
+                    status === BRANCH_STATUS_ACTIVE
+                      ? branchTexts.ownerBranches.toast.activated
+                      : branchTexts.ownerBranches.toast.deactivated,
+                  type: "success",
+                });
+              } finally {
+                setIsStatusUpdating(false);
+              }
+            }}
+          />
+        </div>
       </div>
-    </div>
+      {isStatusUpdating ? (
+        <FullScreenLoading message={branchTexts.ownerBranches.statusUpdating} />
+      ) : null}
+    </>
   );
 }

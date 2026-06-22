@@ -36,6 +36,7 @@ const SERVICE_SELECT = {
   },
   creator: {
     select: {
+      fullName: true,
       id: true,
       username: true,
       role: true,

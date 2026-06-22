@@ -12,6 +12,7 @@ export type AuthUserFields = {
   branch_id: string | null;
   active_branch_id: string | null;
   username: string;
+  full_name?: string | null;
   is_first_login: boolean;
   status: UserStatus;
 };

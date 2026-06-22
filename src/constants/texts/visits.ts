@@ -6,6 +6,8 @@ export const visitTexts = {
       invalidCustomer: "Khách hàng không thuộc tiệm của bạn",
       invalidRequestBody: "Dữ liệu gửi lên không hợp lệ",
       invalidPhoto: "Vui lòng chọn file ảnh hợp lệ",
+      photoStorageUnavailable:
+        "Chưa cấu hình kho lưu ảnh kiểu tóc. Vui lòng kiểm tra R2_BUCKET_NAME.",
       invalidStaff: "Nhân viên không thuộc tiệm của bạn",
       invalidStatusTransition: "Không thể chuyển visit sang trạng thái này",
       invalidServices: "Dịch vụ không thuộc tiệm của bạn",
@@ -75,7 +77,7 @@ export const visitTexts = {
     openDetail: "Mở chi tiết",
     photoWarning: "Thiếu ảnh",
     statuses: {
-      pending: "Pending",
+      pending: "Khởi tạo",
       inProgress: "Đang làm",
       completed: "Hoàn thành",
     },
@@ -131,7 +133,7 @@ export const visitTexts = {
     closeEditStaff: "Đóng chỉnh sửa",
     loading: "Đang tải chi tiết visit...",
     status: {
-      pending: "Pending",
+      pending: "Khởi tạo",
       inProgress: "Đang làm",
       completed: "Hoàn thành",
     },

@@ -7,6 +7,7 @@ import {
   BarChart3,
   BriefcaseBusiness,
   Building2,
+  ChevronDown,
   Gauge,
   LogOut,
   Package,
@@ -15,7 +16,7 @@ import {
   Settings,
   Users,
 } from "lucide-react";
-import type { ComponentType } from "react";
+import { useState, type ComponentType } from "react";
 
 import { USER_ROLE_MANAGER, USER_ROLE_OWNER } from "@/constants/common";
 import { ROUTES } from "@/constants/routes";
@@ -112,9 +113,11 @@ const MANAGER_NAVIGATION_ITEMS: ManagementNavigationItem[] = [
 ];
 
 export function ManagementSidebar() {
+  const [areReportsExpanded, setAreReportsExpanded] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
   const role = session?.user.role;
+  const userDisplayName = session?.user.full_name || session?.user.username || "";
   const { branches } = useBranches(role === USER_ROLE_MANAGER);
 
   if (!isManagementRole(role) || !isManagementPath(pathname)) {
@@ -135,6 +138,9 @@ export function ManagementSidebar() {
 
   return (
     <aside className="fixed inset-y-0 left-0 hidden w-[220px] flex-col border-r border-gray-400 bg-gray-100 lg:flex">
+      <div className="border-b border-gray-400 px-4 py-4 text-sm font-medium text-gray-1000">
+        {commonTexts.navigation.greeting.replace("{name}", userDisplayName)}
+      </div>
       <nav
         aria-label={commonTexts.navigation.management}
         className="flex flex-1 flex-col gap-1 p-3 pb-0"
@@ -153,31 +159,47 @@ export function ManagementSidebar() {
         </Link>
 
         <div className="grid gap-1">
-          <div className="flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-1000">
-            <BriefcaseBusiness className="size-4" aria-hidden="true" />
-            {commonTexts.navigation.reports}
-          </div>
-          <div className="grid gap-1 pl-6">
-            {reportItems.map((item) => {
-              const Icon = item.icon;
+          <button
+            aria-expanded={areReportsExpanded}
+            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-1000 hover:bg-gray-200"
+            type="button"
+            onClick={() => setAreReportsExpanded((isExpanded) => !isExpanded)}
+          >
+            <span className="flex items-center gap-2">
+              <BriefcaseBusiness className="size-4" aria-hidden="true" />
+              {commonTexts.navigation.reports}
+            </span>
+            <ChevronDown
+              className={cn(
+                "size-4 transition-transform",
+                areReportsExpanded && "rotate-180",
+              )}
+              aria-hidden="true"
+            />
+          </button>
+          {areReportsExpanded ? (
+            <div className="grid gap-1 pl-6">
+              {reportItems.map((item) => {
+                const Icon = item.icon;
 
-              return (
-                <Link
-                  key={item.href}
-                  className={cn(
-                    "flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-200 hover:text-gray-1000",
-                    pathname === item.href
-                      ? "bg-gray-200 text-gray-1000"
-                      : "text-gray-900",
-                  )}
-                  href={item.href}
-                >
-                  <Icon className="size-4" aria-hidden="true" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+                return (
+                  <Link
+                    key={item.href}
+                    className={cn(
+                      "flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-200 hover:text-gray-1000",
+                      pathname === item.href
+                        ? "bg-gray-200 text-gray-1000"
+                        : "text-gray-900",
+                    )}
+                    href={item.href}
+                  >
+                    <Icon className="size-4" aria-hidden="true" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
 
         {navigationItems

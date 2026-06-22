@@ -25,6 +25,7 @@ import { branchTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
 import { useStaff } from "@/hooks/useStaff";
 import { dispatchAppToast } from "@/lib/toast";
+import { getStaffDisplayName } from "@/utils/staff";
 
 import { BranchStaffTable } from "./BranchStaffTable";
 import { BranchStaffTransferModal } from "./BranchStaffTransferModal";
@@ -72,7 +73,7 @@ export function BranchInformationScreen({
     () => [
       { label: branchTexts.ownerBranches.noManagerOption, value: "" },
       ...managers.map((manager) => ({
-        label: manager.username,
+        label: getStaffDisplayName(manager),
         value: manager.id,
       })),
     ],
@@ -254,8 +255,9 @@ export function BranchInformationScreen({
                   <Input
                     disabled
                     value={
-                      branch?.manager?.username ??
-                      branchTexts.ownerBranches.unassignedManager
+                      branch?.manager
+                        ? getStaffDisplayName(branch.manager)
+                        : branchTexts.ownerBranches.unassignedManager
                     }
                   />
                 ) : (

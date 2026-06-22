@@ -2,14 +2,13 @@
 
 import type { FormEvent } from "react";
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { PageTitle } from "@/components/global";
 import {
   OwnerStaffDeleteModal,
   OwnerStaffDetailModal,
   OwnerStaffFilters,
-  OwnerStaffFormModal,
   OwnerStaffTable,
   type StaffFilters,
 } from "@/components/screens/owner-staff";
@@ -18,14 +17,14 @@ import {
   STAFF_ROLES,
   USER_ROLE_MANAGER,
   USER_ROLE_OWNER,
-  USER_ROLE_RECEPTIONIST,
   type ManagementRoleValue,
 } from "@/constants/common";
 import { staffTexts } from "@/constants/texts";
+import { ROUTES } from "@/constants/routes";
 import { useBranches } from "@/hooks/useBranches";
 import { useStaff } from "@/hooks/useStaff";
 import { dispatchAppToast } from "@/lib/toast";
-import type { Staff, StaffRole } from "@/types";
+import type { Staff } from "@/types";
 import {
   ALL_FILTER_VALUE,
   getStaffDisplayStatus,
@@ -47,16 +46,9 @@ const DEFAULT_FILTERS: StaffFilters = {
 };
 
 export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
-  const { data: session } = useSession();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState<StaffRole>(USER_ROLE_RECEPTIONIST);
-  const [branchId, setBranchId] = useState("");
-  const [managedBranchIds, setManagedBranchIds] = useState<string[]>([]);
-  const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
+  const router = useRouter();
   const [viewingStaff, setViewingStaff] = useState<Staff | null>(null);
   const [deletingStaff, setDeletingStaff] = useState<Staff | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [draftFilters, setDraftFilters] =
     useState<StaffFilters>(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] =
@@ -65,14 +57,10 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
   const [error, setError] = useState("");
   const {
     staff,
-    createStaff,
     deleteStaff,
     error: staffError,
-    isCreating,
     isDeleting,
     isLoading,
-    isUpdating,
-    updateStaff,
   } = useStaff();
   const {
     branches,
@@ -80,12 +68,9 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
     isLoading: isLoadingBranches,
   } = useBranches();
 
-  const isSubmitting = isCreating || isUpdating;
   const isManagerMode = mode === USER_ROLE_MANAGER;
   const roleOptions =
     mode === USER_ROLE_OWNER ? [...OWNER_STAFF_ROLES] : [...STAFF_ROLES];
-  const managerBranchId = isManagerMode ? session?.user.branch_id : null;
-  const effectiveBranchId = managerBranchId ?? branchId;
   const isBranchLocked = isManagerMode;
 
   const filteredStaff = useMemo(() => {
@@ -128,42 +113,18 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
     filteredStaff.length,
   );
 
-  function resetForm() {
-    setUsername("");
-    setPassword("");
-    setRole(USER_ROLE_RECEPTIONIST);
-    setBranchId("");
-    setManagedBranchIds([]);
-    setEditingStaff(null);
-    setError("");
-  }
-
   function openCreateModal() {
-    resetForm();
-    setBranchId(managerBranchId ?? "");
-    setIsFormOpen(true);
+    router.push(
+      isManagerMode ? ROUTES.managerStaffCreate : ROUTES.ownerStaffCreate,
+    );
   }
 
   function handleEdit(staffMember: Staff) {
-    setUsername(staffMember.username);
-    setPassword("");
-    setRole(staffMember.role);
-    setBranchId(managerBranchId ?? staffMember.branchId ?? "");
-    setManagedBranchIds(
-      staffMember.managedBranches?.map((branch) => branch.id) ?? [],
+    router.push(
+      isManagerMode
+        ? ROUTES.managerStaffEdit(staffMember.id)
+        : ROUTES.ownerStaffEdit(staffMember.id),
     );
-    setEditingStaff(staffMember);
-    setViewingStaff(null);
-    setError("");
-    setIsFormOpen(true);
-  }
-
-  function closeFormModal(open: boolean) {
-    setIsFormOpen(open);
-
-    if (!open) {
-      resetForm();
-    }
   }
 
   function handleApplyFilters(event: FormEvent<HTMLFormElement>) {
@@ -193,72 +154,6 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
         type: "success",
       });
       setDeletingStaff(null);
-    } catch (mutationError) {
-      setError(
-        mutationError instanceof Error
-          ? mutationError.message
-          : staffTexts.ownerStaff.errors.generic,
-      );
-    }
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-
-    const isManagerRole = role === USER_ROLE_MANAGER;
-    const staffInput = {
-      username: username.trim(),
-      password: password.trim() || undefined,
-      role,
-      branchId: isManagerRole ? null : effectiveBranchId,
-      managedBranchIds: isManagerRole ? managedBranchIds : [],
-    };
-
-    if (!staffInput.username) {
-      setError(staffTexts.ownerStaff.errors.missingUsername);
-      return;
-    }
-
-    if (!editingStaff && !staffInput.password) {
-      setError(staffTexts.ownerStaff.errors.missingPassword);
-      return;
-    }
-
-    if (staffInput.password && staffInput.password.length < 8) {
-      setError(staffTexts.ownerStaff.errors.passwordTooShort);
-      return;
-    }
-
-    if (isManagerRole && staffInput.managedBranchIds.length === 0) {
-      setError(staffTexts.ownerStaff.errors.missingBranch);
-      return;
-    }
-
-    if (!isManagerRole && !staffInput.branchId) {
-      setError(staffTexts.ownerStaff.errors.missingBranch);
-      return;
-    }
-
-    try {
-      if (editingStaff) {
-        await updateStaff({
-          id: editingStaff.id,
-          ...staffInput,
-        });
-        dispatchAppToast({
-          message: staffTexts.ownerStaff.toast.updated,
-          type: "success",
-        });
-      } else {
-        await createStaff(staffInput);
-        dispatchAppToast({
-          message: staffTexts.ownerStaff.toast.created,
-          type: "success",
-        });
-      }
-
-      closeFormModal(false);
     } catch (mutationError) {
       setError(
         mutationError instanceof Error
@@ -302,28 +197,6 @@ export function StaffManagementScreen({ mode }: StaffManagementScreenProps) {
           onView={setViewingStaff}
         />
       </div>
-
-      <OwnerStaffFormModal
-        branchId={effectiveBranchId}
-        branches={branches}
-        editingStaff={editingStaff}
-        error={error}
-        isBranchLocked={isBranchLocked}
-        isOpen={isFormOpen}
-        isSubmitting={isSubmitting}
-        managedBranchIds={managedBranchIds}
-        password={password}
-        role={role}
-        roleOptions={roleOptions}
-        username={username}
-        onBranchIdChange={setBranchId}
-        onManagedBranchIdsChange={setManagedBranchIds}
-        onOpenChange={closeFormModal}
-        onPasswordChange={setPassword}
-        onRoleChange={setRole}
-        onSubmit={handleSubmit}
-        onUsernameChange={setUsername}
-      />
 
       <OwnerStaffDetailModal
         staffMember={viewingStaff}

@@ -17,6 +17,7 @@ function normalizePublicUrl(url: string): string {
 }
 
 export const R2_BUCKET_NAME = getEnvValue("R2_BUCKET_NAME");
+export const R2_PRIVATE_BUCKET_NAME = getEnvValue("R2_PRIVATE_BUCKET_NAME");
 export const R2_PUBLIC_URL = normalizePublicUrl(getEnvValue("R2_PUBLIC_URL"));
 
 export const r2Client = new S3Client({

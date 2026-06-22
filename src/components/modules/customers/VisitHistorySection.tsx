@@ -21,6 +21,7 @@ import {
   getCustomerVisitStatusLabel,
   getCustomerVisitStatusTextClassName,
 } from "@/utils/customers/visitHistory";
+import { getStaffDisplayName } from "@/utils/staff";
 
 export function VisitHistorySection({
   customerId,
@@ -87,7 +88,10 @@ export function VisitHistorySection({
                   <span>{formatRelativeVisitDate(visit.createdAt)}</span>
                   <span className="hidden md:inline">
                     {" "}
-                    · {visit.barber?.username ?? customerTexts.detail.noStaff}
+                    ·{" "}
+                    {visit.barber
+                      ? getStaffDisplayName(visit.barber)
+                      : customerTexts.detail.noStaff}
                   </span>
                   {visit.branch ? <span> · {visit.branch.name}</span> : null}
                   <span> · {formatMoney(visit.totalPrice)}</span>

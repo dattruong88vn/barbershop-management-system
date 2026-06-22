@@ -14,6 +14,7 @@ export type Service = {
   createdAt: string;
   createdBy: string;
   creator: {
+    fullName?: string | null;
     id: string;
     role: string;
     username: string;

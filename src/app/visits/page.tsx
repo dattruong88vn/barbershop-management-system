@@ -28,17 +28,19 @@ import type { CustomerVisitStatus } from "@/types";
 import { getVisitListStatusLabel } from "@/utils/visits";
 
 const VISIT_LIST_STATUS_FILTERS: CustomerVisitStatus[] = [
-  VISIT_STATUS_COMPLETED,
-  VISIT_STATUS_IN_PROGRESS,
   VISIT_STATUS_PENDING,
+  VISIT_STATUS_IN_PROGRESS,
+  VISIT_STATUS_COMPLETED,
 ];
 
 export default function VisitsPage() {
   const pageTitle = visitTexts.list.title;
   const [status, setStatus] = useState<CustomerVisitStatus>(
-    VISIT_STATUS_COMPLETED,
+    VISIT_STATUS_PENDING,
   );
-  const { isLoadingVisits, visits, visitsError } = useVisits(status);
+  const { isLoadingVisits, visits, visitsError } = useVisits(status, {
+    scope: "today",
+  });
 
   return (
     <main aria-label={pageTitle}>

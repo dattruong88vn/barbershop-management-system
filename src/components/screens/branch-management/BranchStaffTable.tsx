@@ -16,7 +16,7 @@ import { UI_VARIANT_SECONDARY } from "@/constants/common";
 import { branchTexts, staffTexts } from "@/constants/texts";
 import type { Staff } from "@/types";
 import { formatDisplayDate } from "@/utils/common";
-import { getStaffDisplayStatus } from "@/utils/staff";
+import { getStaffDisplayName, getStaffDisplayStatus } from "@/utils/staff";
 
 import {
   STAFF_ROLE_BADGE_VARIANTS,
@@ -114,7 +114,7 @@ export function BranchStaffTable({
                   <TableRow key={staffMember.id}>
                     <TableCell className="w-12 text-center">
                       <Checkbox
-                        aria-label={staffMember.username}
+                        aria-label={getStaffDisplayName(staffMember)}
                         checked={selectedStaffIds.includes(staffMember.id)}
                         onChange={(event) =>
                           onSelectedStaffIdsChange(
@@ -129,7 +129,7 @@ export function BranchStaffTable({
                       {index + 1}
                     </TableCell>
                     <TableCell className="font-medium">
-                      {staffMember.username}
+                      {getStaffDisplayName(staffMember)}
                     </TableCell>
                     <TableCell>
                       <Badge variant={STAFF_ROLE_BADGE_VARIANTS[staffMember.role]}>

@@ -10,6 +10,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Nếu thấy cùng một JSX/style pattern xuất hiện ở từ 2 màn hình trở lên, tự tách thành component dùng chung trước khi tiếp tục nhân bản pattern. Ví dụ: page title dùng `PageTitle` thay vì lặp `<h1 className="text-2xl font-semibold">`.
 - Không dùng native/browser controls trực tiếp khi global component đã tồn tại.
 - Không hardcode UI text trong component; dùng `src/constants/texts/`.
+- Hiển thị nhân viên/người dùng trong UI nghiệp vụ bằng họ tên đầy đủ trước, fallback username khi thiếu dữ liệu cũ; không dùng username làm tên hiển thị chính trong bảng/danh sách/dropdown/report.
 - Không hardcode colors hoặc custom spacing; dùng Geist/Tailwind design tokens hiện có.
 - Không hardcode role, scope, status, variant (`primary`, `warning`, `danger`, ...) hoặc finite values trong JSX; dùng constants từ `src/constants/common/`.
 - Format/parse dùng lại nhiều nơi, như tiền VND hoặc currency input, phải đặt trong `src/utils/`.
@@ -24,6 +25,8 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Date hiển thị trong UI phải dùng format `dd/mm/yyyy`. Nếu cần kèm giờ, đặt giờ sau ngày, ví dụ `17/06/2026 15:30`.
 - Mọi ô search text phải hiển thị nút icon `X` để xoá nhanh khi user đã nhập nội dung.
 - Option mặc định thể hiện "tất cả giá trị" trong filter/select phải hiển thị đúng `Tất cả`, không thêm tên field phía sau.
+- Label của field bắt buộc phải có dấu `*` màu đỏ và control phải giữ semantic `required`/`aria-required`. Field không bắt buộc chỉ hiển thị label, không thêm hậu tố như `(không bắt buộc)`.
+- Mọi control chọn ảnh dùng trực tiếp vùng upload/preview làm trigger mở file picker bằng click hoặc bàn phím. Không đặt thêm nút chữ `Chọn ảnh`/`Chọn ảnh khác` bên dưới vùng ảnh.
 
 ## Component Map
 
@@ -98,7 +101,8 @@ src/app/design-system/page.tsx
 Every screen must have loading, empty, and error states:
 
 - Loading: use `Skeleton`, `Spinner`, or `LoadingDots`.
-- Full-screen blocking operations, such as route auto-select/redirect or destructive/branch status mutations, use `FullScreenLoading`.
+- Với page có nhiều section/card, giữ page shell và header hiển thị ngay; dùng skeleton theo từng section với kích thước, grid và aspect ratio gần nội dung thật thay vì một skeleton block phủ toàn content.
+- Full-screen blocking operations, such as route auto-select/redirect or destructive/branch status mutations, use `FullScreenLoading`. Its translucent fixed overlay covers the entire viewport, including management navigation, while keeping background context visible.
 - Empty: use `EmptyState`.
 - Error/warning: use `InlineAlert`, `Error`, `Banner`, or `Note`.
 

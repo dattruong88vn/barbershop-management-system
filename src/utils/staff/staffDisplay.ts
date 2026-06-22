@@ -22,7 +22,14 @@ export function formatStaffPageSummary(
 }
 
 export function getStaffSearchText(staffMember: Staff) {
-  return staffMember.username.toLowerCase();
+  return `${staffMember.fullName ?? ""} ${staffMember.username}`.toLowerCase();
+}
+
+export function getStaffDisplayName(staffMember: {
+  fullName?: string | null;
+  username: string;
+}) {
+  return staffMember.fullName?.trim() || staffMember.username;
 }
 
 export function getStaffDisplayStatus(

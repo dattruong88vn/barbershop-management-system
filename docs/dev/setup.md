@@ -15,6 +15,8 @@ git clone repo-url
 cd project
 npm install
 cp .env.example .env.local
+npx prisma generate
+npm run reference:generate
 npx prisma migrate deploy
 npm run dev
 ```
@@ -30,11 +32,13 @@ DATABASE_URL="postgresql://..."
 DIRECT_URL="postgresql://..."
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-secret-key"
+R2_PRIVATE_BUCKET_NAME="private-documents-bucket"
 ```
 
 - `DATABASE_URL`: Supabase Transaction pooler, port `6543`.
 - `DIRECT_URL`: Supabase Session pooler, port `5432`.
 - Do not use Supabase Direct connection string with Prisma.
+- `R2_PRIVATE_BUCKET_NAME` lưu tài liệu nhạy cảm như ảnh CCCD. Bucket này không được bật public access; upload và xem ảnh phải dùng signed URL có thời hạn ngắn.
 
 ## Daily Start
 
@@ -44,6 +48,7 @@ git pull origin develop
 git checkout -b feature/name
 npm install
 npx prisma generate
+npm run reference:generate
 npx prisma migrate deploy
 npm run dev
 ```
@@ -58,6 +63,7 @@ before checking the app in the browser:
 ```bash
 npx prisma migrate deploy
 npx prisma generate
+npm run reference:generate
 npm run dev
 ```
 
@@ -66,6 +72,8 @@ stop it, run the commands above, then start it again.
 
 ## Useful Docs
 
+- New environment deployment runbook: [new-environment-runbook.md](new-environment-runbook.md)
 - Git flow: [git-flow.md](git-flow.md)
 - Prisma and DB: [prisma-and-db.md](prisma-and-db.md)
+- Shared Data DB, location sync, and FDW: [shared-location-db.md](shared-location-db.md)
 - Testing: [testing.md](testing.md)

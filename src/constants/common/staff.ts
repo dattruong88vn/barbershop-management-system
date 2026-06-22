@@ -6,3 +6,15 @@ export {
   USER_ROLE_RECEPTIONIST as STAFF_ROLE_RECEPTIONIST,
   USER_ROLE_SKINNER as STAFF_ROLE_SKINNER,
 } from "./roles";
+
+export const STAFF_GENDER_MALE = "male";
+export const STAFF_GENDER_FEMALE = "female";
+export const STAFF_GENDER_OTHER = "other";
+
+export const STAFF_GENDERS = [
+  STAFF_GENDER_MALE,
+  STAFF_GENDER_FEMALE,
+  STAFF_GENDER_OTHER,
+] as const;
+
+export type StaffGenderValue = (typeof STAFF_GENDERS)[number];

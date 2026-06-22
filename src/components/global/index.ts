@@ -148,6 +148,7 @@ export {
 } from "./Chart";
 export { Combobox, type ComboboxOption } from "./Combobox";
 export { KeyValueRow } from "./KeyValueRow";
+export { InlineAlert } from "./InlineAlert";
 export { MonthCalendar } from "./MonthCalendar";
 export { Skeleton } from "./Skeleton";
 export { Toast } from "./Toast";

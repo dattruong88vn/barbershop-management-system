@@ -4,12 +4,17 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "npm run reference:generate && next dev",
+    "build": "npm run reference:generate && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "reference:generate": "prisma generate --schema prisma/reference-data.prisma",
+    "shared:generate": "prisma generate --config infrastructure/shared-location-db/prisma.config.ts",
+    "shared:migrate": "prisma migrate deploy --config infrastructure/shared-location-db/prisma.config.ts",
+    "shared:sync-location": "tsx --env-file=.env.shared-data infrastructure/shared-location-db/sync.ts",
+    "shared:verify-location": "tsx --env-file=.env.shared-data infrastructure/shared-location-db/verify.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1064.0",
