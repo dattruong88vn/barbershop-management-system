@@ -5,8 +5,8 @@ import { serviceTexts } from "@/constants/texts";
 import type { ServiceFormInput } from "@/types";
 
 const mocks = vi.hoisted(() => ({
+  branchFindFirst: vi.fn(),
   getToken: vi.fn(),
-  prismaDelete: vi.fn(),
   prismaFindFirst: vi.fn(),
   prismaUpdate: vi.fn(),
 }));
@@ -17,8 +17,8 @@ vi.mock("next-auth/jwt", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    branch: { findFirst: mocks.branchFindFirst },
     service: {
-      delete: mocks.prismaDelete,
       findFirst: mocks.prismaFindFirst,
       update: mocks.prismaUpdate,
     },
@@ -54,10 +54,21 @@ function createService() {
   return {
     id: "service-1",
     shopId: "shop-1",
+    branchId: null,
+    branch: null,
     name: "Cắt tóc nam",
     price: { toString: () => "80000" },
+    responsibleRole: "barber",
     isHaircut: true,
+    createdBy: "user-1",
+    creator: {
+      id: "user-1",
+      fullName: "Chủ tiệm",
+      role: "owner",
+      username: "owner",
+    },
     createdAt: new Date("2026-06-03T00:00:00.000Z"),
+    deletedAt: null,
   };
 }
 
@@ -77,23 +88,50 @@ describe("GET /api/services/[id]", () => {
     const response = await GET(createRequest(), createContext());
 
     expect(response.status).toBe(404);
-    expect(mocks.prismaFindFirst).toHaveBeenCalledWith({
-      where: {
-        id: "service-1",
-        shopId: "shop-1",
-      },
-      select: {
-        id: true,
-        shopId: true,
-        name: true,
-        price: true,
-        isHaircut: true,
-        createdAt: true,
-      },
-    });
+    expect(mocks.prismaFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: "service-1",
+          deletedAt: null,
+          shopId: "shop-1",
+        },
+      }),
+    );
     await expect(response.json()).resolves.toEqual({
       error: serviceTexts.api.errors.notFound,
     });
+  });
+
+  it("should limit managers to shop services and their selected managed branch", async () => {
+    mocks.getToken.mockResolvedValue({
+      id: "manager-1",
+      role: "manager",
+      shop_id: "shop-1",
+      branch_id: "branch-2",
+    });
+    mocks.branchFindFirst.mockResolvedValue({ id: "branch-2" });
+    mocks.prismaFindFirst.mockResolvedValue(null);
+
+    const response = await GET(createRequest(), createContext());
+
+    expect(mocks.branchFindFirst).toHaveBeenCalledWith({
+      where: {
+        id: "branch-2",
+        managerId: "manager-1",
+        shopId: "shop-1",
+        status: "active",
+      },
+      select: { id: true },
+    });
+    expect(mocks.prismaFindFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: {
+        id: "service-1",
+        deletedAt: null,
+        shopId: "shop-1",
+        OR: [{ branchId: null }, { branchId: "branch-2" }],
+      },
+    }));
+    expect(response.status).toBe(404);
   });
 });
 
@@ -109,6 +147,7 @@ describe("PATCH /api/services/[id]", () => {
       createRequest({
         name: "Cắt tóc nam",
         price: 0,
+        responsibleRole: "barber",
         isHaircut: true,
       }),
       createContext(),
@@ -126,6 +165,7 @@ describe("PATCH /api/services/[id]", () => {
       ...service,
       name: "Gội đầu",
       price: { toString: () => "50000" },
+      responsibleRole: "skinner",
       isHaircut: false,
     };
 
@@ -141,6 +181,7 @@ describe("PATCH /api/services/[id]", () => {
       createRequest({
         name: " Gội đầu ",
         price: 50000,
+        responsibleRole: "skinner",
         isHaircut: false,
       }),
       createContext(),
@@ -152,21 +193,18 @@ describe("PATCH /api/services/[id]", () => {
       data: {
         name: "Gội đầu",
         price: 50000,
+        responsibleRole: "skinner",
         isHaircut: false,
       },
-      select: {
-        id: true,
-        shopId: true,
-        name: true,
-        price: true,
-        isHaircut: true,
-        createdAt: true,
-      },
+      select: expect.objectContaining({ id: true, deletedAt: true }),
     });
     await expect(response.json()).resolves.toEqual({
       service: {
         ...updatedService,
+        canDelete: true,
+        canEdit: true,
         price: 50000,
+        scope: "shop",
         createdAt: service.createdAt.toISOString(),
       },
     });
@@ -174,8 +212,12 @@ describe("PATCH /api/services/[id]", () => {
 });
 
 describe("DELETE /api/services/[id]", () => {
-  it("should delete an existing service scoped to session shop", async () => {
+  it("should soft delete an existing service scoped to session shop", async () => {
     const service = createService();
+    const deletedService = {
+      ...service,
+      deletedAt: new Date("2026-06-22T00:00:00.000Z"),
+    };
 
     mocks.getToken.mockResolvedValue({
       id: "user-1",
@@ -183,20 +225,22 @@ describe("DELETE /api/services/[id]", () => {
       shop_id: "shop-1",
     });
     mocks.prismaFindFirst.mockResolvedValue(service);
-    mocks.prismaDelete.mockResolvedValue(service);
+    mocks.prismaUpdate.mockResolvedValue(deletedService);
 
     const response = await DELETE(createRequest(), createContext());
 
     expect(response.status).toBe(200);
-    expect(mocks.prismaDelete).toHaveBeenCalledWith({
+    expect(mocks.prismaUpdate).toHaveBeenCalledWith({
       where: { id: "service-1" },
+      data: { deletedAt: expect.any(Date) },
+      select: expect.objectContaining({ id: true, deletedAt: true }),
     });
     await expect(response.json()).resolves.toEqual({
-      service: {
-        ...service,
+      service: expect.objectContaining({
+        id: "service-1",
+        deletedAt: deletedService.deletedAt.toISOString(),
         price: 80000,
-        createdAt: service.createdAt.toISOString(),
-      },
+      }),
     });
   });
 });

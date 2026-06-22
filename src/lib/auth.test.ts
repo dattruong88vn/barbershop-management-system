@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AuthUserFields } from "@/types";
 
 const mocks = vi.hoisted(() => ({
+  branchFindFirst: vi.fn(),
   findFirst: vi.fn(),
   verifyPassword: vi.fn(),
 }));
@@ -13,6 +14,9 @@ vi.mock("@/lib/password", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    branch: {
+      findFirst: mocks.branchFindFirst,
+    },
     user: {
       findFirst: mocks.findFirst,
     },
@@ -148,6 +152,49 @@ describe("authOptions", () => {
         }),
       ).resolves.toEqual(expectedUser);
     });
+
+    it("should select the only active branch managed by a manager", async () => {
+      mocks.findFirst.mockResolvedValue({
+        id: "manager-1",
+        role: "manager",
+        shopId: "shop-1",
+        branchId: null,
+        username: "manager",
+        fullName: "Quản lý",
+        passwordHash: "hashed-password",
+        isFirstLogin: false,
+        managedBranches: [{ id: "branch-1" }],
+        status: "active",
+      });
+      mocks.verifyPassword.mockReturnValue(true);
+
+      await expect(authorize({ username: "manager", password: "Secret123!" })).resolves.toEqual(
+        expect.objectContaining({
+          branch_id: "branch-1",
+          active_branch_id: "branch-1",
+        }),
+      );
+    });
+
+    it("should require a manager with multiple active branches to select one", async () => {
+      mocks.findFirst.mockResolvedValue({
+        id: "manager-1",
+        role: "manager",
+        shopId: "shop-1",
+        branchId: null,
+        username: "manager",
+        fullName: "Quản lý",
+        passwordHash: "hashed-password",
+        isFirstLogin: false,
+        managedBranches: [{ id: "branch-1" }, { id: "branch-2" }],
+        status: "active",
+      });
+      mocks.verifyPassword.mockReturnValue(true);
+
+      await expect(authorize({ username: "manager", password: "Secret123!" })).resolves.toEqual(
+        expect.objectContaining({ branch_id: null, active_branch_id: null }),
+      );
+    });
   });
 
   describe("callbacks", () => {
@@ -209,6 +256,64 @@ describe("authOptions", () => {
       } as unknown as JwtCallbackParams);
 
       expect(_token?.is_first_login).toBe(true);
+    });
+
+    it("should update a manager token only to an active managed tenant branch", async () => {
+      mocks.branchFindFirst.mockResolvedValue({ id: "branch-2" });
+
+      const token = await authOptions.callbacks?.jwt?.({
+        token: {
+          id: "manager-1",
+          role: "manager",
+          shop_id: "shop-1",
+          branch_id: "branch-1",
+          active_branch_id: "branch-1",
+          username: "manager",
+          is_first_login: false,
+          status: "active",
+        },
+        trigger: "update",
+        session: { user: { active_branch_id: "branch-2" } },
+        user: undefined,
+        account: null,
+      } as unknown as JwtCallbackParams);
+
+      expect(mocks.branchFindFirst).toHaveBeenCalledWith({
+        where: {
+          id: "branch-2",
+          managerId: "manager-1",
+          shopId: "shop-1",
+          status: "active",
+        },
+        select: { id: true },
+      });
+      expect(token).toEqual(expect.objectContaining({
+        branch_id: "branch-2",
+        active_branch_id: "branch-2",
+      }));
+    });
+
+    it("should clear manager branch scope when the requested branch is unauthorized", async () => {
+      mocks.branchFindFirst.mockResolvedValue(null);
+
+      const token = await authOptions.callbacks?.jwt?.({
+        token: {
+          id: "manager-1",
+          role: "manager",
+          shop_id: "shop-1",
+          branch_id: "branch-1",
+          active_branch_id: "branch-1",
+          username: "manager",
+          is_first_login: false,
+          status: "active",
+        },
+        trigger: "update",
+        session: { user: { active_branch_id: "branch-outside-scope" } },
+        user: undefined,
+        account: null,
+      } as unknown as JwtCallbackParams);
+
+      expect(token).toEqual(expect.objectContaining({ branch_id: null, active_branch_id: null }));
     });
 
     it("should map token fields into session user", async () => {
