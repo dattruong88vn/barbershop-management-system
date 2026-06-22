@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { SessionProvider, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -11,11 +11,19 @@ import {
   ManagementSidebarContentOffset,
   StaffDesktopFallback,
 } from "@/components/global";
-import { STAFF_ROLES } from "@/constants/common";
+import {
+  MANAGEMENT_ROLES,
+  STAFF_ROLES,
+} from "@/constants/common";
 import {
   API_SERVER_ERROR_EVENT,
   createQueryClient,
 } from "@/lib/queryClient";
+import {
+  getProvinces,
+  LOCATION_PROVINCES_QUERY_KEY,
+  LOCATION_PROVINCES_STALE_TIME_MS,
+} from "@/hooks/useLocations";
 import { APP_NAVIGATION_EVENT } from "@/lib/appNavigation";
 import {
   APP_TOAST_DISMISS_EVENT,
@@ -99,6 +107,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
+        <LocationCacheWarmup />
         <RoleAwareAppShell>{children}</RoleAwareAppShell>
         {toast ? (
           <AppFeedbackNotification
@@ -109,6 +118,29 @@ export function Providers({ children }: ProvidersProps) {
       </QueryClientProvider>
     </SessionProvider>
   );
+}
+
+function LocationCacheWarmup() {
+  const queryClient = useQueryClient();
+  const { data: session, status } = useSession();
+  const role = session?.user.role;
+  const shouldWarmupLocations =
+    status === "authenticated" &&
+    MANAGEMENT_ROLES.some((managementRole) => managementRole === role);
+
+  useEffect(() => {
+    if (!shouldWarmupLocations) {
+      return;
+    }
+
+    void queryClient.prefetchQuery({
+      queryKey: LOCATION_PROVINCES_QUERY_KEY,
+      queryFn: getProvinces,
+      staleTime: LOCATION_PROVINCES_STALE_TIME_MS,
+    });
+  }, [queryClient, shouldWarmupLocations]);
+
+  return null;
 }
 
 function RoleAwareAppShell({ children }: ProvidersProps) {

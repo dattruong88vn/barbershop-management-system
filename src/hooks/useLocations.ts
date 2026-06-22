@@ -12,10 +12,19 @@ import type {
 } from "@/types";
 
 const LOCATIONS_QUERY_KEY = ["locations"] as const;
+export const LOCATION_PROVINCES_QUERY_KEY = [
+  ...LOCATIONS_QUERY_KEY,
+  "provinces",
+] as const;
+export const LOCATION_PROVINCES_STALE_TIME_MS = 1000 * 60 * 60 * 24;
 const PROVINCES_RESPONSE_DATA_KEY = "provinces";
 const WARDS_RESPONSE_DATA_KEY = "wards";
 
-async function getProvinces(): Promise<Province[]> {
+export function locationWardsQueryKey(provinceCode: string) {
+  return [...LOCATIONS_QUERY_KEY, "wards", provinceCode] as const;
+}
+
+export async function getProvinces(): Promise<Province[]> {
   const result = await fetchClient<ProvincesApiResponse>(
     API_ROUTES.locationProvinces,
   );
@@ -32,7 +41,7 @@ async function getProvinces(): Promise<Province[]> {
   return result.provinces;
 }
 
-async function getWards(provinceCode: string): Promise<Ward[]> {
+export async function getWards(provinceCode: string): Promise<Ward[]> {
   const result = await fetchClient<WardsApiResponse>(
     API_ROUTES.locationWards(provinceCode),
   );
@@ -51,11 +60,12 @@ async function getWards(provinceCode: string): Promise<Ward[]> {
 
 export function useLocations(currentProvinceCode: string) {
   const provincesQuery = useQuery({
-    queryKey: [...LOCATIONS_QUERY_KEY, "provinces"],
+    queryKey: LOCATION_PROVINCES_QUERY_KEY,
     queryFn: getProvinces,
+    staleTime: LOCATION_PROVINCES_STALE_TIME_MS,
   });
   const wardsQuery = useQuery({
-    queryKey: [...LOCATIONS_QUERY_KEY, "wards", currentProvinceCode],
+    queryKey: locationWardsQueryKey(currentProvinceCode),
     queryFn: () => getWards(currentProvinceCode),
     enabled: Boolean(currentProvinceCode),
   });

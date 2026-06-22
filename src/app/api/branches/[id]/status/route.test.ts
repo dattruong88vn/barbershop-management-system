@@ -82,7 +82,18 @@ describe("PATCH /api/branches/[id]/status", () => {
       where: {
         shopId: "shop-1",
         status: "active",
-        OR: [{ branchId: "branch-1" }, { id: "manager-1" }],
+        OR: [
+          { branchId: "branch-1" },
+          {
+            id: "manager-1",
+            managedBranches: {
+              none: {
+                id: { not: "branch-1" },
+                status: "active",
+              },
+            },
+          },
+        ],
       },
       data: { status: "branch_suspended" },
     });

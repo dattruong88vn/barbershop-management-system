@@ -74,6 +74,7 @@ function createCustomerWithVisits() {
             comboId: null,
             price: { toString: () => "100000" },
             service: {
+              isHaircut: true,
               name: "Cắt tóc nam",
             },
             combo: null,
@@ -85,6 +86,7 @@ function createCustomerWithVisits() {
             price: { toString: () => "50000" },
             service: null,
             combo: {
+              comboServices: [],
               name: "Combo gội đầu",
             },
           },
@@ -217,6 +219,7 @@ describe("GET /api/customers/[id]/visits", () => {
           services: [
             {
               id: "visit-service-1",
+              isHaircut: true,
               itemId: "service-1",
               name: "Cắt tóc nam",
               type: "service",
@@ -224,6 +227,7 @@ describe("GET /api/customers/[id]/visits", () => {
             },
             {
               id: "visit-service-2",
+              isHaircut: false,
               itemId: "combo-1",
               name: "Combo gội đầu",
               type: "combo",
@@ -248,6 +252,7 @@ describe("GET /api/customers/[id]/visits", () => {
         services: [
           {
             id: "visit-service-1",
+            isHaircut: true,
             itemId: "service-1",
             name: "Cắt tóc nam",
             type: "service",
@@ -255,6 +260,7 @@ describe("GET /api/customers/[id]/visits", () => {
           },
           {
             id: "visit-service-2",
+            isHaircut: false,
             itemId: "combo-1",
             name: "Combo gội đầu",
             type: "combo",

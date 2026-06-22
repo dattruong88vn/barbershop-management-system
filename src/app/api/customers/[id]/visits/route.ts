@@ -61,11 +61,21 @@ const CUSTOMER_VISITS_SELECT = {
           comboPriceSnapshot: true,
           service: {
             select: {
+              isHaircut: true,
               name: true,
             },
           },
           combo: {
             select: {
+              comboServices: {
+                select: {
+                  service: {
+                    select: {
+                      isHaircut: true,
+                    },
+                  },
+                },
+              },
               name: true,
             },
           },
@@ -113,6 +123,10 @@ function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
           ...items,
           {
             id: visitService.id,
+            isHaircut:
+              visitService.combo?.comboServices?.some(
+                (comboService) => comboService.service.isHaircut,
+              ) ?? false,
             itemId: visitService.comboId,
             name:
               visitService.comboNameSnapshot ??
@@ -132,6 +146,7 @@ function formatCustomerVisit(visit: CustomerVisitRecord): CustomerVisit {
         ...items,
         {
           id: visitService.id,
+          isHaircut: visitService.service?.isHaircut ?? false,
           itemId: visitService.serviceId,
           name:
             visitService.serviceNameSnapshot ??
