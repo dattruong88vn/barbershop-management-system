@@ -26,6 +26,7 @@ function createVisit(overrides: Partial<CustomerVisit> = {}): CustomerVisit {
     services: [
       {
         id: "visit-service-1",
+        isHaircut: true,
         itemId: "service-1",
         name: "Cắt tóc nam",
         price: 100000,
@@ -96,6 +97,29 @@ describe("VisitDetailMainSections", () => {
     render(
       <VisitDetailMainSections
         visit={createVisit({ status: "pending" })}
+        onSelectPhoto={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText(visitTexts.detail.photoWarning)).toBeNull();
+  });
+
+  it("should not render photo warning for non-haircut services", () => {
+    render(
+      <VisitDetailMainSections
+        visit={createVisit({
+          services: [
+            {
+              id: "visit-service-1",
+              isHaircut: false,
+              itemId: "service-1",
+              name: "Gội đầu",
+              price: 100000,
+              type: "service",
+            },
+          ],
+          status: "in_progress",
+        })}
         onSelectPhoto={vi.fn()}
       />,
     );

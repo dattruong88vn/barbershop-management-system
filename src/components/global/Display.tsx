@@ -1,6 +1,11 @@
+import Image, { type ImageLoaderProps } from "next/image";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+
+function passthroughImageLoader({ src }: ImageLoaderProps) {
+  return src;
+}
 
 export interface GeistAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   alt?: string;
@@ -37,7 +42,7 @@ export const GeistAvatar = React.forwardRef<HTMLDivElement, GeistAvatarProps>(
       <div
         ref={ref}
         className={cn(
-          "flex items-center justify-center overflow-hidden rounded-full",
+          "relative flex items-center justify-center overflow-hidden rounded-full",
           sizes[size],
           colors[color],
           className,
@@ -45,7 +50,15 @@ export const GeistAvatar = React.forwardRef<HTMLDivElement, GeistAvatarProps>(
         {...props}
       >
         {src ? (
-          <img alt={alt} className="size-full object-cover" src={src} />
+          <Image
+            alt={alt}
+            className="object-cover"
+            fill
+            loader={passthroughImageLoader}
+            sizes="48px"
+            src={src}
+            unoptimized
+          />
         ) : (
           <span className={cn("font-semibold", textSizes[size])}>
             {initials}

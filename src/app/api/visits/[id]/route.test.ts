@@ -1,11 +1,12 @@
 import type { NextRequest } from "next/server";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { visitTexts } from "@/constants/texts";
 
 const mocks = vi.hoisted(() => ({
   getToken: vi.fn(),
   prismaUserFindMany: vi.fn(),
+  prismaVisitCount: vi.fn(),
   prismaVisitFindFirst: vi.fn(),
   prismaVisitUpdate: vi.fn(),
 }));
@@ -20,6 +21,7 @@ vi.mock("@/lib/prisma", () => ({
       findMany: mocks.prismaUserFindMany,
     },
     visit: {
+      count: mocks.prismaVisitCount,
       findFirst: mocks.prismaVisitFindFirst,
       update: mocks.prismaVisitUpdate,
     },
@@ -66,6 +68,12 @@ function createVisitRecord() {
     lastUpdater: {
       username: "Lễ tân",
     },
+    customer: {
+      createdAt: new Date("2026-06-01T01:00:00.000Z"),
+      id: "customer-1",
+      name: "Nguyễn Văn Nam",
+      phone: "0901234567",
+    },
     status: "completed",
     totalPrice: { toString: () => "150000" },
     barber: {
@@ -84,6 +92,7 @@ function createVisitRecord() {
         comboId: null,
         price: { toString: () => "150000" },
         service: {
+          isHaircut: true,
           name: "Cắt tóc nam",
         },
         combo: null,
@@ -91,6 +100,10 @@ function createVisitRecord() {
     ],
   };
 }
+
+beforeEach(() => {
+  mocks.prismaVisitCount.mockResolvedValue(0);
+});
 
 afterEach(() => {
   vi.useRealTimers();
@@ -142,9 +155,18 @@ describe("GET /api/visits/[id]", () => {
         completedAt: "2026-06-04T02:00:00.000Z",
         lastUpdatedBy: "user-1",
         lastUpdatedByName: "Lễ tân",
+        noHaircut: false,
+        noSkinnerService: false,
         canCompleteVisit: false,
+        canCreateNewVisit: true,
         canStartVisit: false,
         canUploadPhotos: false,
+        customer: {
+          createdAt: "2026-06-01T01:00:00.000Z",
+          id: "customer-1",
+          name: "Nguyễn Văn Nam",
+          phone: "0901234567",
+        },
         status: "completed",
         totalPrice: 150000,
         barber: {
@@ -159,6 +181,7 @@ describe("GET /api/visits/[id]", () => {
         services: [
           {
             id: "visit-service-1",
+            isHaircut: true,
             itemId: "service-1",
             name: "Cắt tóc nam",
             type: "service",
@@ -309,9 +332,18 @@ describe("PATCH /api/visits/[id]", () => {
         completedAt: "2026-06-04T02:00:00.000Z",
         lastUpdatedBy: "user-1",
         lastUpdatedByName: "Lễ tân",
+        noHaircut: false,
+        noSkinnerService: false,
         canCompleteVisit: false,
+        canCreateNewVisit: true,
         canStartVisit: false,
         canUploadPhotos: false,
+        customer: {
+          createdAt: "2026-06-01T01:00:00.000Z",
+          id: "customer-1",
+          name: "Nguyễn Văn Nam",
+          phone: "0901234567",
+        },
         status: "completed",
         totalPrice: 150000,
         barber: {
@@ -326,6 +358,7 @@ describe("PATCH /api/visits/[id]", () => {
         services: [
           {
             id: "visit-service-1",
+            isHaircut: true,
             itemId: "service-1",
             name: "Cắt tóc nam",
             type: "service",

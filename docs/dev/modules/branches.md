@@ -53,7 +53,8 @@ Owner branch management, manager branch selection, branch-scoped API access, bra
 
 - Owner can deactivate a branch only when it has no `pending` or `in_progress` visits.
 - Deactivate/reactivate actions must show the global `FullScreenLoading` until the status API finishes.
-- Deactivation sets branch status to `inactive`, records `deactivated_at` and `deactivated_by`, and moves related staff/manager users to `branch_suspended`.
+- Deactivation sets branch status to `inactive`, records `deactivated_at` and `deactivated_by`, and moves related staff to `branch_suspended`.
+- A manager is moved to `branch_suspended` only when they have no other active managed branch.
 - After deactivation, operational actions for that branch are locked.
 - Non-owner users in `branch_suspended` can authenticate, but middleware redirects them to `/branch-unavailable`. Owner must not be redirected because owner needs access to reactivate branches or reassign staff.
 - Reactivating a branch sets status back to `active` and clears deactivation audit fields.

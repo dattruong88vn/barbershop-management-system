@@ -23,7 +23,13 @@ export function ChartContainer({
       data-chart=""
       {...props}
     >
-      <ResponsiveContainer height="100%" minHeight={0} minWidth={0} width="100%">
+      <ResponsiveContainer
+        height="100%"
+        initialDimension={{ height: 288, width: 1 }}
+        minHeight={0}
+        minWidth={0}
+        width="100%"
+      >
         {children}
       </ResponsiveContainer>
     </div>

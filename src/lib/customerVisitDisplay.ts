@@ -73,7 +73,11 @@ export function getRecentVisitPhotos(visits: CustomerVisit[]) {
 }
 
 export function hasVisitPhotoWarning(visit: CustomerVisit | null) {
-  return Boolean(visit && visit.services.length > 0 && visit.photos.length === 0);
+  return Boolean(
+    visit &&
+      visit.photos.length === 0 &&
+      visit.services.some((service) => service.isHaircut),
+  );
 }
 
 export function formatSuggestionStaffName(username: string) {

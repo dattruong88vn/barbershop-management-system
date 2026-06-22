@@ -97,6 +97,7 @@ function createVisitRecord() {
         comboId: null,
         price: { toString: () => "100000" },
         service: {
+          isHaircut: false,
           name: "Cắt tóc nam",
         },
         combo: null,
@@ -410,6 +411,7 @@ describe("POST /api/visits", () => {
         services: [
           {
             id: "visit-service-1",
+            isHaircut: false,
             itemId: "service-1",
             name: "Cắt tóc nam",
             type: "service",

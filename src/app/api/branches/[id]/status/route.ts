@@ -75,7 +75,19 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
           status: "active",
           OR: [
             { branchId: branch.id },
-            ...(branch.managerId ? [{ id: branch.managerId }] : []),
+            ...(branch.managerId
+              ? [
+                  {
+                    id: branch.managerId,
+                    managedBranches: {
+                      none: {
+                        id: { not: branch.id },
+                        status: BRANCH_STATUS_ACTIVE,
+                      },
+                    },
+                  },
+                ]
+              : []),
           ],
         },
         data: { status: "branch_suspended" },

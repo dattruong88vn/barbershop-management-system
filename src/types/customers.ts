@@ -67,6 +67,7 @@ export type CustomerVisitStatus = VisitStatusValue;
 
 export type CustomerVisitService = {
   id: string;
+  isHaircut?: boolean;
   itemId: string | null;
   name: string;
   type: VisitItemTypeValue;
