@@ -6,6 +6,7 @@ Smoke test là script kiểm tra nhanh một flow quan trọng trên dev server 
 
 - Start dev server trước, thường là `npm run dev -- -p 3000`.
 - Chạy smoke script bằng npm script tương ứng, ví dụ `npm run smoke:auth`, `npm run smoke:management`, hoặc `npm run smoke:visits`.
+- Playwright UI smoke dùng `npm run smoke:ui:visits`, `npm run smoke:ui:manager-branch`, hoặc `npm run smoke:ui:staff-form`.
 - Nếu cần trỏ sang server khác, dùng `SMOKE_BASE_URL`.
 - Nếu cần cố định shop, branch, service, hoặc combo, dùng các biến môi trường riêng của script như `SMOKE_SHOP_ID`, `SMOKE_BRANCH_ID`, `SMOKE_SERVICE_ID`, `SMOKE_COMBO_ID`.
 
@@ -71,3 +72,13 @@ Smoke test là script kiểm tra nhanh một flow quan trọng trên dev server 
 - staff không gọi được management API
 - owner không đọc được branch thuộc shop khác
 - location provinces/wards yêu cầu auth và validate province code
+
+## Playwright UI Smoke
+
+Các smoke UI dùng Playwright để kiểm phần thao tác browser mà API smoke không thấy được:
+
+- `npm run smoke:ui:visits`: mở form tạo visit trên mobile, chọn service rồi combo để kiểm hai nhóm tự clear nhau, chọn staff và submit.
+- `npm run smoke:ui:manager-branch`: mở màn chọn chi nhánh của manager có nhiều branch, kiểm card branch và chọn một branch vào dashboard.
+- `npm run smoke:ui:staff-form`: mở form tạo staff desktop, kiểm province cache chỉ gọi một lần, chọn province để load wards, và form required fields sẵn sàng submit.
+
+Các script này cần dev server đang chạy, Chromium Playwright đã được install, và DB dev có owner active. Script tự tạo dữ liệu `SMOKE UI ...` và cleanup sau khi chạy.
