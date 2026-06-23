@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   prismaServiceFindMany: vi.fn(),
   prismaUserFindMany: vi.fn(),
   prismaVisitCreate: vi.fn(),
+  prismaVisitFindMany: vi.fn(),
   prismaVisitFindFirst: vi.fn(),
 }));
 
@@ -37,6 +38,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     visit: {
       create: mocks.prismaVisitCreate,
+      findMany: mocks.prismaVisitFindMany,
       findFirst: mocks.prismaVisitFindFirst,
     },
   },
@@ -46,6 +48,12 @@ import { GET, POST } from "@/app/api/visits/route";
 
 function createGetRequest(): NextRequest {
   return new Request("http://localhost/api/visits") as unknown as NextRequest;
+}
+
+function createVisitListRequest(status = "pending"): NextRequest {
+  return new Request(
+    `http://localhost/api/visits?status=${status}`,
+  ) as unknown as NextRequest;
 }
 
 function createPostRequest(body?: Record<string, unknown> | string): NextRequest {
@@ -81,6 +89,11 @@ function createVisitRecord() {
     lastUpdatedBy: "user-1",
     status: "pending",
     totalPrice: { toString: () => "100000" },
+    customer: {
+      id: "customer-1",
+      name: "Nguyễn Văn Nam",
+      phone: "0901234567",
+    },
     barber: {
       id: "barber-1",
       username: "barber01",
@@ -200,6 +213,45 @@ describe("GET /api/visits", () => {
           username: "skinner01",
           role: "skinner",
         },
+      ],
+    });
+  });
+
+  it("should allow owners to list visits across the shop without branch scope", async () => {
+    const visit = createVisitRecord();
+
+    mocks.getToken.mockResolvedValue({
+      id: "owner-1",
+      role: "owner",
+      shop_id: "shop-1",
+    });
+    mocks.prismaVisitFindMany.mockResolvedValue([visit]);
+
+    const response = await GET(createVisitListRequest());
+
+    expect(response.status).toBe(200);
+    expect(mocks.prismaVisitFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.not.objectContaining({
+          branchId: expect.any(String),
+        }),
+      }),
+    );
+    expect(mocks.prismaVisitFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          shopId: "shop-1",
+          status: "pending",
+        }),
+      }),
+    );
+    await expect(response.json()).resolves.toEqual({
+      visits: [
+        expect.objectContaining({
+          id: visit.id,
+          customer: visit.customer,
+          status: visit.status,
+        }),
       ],
     });
   });

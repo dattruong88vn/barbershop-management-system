@@ -19,6 +19,7 @@ Developer handbook cho Barber Shop SaaS. Dùng thư mục này khi cần hiểu 
 - Prisma và database: [prisma-and-db.md](prisma-and-db.md)
 - Shared data database and location sync: [shared-location-db.md](shared-location-db.md)
 - Testing: [testing.md](testing.md)
+- Smoke tests: [smoke-tests.md](smoke-tests.md)
 
 ## Product/UI Docs
 

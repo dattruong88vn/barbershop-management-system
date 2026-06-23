@@ -8,6 +8,7 @@ import {
   STAFF_ROLES,
   USER_ROLE_BARBER,
   USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   USER_ROLE_SKINNER,
   VISIT_ITEM_TYPE_COMBO,
   VISIT_ITEM_TYPE_SERVICE,
@@ -108,7 +109,7 @@ type StaffAuthResult =
       role: UserRole;
       userId: string;
       shopId: string;
-      branchId: string;
+      branchId: string | null;
     }
   | {
       error: string;
@@ -257,14 +258,20 @@ async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
     return { error: visitTexts.api.errors.forbidden, status: 403 };
   }
 
-  if (!token.branch_id) {
+  const branchId = typeof token.branch_id === "string" ? token.branch_id : null;
+
+  if (token.role !== USER_ROLE_OWNER && !branchId) {
     return { error: visitTexts.api.errors.missingBranch, status: 400 };
   }
 
   if (token.role === USER_ROLE_MANAGER) {
+    if (!branchId) {
+      return { error: visitTexts.api.errors.missingBranch, status: 400 };
+    }
+
     const managedBranch = await prisma.branch.findFirst({
       where: {
-        id: token.branch_id,
+        id: branchId,
         managerId: token.id,
         shopId: token.shop_id,
         status: "active",
@@ -281,7 +288,7 @@ async function getStaffAuth(request: NextRequest): Promise<StaffAuthResult> {
     role: token.role as UserRole,
     userId: token.id,
     shopId: token.shop_id,
-    branchId: token.branch_id,
+    branchId,
   };
 }
 
@@ -370,9 +377,9 @@ export async function GET(request: NextRequest) {
     const todayRange = scope === "today" ? getTodayDateRange() : null;
     const visits = await prisma.visit.findMany({
       where: {
-        branchId: authResult.branchId,
         shopId: authResult.shopId,
         status: statusFilter,
+        ...(authResult.branchId ? { branchId: authResult.branchId } : {}),
         ...(todayRange && statusFilter === VISIT_STATUS_COMPLETED
           ? {
               createdAt: {
@@ -397,6 +404,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       visits: visits.map(formatVisitListResponse),
     });
+  }
+
+  if (!authResult.branchId) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.missingBranch },
+      { status: 400 },
+    );
   }
 
   const [services, combos, barbers, skinners] = await Promise.all([
@@ -546,6 +560,13 @@ export async function POST(request: NextRequest) {
     authResult.role === USER_ROLE_SKINNER && !visitInput.skinnerId
       ? authResult.userId
       : visitInput.skinnerId;
+
+  if (!authResult.branchId) {
+    return NextResponse.json(
+      { error: visitTexts.api.errors.missingBranch },
+      { status: 400 },
+    );
+  }
 
   const [services, combos, isValidStaff, branch] = await Promise.all([
     prisma.service.findMany({
