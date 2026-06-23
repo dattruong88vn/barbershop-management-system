@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { encode } from "next-auth/jwt";
 
 import {
+  BRANCH_STATUS_ACTIVE,
+  BRANCH_STATUS_INACTIVE,
   CATALOG_STATUS_DELETED,
   SERVICE_RESPONSIBLE_ROLE_BARBER,
   SERVICE_RESPONSIBLE_ROLE_SKINNER,
@@ -9,9 +11,10 @@ import {
   USER_ROLE_MANAGER,
   USER_ROLE_OWNER,
   USER_ROLE_RECEPTIONIST,
+  VISIT_STATUS_PENDING,
   type UserRoleValue,
 } from "../../src/constants/common";
-import { API_ROUTES } from "../../src/constants/routes";
+import { API_ROUTES, ROUTES } from "../../src/constants/routes";
 import { DEFAULT_JSON_HEADERS } from "../../src/lib/apiConfig";
 import { hashPassword } from "../../src/lib/password";
 import type { UserStatus } from "../../src/types/auth";
@@ -52,9 +55,12 @@ const baseUrl = process.env.SMOKE_BASE_URL ?? "http://localhost:3000";
 const secret = process.env.NEXTAUTH_SECRET;
 const stamp = Date.now().toString();
 const createdBranchIds: string[] = [];
+const createdCustomerIds: string[] = [];
 const createdUserIds: string[] = [];
+const createdShopIds: string[] = [];
 const createdServiceIds: string[] = [];
 const createdComboIds: string[] = [];
+const createdVisitIds: string[] = [];
 
 // In ra một bước đã qua để người chạy thấy tiến độ theo từng flow.
 function logStep(message: string) {
@@ -110,6 +116,19 @@ async function api(
 
   return {
     data: await readJson(response),
+    status: response.status,
+  };
+}
+
+// Gọi page route qua middleware để kiểm redirect/permission ở tầng routing.
+async function pageRequest(cookie: string, path: string) {
+  const response = await fetch(new URL(path, baseUrl), {
+    headers: { Cookie: cookie },
+    redirect: "manual",
+  });
+
+  return {
+    location: response.headers.get("location") ?? "",
     status: response.status,
   };
 }
@@ -197,6 +216,43 @@ async function createBranch(shopId: string, suffix: string) {
   return branch.id;
 }
 
+// Tạo staff smoke trực tiếp trong DB khi flow chỉ cần dữ liệu nền.
+async function createStaff(
+  context: {
+    branchId: string | null;
+    role: UserRoleValue;
+    shopId: string;
+    status?: UserStatus;
+  },
+  suffix: string,
+): Promise<SmokeUser> {
+  const user = await prisma.user.create({
+    data: {
+      branchId: context.branchId,
+      fullName: `SMOKE Staff ${stamp}-${suffix}`,
+      isFirstLogin: false,
+      passwordHash: hashPassword(`SmokeStaff${stamp}!`),
+      role: context.role,
+      shopId: context.shopId,
+      status: context.status ?? "active",
+      username: `smoke.${suffix}.${stamp}`,
+    },
+    select: {
+      branchId: true,
+      fullName: true,
+      id: true,
+      role: true,
+      shopId: true,
+      status: true,
+      username: true,
+    },
+  });
+
+  createdUserIds.push(user.id);
+
+  return user;
+}
+
 // Tạo manager smoke và assign vào hai branch để kiểm branch context.
 async function createManager(shopId: string, branchIds: string[]): Promise<SmokeUser> {
   const manager = await prisma.user.create({
@@ -266,6 +322,46 @@ function readEntityId(data: JsonRecord, key: string) {
   }
 
   return id;
+}
+
+// Tạo customer/visit pending trực tiếp để kiểm các API chặn open visit.
+async function createPendingVisit(input: {
+  barberId?: string | null;
+  branchId: string;
+  createdBy: string;
+  shopId: string;
+}) {
+  const customer = await prisma.customer.create({
+    data: {
+      name: `SMOKE Customer ${stamp}`,
+      phone: `07${stamp.slice(-7)}${createdCustomerIds.length}`,
+      shopId: input.shopId,
+    },
+    select: { id: true },
+  });
+  createdCustomerIds.push(customer.id);
+
+  const branch = await prisma.branch.findUniqueOrThrow({
+    where: { id: input.branchId },
+    select: { address: true, name: true },
+  });
+  const visit = await prisma.visit.create({
+    data: {
+      branchAddressSnapshot: branch.address,
+      branchId: input.branchId,
+      branchNameSnapshot: branch.name,
+      barberId: input.barberId ?? null,
+      createdBy: input.createdBy,
+      customerId: customer.id,
+      shopId: input.shopId,
+      status: VISIT_STATUS_PENDING,
+      totalPrice: 0,
+    },
+    select: { id: true },
+  });
+  createdVisitIds.push(visit.id);
+
+  return visit.id;
 }
 
 // Tạo service bằng API để dùng tiếp cho service và combo smoke.
@@ -593,8 +689,288 @@ async function smokeStaffManagement(
   );
 }
 
+// Kiểm branch management: create/edit, inactive lock, open visit block, reactivate.
+async function smokeBranchManagement(
+  context: SmokeContext,
+  ownerCookie: string,
+) {
+  const createResponse = await api(ownerCookie, API_ROUTES.branches, {
+    body: {
+      address: `SMOKE API Branch Address ${stamp}`,
+      managerId: null,
+      name: `SMOKE API Branch ${stamp}`,
+    },
+    method: "POST",
+  });
+  assert(createResponse.status === 201, "owner can create branch");
+  const branchId = readEntityId(createResponse.data, "branch");
+  createdBranchIds.push(branchId);
+
+  const updateResponse = await api(
+    ownerCookie,
+    API_ROUTES.branchDetail(branchId),
+    {
+      body: {
+        address: `SMOKE API Branch Updated Address ${stamp}`,
+        managerId: null,
+        name: `SMOKE API Branch Updated ${stamp}`,
+      },
+      method: "PATCH",
+    },
+  );
+  const updatedBranch = asRecord(updateResponse.data.branch, "updated branch");
+  assert(
+    updateResponse.status === 200 &&
+      updatedBranch.name === `SMOKE API Branch Updated ${stamp}`,
+    "owner can edit active branch",
+  );
+
+  const deactivateResponse = await api(
+    ownerCookie,
+    API_ROUTES.branchStatus(branchId),
+    {
+      body: { status: BRANCH_STATUS_INACTIVE },
+      method: "PATCH",
+    },
+  );
+  assert(deactivateResponse.status === 200, "owner can deactivate branch without open visits");
+
+  const inactiveEditResponse = await api(
+    ownerCookie,
+    API_ROUTES.branchDetail(branchId),
+    {
+      body: {
+        address: `SMOKE Inactive Edit ${stamp}`,
+        managerId: null,
+        name: `SMOKE Inactive Edit ${stamp}`,
+      },
+      method: "PATCH",
+    },
+  );
+  assert(inactiveEditResponse.status === 400, "inactive branch edit is blocked");
+
+  const reactivateResponse = await api(
+    ownerCookie,
+    API_ROUTES.branchStatus(branchId),
+    {
+      body: { status: BRANCH_STATUS_ACTIVE },
+      method: "PATCH",
+    },
+  );
+  assert(reactivateResponse.status === 200, "owner can reactivate branch");
+
+  const openVisitBranchId = await createBranch(context.shopId, "open-visit");
+  await createPendingVisit({
+    branchId: openVisitBranchId,
+    createdBy: context.owner.id,
+    shopId: context.shopId,
+  });
+  const blockedDeactivateResponse = await api(
+    ownerCookie,
+    API_ROUTES.branchStatus(openVisitBranchId),
+    {
+      body: { status: BRANCH_STATUS_INACTIVE },
+      method: "PATCH",
+    },
+  );
+  assert(blockedDeactivateResponse.status === 400, "branch with open visit cannot deactivate");
+
+  const suspendedBranchId = await createBranch(context.shopId, "suspend-staff");
+  const suspendedStaff = await createStaff(
+    {
+      branchId: suspendedBranchId,
+      role: USER_ROLE_RECEPTIONIST,
+      shopId: context.shopId,
+    },
+    "suspend-staff",
+  );
+  const suspendedResponse = await api(
+    ownerCookie,
+    API_ROUTES.branchStatus(suspendedBranchId),
+    {
+      body: { status: BRANCH_STATUS_INACTIVE },
+      method: "PATCH",
+    },
+  );
+  const staffAfterDeactivate = await prisma.user.findUniqueOrThrow({
+    where: { id: suspendedStaff.id },
+    select: { status: true },
+  });
+  assert(
+    suspendedResponse.status === 200 &&
+      staffAfterDeactivate.status === "branch_suspended",
+    "deactivate branch suspends active staff",
+  );
+}
+
+// Kiểm staff transfer: transfer staff hợp lệ và chặn staff còn open visit.
+async function smokeStaffTransfer(context: SmokeContext, ownerCookie: string) {
+  const sourceBranchId = await createBranch(context.shopId, "transfer-source");
+  const targetBranchId = await createBranch(context.shopId, "transfer-target");
+  const transferStaff = await createStaff(
+    {
+      branchId: sourceBranchId,
+      role: USER_ROLE_RECEPTIONIST,
+      shopId: context.shopId,
+      status: "branch_suspended",
+    },
+    "transfer-staff",
+  );
+  const transferResponse = await api(ownerCookie, API_ROUTES.staffTransfer, {
+    body: {
+      staffIds: [transferStaff.id],
+      targetBranchId,
+    },
+    method: "PATCH",
+  });
+  const transferredStaff = await prisma.user.findUniqueOrThrow({
+    where: { id: transferStaff.id },
+    select: { branchId: true, status: true },
+  });
+  assert(
+    transferResponse.status === 200 &&
+      transferResponse.data.transferredCount === 1 &&
+      transferredStaff.branchId === targetBranchId &&
+      transferredStaff.status === "active",
+    "owner can transfer suspended staff to active branch",
+  );
+
+  const blockedBarber = await createStaff(
+    {
+      branchId: sourceBranchId,
+      role: USER_ROLE_BARBER,
+      shopId: context.shopId,
+    },
+    "blocked-transfer-barber",
+  );
+  await createPendingVisit({
+    barberId: blockedBarber.id,
+    branchId: sourceBranchId,
+    createdBy: context.owner.id,
+    shopId: context.shopId,
+  });
+  const blockedTransferResponse = await api(ownerCookie, API_ROUTES.staffTransfer, {
+    body: {
+      staffIds: [blockedBarber.id],
+      targetBranchId,
+    },
+    method: "PATCH",
+  });
+  assert(blockedTransferResponse.status === 400, "staff with open visit cannot transfer");
+}
+
+// Kiểm route guard và quyền API cơ bản giữa owner, manager, staff và tenant khác.
+async function smokeRouteGuards(
+  context: SmokeContext,
+  ownerCookie: string,
+  managerCookie: string,
+) {
+  const staff = await createStaff(
+    {
+      branchId: context.managerBranchId,
+      role: USER_ROLE_RECEPTIONIST,
+      shopId: context.shopId,
+    },
+    "route-guard-staff",
+  );
+  const staffCookie = await cookieFor(staff, context.managerBranchId);
+  const ownerManagerPage = await pageRequest(ownerCookie, ROUTES.managerServices);
+  assert(
+    ownerManagerPage.status >= 300 &&
+      ownerManagerPage.status < 400 &&
+      ownerManagerPage.location.includes(ROUTES.dashboard),
+    "owner is redirected away from manager routes",
+  );
+
+  const managerOwnerPage = await pageRequest(managerCookie, ROUTES.ownerServices);
+  assert(
+    managerOwnerPage.status >= 300 &&
+      managerOwnerPage.status < 400 &&
+      managerOwnerPage.location.includes(ROUTES.managerSelectBranch),
+    "manager is redirected away from owner routes",
+  );
+
+  const staffManagementApi = await api(staffCookie, API_ROUTES.services());
+  assert(staffManagementApi.status === 403, "staff cannot call management API");
+
+  const otherShop = await prisma.shop.create({
+    data: {
+      address: `SMOKE Other Shop Address ${stamp}`,
+      name: `SMOKE Other Shop ${stamp}`,
+      trialExpiresAt: new Date(Date.now() + 86400000),
+    },
+    select: { id: true },
+  });
+  createdShopIds.push(otherShop.id);
+  const otherBranch = await prisma.branch.create({
+    data: {
+      address: `SMOKE Other Branch Address ${stamp}`,
+      name: `SMOKE Other Branch ${stamp}`,
+      shopId: otherShop.id,
+    },
+    select: { id: true },
+  });
+  const tenantIsolationResponse = await api(
+    ownerCookie,
+    API_ROUTES.branchDetail(otherBranch.id),
+  );
+  assert(tenantIsolationResponse.status === 404, "owner cannot read another shop branch");
+}
+
+// Kiểm location APIs: cần auth, provinces trả array, wards validate province code.
+async function smokeLocationApis(ownerCookie: string) {
+  const unauthorizedProvinces = await api("", API_ROUTES.locationProvinces);
+  assert(unauthorizedProvinces.status === 401, "location provinces requires auth");
+
+  const provincesResponse = await api(ownerCookie, API_ROUTES.locationProvinces);
+  const provinces = Array.isArray(provincesResponse.data.provinces)
+    ? provincesResponse.data.provinces
+    : [];
+  assert(provincesResponse.status === 200, "authenticated user can load provinces");
+
+  const missingWardsResponse = await api(ownerCookie, "/api/locations/wards");
+  assert(missingWardsResponse.status === 400, "wards requires province code");
+
+  const invalidWardsResponse = await api(
+    ownerCookie,
+    API_ROUTES.locationWards("invalid-province"),
+  );
+  assert(invalidWardsResponse.status === 400, "wards rejects invalid province code");
+
+  if (!provinces.length) {
+    logStep("valid wards lookup skipped because no active provinces are configured");
+    return;
+  }
+
+  const firstProvince = asRecord(provinces[0], "province");
+  const provinceCode =
+    typeof firstProvince.code === "string" ? firstProvince.code : "";
+  assert(Boolean(provinceCode), "province response includes code");
+
+  const wardsResponse = await api(
+    ownerCookie,
+    API_ROUTES.locationWards(provinceCode),
+  );
+  assert(
+    wardsResponse.status === 200 && Array.isArray(wardsResponse.data.wards),
+    "authenticated user can load wards by province",
+  );
+}
+
 // Dọn dữ liệu smoke theo thứ tự tránh vướng foreign key.
 async function cleanupSmokeData() {
+  await prisma.visitPhoto.deleteMany({
+    where: { visitId: { in: createdVisitIds } },
+  });
+  await prisma.visitService.deleteMany({
+    where: { visitId: { in: createdVisitIds } },
+  });
+  await prisma.visit.deleteMany({
+    where: { id: { in: createdVisitIds } },
+  });
+  await prisma.customer.deleteMany({
+    where: { id: { in: createdCustomerIds } },
+  });
   await prisma.comboService.deleteMany({
     where: { comboId: { in: createdComboIds } },
   });
@@ -620,9 +996,15 @@ async function cleanupSmokeData() {
       name: { startsWith: "SMOKE Branch" },
     },
   });
+  await prisma.shop.deleteMany({
+    where: {
+      id: { in: createdShopIds },
+      name: { startsWith: "SMOKE Other Shop" },
+    },
+  });
 }
 
-// Điều phối bốn nhóm smoke: manager branch context, service, combo và staff.
+// Điều phối các nhóm smoke management và operational guard ưu tiên trung bình.
 async function run() {
   await assertServerIsRunning();
   const context = await setupContext();
@@ -634,6 +1016,10 @@ async function run() {
   await smokeServiceManagement(managerCookie);
   await smokeComboManagement(managerCookie);
   await smokeStaffManagement(context, ownerCookie, managerCookie);
+  await smokeBranchManagement(context, ownerCookie);
+  await smokeStaffTransfer(context, ownerCookie);
+  await smokeRouteGuards(context, ownerCookie, managerCookie);
+  await smokeLocationApis(ownerCookie);
   console.log("Management smoke passed.");
 }
 

@@ -61,3 +61,13 @@ Smoke test là script kiểm tra nhanh một flow quan trọng trên dev server 
 - manager không tạo được manager account
 - owner tạo manager account và assign nhiều branch
 - owner đổi manager thành staff thường, đồng thời gỡ branch manager assignment cũ
+- owner tạo/sửa/ngừng/kích hoạt lại branch
+- branch inactive bị chặn edit
+- branch còn open visit bị chặn ngừng hoạt động
+- ngừng branch chuyển staff active sang `branch_suspended`
+- owner transfer staff sang branch active và restore status active
+- staff còn open visit bị chặn transfer
+- owner/manager bị redirect khỏi workspace sai role
+- staff không gọi được management API
+- owner không đọc được branch thuộc shop khác
+- location provinces/wards yêu cầu auth và validate province code
