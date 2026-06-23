@@ -16,6 +16,7 @@ vi.mock("@/lib/fetchClient", () => ({
 
 import {
   LOCATION_PROVINCES_QUERY_KEY,
+  LOCATION_WARDS_STALE_TIME_MS,
   locationWardsQueryKey,
   useLocations,
 } from "@/hooks/useLocations";
@@ -82,6 +83,7 @@ describe("useLocations", () => {
 
   it("should expose stable location query keys", () => {
     expect(LOCATION_PROVINCES_QUERY_KEY).toEqual(["locations", "provinces"]);
+    expect(LOCATION_WARDS_STALE_TIME_MS).toBe(1000 * 60 * 60 * 24);
     expect(locationWardsQueryKey("79")).toEqual(["locations", "wards", "79"]);
   });
 });

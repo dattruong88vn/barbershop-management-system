@@ -108,18 +108,33 @@ describe("middleware", () => {
     expect(_response.headers.get("location")).toBeNull();
   });
 
-  it("should redirect owner away from forbidden routes", async () => {
+  it("should allow owner access to visit routes", async () => {
     mocks.getToken.mockResolvedValue({
       role: "owner",
       is_first_login: false,
     });
 
-    const _response = await middleware(createRequest(ROUTES.visits));
-
-    expect(_response.status).toBe(307);
-    expect(_response.headers.get("location")).toBe(
-      `http://localhost${ROUTES.dashboard}`,
+    const _response = await middleware(
+      createRequest(ROUTES.visitDetail("visit-1")),
     );
+
+    expect(_response.status).toBe(200);
+    expect(_response.headers.get("location")).toBeNull();
+  });
+
+  it("should allow manager with active branch access to visit routes", async () => {
+    mocks.getToken.mockResolvedValue({
+      active_branch_id: "branch-1",
+      role: "manager",
+      is_first_login: false,
+    });
+
+    const _response = await middleware(
+      createRequest(ROUTES.visitDetail("visit-1")),
+    );
+
+    expect(_response.status).toBe(200);
+    expect(_response.headers.get("location")).toBeNull();
   });
 
   it("should redirect staff users away from dashboard to customers", async () => {

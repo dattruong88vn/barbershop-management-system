@@ -17,6 +17,7 @@ export const LOCATION_PROVINCES_QUERY_KEY = [
   "provinces",
 ] as const;
 export const LOCATION_PROVINCES_STALE_TIME_MS = 1000 * 60 * 60 * 24;
+export const LOCATION_WARDS_STALE_TIME_MS = 1000 * 60 * 60 * 24;
 const PROVINCES_RESPONSE_DATA_KEY = "provinces";
 const WARDS_RESPONSE_DATA_KEY = "wards";
 
@@ -68,6 +69,7 @@ export function useLocations(currentProvinceCode: string) {
     queryKey: locationWardsQueryKey(currentProvinceCode),
     queryFn: () => getWards(currentProvinceCode),
     enabled: Boolean(currentProvinceCode),
+    staleTime: LOCATION_WARDS_STALE_TIME_MS,
   });
 
   return {

@@ -22,6 +22,7 @@ const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, typeof USER_ROLE_SUPERA
       ROUTES.ownerCombos,
       ROUTES.ownerStaff,
       ROUTES.ownerBranches,
+      ROUTES.visits,
       ROUTES.reports,
     ],
     [USER_ROLE_MANAGER]: [
@@ -30,6 +31,7 @@ const PROTECTED_ROUTES_BY_ROLE: Record<Exclude<UserRole, typeof USER_ROLE_SUPERA
       ROUTES.managerCombos,
       ROUTES.managerStaff,
       ROUTES.managerSelectBranch,
+      ROUTES.visits,
       ROUTES.reports,
     ],
     [USER_ROLE_RECEPTIONIST]: [ROUTES.visits, ROUTES.customers, ROUTES.reports],
