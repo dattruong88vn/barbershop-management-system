@@ -25,6 +25,11 @@ type SignInResult = {
   status: number;
 };
 
+type CsrfContext = {
+  cookie: string;
+  token: string;
+};
+
 const prisma = new PrismaClient();
 const baseUrl = process.env.SMOKE_BASE_URL ?? "http://localhost:3000";
 const stamp = Date.now().toString();
@@ -114,8 +119,8 @@ async function assertServerIsRunning() {
   }
 }
 
-// Lấy CSRF token của NextAuth để POST credentials callback như form login thật.
-async function getCsrfToken() {
+// Lấy CSRF token và cookie của NextAuth để POST credentials giống form login thật.
+async function getCsrfContext(): Promise<CsrfContext> {
   const response = await api("/api/auth/csrf");
   const csrfToken =
     typeof response.body.csrfToken === "string" ? response.body.csrfToken : "";
@@ -124,15 +129,34 @@ async function getCsrfToken() {
     fail("NextAuth did not return a CSRF token.");
   }
 
-  return csrfToken;
+  return {
+    cookie: toCookieHeader(response.headers),
+    token: csrfToken,
+  };
+}
+
+// Chuẩn hoá status NextAuth credentials vì lỗi đăng nhập có thể nằm trong JSON body.
+function getSignInStatus(response: Response, body: JsonRecord) {
+  if (typeof body.status === "number") {
+    return body.status;
+  }
+
+  if (
+    body.error === "CredentialsSignin" ||
+    (typeof body.url === "string" && body.url.includes("error=CredentialsSignin"))
+  ) {
+    return 401;
+  }
+
+  return response.status;
 }
 
 // Đăng nhập qua credentials callback thật và trả cookie session nếu thành công.
 async function signIn(username: string, password: string): Promise<SignInResult> {
-  const csrfToken = await getCsrfToken();
+  const csrf = await getCsrfContext();
   const response = await fetch(new URL("/api/auth/callback/credentials", baseUrl), {
     body: new URLSearchParams({
-      csrfToken,
+      csrfToken: csrf.token,
       json: "true",
       password,
       redirect: "false",
@@ -140,15 +164,18 @@ async function signIn(username: string, password: string): Promise<SignInResult>
     }),
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
+      Cookie: csrf.cookie,
     },
     method: "POST",
     redirect: "manual",
   });
+  const body = await readJson(response);
+  const bodyStatus = typeof body.status === "number" ? body.status : null;
 
   return {
-    body: await readJson(response),
+    body,
     cookie: toCookieHeader(response.headers),
-    status: response.status,
+    status: bodyStatus ?? getSignInStatus(response, body),
   };
 }
 

@@ -5,10 +5,40 @@ Smoke test là script kiểm tra nhanh một flow quan trọng trên dev server 
 ## Cách chạy
 
 - Start dev server trước, thường là `npm run dev -- -p 3000`.
+- Chạy toàn bộ smoke tuần tự bằng `npm run smoke:all`.
 - Chạy smoke script bằng npm script tương ứng, ví dụ `npm run smoke:auth`, `npm run smoke:management`, hoặc `npm run smoke:visits`.
 - Playwright UI smoke dùng `npm run smoke:ui:visits`, `npm run smoke:ui:manager-branch`, hoặc `npm run smoke:ui:staff-form`.
 - Nếu cần trỏ sang server khác, dùng `SMOKE_BASE_URL`.
 - Nếu cần cố định shop, branch, service, hoặc combo, dùng các biến môi trường riêng của script như `SMOKE_SHOP_ID`, `SMOKE_BRANCH_ID`, `SMOKE_SERVICE_ID`, `SMOKE_COMBO_ID`.
+- Runbook nâng cao nằm ở `docs/dev/smoke-runbook.md`.
+
+## Runner tổng
+
+`npm run smoke:all` chạy các smoke hiện có theo thứ tự API trước, UI sau:
+
+- `smoke:auth`
+- `smoke:management`
+- `smoke:visits`
+- `smoke:ui:manager-branch`
+- `smoke:ui:staff-form`
+- `smoke:ui:visits`
+
+Các flag hữu ích:
+
+- `npm run smoke:all -- --api-only`: chỉ chạy API smoke.
+- `npm run smoke:all -- --ui-only`: chỉ chạy Playwright UI smoke.
+- `npm run smoke:all -- --continue-on-failure`: gom lỗi của nhiều smoke trong một lần chạy.
+- `npm run smoke:all -- --list`: xem danh sách smoke mà không chạy.
+
+Runner tổng chạy tuần tự từng script để hạn chế dữ liệu smoke và cleanup đụng nhau. Khi chạy full, giữ dev server ở một terminal riêng để đọc log API song song với output runner.
+
+Quy trình khuyến nghị trước commit lớn:
+
+1. `npm run dev -- -p 3000`.
+2. `npm run smoke:all -- --list` để xác nhận danh sách flow.
+3. `npm run smoke:all`.
+4. Nếu fail, sửa lỗi đầu tiên rồi chạy lại script riêng trước, ví dụ `npm run smoke:auth` hoặc `npm run smoke:ui:visits`.
+5. Khi script riêng pass, chạy lại `npm run smoke:all` một lần.
 
 ## Quy ước viết file smoke
 

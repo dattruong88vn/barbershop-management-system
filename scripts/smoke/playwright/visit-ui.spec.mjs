@@ -98,7 +98,14 @@ test("visit create UI clears service/combo selections and submits", async ({
   await page.getByRole("option", { name: barber.fullName }).click();
   await page.getByRole("combobox", { name: "Skinner" }).click();
   await page.getByRole("option", { name: skinner.fullName }).click();
+  const visitCreateResponse = page.waitForResponse(
+    (response) =>
+      response.url() === `${baseUrl}/api/visits` &&
+      response.request().method() === "POST",
+  );
+
   await page.getByRole("button", { name: "Tạo visit" }).click();
+  expect((await visitCreateResponse).status()).toBe(201);
 
   await expect(page).toHaveURL(/\/visits\/[0-9a-f-]+/i);
   await collectVisitsForCustomer(customer.id);
