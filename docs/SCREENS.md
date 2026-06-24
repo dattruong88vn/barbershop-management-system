@@ -162,13 +162,14 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - **Ưu tiên:** desktop
 - **Purpose:** overview nhanh + action alerts. Tổng quan dùng để scan tình hình vận hành hiện tại/kỳ đang xem và nhắc việc cần xử lý ngay, không thay thế báo cáo chi tiết.
 - **Header:** chỉ hiển thị title `Tổng quan`, không hiển thị description/subtitle.
-- **Filter:** dùng 3 tabs `Tháng`, `Năm hiện tại`, `Tất cả thời gian`. Mặc định chọn `Tháng` của tháng hiện tại. Khi tab `Tháng` active, hiển thị badge action `Chọn tháng` để mở month picker; chọn tháng xong vẫn giữ tab `Tháng`.
+- **Filter:** dùng 3 tabs `Tháng`, `Năm hiện tại`, `Tất cả thời gian`. Mặc định chọn `Tháng` của tháng hiện tại. Khi tab `Tháng` active, hiển thị badge action `Chọn tháng` để mở month picker; chọn tháng xong vẫn giữ tab `Tháng`. Owner có thêm filter chi nhánh gồm `Tất cả chi nhánh` và mọi chi nhánh active/inactive để xem dữ liệu lịch sử; manager không có filter chi nhánh vì dữ liệu bị scope theo branch active đang chọn.
 - **Content layout:** toàn bộ widgets/charts/alerts bên dưới filter nằm trong một global card chung. Card title là kỳ đang chọn: tên tháng được chọn, `Năm hiện tại`, hoặc `Tất cả thời gian`.
 - **Title casing:** tất cả title trên Tổng quan phải viết hoa chữ đầu, bao gồm page title, section title, card title, chart title và title kỳ được chọn.
 - **Widgets:** Revenue, Total Visits, New Customers, Returning Customers
 - **Charts:** Revenue Trend, Top Barbers, Top Skinners, Top Services, Top Combos
 - **Alerts:** haircut visit thiếu ảnh kiểu tóc
-- **Backend:** `GET /api/dashboard?period=month|year|all&month=YYYY-MM` đã implement cho `owner` và `manager`, scoped theo `shop_id`
+- **Metrics:** `Khách mới` là khách có visit `completed` đầu tiên trong kỳ/phạm vi đang xem. `Khách quay lại` với `Tháng`/`Năm hiện tại` là khách đã có visit `completed` trước kỳ và quay lại trong kỳ hiện tại; với `Tất cả thời gian` là khách có từ 2 visit `completed` trở lên trong phạm vi đang xem.
+- **Backend:** `GET /api/dashboard?period=month|year|all&month=YYYY-MM&branchId=<id>` đã implement cho `owner` và `manager`. Owner scoped theo `shop_id` và branch filter nếu có; manager scoped theo active branch trong session và API phải xác minh branch đó active + thuộc quyền quản lý.
 - **States:** loading, loaded, empty, error
 
 ## 10. Services

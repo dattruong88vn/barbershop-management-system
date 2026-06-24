@@ -40,7 +40,12 @@ export function useDashboard(filter: DashboardFilter) {
   const dashboardQuery = useQuery({
     placeholderData: keepPreviousData,
     queryFn: () => getDashboard(filter),
-    queryKey: [...DASHBOARD_QUERY_KEY, filter.period, filter.month],
+    queryKey: [
+      ...DASHBOARD_QUERY_KEY,
+      filter.period,
+      filter.month,
+      filter.branchId,
+    ],
   });
 
   return {

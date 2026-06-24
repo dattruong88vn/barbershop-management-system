@@ -10,7 +10,10 @@ import {
   REPORT_PERIODS,
   SERVICE_RESPONSIBLE_ROLE_BARBER,
   SERVICE_RESPONSIBLE_ROLE_SKINNER,
+  USER_ROLE_MANAGER,
+  USER_ROLE_OWNER,
   VISIT_STATUS_COMPLETED,
+  type ManagementRoleValue,
   type ReportPeriodValue,
 } from "@/constants/common";
 import { dashboardTexts, reportTexts } from "@/constants/texts";
@@ -91,7 +94,10 @@ type DashboardVisitRecord = Prisma.VisitGetPayload<{
 
 type DashboardAuthResult =
   | {
+      branchId: string | null;
+      role: ManagementRoleValue;
       shopId: string;
+      userId: string;
     }
   | {
       error: string;
@@ -129,7 +135,15 @@ async function getDashboardAuth(
   }
 
   return {
+    branchId:
+      typeof token.active_branch_id === "string"
+        ? token.active_branch_id
+        : typeof token.branch_id === "string"
+          ? token.branch_id
+          : null,
+    role: token.role as ManagementRoleValue,
     shopId: token.shop_id,
+    userId: token.id,
   };
 }
 
@@ -204,6 +218,62 @@ function getDashboardServerError(error: unknown) {
   );
 }
 
+function getDashboardBranchId(request: NextRequest) {
+  return request.nextUrl.searchParams.get("branchId")?.trim() || null;
+}
+
+async function getValidatedBranchId({
+  authResult,
+  requestedBranchId,
+}: {
+  authResult: Extract<DashboardAuthResult, { shopId: string }>;
+  requestedBranchId: string | null;
+}): Promise<
+  | {
+      branchId: string | null;
+    }
+  | {
+      error: string;
+      status: number;
+    }
+> {
+  if (authResult.role === USER_ROLE_MANAGER) {
+    if (!authResult.branchId) {
+      return { error: dashboardTexts.api.errors.forbidden, status: 403 };
+    }
+
+    const branch = await prisma.branch.findFirst({
+      where: {
+        id: authResult.branchId,
+        managerId: authResult.userId,
+        shopId: authResult.shopId,
+        status: "active",
+      },
+      select: { id: true },
+    });
+
+    return branch
+      ? { branchId: branch.id }
+      : { error: dashboardTexts.api.errors.forbidden, status: 403 };
+  }
+
+  if (authResult.role === USER_ROLE_OWNER && requestedBranchId) {
+    const branch = await prisma.branch.findFirst({
+      where: {
+        id: requestedBranchId,
+        shopId: authResult.shopId,
+      },
+      select: { id: true },
+    });
+
+    return branch
+      ? { branchId: branch.id }
+      : { error: dashboardTexts.api.errors.forbidden, status: 403 };
+  }
+
+  return { branchId: null };
+}
+
 function getTrendKey(date: Date, period: ReportPeriodValue) {
   if (period === REPORT_PERIOD_MONTH) {
     return [
@@ -270,43 +340,80 @@ function getVisitRevenue(visit: DashboardVisitRecord) {
   );
 }
 
-async function getReturningCustomerCount({
+async function getCustomerMetrics({
+  branchId,
   customerIds,
   range,
   shopId,
 }: {
+  branchId: string | null;
   customerIds: string[];
   range: ReportRange | null;
   shopId: string;
 }) {
   if (!customerIds.length) {
-    return 0;
+    return {
+      newCustomers: 0,
+      returningCustomers: 0,
+    };
   }
+
+  const baseWhere = {
+    ...(branchId ? { branchId } : {}),
+    completedAt: {
+      not: null,
+    },
+    customerId: {
+      in: customerIds,
+    },
+    shopId,
+    status: VISIT_STATUS_COMPLETED,
+  } satisfies Prisma.VisitWhereInput;
 
   const customerVisitCounts = await prisma.visit.groupBy({
     _count: {
       _all: true,
     },
     by: ["customerId"],
-    where: {
-      customerId: {
-        in: customerIds,
-      },
-      ...(range
-        ? {
-            completedAt: {
-              lt: range.end,
-            },
-          }
-        : {}),
-      shopId,
-      status: VISIT_STATUS_COMPLETED,
-    },
+    where: range
+      ? {
+          ...baseWhere,
+          completedAt: {
+            lt: range.start,
+          },
+        }
+      : baseWhere,
   });
 
-  return customerVisitCounts.filter(
-    (customerVisitCount) => customerVisitCount._count._all > 1,
-  ).length;
+  if (!range) {
+    return {
+      newCustomers: customerVisitCounts.length,
+      returningCustomers: customerVisitCounts.filter(
+        (customerVisitCount) => customerVisitCount._count._all > 1,
+      ).length,
+    };
+  }
+
+  const firstCompletedVisits = await prisma.visit.groupBy({
+    _min: {
+      completedAt: true,
+    },
+    by: ["customerId"],
+    where: baseWhere,
+  });
+
+  return {
+    newCustomers: firstCompletedVisits.filter((customerVisit) => {
+      const firstCompletedAt = customerVisit._min.completedAt;
+
+      return (
+        firstCompletedAt !== null &&
+        firstCompletedAt >= range.start &&
+        firstCompletedAt < range.end
+      );
+    }).length,
+    returningCustomers: customerVisitCounts.length,
+  };
 }
 
 function applyVisitToTrend(
@@ -420,6 +527,19 @@ export async function GET(request: NextRequest) {
     const period = getReportPeriod(request);
     const monthDate = getReportMonth(request);
     const range = getReportRange(period, monthDate);
+    const branchResult = await getValidatedBranchId({
+      authResult,
+      requestedBranchId: getDashboardBranchId(request),
+    });
+
+    if ("error" in branchResult) {
+      return NextResponse.json(
+        { error: branchResult.error },
+        { status: branchResult.status },
+      );
+    }
+
+    const branchId = branchResult.branchId;
 
     const visits = await prisma.visit.findMany({
       orderBy: { completedAt: "asc" },
@@ -433,21 +553,9 @@ export async function GET(request: NextRequest) {
               },
             }
           : {}),
+        ...(branchId ? { branchId } : {}),
         shopId: authResult.shopId,
         status: VISIT_STATUS_COMPLETED,
-      },
-    });
-    const newCustomers = await prisma.customer.count({
-      where: {
-        ...(range
-          ? {
-              createdAt: {
-                gte: range.start,
-                lt: range.end,
-              },
-            }
-          : {}),
-        shopId: authResult.shopId,
       },
     });
     const serviceIds = [
@@ -480,7 +588,8 @@ export async function GET(request: NextRequest) {
     const topServices = new Map<string, TopItemAccumulator>();
     const topSkinners = new Map<string, TopItemAccumulator>();
     const customerIds = [...new Set(visits.map((visit) => visit.customer.id))];
-    const returningCustomerCount = await getReturningCustomerCount({
+    const customerMetrics = await getCustomerMetrics({
+      branchId,
       customerIds,
       range,
       shopId: authResult.shopId,
@@ -503,6 +612,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       [DASHBOARD_RESPONSE_DATA_KEY]: {
+        branchId,
         haircutWarnings: getHaircutWarnings(visits, haircutServiceIds),
         metrics: [
           {
@@ -515,11 +625,11 @@ export async function GET(request: NextRequest) {
           },
           {
             label: dashboardTexts.metrics.newCustomers,
-            value: String(newCustomers),
+            value: String(customerMetrics.newCustomers),
           },
           {
             label: dashboardTexts.metrics.returningCustomers,
-            value: String(returningCustomerCount),
+            value: String(customerMetrics.returningCustomers),
           },
         ],
         periodLabel: getReportPeriodLabel(period, monthDate),

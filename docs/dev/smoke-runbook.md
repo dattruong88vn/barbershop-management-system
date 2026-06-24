@@ -38,6 +38,21 @@ Nếu chỉ muốn kiểm danh sách flow trước khi chạy thật, dùng `npm
 - Sửa UI form visit, form staff, manager branch selection: chạy `npm run smoke:all -- --ui-only`.
 - Trước commit lớn hoặc trước staging: chạy `npm run smoke:all`.
 
+## Smoke Test Triggers
+
+Sau khi `FIX` các phần dưới đây, agent phải chạy smoke tương ứng trừ khi user nói rõ không chạy test. Rule này là ngoại lệ của rule không tự chạy unit test/ESLint sau implementation.
+
+- Auth, session, middleware, role redirect, manager branch scope: chạy `npm run smoke:management`; nếu có đổi login/change-password thì chạy thêm `npm run smoke:auth`.
+- Dashboard/report API, metric doanh thu, khách mới/quay lại, branch-scoped report/dashboard: chạy `npm run smoke:management`.
+- Service, combo, staff, branch, location API hoặc management role/scope: chạy `npm run smoke:management`.
+- Visit create/update/detail, service-combo selection, pricing snapshot, haircut photo, staff assignment: chạy `npm run smoke:visits`.
+- Manager branch selection UI: chạy `npm run smoke:ui:manager-branch`.
+- Staff form UI: chạy `npm run smoke:ui:staff-form`.
+- Visit UI: chạy `npm run smoke:ui:visits`.
+- Thay đổi chạm nhiều nhóm hoặc trước `PUSH`: chạy `npm run smoke:all`.
+
+Nếu smoke cần dev server, browser, dữ liệu dev hoặc network mà không chạy được, agent phải báo rõ lý do và không bỏ qua âm thầm.
+
 ## Đọc kết quả fail
 
 API smoke in log theo dạng `[ok] ...`. Dòng fail đầu tiên thường là rule nghiệp vụ hoặc response status không đúng.

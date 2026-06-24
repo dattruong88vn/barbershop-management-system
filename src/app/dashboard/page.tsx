@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BarChart3 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 import { Card, Heading, Modal, MonthCalendar } from "@/components/global";
 import { EmptyState } from "@/components/global/EmptyState";
@@ -15,12 +16,15 @@ import {
   DashboardTopList,
 } from "@/components/screens/dashboard";
 import {
+  BRANCH_STATUS_ALL,
   REPORT_PERIOD_ALL,
   REPORT_PERIOD_MONTH,
   REPORT_PERIOD_YEAR,
   type ReportPeriodValue,
+  USER_ROLE_OWNER,
 } from "@/constants/common";
 import { dashboardTexts } from "@/constants/texts";
+import { useBranches } from "@/hooks/useBranches";
 import { useDashboard } from "@/hooks/useDashboard";
 import {
   getDashboardPeriodFilter,
@@ -29,12 +33,22 @@ import {
 } from "@/utils/reports";
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
   const [period, setPeriod] = useState<ReportPeriodValue>(
     REPORT_PERIOD_MONTH,
   );
   const [selectedMonth, setSelectedMonth] = useState(getReportMonthKey());
+  const [selectedBranchId, setSelectedBranchId] =
+    useState<string>(BRANCH_STATUS_ALL);
   const [isMonthCalendarOpen, setIsMonthCalendarOpen] = useState(false);
+  const isOwner = session?.user.role === USER_ROLE_OWNER;
+  const { branches } = useBranches(isOwner);
+  const dashboardBranchId =
+    isOwner && selectedBranchId !== BRANCH_STATUS_ALL
+      ? selectedBranchId
+      : undefined;
   const dashboardFilter = getDashboardPeriodFilter({
+    branchId: dashboardBranchId,
     month: selectedMonth,
     period,
   });
@@ -44,6 +58,16 @@ export default function DashboardPage() {
   const shouldShowDataSkeleton = isFetching && Boolean(dashboard);
   const maximumMonth = getReportMonthKey();
   const minimumMonth = getMinimumReportMonthKey();
+  const branchOptions = [
+    {
+      label: dashboardTexts.filters.branchOptions.all,
+      value: BRANCH_STATUS_ALL,
+    },
+    ...branches.map((branch) => ({
+      label: branch.name,
+      value: branch.id,
+    })),
+  ];
 
   function handlePeriodChange(nextPeriod: ReportPeriodValue) {
     if (nextPeriod === REPORT_PERIOD_MONTH) {
@@ -98,7 +122,10 @@ export default function DashboardPage() {
           {!shouldShowInitialSkeleton && !error && dashboard ? (
             <>
               <DashboardPeriodFilter
+                branchId={selectedBranchId}
+                branchOptions={isOwner ? branchOptions : []}
                 period={period}
+                onBranchChange={setSelectedBranchId}
                 onMonthPickerOpen={handleSpecificMonthOpen}
                 onPeriodChange={handlePeriodChange}
               />

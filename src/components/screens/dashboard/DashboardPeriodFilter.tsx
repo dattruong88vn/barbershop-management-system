@@ -1,8 +1,6 @@
 "use client";
 
-import {
-  BadgeButton,
-  Card } from "@/components/global";
+import { BadgeButton, Card, Select } from "@/components/global";
 import {
   REPORT_PERIOD_ALL,
   REPORT_PERIOD_MONTH,
@@ -14,12 +12,18 @@ import { dashboardTexts } from "@/constants/texts";
 import { cn } from "@/lib/utils";
 
 type DashboardPeriodFilterProps = {
+  branchId: string;
+  branchOptions?: Array<{ label: string; value: string }>;
   onMonthPickerOpen: () => void;
+  onBranchChange?: (branchId: string) => void;
   onPeriodChange: (period: ReportPeriodValue) => void;
   period: ReportPeriodValue;
 };
 
 export function DashboardPeriodFilter({
+  branchId,
+  branchOptions = [],
+  onBranchChange,
   onMonthPickerOpen,
   onPeriodChange,
   period,
@@ -41,7 +45,7 @@ export function DashboardPeriodFilter({
 
   return (
     <Card padding="md">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div
           className="inline-flex rounded-lg border border-gray-400 bg-gray-100 p-1"
           role="tablist"
@@ -65,17 +69,35 @@ export function DashboardPeriodFilter({
           ))}
         </div>
 
-        {period === REPORT_PERIOD_MONTH ? (
-          <BadgeButton
-            className="min-h-0 py-0.5"
-            outline
-            size="sm"
-            variant={UI_VARIANT_WARNING}
-            onClick={onMonthPickerOpen}
-          >
-            {dashboardTexts.filters.chooseSpecificMonth}
-          </BadgeButton>
-        ) : null}
+        <div className="flex flex-wrap items-end gap-3">
+          {branchOptions.length > 0 && onBranchChange ? (
+            <label className="grid min-w-56 gap-1 text-sm font-medium text-gray-1000">
+              {dashboardTexts.filters.branchLabel}
+              <Select
+                value={branchId}
+                onChange={(event) => onBranchChange(event.target.value)}
+              >
+                {branchOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+            </label>
+          ) : null}
+
+          {period === REPORT_PERIOD_MONTH ? (
+            <BadgeButton
+              className="min-h-0 py-0.5"
+              outline
+              size="sm"
+              variant={UI_VARIANT_WARNING}
+              onClick={onMonthPickerOpen}
+            >
+              {dashboardTexts.filters.chooseSpecificMonth}
+            </BadgeButton>
+          ) : null}
+        </div>
       </div>
     </Card>
   );

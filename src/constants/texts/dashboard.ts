@@ -18,6 +18,10 @@ export const dashboardTexts = {
   },
   empty: "Chưa có dữ liệu tổng quan cho kỳ này.",
   filters: {
+    branchLabel: "Chi nhánh",
+    branchOptions: {
+      all: "Tất cả chi nhánh",
+    },
     chooseSpecificMonth: "Chọn tháng",
     monthPickerLabel: "Chọn tháng tổng quan",
     periodOptions: {

@@ -23,6 +23,7 @@ export type DashboardHaircutWarning = {
 };
 
 export type DashboardData = {
+  branchId: string | null;
   haircutWarnings: DashboardHaircutWarning[];
   metrics: DashboardMetric[];
   periodLabel: string;
@@ -39,6 +40,7 @@ export type DashboardApiResponse = {
 };
 
 export type DashboardFilter = {
+  branchId?: string;
   month?: string;
   period: ReportPeriodValue;
 };

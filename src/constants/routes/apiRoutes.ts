@@ -23,8 +23,20 @@ export const API_ROUTES = {
   customers: "/api/customers",
   customerDetail: (id: string) => `/api/customers/${id}`,
   customerVisits: (id: string) => `/api/customers/${id}/visits`,
-  dashboard: ({ month, period }: { month?: string; period: string }) => {
+  dashboard: ({
+    branchId,
+    month,
+    period,
+  }: {
+    branchId?: string;
+    month?: string;
+    period: string;
+  }) => {
     const params = new URLSearchParams({ period });
+
+    if (branchId) {
+      params.set("branchId", branchId);
+    }
 
     if (month) {
       params.set("month", month);

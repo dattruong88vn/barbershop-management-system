@@ -135,7 +135,8 @@ Component placement:
 - Stack: Vitest + React Testing Library.
 - Test files live next to the file under test.
 - Do not write or update tests unless explicitly asked.
-- Do not run tests or ESLint after implementation unless asked.
+- Do not run unit tests or ESLint after implementation unless asked.
+- Smoke tests are mandatory after `FIX` changes that match `docs/dev/smoke-runbook.md#smoke-test-triggers`, unless user explicitly says not to run tests.
 - When asked to commit: run ESLint and targeted Vitest for new/updated test files only.
 - Run full suite only when explicitly requested.
 - If feature code changed but tests were not updated, remind the user before committing.

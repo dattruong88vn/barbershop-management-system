@@ -72,14 +72,20 @@ export function getPersonalReportPeriodFilter({
 }
 
 export function getDashboardPeriodFilter({
+  branchId,
   month,
   period,
 }: {
+  branchId?: string;
   month: string;
   period: ReportPeriodValue;
 }): {
+  branchId?: string;
   month?: string;
   period: ReportPeriodValue;
 } {
-  return getPersonalReportPeriodFilter({ month, period });
+  return {
+    ...getPersonalReportPeriodFilter({ month, period }),
+    ...(branchId ? { branchId } : {}),
+  };
 }
