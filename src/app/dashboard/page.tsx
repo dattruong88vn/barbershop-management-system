@@ -166,7 +166,7 @@ export default function DashboardPage() {
                         title={dashboardTexts.sections.topServices}
                       />
                       <DashboardTopList
-                        href={ROUTES.reportCombos}
+                        href={ROUTES.reportServices}
                         items={dashboard.topCombos}
                         title={dashboardTexts.sections.topCombos}
                       />

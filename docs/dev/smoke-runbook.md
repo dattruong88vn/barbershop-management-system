@@ -35,7 +35,7 @@ Nếu chỉ muốn kiểm danh sách flow trước khi chạy thật, dùng `npm
 - Sửa auth, middleware, role redirect: chạy `npm run smoke:all -- --api-only`, tối thiểu phải pass `smoke:auth`.
 - Sửa service, combo, staff, branch, location API: chạy `npm run smoke:management`.
 - Sửa dashboard/report API, branch filter dashboard, khách mới/quay lại: chạy `npm run smoke:dashboard`.
-- Sửa staff/branch report API, filter, branch scope, allocated revenue hoặc detail pagination: chạy `npm run smoke:reports`.
+- Sửa staff/branch/service/combo report API, filter, branch scope, allocated revenue hoặc detail pagination: chạy `npm run smoke:reports`.
 - Sửa visit API, pricing snapshot, haircut photo, staff assignment: chạy `npm run smoke:visits`.
 - Sửa UI form visit, form staff, manager branch selection: chạy `npm run smoke:all -- --ui-only`.
 - Trước commit lớn hoặc trước staging: chạy `npm run smoke:all`.
@@ -46,7 +46,7 @@ Sau khi `FIX` các phần dưới đây, agent phải chạy smoke tương ứng
 
 - Auth, session, middleware, role redirect, manager branch scope: chạy `npm run smoke:management`; nếu có đổi login/change-password thì chạy thêm `npm run smoke:auth`.
 - Dashboard/report API, metric doanh thu, khách mới/quay lại, branch-scoped report/dashboard: chạy `npm run smoke:dashboard`.
-- Staff/branch report API, date range, role/search/status filter, allocated revenue hoặc detail pagination: chạy `npm run smoke:reports`.
+- Staff/branch/service/combo report API, date range, role/search/status/sort filter, allocated revenue hoặc detail pagination: chạy `npm run smoke:reports`.
 - Service, combo, staff, branch, location API hoặc management role/scope: chạy `npm run smoke:management`.
 - Visit create/update/detail, service-combo selection, pricing snapshot, haircut photo, staff assignment: chạy `npm run smoke:visits`.
 - Manager branch selection UI: chạy `npm run smoke:ui:manager-branch`.

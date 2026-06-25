@@ -4,6 +4,9 @@ import type {
   ManagementReportKindValue,
   ManagementRoleValue,
   ReportPeriodValue,
+  ReportItemTabValue,
+  ReportUsageSortValue,
+  ServiceResponsibleRoleValue,
   StaffReportStatus,
   StaffRoleValue,
 } from "@/constants/common";
@@ -159,6 +162,67 @@ export type BranchReportDetailApiResponse = {
 
 export type BranchReportDetailFilter = BranchReportFilter & {
   branchId: string;
+  page: number;
+  pageSize: number;
+};
+
+export type ServiceComboReportRow = {
+  branchId: string | null;
+  branchName: string;
+  customerCount: number;
+  detailCount: number;
+  itemId: string;
+  itemName: string;
+  responsibleRole: ServiceResponsibleRoleValue | null;
+  usageCount: number;
+};
+
+export type ServiceComboReportData = {
+  branchId: string | null;
+  branchName: string | null;
+  periodLabel: string;
+  rows: ServiceComboReportRow[];
+  tab: ReportItemTabValue;
+};
+
+export type ServiceComboReportApiResponse = {
+  error?: string;
+  report?: ServiceComboReportData;
+};
+
+export type ServiceComboReportFilter = {
+  branchId?: string;
+  fromDate: string;
+  responsibleRole?: ServiceResponsibleRoleValue;
+  search?: string;
+  sort?: ReportUsageSortValue;
+  tab: ReportItemTabValue;
+  toDate: string;
+};
+
+export type ServiceComboReportDetail = {
+  branchName: string;
+  completedAt: string | null;
+  customerName: string;
+  itemName: string;
+  responsibleRole: ServiceResponsibleRoleValue | null;
+  visitId: string;
+};
+
+export type ServiceComboReportDetailData = {
+  details: ServiceComboReportDetail[];
+  itemId: string;
+  pagination: ReportPaginationMeta;
+  tab: ReportItemTabValue;
+};
+
+export type ServiceComboReportDetailApiResponse = {
+  error?: string;
+  report?: ServiceComboReportDetailData;
+};
+
+export type ServiceComboReportDetailFilter = ServiceComboReportFilter & {
+  itemId: string;
   page: number;
   pageSize: number;
 };

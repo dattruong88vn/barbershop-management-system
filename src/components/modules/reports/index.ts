@@ -9,4 +9,5 @@ export * from "./PersonalReportTopItems";
 export * from "./PersonalReportView";
 export * from "./ReportMetaBar";
 export * from "./ReportDateRangeFilter";
+export * from "./ServiceComboReportView";
 export * from "./StaffReportView";

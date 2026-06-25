@@ -10,7 +10,6 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - `src/app/reports/revenue/page.tsx`
 - `src/app/reports/staff/page.tsx`
 - `src/app/reports/services/page.tsx`
-- `src/app/reports/combos/page.tsx`
 - `src/app/reports/branches/page.tsx`
 - `src/app/api/reports/`
 - `src/components/modules/reports/`
@@ -31,6 +30,7 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Keep raw line details available when grouping by staff, service, combo, or branch.
 - Staff report summary must not inline all raw visit/service detail rows. Load staff detail rows through the paginated detail API and cache client queries by staff id plus active filters.
 - Branch report summary must count `1 service = 1 lượt` and `1 combo = 1 lượt` even though combo revenue is allocated across multiple `visit_services` rows.
+- Service/combo usage report does not show revenue. It is focused on usage count and unique customers.
 
 ## Report Kinds
 
@@ -89,6 +89,30 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Detail rows show completed date, customer, receptionist, barber, skinner, service/combo count, and revenue. They do not link to visit detail yet.
 - Client detail cache keys include branch id, `fromDate`, `toDate`, status, page, and page size.
 
+## Service/Combo Report
+
+- `/reports/services` renders the only management report screen for service and combo usage, with two tabs: service and combo.
+- Do not create or link a separate `/reports/combos` route; combo reporting lives in the combo tab of `/reports/services`.
+- Owner and manager can view the report.
+- Manager is always scoped to the active managed branch and cannot override scope with query params. Manager UI does not show branch filter.
+- Owner can filter by branch.
+- Summary endpoint: `GET /api/reports/services?tab=service|combo&fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD`.
+- Detail endpoint: `GET /api/reports/services/details?tab=service|combo&itemId=<id>&fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD&page=1&pageSize=10`.
+- Each tab keeps an independent draft and applied filter state. Switching tabs must restore that tab's own filters instead of copying filters from the other tab.
+- Filters are date range, search by item name, usage sort, and owner-only branch. Service tab also has responsible role filter (`barber`/`skinner`).
+- Filters update the API query only after `Áp dụng`.
+- Sort values are `usage_desc` and `usage_asc`.
+- Service tab includes catalog services created at shop scope and branch scope, including services with zero usage in the period.
+- Service tab counts only direct service selections (`visit_services.combo_id IS NULL`). Service rows inside combo visits do not increase service usage.
+- Combo tab includes catalog combos created at shop scope and branch scope, including combos with zero usage in the period.
+- Combo tab counts one combo per visit by unique `visitId + comboId`, regardless of how many service rows were allocated for that combo.
+- Summary columns are item name, branch/scope, responsible role for services, usage count, unique customers, and detail action.
+- Service detail pagination runs on `visit_services` rows for direct services.
+- Combo detail pagination runs on visits that contain the combo so combo service rows are not duplicated.
+- Detail rows do not link to visit detail yet.
+- Client summary cache keys include tab, branch, role, search, sort, `fromDate`, and `toDate`, with a 5-minute stale window. Do not show previous summary data from different params while a new uncached query loads.
+- Client detail cache keys include item id, tab, branch, role, search, sort, `fromDate`, `toDate`, page, and page size.
+
 ## Management Report Date Range
 
 - Every owner/manager report uses the shared `Từ ngày` and `Đến ngày` filter instead of month/year/all-time checkboxes.
@@ -98,7 +122,7 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - API validates both dates and returns `400` when either date is missing, invalid, or `fromDate > toDate`.
 - Report queries use an inclusive start and exclusive next-day end: `completedAt >= startOfFromDate` and `completedAt < startOfDayAfterToDate`.
 - Date boundaries use Vietnam time (`UTC+07:00`) until shop-specific timezone configuration is introduced.
-- Detail query cache keys include the drill-down id such as staff id or branch id, active filters, `fromDate`, `toDate`, page, and page size.
+- Detail query cache keys include the drill-down id such as staff id, branch id, or item id, active filters, `fromDate`, `toDate`, page, and page size.
 - Use global `DateRangePicker` through `ReportDateRangeFilter` for all management report screens so date labels, constraints, and layout stay consistent. Native date inputs are not allowed.
 - Management reports label the field `Chọn thời gian`; the trigger shows only the selected date range, does not repeat `Từ ngày`/`Đến ngày`, and expands dynamically to the available filter-grid column width.
 
@@ -111,5 +135,5 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Use `ReportMetaBar` for report context metadata such as `Kỳ báo cáo`, `Thông tin chi nhánh`, role, and modal detail context. Metadata uses base-size text, and items must stay on one row per item with title and value adjacent (`title value`), then flow into responsive columns. The report-level context section sits above the filter section; do not place period/branch context inside the filter card. Do not use wide left/right key-value rows for report context.
 - Staff names in the report table use semibold emphasis.
 - `src/utils/reports/reportDateRanges.test.ts` covers UTC+7 boundaries, one-day ranges, invalid dates, reversed ranges, and display labels.
-- `npm run smoke:reports` covers staff report owner/manager scope, inactive staff visibility, unknown assignment, API role/search filters, invalid date ranges, branch report owner-only scope, inactive branch visibility, branch status filtering, combo item counting, allocated revenue, and detail pagination.
+- `npm run smoke:reports` covers staff report owner/manager scope, inactive staff visibility, unknown assignment, API role/search filters, invalid date ranges, branch report owner-only scope, inactive branch visibility, branch status filtering, combo item counting, allocated revenue, service/combo report manager scope, service direct-only counting, combo per-visit counting, usage sort, and detail pagination.
 - For allocation changes, manually reason through rounding and total preservation.

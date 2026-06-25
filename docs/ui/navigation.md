@@ -44,8 +44,7 @@ Sidebar:
 - Báo cáo (collapse, mặc định đóng)
   - Doanh thu → `/reports/revenue`
   - Nhân viên → `/reports/staff`
-  - Dịch vụ → `/reports/services`
-  - Combo → `/reports/combos`
+  - Dịch vụ/Combo → `/reports/services`
   - Chi nhánh → `/reports/branches`
 - Quản lý dịch vụ → `/owner/services`
 - Quản lý combo → `/owner/combos`
@@ -69,8 +68,7 @@ Manager role:
   - Báo cáo (collapse, mặc định đóng)
     - Doanh thu → `/reports/revenue`
     - Nhân viên → `/reports/staff`
-    - Dịch vụ → `/reports/services`
-    - Combo → `/reports/combos`
+    - Dịch vụ/Combo → `/reports/services`
   - Quản lý dịch vụ → `/manager/services`
   - Quản lý combo → `/manager/combos`
   - Quản lý nhân viên → `/manager/staff`

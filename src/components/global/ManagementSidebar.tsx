@@ -49,11 +49,6 @@ const REPORT_NAVIGATION_ITEMS: ManagementNavigationItem[] = [
     label: commonTexts.navigation.reportServices,
   },
   {
-    href: ROUTES.reportCombos,
-    icon: Package,
-    label: commonTexts.navigation.reportCombos,
-  },
-  {
     href: ROUTES.reportBranches,
     icon: Building2,
     label: commonTexts.navigation.reportBranches,

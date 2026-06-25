@@ -158,6 +158,71 @@ export const API_ROUTES = {
 
     return `/api/reports/staff/details?${params.toString()}`;
   },
+  serviceComboReport: ({
+    branchId,
+    fromDate,
+    responsibleRole,
+    search,
+    sort,
+    tab,
+    toDate,
+  }: {
+    branchId?: string;
+    fromDate: string;
+    responsibleRole?: string;
+    search?: string;
+    sort?: string;
+    tab: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({ fromDate, tab, toDate });
+
+    if (branchId) params.set("branchId", branchId);
+    if (responsibleRole) params.set("responsibleRole", responsibleRole);
+    if (search) params.set("search", search);
+    if (sort) params.set("sort", sort);
+
+    return `/api/reports/services?${params.toString()}`;
+  },
+  serviceComboReportDetails: ({
+    branchId,
+    fromDate,
+    itemId,
+    page,
+    pageSize,
+    responsibleRole,
+    search,
+    sort,
+    tab,
+    toDate,
+  }: {
+    branchId?: string;
+    fromDate: string;
+    itemId: string;
+    page: number;
+    pageSize: number;
+    responsibleRole?: string;
+    search?: string;
+    sort?: string;
+    tab: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({
+      fromDate,
+      itemId,
+      page: String(page),
+      pageSize: String(pageSize),
+      tab,
+      toDate,
+    });
+
+    if (branchId) params.set("branchId", branchId);
+    if (responsibleRole) params.set("responsibleRole", responsibleRole);
+    if (search) params.set("search", search);
+    if (sort) params.set("sort", sort);
+
+    return `/api/reports/services/details?${params.toString()}`;
+  },
   services: ({ status }: { status?: string } = {}) => {
     const params = new URLSearchParams();
 

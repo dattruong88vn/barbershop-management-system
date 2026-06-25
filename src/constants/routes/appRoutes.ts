@@ -90,7 +90,6 @@ export const ROUTES = {
   reportRevenue: "/reports/revenue",
   reportStaff: "/reports/staff",
   reportServices: "/reports/services",
-  reportCombos: "/reports/combos",
   reportBranches: "/reports/branches",
   ownerServices: "/owner/services",
   ownerCombos: "/owner/combos",

@@ -2,6 +2,7 @@ export * from "./branchStatuses";
 export * from "./catalogStatuses";
 export * from "./pagination";
 export * from "./reportKinds";
+export * from "./reportItems";
 export * from "./reportPeriods";
 export * from "./roles";
 export * from "./serviceResponsibleRoles";
