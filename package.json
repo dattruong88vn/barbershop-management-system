@@ -10,6 +10,7 @@
     "lint": "eslint",
     "smoke:all": "tsx --env-file=.env.local scripts/smoke/run-all.ts",
     "smoke:auth": "tsx --env-file=.env.local scripts/smoke/auth-flow.ts",
+    "smoke:dashboard": "tsx --env-file=.env.local scripts/smoke/dashboard-flow.ts",
     "smoke:management": "tsx --env-file=.env.local scripts/smoke/management-flow.ts",
     "smoke:ui:manager-branch": "node --env-file=.env.local ./node_modules/@playwright/test/cli.js test scripts/smoke/playwright/manager-branch-ui.spec.mjs --browser=chromium --reporter=line",
     "smoke:ui:staff-form": "node --env-file=.env.local ./node_modules/@playwright/test/cli.js test scripts/smoke/playwright/staff-form-ui.spec.mjs --browser=chromium --reporter=line",

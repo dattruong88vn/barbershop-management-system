@@ -6,7 +6,7 @@ Smoke test là script kiểm tra nhanh một flow quan trọng trên dev server 
 
 - Start dev server trước, thường là `npm run dev -- -p 3000`.
 - Chạy toàn bộ smoke tuần tự bằng `npm run smoke:all`.
-- Chạy smoke script bằng npm script tương ứng, ví dụ `npm run smoke:auth`, `npm run smoke:management`, hoặc `npm run smoke:visits`.
+- Chạy smoke script bằng npm script tương ứng, ví dụ `npm run smoke:auth`, `npm run smoke:management`, `npm run smoke:dashboard`, hoặc `npm run smoke:visits`.
 - Playwright UI smoke dùng `npm run smoke:ui:visits`, `npm run smoke:ui:manager-branch`, hoặc `npm run smoke:ui:staff-form`.
 - Nếu cần trỏ sang server khác, dùng `SMOKE_BASE_URL`.
 - Nếu cần cố định shop, branch, service, hoặc combo, dùng các biến môi trường riêng của script như `SMOKE_SHOP_ID`, `SMOKE_BRANCH_ID`, `SMOKE_SERVICE_ID`, `SMOKE_COMBO_ID`.
@@ -18,6 +18,7 @@ Smoke test là script kiểm tra nhanh một flow quan trọng trên dev server 
 
 - `smoke:auth`
 - `smoke:management`
+- `smoke:dashboard`
 - `smoke:visits`
 - `smoke:ui:manager-branch`
 - `smoke:ui:staff-form`
@@ -102,6 +103,20 @@ Quy trình khuyến nghị trước commit lớn:
 - staff không gọi được management API
 - owner không đọc được branch thuộc shop khác
 - location provinces/wards yêu cầu auth và validate province code
+
+## Dashboard Smoke
+
+`npm run smoke:dashboard` kiểm tra dashboard API:
+
+- owner xem tổng dashboard trên tất cả chi nhánh
+- owner filter dashboard theo chi nhánh active
+- owner filter dashboard theo chi nhánh inactive để xem dữ liệu lịch sử
+- manager chỉ xem dashboard của active branch đang chọn
+- manager không đổi được scope dashboard bằng query `branchId`
+- manager không có active branch bị chặn
+- `Khách mới` dùng visit `completed` đầu tiên trong kỳ
+- `Khách quay lại` dùng visit `completed` trước kỳ và quay lại trong kỳ
+- với `Tất cả thời gian`, khách có từ 2 visit `completed` trở lên được tính là quay lại
 
 ## Playwright UI Smoke
 

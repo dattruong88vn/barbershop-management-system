@@ -26,6 +26,11 @@ const smokeScripts: SmokeScript[] = [
     name: "smoke:management",
   },
   {
+    description: "Dashboard API branch scope và khách mới/quay lại",
+    group: "api",
+    name: "smoke:dashboard",
+  },
+  {
     description: "Visit API với service/combo, ảnh haircut và staff assignment",
     group: "api",
     name: "smoke:visits",
