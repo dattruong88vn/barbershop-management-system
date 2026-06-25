@@ -24,6 +24,7 @@ Visit creation, visit list/detail, status changes, service/combo selection, barb
 - UI validation and API validation must enforce the same selection rules.
 - Every service must declare `responsibleRole` as `barber` or `skinner`.
 - Visit service/combo pricing must be snapshotted into `visit_services` at create/update time.
+- Haircut warning input must be snapshotted into `visit_services.is_haircut_snapshot` at create/update time.
 - Every visit belongs to one branch. Staff use their assigned branch; manager uses the active branch selected before entering the management workspace.
 - Customers remain shop-level and may have visits across multiple branches.
 - Snapshot branch name and address on the visit so historical display and reports do not change when branch information is edited.

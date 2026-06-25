@@ -1,3 +1,6 @@
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+
 import { Heading, Paragraph } from "@/components/global";
 import { dashboardTexts } from "@/constants/texts";
 import type { DashboardTopItem } from "@/types";
@@ -9,17 +12,30 @@ const VND_FORMATTER = new Intl.NumberFormat("vi-VN", {
 });
 
 export function DashboardTopList({
+  href,
   items,
   title,
 }: {
+  href?: string;
   items: DashboardTopItem[];
   title: string;
 }) {
   return (
     <section className="min-h-72 rounded-xl border border-gray-400 bg-gray-100 p-4">
-      <Heading level={3} size="section">
-        {title}
-      </Heading>
+      <div className="flex items-center justify-between gap-3">
+        <Heading level={3} size="section">
+          {title}
+        </Heading>
+        {href ? (
+          <Link
+            className="inline-flex shrink-0 items-center gap-1 text-label-13 font-medium text-primary hover:underline"
+            href={href}
+          >
+            {dashboardTexts.topList.viewReport}
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        ) : null}
+      </div>
       {items.length ? (
         <ol className="mt-4 grid gap-3">
           {items.map((item, index) => (

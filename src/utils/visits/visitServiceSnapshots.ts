@@ -6,6 +6,7 @@ type DecimalLike = {
 
 type SnapshotService = {
   id: string;
+  isHaircut: boolean;
   name: string;
   price: DecimalLike;
   responsibleRole: ServiceResponsibleRoleValue;
@@ -27,6 +28,7 @@ export type VisitServiceSnapshotCreateInput = {
   comboPriceSnapshot?: number;
   price: number;
   responsibleRoleSnapshot: ServiceResponsibleRoleValue;
+  isHaircutSnapshot: boolean;
   serviceId: string;
   serviceNameSnapshot: string;
   servicePriceSnapshot: number;
@@ -86,6 +88,7 @@ export function buildVisitServiceSnapshots({
         allocatedPrice: servicePrice,
         price: servicePrice,
         responsibleRoleSnapshot: service.responsibleRole,
+        isHaircutSnapshot: service.isHaircut,
         serviceId: service.id,
         serviceNameSnapshot: service.name,
         servicePriceSnapshot: servicePrice,
@@ -106,6 +109,7 @@ export function buildVisitServiceSnapshots({
           comboPriceSnapshot: comboPrice,
           price: allocatedPrice,
           responsibleRoleSnapshot: service.responsibleRole,
+          isHaircutSnapshot: service.isHaircut,
           serviceId: service.id,
           serviceNameSnapshot: service.name,
           servicePriceSnapshot: getDecimalNumber(service.price),

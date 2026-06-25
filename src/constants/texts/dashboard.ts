@@ -21,6 +21,7 @@ export const dashboardTexts = {
     branchLabel: "Chi nhánh",
     branchOptions: {
       all: "Tất cả chi nhánh",
+      inactiveStatus: "Ngừng hoạt động",
     },
     chooseSpecificMonth: "Chọn tháng",
     monthPickerLabel: "Chọn tháng tổng quan",
@@ -48,6 +49,7 @@ export const dashboardTexts = {
   topList: {
     count: (count: number) => `${count} lượt`,
     empty: "Chưa có dữ liệu xếp hạng.",
+    viewReport: "Xem báo cáo",
   },
   unknownStaff: "Chưa xác định",
   title: "Tổng quan",

@@ -305,6 +305,7 @@ async function createCompletedVisit(input: {
       visitServices: {
         create: {
           allocatedPrice: 100000,
+          isHaircutSnapshot: true,
           price: 100000,
           responsibleRoleSnapshot: SERVICE_RESPONSIBLE_ROLE_BARBER,
           serviceId: input.serviceId,
@@ -422,6 +423,11 @@ async function setupContext(): Promise<SmokeContext> {
     shopId: owner.shopId,
   });
 
+  await prisma.service.update({
+    where: { id: serviceId },
+    data: { isHaircut: false },
+  });
+
   return {
     activeBranch,
     inactiveBranch,
@@ -451,6 +457,34 @@ function readMetric(dashboard: JsonRecord, label: string) {
   return metric.value;
 }
 
+// Đọc trend để smoke khóa behavior zero-fill cho các ngày/tháng không có visit.
+function readRevenueTrend(dashboard: JsonRecord) {
+  if (!Array.isArray(dashboard.revenueTrend)) {
+    fail("Dashboard revenue trend is missing.");
+  }
+
+  return dashboard.revenueTrend.map((item) => asRecord(item, "revenue trend"));
+}
+
+// Đọc số warning thiếu ảnh để đảm bảo dashboard dùng snapshot haircut của visit.
+function readHaircutWarningCount(dashboard: JsonRecord) {
+  if (!Array.isArray(dashboard.haircutWarnings)) {
+    fail("Dashboard haircut warnings are missing.");
+  }
+
+  return dashboard.haircutWarnings.length;
+}
+
+function getCurrentMonthDayCount() {
+  const currentDate = new Date();
+
+  return new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0,
+  ).getDate();
+}
+
 // Kiểm số visit metric và customer metric trên payload dashboard.
 function assertDashboardMetrics(
   dashboard: JsonRecord,
@@ -478,8 +512,9 @@ async function smokeOwnerDashboard(context: SmokeContext, ownerCookie: string) {
     API_ROUTES.dashboard({ month: undefined, period: REPORT_PERIOD_MONTH }),
   );
   assert(allResponse.status === 200, "owner can load dashboard across all branches");
+  const allDashboard = readDashboard(allResponse.data);
   assertDashboardMetrics(
-    readDashboard(allResponse.data),
+    allDashboard,
     {
       branchId: null,
       newCustomers: "4",
@@ -487,6 +522,16 @@ async function smokeOwnerDashboard(context: SmokeContext, ownerCookie: string) {
       totalVisits: "6",
     },
     "owner all-branch dashboard counts first-completed and returning customers",
+  );
+  const allTrend = readRevenueTrend(allDashboard);
+  assert(
+    allTrend.length === getCurrentMonthDayCount() &&
+      allTrend.some((point) => point.revenue === 0 && point.visits === 0),
+    "monthly revenue trend includes zero-filled days",
+  );
+  assert(
+    readHaircutWarningCount(allDashboard) === 6,
+    "haircut warning uses visit service haircut snapshot",
   );
 
   const branchResponse = await api(
@@ -497,8 +542,9 @@ async function smokeOwnerDashboard(context: SmokeContext, ownerCookie: string) {
     }),
   );
   assert(branchResponse.status === 200, "owner can filter dashboard by active branch");
+  const branchDashboard = readDashboard(branchResponse.data);
   assertDashboardMetrics(
-    readDashboard(branchResponse.data),
+    branchDashboard,
     {
       branchId: context.activeBranch.id,
       newCustomers: "2",
@@ -506,6 +552,10 @@ async function smokeOwnerDashboard(context: SmokeContext, ownerCookie: string) {
       totalVisits: "4",
     },
     "owner active-branch dashboard excludes other branches",
+  );
+  assert(
+    readHaircutWarningCount(branchDashboard) === 4,
+    "active-branch haircut warnings are branch-scoped",
   );
 
   const inactiveResponse = await api(
@@ -590,8 +640,9 @@ async function smokeAllTimeCustomerMetrics(
   );
 
   assert(response.status === 200, "owner can load all-time dashboard by branch");
+  const dashboard = readDashboard(response.data);
   assertDashboardMetrics(
-    readDashboard(response.data),
+    dashboard,
     {
       branchId: context.activeBranch.id,
       newCustomers: "3",
@@ -599,6 +650,10 @@ async function smokeAllTimeCustomerMetrics(
       totalVisits: "5",
     },
     "all-time dashboard counts repeat completed customers as returning",
+  );
+  assert(
+    readRevenueTrend(dashboard).length >= 2,
+    "all-time revenue trend includes the full month range with zero-filled months",
   );
 }
 

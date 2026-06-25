@@ -17,12 +17,14 @@ import {
 } from "@/components/screens/dashboard";
 import {
   BRANCH_STATUS_ALL,
+  BRANCH_STATUS_INACTIVE,
   REPORT_PERIOD_ALL,
   REPORT_PERIOD_MONTH,
   REPORT_PERIOD_YEAR,
   type ReportPeriodValue,
   USER_ROLE_OWNER,
 } from "@/constants/common";
+import { ROUTES } from "@/constants/routes";
 import { dashboardTexts } from "@/constants/texts";
 import { useBranches } from "@/hooks/useBranches";
 import { useDashboard } from "@/hooks/useDashboard";
@@ -64,7 +66,10 @@ export default function DashboardPage() {
       value: BRANCH_STATUS_ALL,
     },
     ...branches.map((branch) => ({
-      label: branch.name,
+      label:
+        branch.status === BRANCH_STATUS_INACTIVE
+          ? `${branch.name} - ${dashboardTexts.filters.branchOptions.inactiveStatus}`
+          : branch.name,
       value: branch.id,
     })),
   ];
@@ -146,18 +151,22 @@ export default function DashboardPage() {
                     <DashboardRevenueTrend data={dashboard.revenueTrend} />
                     <div className="grid gap-4 lg:grid-cols-2">
                       <DashboardTopList
+                        href={ROUTES.reportStaff}
                         items={dashboard.topBarbers}
                         title={dashboardTexts.sections.topBarbers}
                       />
                       <DashboardTopList
+                        href={ROUTES.reportStaff}
                         items={dashboard.topSkinners}
                         title={dashboardTexts.sections.topSkinners}
                       />
                       <DashboardTopList
+                        href={ROUTES.reportServices}
                         items={dashboard.topServices}
                         title={dashboardTexts.sections.topServices}
                       />
                       <DashboardTopList
+                        href={ROUTES.reportCombos}
                         items={dashboard.topCombos}
                         title={dashboardTexts.sections.topCombos}
                       />

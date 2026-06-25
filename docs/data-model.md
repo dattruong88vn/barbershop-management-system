@@ -167,11 +167,13 @@
 | `combo_name_snapshot` | string | Tên combo tại thời điểm tạo visit |
 | `combo_price_snapshot` | decimal | Giá combo tại thời điểm tạo visit |
 | `responsible_role_snapshot` | enum | `barber`, `skinner` — snapshot nhóm phụ trách tại thời điểm tạo visit |
+| `is_haircut_snapshot` | boolean | Dịch vụ có phải cắt tóc tại thời điểm tạo/sửa visit |
 | `allocated_price` | decimal | Doanh thu phân bổ cho dòng service snapshot |
 
 > Một visit chỉ được có dịch vụ lẻ hoặc combo, không lưu hỗn hợp cả hai nhóm. UI tạo visit phải tự bỏ chọn dịch vụ lẻ khi chọn combo và tự bỏ chọn combo khi chọn dịch vụ lẻ; API cũng phải reject payload có cả service và combo trong cùng visit.
 > Khi visit dùng dịch vụ lẻ, `allocated_price = service_price_snapshot = price`.
 > Khi visit dùng combo, hệ thống lưu một dòng `visit_services` cho mỗi dịch vụ con trong combo, kèm `combo_id` và snapshot combo. `allocated_price` được tính theo tỷ lệ `combo.price / sum(service.price)` tại thời điểm tạo/sửa visit; dòng cuối nhận chênh lệch làm tròn để tổng phân bổ luôn bằng giá combo.
+> Cảnh báo thiếu ảnh kiểu tóc dùng `is_haircut_snapshot`, không dùng trạng thái `is_haircut` hiện tại của service.
 > Báo cáo không tính lại bằng giá hoặc tên service/combo hiện tại, mà dùng snapshot và `allocated_price`.
 
 ---

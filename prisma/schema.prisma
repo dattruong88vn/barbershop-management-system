@@ -278,6 +278,7 @@ model VisitService {
   comboNameSnapshot       String?                 @map("combo_name_snapshot")
   comboPriceSnapshot      Decimal?                @map("combo_price_snapshot") @db.Decimal(12, 2)
   responsibleRoleSnapshot ServiceResponsibleRole? @map("responsible_role_snapshot")
+  isHaircutSnapshot       Boolean                 @default(false) @map("is_haircut_snapshot")
   allocatedPrice          Decimal                 @map("allocated_price") @db.Decimal(12, 2)
 
   shop    Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)

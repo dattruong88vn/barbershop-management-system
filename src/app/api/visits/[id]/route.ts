@@ -82,6 +82,7 @@ const VISIT_SELECT = {
       comboId: true,
       price: true,
       serviceNameSnapshot: true,
+      isHaircutSnapshot: true,
       comboNameSnapshot: true,
       comboPriceSnapshot: true,
       service: {
@@ -232,9 +233,14 @@ function formatVisitResponse(
           {
             id: visitService.id,
             isHaircut:
-              visitService.combo?.comboServices?.some(
+              visit.visitServices.some(
+                (service) =>
+                  service.comboId === visitService.comboId &&
+                  service.isHaircutSnapshot,
+              ) ||
+              (visitService.combo?.comboServices?.some(
                 (comboService) => comboService.service.isHaircut,
-              ) ?? false,
+              ) ?? false),
             itemId: visitService.comboId,
             name:
               visitService.comboNameSnapshot ??
@@ -254,7 +260,9 @@ function formatVisitResponse(
         ...items,
         {
           id: visitService.id,
-          isHaircut: visitService.service?.isHaircut ?? false,
+          isHaircut:
+            visitService.isHaircutSnapshot ||
+            (visitService.service?.isHaircut ?? false),
           itemId: visitService.serviceId,
           name:
             visitService.serviceNameSnapshot ??
@@ -570,6 +578,7 @@ export async function PATCH(
           id: true,
           name: true,
           price: true,
+          isHaircut: true,
           responsibleRole: true,
         },
       }),
@@ -589,6 +598,7 @@ export async function PATCH(
                   id: true,
                   name: true,
                   price: true,
+                  isHaircut: true,
                   responsibleRole: true,
                 },
               },

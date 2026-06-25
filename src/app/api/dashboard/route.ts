@@ -69,6 +69,7 @@ const DASHBOARD_VISIT_SELECT = {
       allocatedPrice: true,
       comboId: true,
       comboNameSnapshot: true,
+      isHaircutSnapshot: true,
       responsibleRoleSnapshot: true,
       serviceId: true,
       serviceNameSnapshot: true,
@@ -324,12 +325,76 @@ function formatTopItems(itemMap: Map<string, TopItemAccumulator>) {
     }));
 }
 
-function buildRevenueTrend(
-  trendMap: Map<string, DashboardTrendPoint>,
-): DashboardTrendPoint[] {
-  return Array.from(trendMap.entries())
-    .sort(([firstKey], [secondKey]) => firstKey.localeCompare(secondKey))
-    .map(([, trendPoint]) => trendPoint);
+function buildRevenueTrend({
+  monthDate,
+  period,
+  trendMap,
+}: {
+  monthDate: Date;
+  period: ReportPeriodValue;
+  trendMap: Map<string, DashboardTrendPoint>;
+}): DashboardTrendPoint[] {
+  if (period === REPORT_PERIOD_MONTH) {
+    const daysInMonth = new Date(
+      monthDate.getFullYear(),
+      monthDate.getMonth() + 1,
+      0,
+    ).getDate();
+
+    return Array.from({ length: daysInMonth }, (_, index) => {
+      const date = new Date(
+        monthDate.getFullYear(),
+        monthDate.getMonth(),
+        index + 1,
+      );
+      const key = getTrendKey(date, period);
+
+      return (
+        trendMap.get(key) ?? {
+          label: getTrendLabel(date, period),
+          revenue: 0,
+          visits: 0,
+        }
+      );
+    });
+  }
+
+  const currentYear = new Date().getFullYear();
+  const firstTrendDate =
+    period === REPORT_PERIOD_ALL && trendMap.size
+      ? getReportMonthDate(
+          Array.from(trendMap.keys()).sort((firstKey, secondKey) =>
+            firstKey.localeCompare(secondKey),
+          )[0],
+        )
+      : null;
+  const startMonth =
+    period === REPORT_PERIOD_ALL && firstTrendDate
+      ? new Date(firstTrendDate.getFullYear(), firstTrendDate.getMonth(), 1)
+      : new Date(currentYear, 0, 1);
+  const endMonth =
+    period === REPORT_PERIOD_ALL
+      ? new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      : new Date(currentYear, 11, 1);
+  const points: DashboardTrendPoint[] = [];
+
+  for (
+    let date = new Date(startMonth);
+    date <= endMonth;
+    date = new Date(date.getFullYear(), date.getMonth() + 1, 1)
+  ) {
+    const key = getTrendKey(date, period);
+
+    points.push(
+      trendMap.get(key) ?? {
+        label: getTrendLabel(date, period),
+        revenue: 0,
+        visits: 0,
+      },
+    );
+  }
+
+  return points;
 }
 
 function getVisitRevenue(visit: DashboardVisitRecord) {
@@ -494,15 +559,11 @@ function applyVisitServicesToTopItems({
   });
 }
 
-function getHaircutWarnings(
-  visits: DashboardVisitRecord[],
-  haircutServiceIds: Set<string>,
-) {
+function getHaircutWarnings(visits: DashboardVisitRecord[]) {
   return visits
     .filter((visit) => {
       const hasHaircutService = visit.visitServices.some(
-        (visitService) =>
-          visitService.serviceId && haircutServiceIds.has(visitService.serviceId),
+        (visitService) => visitService.isHaircutSnapshot,
       );
 
       return hasHaircutService && visit.visitPhotos.length === 0;
@@ -558,30 +619,6 @@ export async function GET(request: NextRequest) {
         status: VISIT_STATUS_COMPLETED,
       },
     });
-    const serviceIds = [
-      ...new Set(
-        visits.flatMap((visit) =>
-          visit.visitServices
-            .map((visitService) => visitService.serviceId)
-            .filter((serviceId): serviceId is string => Boolean(serviceId)),
-        ),
-      ),
-    ];
-    const haircutServices = serviceIds.length
-      ? await prisma.service.findMany({
-          select: { id: true },
-          where: {
-            id: {
-              in: serviceIds,
-            },
-            isHaircut: true,
-            shopId: authResult.shopId,
-          },
-        })
-      : [];
-    const haircutServiceIds = new Set(
-      haircutServices.map((service) => service.id),
-    );
     const revenueTrend = new Map<string, DashboardTrendPoint>();
     const topBarbers = new Map<string, TopItemAccumulator>();
     const topCombos = new Map<string, TopItemAccumulator>();
@@ -613,7 +650,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       [DASHBOARD_RESPONSE_DATA_KEY]: {
         branchId,
-        haircutWarnings: getHaircutWarnings(visits, haircutServiceIds),
+        haircutWarnings: getHaircutWarnings(visits),
         metrics: [
           {
             label: dashboardTexts.metrics.revenue,
@@ -633,7 +670,11 @@ export async function GET(request: NextRequest) {
           },
         ],
         periodLabel: getReportPeriodLabel(period, monthDate),
-        revenueTrend: buildRevenueTrend(revenueTrend),
+        revenueTrend: buildRevenueTrend({
+          monthDate,
+          period,
+          trendMap: revenueTrend,
+        }),
         topBarbers: formatTopItems(topBarbers),
         topCombos: formatTopItems(topCombos),
         topServices: formatTopItems(topServices),
