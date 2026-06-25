@@ -139,6 +139,10 @@ export {
   type GeistWindowProps as WindowProps,
 } from "./Specialized";
 export { EmptyState } from "./EmptyState";
+export {
+  DateRangePicker,
+  type DateRangePickerValue,
+} from "./DateRangePicker";
 export { FullScreenLoading } from "./FullScreenLoading";
 export {
   ChartContainer,

@@ -94,7 +94,7 @@ export const GeistBadgeButton = React.forwardRef<
     <button
       ref={ref}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-transparent font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-transparent font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
         outline
           ? badgeVariants[variant].outline
           : badgeVariants[variant].filled,

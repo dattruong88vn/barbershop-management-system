@@ -104,6 +104,8 @@ GeistSnippet.displayName = "GeistSnippet";
 
 export interface GeistCalendarProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+  maxDate?: Date;
+  minDate?: Date;
   onChange?: (date: Date) => void;
   value?: Date;
 }
@@ -111,99 +113,129 @@ export interface GeistCalendarProps
 export const GeistCalendar = React.forwardRef<
   HTMLDivElement,
   GeistCalendarProps
->(({ className, onChange, value = new Date(), ...props }, ref) => {
-  const [currentDate, setCurrentDate] = React.useState(value);
-  const daysInMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0,
-  ).getDate();
-  const firstDay = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1,
-  ).getDay();
+>(
+  (
+    {
+      className,
+      maxDate,
+      minDate,
+      onChange,
+      value = new Date(),
+      ...props
+    },
+    ref,
+  ) => {
+    const [currentDate, setCurrentDate] = React.useState(value);
+    const daysInMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0,
+    ).getDate();
+    const firstDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1,
+    ).getDay();
+    const previousMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 1,
+      1,
+    );
+    const nextMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      1,
+    );
+    const canGoPrevious =
+      !minDate ||
+      previousMonth >=
+        new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    const canGoNext =
+      !maxDate ||
+      nextMonth <= new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    const monthLabel = `${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
 
-  return (
-    <div
-      ref={ref}
-      className={cn("rounded-xl border border-gray-400 p-4", className)}
-      {...props}
-    >
-      <div className="mb-4 flex items-center justify-between">
-        <button
-          className="min-h-11 px-2"
-          type="button"
-          onClick={() =>
-            setCurrentDate(
-              new Date(currentDate.getFullYear(), currentDate.getMonth() - 1),
-            )
-          }
-        >
-          {designSystemTexts.actions.previous}
-        </button>
-        <span className="text-sm font-semibold text-gray-1000">
-          {currentDate.toLocaleString("vi-VN", {
-            month: "long",
-            year: "numeric",
+    React.useEffect(() => {
+      setCurrentDate(value);
+    }, [value]);
+
+    return (
+      <div
+        ref={ref}
+        className={cn("rounded-xl border border-gray-400 p-4", className)}
+        {...props}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <button
+            className="min-h-9 px-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!canGoPrevious}
+            type="button"
+            onClick={() => setCurrentDate(previousMonth)}
+          >
+            {designSystemTexts.calendar.previous}
+          </button>
+          <span className="text-sm font-semibold text-gray-1000">
+            {monthLabel}
+          </span>
+          <button
+            className="min-h-9 px-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!canGoNext}
+            type="button"
+            onClick={() => setCurrentDate(nextMonth)}
+          >
+            {designSystemTexts.calendar.next}
+          </button>
+        </div>
+        <div className="grid grid-cols-7 gap-1 text-center text-xs">
+          {designSystemTexts.calendar.days.map((day) => (
+            <div key={day} className="font-semibold text-gray-700">
+              {day}
+            </div>
+          ))}
+          {Array.from({ length: firstDay }).map((_, index) => (
+            <div key={`empty-${index}`} />
+          ))}
+          {Array.from({ length: daysInMonth }).map((_, index) => {
+            const date = index + 1;
+            const isSelected =
+              date === value.getDate() &&
+              value.getMonth() === currentDate.getMonth() &&
+              value.getFullYear() === currentDate.getFullYear();
+            const candidateDate = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth(),
+              date,
+            );
+            const isDisabled =
+              Boolean(minDate && candidateDate < minDate) ||
+              Boolean(maxDate && candidateDate > maxDate);
+
+            return (
+              <button
+                key={date}
+                className={cn(
+                  "flex size-9 items-center justify-center rounded-md text-sm",
+                  isSelected
+                    ? "bg-blue-900 text-background-100"
+                    : "hover:bg-gray-200",
+                  isDisabled &&
+                    "cursor-not-allowed opacity-40 hover:bg-transparent",
+                )}
+                disabled={isDisabled}
+                type="button"
+                onClick={() => {
+                  onChange?.(candidateDate);
+                }}
+              >
+                {date}
+              </button>
+            );
           })}
-        </span>
-        <button
-          className="min-h-11 px-2"
-          type="button"
-          onClick={() =>
-            setCurrentDate(
-              new Date(currentDate.getFullYear(), currentDate.getMonth() + 1),
-            )
-          }
-        >
-          {designSystemTexts.actions.next}
-        </button>
+        </div>
       </div>
-      <div className="grid grid-cols-7 gap-2 text-center text-xs">
-        {designSystemTexts.calendar.days.map((day) => (
-          <div key={day} className="font-semibold text-gray-700">
-            {day}
-          </div>
-        ))}
-        {Array.from({ length: firstDay }).map((_, index) => (
-          <div key={`empty-${index}`} />
-        ))}
-        {Array.from({ length: daysInMonth }).map((_, index) => {
-          const date = index + 1;
-          const isSelected =
-            date === value.getDate() &&
-            value.getMonth() === currentDate.getMonth() &&
-            value.getFullYear() === currentDate.getFullYear();
-
-          return (
-            <button
-              key={date}
-              className={cn(
-                "min-h-11 rounded-md p-2 text-sm",
-                isSelected
-                  ? "bg-blue-900 text-background-100"
-                  : "hover:bg-gray-200",
-              )}
-              type="button"
-              onClick={() => {
-                onChange?.(
-                  new Date(
-                    currentDate.getFullYear(),
-                    currentDate.getMonth(),
-                    date,
-                  ),
-                );
-              }}
-            >
-              {date}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-});
+    );
+  },
+);
 GeistCalendar.displayName = "GeistCalendar";
 
 export interface GeistThemeSwitcherProps

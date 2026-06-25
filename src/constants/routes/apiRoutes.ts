@@ -58,6 +58,64 @@ export const API_ROUTES = {
 
     return `/api/reports/personal?${params.toString()}`;
   },
+  staffReport: ({
+    branchId,
+    fromDate,
+    role,
+    search,
+    toDate,
+  }: {
+    branchId?: string;
+    fromDate: string;
+    role?: string;
+    search?: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({ fromDate, toDate });
+
+    if (branchId) {
+      params.set("branchId", branchId);
+    }
+    if (role) params.set("role", role);
+    if (search) params.set("search", search);
+
+    return `/api/reports/staff?${params.toString()}`;
+  },
+  staffReportDetails: ({
+    branchId,
+    fromDate,
+    page,
+    pageSize,
+    role,
+    search,
+    staffId,
+    toDate,
+  }: {
+    branchId?: string;
+    fromDate: string;
+    page: number;
+    pageSize: number;
+    role?: string;
+    search?: string;
+    staffId: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({
+      fromDate,
+      page: String(page),
+      pageSize: String(pageSize),
+      staffId,
+      toDate,
+    });
+
+    if (branchId) {
+      params.set("branchId", branchId);
+    }
+    if (role) params.set("role", role);
+    if (search) params.set("search", search);
+
+    return `/api/reports/staff/details?${params.toString()}`;
+  },
   services: ({ status }: { status?: string } = {}) => {
     const params = new URLSearchParams();
 

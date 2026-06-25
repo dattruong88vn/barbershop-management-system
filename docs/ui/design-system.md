@@ -23,10 +23,13 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 - Cột số thứ tự trong table phải dùng title `#`, width hẹp (`w-10` hoặc tương đương) và canh giữa cả header lẫn cell.
 - Màn hình quản lý catalog có soft delete như dịch vụ/combo phải dùng tabs `Đang hoạt động` và `Đã xoá` nằm trên filter card; tab đã xoá chỉ để xem lại, không hiển thị thao tác tạo/sửa/xoá. Nếu entity có flow tạo bản mới từ bản đã xoá như combo, chỉ hiển thị thao tác nhân bản thay vì restore.
 - Date hiển thị trong UI phải dùng format `dd/mm/yyyy`. Nếu cần kèm giờ, đặt giờ sau ngày, ví dụ `17/06/2026 15:30`.
+- Field ngày phải dùng global `Calendar`, `MonthCalendar`, hoặc `DateRangePicker`; không dùng native `input[type="date"]`/`input[type="month"]` trong feature UI. Khoảng ngày dùng `DateRangePicker`.
+- `DateRangePicker` hiển thị label bên ngoài control; trigger chỉ hiển thị `dd/mm/yyyy - dd/mm/yyyy` với font size bằng Select/Search. Width và max-width kế thừa động từ container để cân với grid và co theo viewport; nội dung ngày được truncate khi không đủ chỗ. Icon lịch và chevron nằm cùng cụm bên phải. Popup giữ hai lịch `Từ ngày`/`Đến ngày`, header tháng dùng `MM/YYYY`, navigation dùng `Prev`/`Next`, và mỗi ngày là ô vuông cố định để trạng thái selected không làm lệch layout.
 - Mọi ô search text phải hiển thị nút icon `X` để xoá nhanh khi user đã nhập nội dung.
 - Option mặc định thể hiện "tất cả giá trị" trong filter/select phải hiển thị đúng `Tất cả`, không thêm tên field phía sau.
 - Label của field bắt buộc phải có dấu `*` màu đỏ và control phải giữ semantic `required`/`aria-required`. Field không bắt buộc chỉ hiển thị label, không thêm hậu tố như `(không bắt buộc)`.
 - Mọi control chọn ảnh dùng trực tiếp vùng upload/preview làm trigger mở file picker bằng click hoặc bàn phím. Không đặt thêm nút chữ `Chọn ảnh`/`Chọn ảnh khác` bên dưới vùng ảnh.
+- Mọi phần tử tương tác đang enabled (`button`, link có `href`, select, summary, label gắn với control, hoặc phần tử semantic `role="button"`/`role="link"`) phải hiển thị `cursor-pointer` khi hover. Phần tử disabled hoặc `aria-disabled="true"` phải hiển thị `cursor-not-allowed`; không dùng `pointer-events-none` nếu nó làm mất cursor feedback.
 
 ## Component Map
 
@@ -40,7 +43,7 @@ Tài liệu này là điểm vào ngắn cho dev và Codex trước khi build UI
 | Textarea/select | `Textarea`, `Select`, `Combobox`, `MultiSelect` |
 | Boolean controls | `Checkbox`, `Radio`, `Switch` |
 | Numeric controls | `Slider` |
-| Month/date picker | `MonthCalendar`, `Calendar` |
+| Month/date picker | `MonthCalendar`, `Calendar`, `DateRangePicker` |
 | Cards/sections | `Card`, `Grid`, `Collapse` |
 | Tables | `Table`, `TableHead`, `TableBody`, `TableRow`, `TableCell` |
 | Title/value rows | `KeyValueRow` |

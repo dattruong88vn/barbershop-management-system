@@ -18,3 +18,10 @@ export const STAFF_GENDERS = [
 ] as const;
 
 export type StaffGenderValue = (typeof STAFF_GENDERS)[number];
+
+export enum StaffReportStatus {
+  Active = "active",
+  BranchSuspended = "branch_suspended",
+  Inactive = "inactive",
+  Unknown = "unknown",
+}

@@ -1,4 +1,5 @@
 import {
+  StaffReportStatus,
   USER_ROLE_BARBER,
   USER_ROLE_MANAGER,
   USER_ROLE_OWNER,
@@ -11,9 +12,15 @@ export const reportTexts = {
   api: {
     errors: {
       forbidden: "Forbidden",
+      invalidDateRange: "Khoảng ngày báo cáo không hợp lệ.",
       serverError: "Server error",
       unauthorized: "Unauthorized",
     },
+  },
+  dateRange: {
+    fromDateLabel: "Từ ngày",
+    label: "Chọn thời gian",
+    toDateLabel: "Đến ngày",
   },
   manager: {
     description:
@@ -74,4 +81,50 @@ export const reportTexts = {
     [USER_ROLE_RECEPTIONIST]: "Reception",
     [USER_ROLE_SKINNER]: "Skinner",
   } satisfies Record<ReportPageRole, string>,
+  staffReport: {
+    allBranches: "Tất cả chi nhánh",
+    allRoles: "Tất cả vai trò",
+    branchLabel: "Chi nhánh",
+    columns: {
+      action: "Chi tiết",
+      branch: "Chi nhánh",
+      customers: "Khách",
+      role: "Vai trò",
+      services: "Số dịch vụ/combo",
+      staff: "Nhân viên",
+      status: "Trạng thái",
+      visits: "Visit",
+    },
+    detailColumns: {
+      branch: "Chi nhánh",
+      completedAt: "Hoàn thành",
+      customer: "Khách",
+      item: "Dịch vụ/combo",
+      role: "Phụ trách",
+      visit: "Visit",
+    },
+    empty: "Chưa có dữ liệu báo cáo nhân viên.",
+    filtersTitle: "Bộ lọc",
+    currentBranchLabel: "Thông tin chi nhánh",
+    detailPageSummary: "Trang {page}/{totalPages} · {total} dòng",
+    applyFilters: "Áp dụng",
+    loading: "Đang tải báo cáo nhân viên",
+    loadingDetails: "Đang tải chi tiết báo cáo nhân viên",
+    retryDetails: "Thử lại",
+    managerScopeNotice: "Dữ liệu đang được giới hạn theo chi nhánh đang làm việc.",
+    periodLabel: "Kỳ báo cáo",
+    receptionistVisitItem: "Visit tiếp nhận",
+    roleLabel: "Vai trò",
+    statusLabels: {
+      [StaffReportStatus.Active]: "Đang làm việc",
+      [StaffReportStatus.BranchSuspended]: "Chi nhánh đóng cửa",
+      [StaffReportStatus.Inactive]: "Đã nghỉ việc",
+      [StaffReportStatus.Unknown]: "Thiếu phân công",
+    },
+    tableTitle: "Bảng nhân viên",
+    unknownItem: "Dịch vụ chưa xác định",
+    unknownRole: "Chưa xác định",
+    unknownStaff: "Chưa xác định",
+    viewDetails: "Xem",
+  },
 };

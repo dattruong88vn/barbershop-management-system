@@ -44,7 +44,7 @@ export const GeistButton = React.forwardRef<
       <button
         ref={ref}
         className={cn(
-          "inline-flex min-h-11 items-center justify-center gap-2 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex min-h-11 items-center justify-center gap-2 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
           variants[variant],
           sizes[size],
           className,

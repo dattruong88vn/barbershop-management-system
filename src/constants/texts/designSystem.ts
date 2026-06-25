@@ -9,6 +9,8 @@ export const designSystemTexts = {
   },
   calendar: {
     days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+    next: "Next",
+    previous: "Prev",
   },
   form: {
     selectItems: "Chọn mục...",
@@ -61,6 +63,7 @@ export const designSystemTexts = {
       description: "Mô tả ngắn cho component.",
       drawerLeft: "Drawer trái",
       drawerRight: "Drawer phải",
+      fromDate: "Từ ngày",
       email: "Tên đăng nhập",
       emptyState: "Empty state",
       error: "Lỗi",
@@ -87,6 +90,8 @@ export const designSystemTexts = {
       switch: "Switch",
       textarea: "Textarea",
       tooltip: "Tooltip",
+      toDate: "Đến ngày",
+      dateRange: "Chọn thời gian",
       warning: "Warning",
       window: "Window",
     },

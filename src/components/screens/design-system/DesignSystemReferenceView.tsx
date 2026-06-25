@@ -34,6 +34,7 @@ import {
   CommandMenu,
   ContextMenu,
   Description,
+  DateRangePicker,
   Drawer,
   EmptyState,
   Error,
@@ -184,6 +185,10 @@ export function DesignSystemReferenceView() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState({
+    fromDate: new Date(2026, 5, 1),
+    toDate: new Date(2026, 5, 12),
+  });
 
   return (
     <main className="min-h-screen bg-muted/30 px-4 py-6 text-foreground md:px-6 lg:px-8">
@@ -500,6 +505,14 @@ export function DesignSystemReferenceView() {
               <CodeBlock code={texts.code.variant} />
               <Snippet code={texts.samples.snippet} />
               <Calendar value={new Date(2026, 5, 12)} />
+              <DateRangePicker
+                fromDateLabel={texts.labels.fromDate}
+                label={texts.labels.dateRange}
+                maxDate={new Date(2026, 5, 30)}
+                toDateLabel={texts.labels.toDate}
+                value={dateRange}
+                onChange={setDateRange}
+              />
               <div className="space-y-4">
                 <ThemeSwitcher />
                 <SplitButton

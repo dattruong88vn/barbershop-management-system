@@ -25,6 +25,7 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 - Mọi vùng chọn ảnh phải click/keyboard trực tiếp được để mở file picker; không hiển thị nút `Chọn ảnh` riêng bên cạnh hoặc bên dưới.
 - Option mặc định thể hiện tất cả giá trị trong filter/select hiển thị `Tất cả`, không thêm tên field phía sau.
 - Mọi thao tác thành công phải hiển thị success feedback qua global Feedback notification flow; nếu có điều hướng sau thành công, feedback phải được dispatch trước khi điều hướng bằng app router.
+- Mọi button, link và control có thể tương tác phải hiển thị cursor pointer khi hover; trạng thái disabled hiển thị cursor not-allowed.
 - Type/interface dùng chung đặt trong `src/types/`. Không định nghĩa trong component.
 - Dùng shadcn/ui khi có thể. TypeScript strict, không dùng `any`.
 - Header của mọi page chỉ hiển thị title. Không render description/subtitle trong page header.
@@ -249,11 +250,16 @@ Tham chiếu `AGENTS.md` — các điểm liên quan trực tiếp tới UI:
 ## 14. Reports
 
 - **Route:** `/reports` (`ROUTES.reports`)
-- **Roles:** owner (phạm vi dữ liệu theo role)
+- **Roles:** owner, manager (phạm vi dữ liệu theo role)
 - **Ưu tiên:** desktop
 - **Purpose:** audit + analysis. Reports dùng để phân tích sâu, đối soát doanh thu phân bổ, xem bảng/biểu đồ chi tiết và drill-down theo kỳ/nhân sự/dịch vụ.
+- **Bộ lọc thời gian:** tất cả báo cáo của owner/manager dùng global `DateRangePicker`, label ngoài control là `Chọn thời gian`, trigger chỉ hiển thị `dd/mm/yyyy - dd/mm/yyyy`, font bằng các filter còn lại và giãn động theo width của cột filter; icon lịch và chevron canh phải. Popup dùng hai lịch `Từ ngày` và `Đến ngày`, header tháng `MM/YYYY`, navigation `Prev`/`Next`, ngày là ô vuông cố định. Mặc định từ ngày đầu tháng hiện tại đến hôm nay; không dùng native date input hoặc checkbox Tháng/Năm/Tất cả thời gian. Không cho chọn ngày kết thúc trước ngày bắt đầu hoặc sau hôm nay.
+- **API thời gian:** mọi report API management nhận đồng thời `fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD`, validate khoảng ngày và lọc từ đầu ngày bắt đầu đến trước đầu ngày kế tiếp của ngày kết thúc theo múi giờ Việt Nam (`UTC+07:00`).
 - **Sections:** Revenue, Branch Analytics, Top Employees, Top Services, Top Combos
-- **Backend:** Report API chưa implement → giữ placeholder/mock cho đến khi có backend
+- **Staff report:** `/reports/staff` hiển thị bảng summary cho owner/manager. Owner có filter chi nhánh; manager bị scope theo branch active. Trên desktop, manager hiển thị thời gian, vai trò, tìm nhân viên và nút `Áp dụng` trên cùng một hàng; owner thêm chi nhánh thành một control. Filter chỉ gọi API sau khi bấm `Áp dụng`; role/search được lọc ở backend. Không hiển thị manager trong danh sách nhân viên. Báo cáo lịch sử vẫn hiển thị nhân viên inactive và branch-suspended. Receptionist có metric visit/khách; barber/skinner tính `Số dịch vụ/combo` theo `responsibleRole` snapshot. Không hiển thị doanh thu trong danh sách hoặc popup chi tiết. Dòng thiếu phân công hiển thị `Chưa xác định`. Trạng thái dùng enum `StaffReportStatus`: `active` = `Đang làm việc`, `branch_suspended` = `Chi nhánh đóng cửa`, `inactive` = `Đã nghỉ việc`, `unknown` = `Thiếu phân công` với badge error/danger. Filter nhân viên dùng ô search, không dùng dropdown chọn nhân viên.
+- **Staff detail:** nút `Chi tiết` mở popup, không expand row. Popup gọi API riêng `GET /api/reports/staff/details` theo `staffId`, kỳ báo cáo, chi nhánh và phân trang DB-side. Client cache detail theo staff id và filter hiện tại; khi lỗi hiển thị action `Thử lại`.
+- **Report metadata:** các thông tin ngữ cảnh như `Kỳ báo cáo`, `Thông tin chi nhánh` nằm trong section riêng phía trên `Bộ lọc`. Metadata dùng font base; metadata và role trong popup chi tiết dùng layout một hàng theo từng item, title và value đặt sát nhau, chia cột responsive. Tên nhân viên trong bảng dùng semibold. Dùng chung pattern này cho các báo cáo management khác.
+- **Backend:** Staff personal report và staff management report đã có API; các report management còn lại giữ placeholder/mock cho đến khi có backend.
 - **States:** loading, loaded, mock/placeholder
 - **Reporting data:** báo cáo doanh thu phải dùng `visit_services.allocated_price` và các field snapshot, bao gồm snapshot chi nhánh trên visit; không dùng giá/tên service, combo hoặc branch hiện tại.
 
