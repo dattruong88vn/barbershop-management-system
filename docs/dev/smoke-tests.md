@@ -119,9 +119,11 @@ Quy trình khuyến nghị trước commit lớn:
 - `Khách quay lại` dùng visit `completed` trước kỳ và quay lại trong kỳ
 - với `Tất cả thời gian`, khách có từ 2 visit `completed` trở lên được tính là quay lại
 
-## Staff Report Smoke
+## Report Smoke
 
-`npm run smoke:reports` kiểm tra staff report API:
+`npm run smoke:reports` kiểm tra staff report và branch report API.
+
+Staff report:
 
 - owner filter theo branch
 - manager bị scope theo active managed branch
@@ -130,6 +132,17 @@ Quy trình khuyến nghị trước commit lớn:
 - nhân viên inactive vẫn xuất hiện trong báo cáo lịch sử
 - service thiếu skinner được gom dưới `Chưa xác định`
 - detail API phân trang theo `page`/`pageSize` và trả đúng tổng số dòng
+
+Branch report:
+
+- owner xem được summary
+- manager bị chặn vì branch report owner-only
+- date range không hợp lệ trả `400`
+- chi nhánh inactive vẫn xuất hiện nếu có ngày hoạt động trong kỳ
+- filter trạng thái chi nhánh chạy ở API
+- combo được tính là một lượt trong `Số dịch vụ/combo`
+- doanh thu dùng tổng `allocatedPrice`
+- detail API phân trang theo visit
 
 ## Playwright UI Smoke
 

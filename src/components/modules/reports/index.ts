@@ -1,3 +1,4 @@
+export * from "./BranchReportView";
 export * from "./ManagementReportPlaceholderPage";
 export * from "./ManagerReportPlaceholder";
 export * from "./PersonalReportGeneralInfoCard";

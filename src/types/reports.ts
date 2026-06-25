@@ -1,4 +1,6 @@
 import type {
+  BranchStatusFilterValue,
+  BranchStatusValue,
   ManagementReportKindValue,
   ManagementRoleValue,
   ReportPeriodValue,
@@ -104,4 +106,59 @@ export type StaffReportDetailFilter = StaffReportFilter & {
   page: number;
   pageSize: number;
   staffId: string;
+};
+
+export type BranchReportRow = {
+  branchId: string;
+  branchName: string;
+  customerCount: number;
+  detailCount: number;
+  revenue: number;
+  serviceCount: number;
+  status: BranchStatusValue;
+  visitCount: number;
+};
+
+export type BranchReportData = {
+  periodLabel: string;
+  rows: BranchReportRow[];
+};
+
+export type BranchReportApiResponse = {
+  error?: string;
+  report?: BranchReportData;
+};
+
+export type BranchReportFilter = {
+  fromDate: string;
+  status?: BranchStatusFilterValue;
+  toDate: string;
+};
+
+export type BranchReportDetail = {
+  barberName: string | null;
+  completedAt: string | null;
+  customerName: string;
+  receptionistName: string;
+  revenue: number;
+  serviceCount: number;
+  skinnerName: string | null;
+  visitId: string;
+};
+
+export type BranchReportDetailData = {
+  branchId: string;
+  details: BranchReportDetail[];
+  pagination: ReportPaginationMeta;
+};
+
+export type BranchReportDetailApiResponse = {
+  error?: string;
+  report?: BranchReportDetailData;
+};
+
+export type BranchReportDetailFilter = BranchReportFilter & {
+  branchId: string;
+  page: number;
+  pageSize: number;
 };

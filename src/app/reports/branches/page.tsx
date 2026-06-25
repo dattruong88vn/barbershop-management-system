@@ -1,8 +1,5 @@
-import { ManagementReportPlaceholderPage } from "@/components/modules/reports";
-import { MANAGEMENT_REPORT_BRANCHES } from "@/constants/common";
+import { BranchReportView } from "@/components/modules/reports";
 
 export default function BranchesReportPage() {
-  return (
-    <ManagementReportPlaceholderPage reportKind={MANAGEMENT_REPORT_BRANCHES} />
-  );
+  return <BranchReportView />;
 }

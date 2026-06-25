@@ -58,6 +58,48 @@ export const API_ROUTES = {
 
     return `/api/reports/personal?${params.toString()}`;
   },
+  branchReport: ({
+    fromDate,
+    status,
+    toDate,
+  }: {
+    fromDate: string;
+    status?: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({ fromDate, toDate });
+
+    if (status) params.set("status", status);
+
+    return `/api/reports/branches?${params.toString()}`;
+  },
+  branchReportDetails: ({
+    branchId,
+    fromDate,
+    page,
+    pageSize,
+    status,
+    toDate,
+  }: {
+    branchId: string;
+    fromDate: string;
+    page: number;
+    pageSize: number;
+    status?: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({
+      branchId,
+      fromDate,
+      page: String(page),
+      pageSize: String(pageSize),
+      toDate,
+    });
+
+    if (status) params.set("status", status);
+
+    return `/api/reports/branches/details?${params.toString()}`;
+  },
   staffReport: ({
     branchId,
     fromDate,
