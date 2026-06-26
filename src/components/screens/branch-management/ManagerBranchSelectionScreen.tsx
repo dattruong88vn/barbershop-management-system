@@ -22,8 +22,9 @@ import { useBranches } from "@/hooks/useBranches";
 export function ManagerBranchSelectionScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { update: updateSession } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const { branches, error, isLoading } = useBranches();
+  const [autoSelectFailed, setAutoSelectFailed] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const autoSelectedBranchIdRef = useRef<string | null>(null);
   const activeBranches = useMemo(
@@ -34,9 +35,12 @@ export function ManagerBranchSelectionScreen() {
       ),
     [branches],
   );
+  const singleActiveBranchId =
+    activeBranches.length === 1 ? activeBranches[0].id : null;
 
   const selectBranch = useCallback(
     (branchId: string) => {
+      setAutoSelectFailed(false);
       setIsRedirecting(true);
       void updateSession({ user: { active_branch_id: branchId } }).then(
         (updatedSession) => {
@@ -57,15 +61,24 @@ export function ManagerBranchSelectionScreen() {
     if (!isLoading && !error && activeBranches.length === 1) {
       const branchId = activeBranches[0].id;
 
+      if (session?.user.active_branch_id === branchId) {
+        router.replace(ROUTES.dashboard);
+        return;
+      }
+
       if (autoSelectedBranchIdRef.current === branchId) {
         return;
       }
 
       autoSelectedBranchIdRef.current = branchId;
+      setAutoSelectFailed(false);
+      setIsRedirecting(true);
       void updateSession({ user: { active_branch_id: branchId } }).then(
         (updatedSession) => {
           if (updatedSession?.user.active_branch_id !== branchId) {
             autoSelectedBranchIdRef.current = null;
+            setAutoSelectFailed(true);
+            setIsRedirecting(false);
             return;
           }
           void queryClient.invalidateQueries();
@@ -73,13 +86,28 @@ export function ManagerBranchSelectionScreen() {
         },
         () => {
           autoSelectedBranchIdRef.current = null;
+          setAutoSelectFailed(true);
+          setIsRedirecting(false);
         },
       );
     }
-  }, [activeBranches, error, isLoading, queryClient, router, updateSession]);
+  }, [
+    activeBranches,
+    error,
+    isLoading,
+    queryClient,
+    router,
+    session?.user.active_branch_id,
+    updateSession,
+  ]);
 
   const shouldShowFullScreenLoading =
-    isLoading || isRedirecting || (!error && activeBranches.length === 1);
+    isLoading ||
+    isRedirecting ||
+    (!error &&
+      activeBranches.length === 1 &&
+      (session?.user.active_branch_id === singleActiveBranchId ||
+        !autoSelectFailed));
 
   if (shouldShowFullScreenLoading) {
     return (
@@ -110,7 +138,10 @@ export function ManagerBranchSelectionScreen() {
           <EmptyState title={branchTexts.ownerBranches.selectBranch.empty} />
         ) : null}
 
-        {!isLoading && !error && activeBranches.length > 1 ? (
+        {!isLoading &&
+        !error &&
+        (activeBranches.length > 1 ||
+          (activeBranches.length === 1 && autoSelectFailed)) ? (
           <div className="grid gap-4 sm:grid-cols-2">
             {activeBranches.map((branch) => (
               <Card className="flex flex-col" key={branch.id} padding="lg">

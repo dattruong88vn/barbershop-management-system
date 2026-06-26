@@ -31,7 +31,8 @@ const smokeScripts: SmokeScript[] = [
     name: "smoke:dashboard",
   },
   {
-    description: "Staff/branch/service/combo report API date range, scope, filters và pagination",
+    description:
+      "Staff/branch/service/combo/revenue report API date range, scope, filters và pagination",
     group: "api",
     name: "smoke:reports",
   },

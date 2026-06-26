@@ -101,7 +101,7 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Branch tab rows include branch, completed visits, unique customers, service/combo count, revenue, and detail action.
 - Branch tab owner rows include all branches active during the selected range; manager sees only the active managed branch.
 - Branch detail pagination runs on completed visits and shows completed date, branch, customer, receptionist, barber, skinner, service/combo count, and revenue.
-- Item tab shows three pie charts: service vs combo revenue share, combo revenue share by combo, and service revenue share by service.
+- Item tab shows three solid pie charts: service vs combo revenue share, combo revenue share by combo, and service revenue share by service. Do not render these charts as donut charts; keep `innerRadius` unset. Use shared chart tokens `--chart-1..8`, with green as the first segment color, and keep legends below the chart with aligned label/value rows.
 - Item tab table includes item name, type, usage count, unique customers, revenue, revenue share, and detail action.
 - Item tab service rows count only direct service selections (`visit_services.combo_id IS NULL`) and do not include service rows inside combo visits.
 - Item tab combo rows count one combo per visit by unique `visitId + comboId`; combo revenue sums allocated rows for that combo.
@@ -145,6 +145,7 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Detail query cache keys include the drill-down id such as staff id, branch id, or item id, active filters, `fromDate`, `toDate`, page, and page size.
 - Use global `DateRangePicker` through `ReportDateRangeFilter` for all management report screens so date labels, constraints, and layout stay consistent. Native date inputs are not allowed.
 - Management reports label the field `Chọn thời gian`; the trigger shows only the selected date range, does not repeat `Từ ngày`/`Đến ngày`, and expands dynamically to the available filter-grid column width.
+- Management report filter cards keep the `Áp dụng` action aligned to the right edge of the filter grid. The button uses its natural `Button` width and must not stretch to fill the grid column.
 
 ## Implementation Notes
 

@@ -347,9 +347,11 @@ export function StaffReportView() {
                 />
               </label>
 
-              <Button type="button" onClick={handleFiltersApply}>
-                {reportTexts.staffReport.applyFilters}
-              </Button>
+              <div className="flex justify-end md:justify-self-end">
+                <Button type="button" onClick={handleFiltersApply}>
+                  {reportTexts.staffReport.applyFilters}
+                </Button>
+              </div>
             </div>
           </Card>
 

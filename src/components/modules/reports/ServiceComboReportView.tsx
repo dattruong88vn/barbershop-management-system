@@ -503,9 +503,11 @@ export function ServiceComboReportView({
                 </Select>
               </label>
 
-              <Button type="button" onClick={handleFiltersApply}>
-                {reportTexts.serviceComboReport.applyFilters}
-              </Button>
+              <div className="flex justify-end md:justify-self-end">
+                <Button type="button" onClick={handleFiltersApply}>
+                  {reportTexts.serviceComboReport.applyFilters}
+                </Button>
+              </div>
             </div>
           </Card>
 

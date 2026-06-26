@@ -89,9 +89,9 @@ Sau khi script riêng pass, chạy lại `npm run smoke:all` để đảm bảo 
 
 ## Khi thêm smoke mới
 
-1. Thêm script riêng vào `package.json`.
+1. Thêm script riêng vào `package.json`, hoặc nối flow mới vào script nhóm hiện có nếu flow thuộc cùng module như `smoke:reports`.
 2. Nếu là API smoke, đặt file trong `scripts/smoke/`.
 3. Nếu là UI smoke, đặt spec trong `scripts/smoke/playwright/`.
 4. Mỗi function trong file smoke phải có comment tiếng Việt nêu mục đích flow.
-5. Đăng ký script mới trong `scripts/smoke/run-all.ts`.
+5. Đăng ký script mới trong `scripts/smoke/run-all.ts`, hoặc cập nhật mô tả script nhóm nếu chỉ nối thêm flow vào script nhóm.
 6. Cập nhật `docs/dev/smoke-tests.md` và runbook này nếu flow mới cần lưu ý vận hành.

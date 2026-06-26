@@ -57,6 +57,9 @@ const PIE_COLORS = [
   "var(--chart-3)",
   "var(--chart-4)",
   "var(--chart-5)",
+  "var(--chart-6)",
+  "var(--chart-7)",
+  "var(--chart-8)",
 ];
 
 type SelectedRevenueRow =
@@ -138,9 +141,12 @@ function RevenuePieChart({
   return (
     <Card title={title}>
       {data.length ? (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(12rem,16rem)] lg:items-center">
-          <ChartContainer minHeightClassName="h-64">
-            <PieChart>
+        <div className="grid gap-4">
+          <ChartContainer
+            className="mx-auto max-w-64"
+            minHeightClassName="h-52"
+          >
+            <PieChart margin={{ bottom: 4, left: 4, right: 4, top: 4 }}>
               <Tooltip
                 content={
                   <ChartTooltipContent
@@ -153,10 +159,11 @@ function RevenuePieChart({
                 cy="50%"
                 data={data}
                 dataKey={PIE_DATA_KEY}
-                innerRadius={52}
+                endAngle={-270}
                 nameKey="label"
-                outerRadius={92}
-                paddingAngle={2}
+                outerRadius={76}
+                paddingAngle={0}
+                startAngle={90}
               >
                 {data.map((segment, index) => (
                   <Cell
@@ -167,11 +174,11 @@ function RevenuePieChart({
               </Pie>
             </PieChart>
           </ChartContainer>
-          <div className="grid gap-2">
+          <div className="grid gap-2 border-t border-gray-400 pt-3">
             {data.map((segment, index) => (
               <div
                 key={segment.id}
-                className="flex items-center justify-between gap-3 text-sm"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-sm"
               >
                 <span className="flex min-w-0 items-center gap-2 text-gray-700">
                   <span
@@ -435,9 +442,11 @@ export function RevenueReportView() {
                 onToDateChange={handleToDateChange}
               />
 
-              <Button type="button" onClick={handleFiltersApply}>
-                {reportTexts.revenueReport.applyFilters}
-              </Button>
+              <div className="flex justify-end md:col-start-2 md:justify-self-end xl:col-start-3">
+                <Button type="button" onClick={handleFiltersApply}>
+                  {reportTexts.revenueReport.applyFilters}
+                </Button>
+              </div>
             </div>
           </Card>
 

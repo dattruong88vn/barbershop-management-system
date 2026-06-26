@@ -267,9 +267,11 @@ export function BranchReportView() {
                 </Select>
               </label>
 
-              <Button type="button" onClick={handleFiltersApply}>
-                {reportTexts.branchReport.applyFilters}
-              </Button>
+              <div className="flex justify-end md:justify-self-end">
+                <Button type="button" onClick={handleFiltersApply}>
+                  {reportTexts.branchReport.applyFilters}
+                </Button>
+              </div>
             </div>
           </Card>
 
