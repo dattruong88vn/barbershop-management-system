@@ -179,6 +179,32 @@ describe("Providers", () => {
     expect(mocks.push).toHaveBeenCalledWith(ROUTES.login);
   });
 
+  it("should sign out before navigating to login for auth failures", () => {
+    mockSession("manager");
+
+    render(
+      <Providers>
+        <div>child content</div>
+      </Providers>,
+    );
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent(APP_NAVIGATION_EVENT, {
+          detail: {
+            href: ROUTES.login,
+            signOut: true,
+          },
+        }),
+      );
+    });
+
+    expect(mocks.signOut).toHaveBeenCalledWith({
+      callbackUrl: ROUTES.login,
+    });
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
   it("should warm location province cache for management roles", async () => {
     mockSession("manager");
     mocks.fetchClient.mockResolvedValue({ provinces: [] });

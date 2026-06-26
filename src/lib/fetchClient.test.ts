@@ -48,13 +48,14 @@ describe("fetchClient", () => {
       expect.objectContaining({
         detail: {
           href: ROUTES.login,
+          signOut: true,
         },
       }),
     );
     window.removeEventListener(APP_NAVIGATION_EVENT, navigationListener);
   });
 
-  it("should redirect to dashboard on 403", async () => {
+  it("should redirect to login on 403", async () => {
     const navigationListener = vi.fn();
     window.addEventListener(APP_NAVIGATION_EVENT, navigationListener);
     vi.mocked(fetch).mockResolvedValue(createJsonResponse({}, 403));
@@ -65,7 +66,8 @@ describe("fetchClient", () => {
     expect(navigationListener).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: {
-          href: ROUTES.dashboard,
+          href: ROUTES.login,
+          signOut: true,
         },
       }),
     );

@@ -58,11 +58,11 @@ describe("fetchServer", () => {
     expect(mocks.redirect).toHaveBeenCalledWith(ROUTES.login);
   });
 
-  it("should redirect to dashboard on 403", async () => {
+  it("should redirect to login on 403", async () => {
     vi.mocked(fetch).mockResolvedValue(createJsonResponse({}, 403));
 
     await expect(fetchServer("/api/test")).rejects.toThrow("NEXT_REDIRECT");
-    expect(mocks.redirect).toHaveBeenCalledWith(ROUTES.dashboard);
+    expect(mocks.redirect).toHaveBeenCalledWith(ROUTES.login);
   });
 
   it("should call notFound on 404", async () => {

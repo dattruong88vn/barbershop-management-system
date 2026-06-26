@@ -20,4 +20,23 @@ describe("dispatchAppNavigation", () => {
 
     window.removeEventListener(APP_NAVIGATION_EVENT, listener);
   });
+
+  it("should dispatch sign out navigation detail when requested", () => {
+    const listener = vi.fn();
+
+    window.addEventListener(APP_NAVIGATION_EVENT, listener);
+
+    dispatchAppNavigation("/login", { signOut: true });
+
+    expect(listener).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: {
+          href: "/login",
+          signOut: true,
+        },
+      }),
+    );
+
+    window.removeEventListener(APP_NAVIGATION_EVENT, listener);
+  });
 });

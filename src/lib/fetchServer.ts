@@ -44,7 +44,7 @@ export async function fetchServer<TResponse>(
   }
 
   if (response.status === 403) {
-    redirect(ROUTES.dashboard);
+    redirect(ROUTES.login);
   }
 
   if (response.status === 404) {

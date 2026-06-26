@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -71,6 +71,11 @@ export function Providers({ children }: ProvidersProps) {
         !(event instanceof CustomEvent) ||
         typeof event.detail?.href !== "string"
       ) {
+        return;
+      }
+
+      if (event.detail.signOut === true) {
+        void signOut({ callbackUrl: event.detail.href });
         return;
       }
 

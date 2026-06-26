@@ -39,12 +39,12 @@ export async function fetchClient<TResponse>(
   const responseBody = await parseApiResponse(response);
 
   if (response.status === 401) {
-    dispatchAppNavigation(ROUTES.login);
+    dispatchAppNavigation(ROUTES.login, { signOut: true });
     throw new Error(commonTexts.api.errors.unauthorized);
   }
 
   if (response.status === 403) {
-    dispatchAppNavigation(ROUTES.dashboard);
+    dispatchAppNavigation(ROUTES.login, { signOut: true });
     throw new Error(commonTexts.api.errors.forbidden);
   }
 
