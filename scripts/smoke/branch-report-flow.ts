@@ -225,6 +225,7 @@ async function setup() {
   const activeBranch = await prisma.branch.create({
     data: {
       address: `SMOKE Active Branch Address ${stamp}`,
+      createdAt: new Date("2026-06-24T12:00:00.000Z"),
       name: `SMOKE Active Branch ${stamp}`,
       shopId,
       status: BRANCH_STATUS_ACTIVE,
@@ -233,6 +234,7 @@ async function setup() {
   const inactiveBranch = await prisma.branch.create({
     data: {
       address: `SMOKE Inactive Branch Address ${stamp}`,
+      createdAt: new Date("2026-06-24T12:00:00.000Z"),
       deactivatedAt: new Date("2026-06-25T12:00:00.000Z"),
       name: `SMOKE Inactive Branch ${stamp}`,
       shopId,

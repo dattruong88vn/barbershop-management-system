@@ -6,6 +6,8 @@ import type {
   ReportPeriodValue,
   ReportItemTabValue,
   ReportUsageSortValue,
+  RevenueReportItemTypeValue,
+  RevenueReportTabValue,
   ServiceResponsibleRoleValue,
   StaffReportStatus,
   StaffRoleValue,
@@ -223,6 +225,96 @@ export type ServiceComboReportDetailApiResponse = {
 
 export type ServiceComboReportDetailFilter = ServiceComboReportFilter & {
   itemId: string;
+  page: number;
+  pageSize: number;
+};
+
+export type RevenueReportBranchRow = {
+  branchId: string;
+  branchName: string;
+  customerCount: number;
+  detailCount: number;
+  revenue: number;
+  serviceCount: number;
+  visitCount: number;
+};
+
+export type RevenueReportItemRow = {
+  customerCount: number;
+  detailCount: number;
+  itemId: string;
+  itemName: string;
+  itemType: RevenueReportItemTypeValue;
+  revenue: number;
+  revenueShare: number;
+  usageCount: number;
+};
+
+export type RevenueReportPieSegment = {
+  id: string;
+  label: string;
+  revenue: number;
+  revenueShare: number;
+};
+
+export type RevenueReportData = {
+  branchName: string | null;
+  branchRows: RevenueReportBranchRow[];
+  comboPie: RevenueReportPieSegment[];
+  itemRows: RevenueReportItemRow[];
+  itemTypePie: RevenueReportPieSegment[];
+  periodLabel: string;
+  servicePie: RevenueReportPieSegment[];
+  tab: RevenueReportTabValue;
+  totals: {
+    customerCount: number;
+    revenue: number;
+    serviceCount: number;
+    visitCount: number;
+  };
+};
+
+export type RevenueReportApiResponse = {
+  error?: string;
+  report?: RevenueReportData;
+};
+
+export type RevenueReportFilter = {
+  fromDate: string;
+  tab: RevenueReportTabValue;
+  toDate: string;
+};
+
+export type RevenueReportDetail = {
+  barberName: string | null;
+  branchName: string;
+  completedAt: string | null;
+  customerName: string;
+  itemName?: string;
+  itemType?: RevenueReportItemTypeValue;
+  receptionistName: string;
+  revenue: number;
+  serviceCount: number;
+  skinnerName: string | null;
+  visitId: string;
+};
+
+export type RevenueReportDetailData = {
+  details: RevenueReportDetail[];
+  drilldownId: string;
+  itemType: RevenueReportItemTypeValue | null;
+  pagination: ReportPaginationMeta;
+  tab: RevenueReportTabValue;
+};
+
+export type RevenueReportDetailApiResponse = {
+  error?: string;
+  report?: RevenueReportDetailData;
+};
+
+export type RevenueReportDetailFilter = RevenueReportFilter & {
+  drilldownId: string;
+  itemType?: RevenueReportItemTypeValue;
   page: number;
   pageSize: number;
 };

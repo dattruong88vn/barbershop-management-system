@@ -31,6 +31,7 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Staff report summary must not inline all raw visit/service detail rows. Load staff detail rows through the paginated detail API and cache client queries by staff id plus active filters.
 - Branch report summary must count `1 service = 1 lượt` and `1 combo = 1 lượt` even though combo revenue is allocated across multiple `visit_services` rows.
 - Service/combo usage report does not show revenue. It is focused on usage count and unique customers.
+- Revenue item report counts direct service revenue only for service rows; service rows inside combo visits stay under combo revenue.
 
 ## Report Kinds
 
@@ -89,6 +90,25 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Detail rows show completed date, customer, receptionist, barber, skinner, service/combo count, and revenue. They do not link to visit detail yet.
 - Client detail cache keys include branch id, `fromDate`, `toDate`, status, page, and page size.
 
+## Revenue Report
+
+- `/reports/revenue` is available to owner and manager.
+- Summary endpoint: `GET /api/reports/revenue?tab=branch|item&fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD`.
+- Detail endpoint: `GET /api/reports/revenue/details?tab=branch|item&drilldownId=<branchId|itemId>&itemType=service|combo&fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD&page=1&pageSize=10`. `itemType` is required only for `tab=item`.
+- Manager is always scoped to the active managed branch and cannot override scope with query params.
+- Revenue report has two tabs: branch revenue and service/combo revenue.
+- Filters are date range plus `Áp dụng`; there is no branch filter.
+- Branch tab rows include branch, completed visits, unique customers, service/combo count, revenue, and detail action.
+- Branch tab owner rows include all branches active during the selected range; manager sees only the active managed branch.
+- Branch detail pagination runs on completed visits and shows completed date, branch, customer, receptionist, barber, skinner, service/combo count, and revenue.
+- Item tab shows three pie charts: service vs combo revenue share, combo revenue share by combo, and service revenue share by service.
+- Item tab table includes item name, type, usage count, unique customers, revenue, revenue share, and detail action.
+- Item tab service rows count only direct service selections (`visit_services.combo_id IS NULL`) and do not include service rows inside combo visits.
+- Item tab combo rows count one combo per visit by unique `visitId + comboId`; combo revenue sums allocated rows for that combo.
+- Revenue totals and table rows use `visit_services.allocated_price` and snapshot names.
+- Client summary cache keys include tab, `fromDate`, and `toDate`, with a 5-minute stale window.
+- Client detail cache keys include tab, drill-down id, item type, `fromDate`, `toDate`, page, and page size.
+
 ## Service/Combo Report
 
 - `/reports/services` renders the only management report screen for service and combo usage, with two tabs: service and combo.
@@ -135,5 +155,5 @@ Revenue reports, personal staff reports, branch/service/combo reports, report pa
 - Use `ReportMetaBar` for report context metadata such as `Kỳ báo cáo`, `Thông tin chi nhánh`, role, and modal detail context. Metadata uses base-size text, and items must stay on one row per item with title and value adjacent (`title value`), then flow into responsive columns. The report-level context section sits above the filter section; do not place period/branch context inside the filter card. Do not use wide left/right key-value rows for report context.
 - Staff names in the report table use semibold emphasis.
 - `src/utils/reports/reportDateRanges.test.ts` covers UTC+7 boundaries, one-day ranges, invalid dates, reversed ranges, and display labels.
-- `npm run smoke:reports` covers staff report owner/manager scope, inactive staff visibility, unknown assignment, API role/search filters, invalid date ranges, branch report owner-only scope, inactive branch visibility, branch status filtering, combo item counting, allocated revenue, service/combo report manager scope, service direct-only counting, combo per-visit counting, usage sort, and detail pagination.
+- `npm run smoke:reports` covers staff report owner/manager scope, inactive staff visibility, unknown assignment, API role/search filters, invalid date ranges, branch report owner-only scope, inactive branch visibility, branch status filtering, combo item counting, allocated revenue, service/combo report manager scope, service direct-only counting, combo per-visit counting, revenue report owner/manager scope, revenue pie totals, revenue direct-service/combo separation, usage sort, and detail pagination.
 - For allocation changes, manually reason through rounding and total preservation.

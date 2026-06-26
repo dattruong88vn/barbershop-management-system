@@ -7,6 +7,7 @@ export * from "./PersonalReportSkeleton";
 export * from "./PersonalReportSummaryCard";
 export * from "./PersonalReportTopItems";
 export * from "./PersonalReportView";
+export * from "./RevenueReportView";
 export * from "./ReportMetaBar";
 export * from "./ReportDateRangeFilter";
 export * from "./ServiceComboReportView";

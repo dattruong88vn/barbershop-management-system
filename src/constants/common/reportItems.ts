@@ -17,3 +17,24 @@ export const REPORT_USAGE_SORTS = [
 ] as const;
 
 export type ReportUsageSortValue = (typeof REPORT_USAGE_SORTS)[number];
+
+export const REVENUE_REPORT_TAB_BRANCH = "branch" as const;
+export const REVENUE_REPORT_TAB_ITEM = "item" as const;
+
+export const REVENUE_REPORT_TABS = [
+  REVENUE_REPORT_TAB_BRANCH,
+  REVENUE_REPORT_TAB_ITEM,
+] as const;
+
+export type RevenueReportTabValue = (typeof REVENUE_REPORT_TABS)[number];
+
+export const REVENUE_REPORT_ITEM_TYPE_SERVICE = "service" as const;
+export const REVENUE_REPORT_ITEM_TYPE_COMBO = "combo" as const;
+
+export const REVENUE_REPORT_ITEM_TYPES = [
+  REVENUE_REPORT_ITEM_TYPE_SERVICE,
+  REVENUE_REPORT_ITEM_TYPE_COMBO,
+] as const;
+
+export type RevenueReportItemTypeValue =
+  (typeof REVENUE_REPORT_ITEM_TYPES)[number];

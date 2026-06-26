@@ -100,6 +100,49 @@ export const API_ROUTES = {
 
     return `/api/reports/branches/details?${params.toString()}`;
   },
+  revenueReport: ({
+    fromDate,
+    tab,
+    toDate,
+  }: {
+    fromDate: string;
+    tab: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({ fromDate, tab, toDate });
+
+    return `/api/reports/revenue?${params.toString()}`;
+  },
+  revenueReportDetails: ({
+    drilldownId,
+    fromDate,
+    itemType,
+    page,
+    pageSize,
+    tab,
+    toDate,
+  }: {
+    drilldownId: string;
+    fromDate: string;
+    itemType?: string;
+    page: number;
+    pageSize: number;
+    tab: string;
+    toDate: string;
+  }) => {
+    const params = new URLSearchParams({
+      drilldownId,
+      fromDate,
+      page: String(page),
+      pageSize: String(pageSize),
+      tab,
+      toDate,
+    });
+
+    if (itemType) params.set("itemType", itemType);
+
+    return `/api/reports/revenue/details?${params.toString()}`;
+  },
   staffReport: ({
     branchId,
     fromDate,

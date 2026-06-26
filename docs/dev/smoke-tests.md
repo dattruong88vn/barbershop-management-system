@@ -121,7 +121,7 @@ Quy trình khuyến nghị trước commit lớn:
 
 ## Report Smoke
 
-`npm run smoke:reports` kiểm tra staff report, branch report và service/combo report API.
+`npm run smoke:reports` kiểm tra staff report, branch report, service/combo report và revenue report API.
 
 Staff report:
 
@@ -153,6 +153,18 @@ Service/combo report:
 - tab dịch vụ chỉ tính dịch vụ lẻ, không tính service con trong combo
 - tab combo tính một combo trong một visit là một lượt
 - detail API phân trang theo service/combo đúng nguồn dữ liệu
+
+Revenue report:
+
+- owner xem được tab chi nhánh với tất cả chi nhánh trong kỳ
+- manager xem được tab chi nhánh nhưng bị scope theo active managed branch
+- date range không hợp lệ trả `400`
+- tab dịch vụ/combo tách doanh thu dịch vụ lẻ khỏi doanh thu combo
+- service con trong combo không tăng doanh thu/lượt của service
+- combo tính một combo trong một visit là một lượt và doanh thu bằng tổng `allocatedPrice`
+- pie tổng dịch vụ/combo khớp doanh thu bảng
+- detail chi nhánh phân trang theo visit
+- detail combo phân trang theo visit chứa combo để không duplicate service con
 
 ## Playwright UI Smoke
 

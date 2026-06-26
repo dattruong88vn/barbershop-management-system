@@ -1,8 +1,5 @@
-import { ManagementReportPlaceholderPage } from "@/components/modules/reports";
-import { MANAGEMENT_REPORT_REVENUE } from "@/constants/common";
+import { RevenueReportView } from "@/components/modules/reports";
 
 export default function RevenueReportPage() {
-  return (
-    <ManagementReportPlaceholderPage reportKind={MANAGEMENT_REPORT_REVENUE} />
-  );
+  return <RevenueReportView />;
 }
