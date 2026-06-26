@@ -11,13 +11,19 @@ CREATE TYPE "ShopStatus" AS ENUM ('active', 'expired');
 CREATE TYPE "UserRole" AS ENUM ('superadmin', 'owner', 'manager', 'receptionist', 'barber', 'skinner');
 
 -- CreateEnum
-CREATE TYPE "UserStatus" AS ENUM ('active', 'inactive');
+CREATE TYPE "UserStatus" AS ENUM ('active', 'inactive', 'branch_suspended');
+
+-- CreateEnum
+CREATE TYPE "BranchStatus" AS ENUM ('active', 'inactive');
 
 -- CreateEnum
 CREATE TYPE "VisitStatus" AS ENUM ('pending', 'in_progress', 'completed');
 
 -- CreateEnum
 CREATE TYPE "ServiceResponsibleRole" AS ENUM ('barber', 'skinner');
+
+-- CreateEnum
+CREATE TYPE "user_gender" AS ENUM ('male', 'female', 'other');
 
 -- CreateTable
 CREATE TABLE "shops" (
@@ -36,8 +42,12 @@ CREATE TABLE "shops" (
 CREATE TABLE "branches" (
     "id" UUID NOT NULL,
     "shop_id" UUID NOT NULL,
+    "manager_id" UUID,
     "name" TEXT NOT NULL,
     "address" TEXT NOT NULL,
+    "status" "BranchStatus" NOT NULL DEFAULT 'active',
+    "deactivated_at" TIMESTAMPTZ(6),
+    "deactivated_by" UUID,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "branches_pkey" PRIMARY KEY ("id")
@@ -49,6 +59,18 @@ CREATE TABLE "users" (
     "shop_id" UUID,
     "branch_id" UUID,
     "username" TEXT NOT NULL,
+    "full_name" TEXT,
+    "phone" TEXT,
+    "date_of_birth" DATE,
+    "gender" "user_gender",
+    "hometown" TEXT,
+    "current_address" TEXT,
+    "hometown_province_code" VARCHAR(20),
+    "current_province_code" VARCHAR(20),
+    "current_ward_code" VARCHAR(20),
+    "current_address_line" TEXT,
+    "identity_card_front_key" TEXT,
+    "identity_card_back_key" TEXT,
     "password_hash" TEXT NOT NULL,
     "role" "UserRole" NOT NULL,
     "status" "UserStatus" NOT NULL DEFAULT 'active',
@@ -62,10 +84,13 @@ CREATE TABLE "users" (
 CREATE TABLE "services" (
     "id" UUID NOT NULL,
     "shop_id" UUID NOT NULL,
+    "branch_id" UUID,
     "name" TEXT NOT NULL,
     "price" DECIMAL(12,2) NOT NULL,
     "responsible_role" "ServiceResponsibleRole" NOT NULL,
     "is_haircut" BOOLEAN NOT NULL DEFAULT false,
+    "created_by" UUID NOT NULL,
+    "deleted_at" TIMESTAMPTZ(6),
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "services_pkey" PRIMARY KEY ("id")
@@ -75,9 +100,12 @@ CREATE TABLE "services" (
 CREATE TABLE "combos" (
     "id" UUID NOT NULL,
     "shop_id" UUID NOT NULL,
+    "branch_id" UUID,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "price" DECIMAL(12,2) NOT NULL,
+    "created_by" UUID NOT NULL,
+    "deleted_at" TIMESTAMPTZ(6),
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "combos_pkey" PRIMARY KEY ("id")
@@ -110,6 +138,8 @@ CREATE TABLE "visits" (
     "shop_id" UUID NOT NULL,
     "customer_id" UUID NOT NULL,
     "branch_id" UUID NOT NULL,
+    "branch_name_snapshot" TEXT NOT NULL,
+    "branch_address_snapshot" TEXT NOT NULL,
     "barber_id" UUID,
     "skinner_id" UUID,
     "no_haircut" BOOLEAN NOT NULL DEFAULT false,
@@ -137,6 +167,7 @@ CREATE TABLE "visit_services" (
     "combo_name_snapshot" TEXT,
     "combo_price_snapshot" DECIMAL(12,2),
     "responsible_role_snapshot" "ServiceResponsibleRole",
+    "is_haircut_snapshot" BOOLEAN NOT NULL DEFAULT false,
     "allocated_price" DECIMAL(12,2) NOT NULL,
 
     CONSTRAINT "visit_services_pkey" PRIMARY KEY ("id")
@@ -158,6 +189,15 @@ CREATE TABLE "visit_photos" (
 CREATE INDEX "branches_shop_id_idx" ON "branches"("shop_id");
 
 -- CreateIndex
+CREATE INDEX "branches_shop_id_status_idx" ON "branches"("shop_id", "status");
+
+-- CreateIndex
+CREATE INDEX "branches_manager_id_idx" ON "branches"("manager_id");
+
+-- CreateIndex
+CREATE INDEX "branches_deactivated_by_idx" ON "branches"("deactivated_by");
+
+-- CreateIndex
 CREATE INDEX "users_branch_id_idx" ON "users"("branch_id");
 
 -- CreateIndex
@@ -167,7 +207,31 @@ CREATE UNIQUE INDEX "users_shop_id_username_key" ON "users"("shop_id", "username
 CREATE INDEX "services_shop_id_idx" ON "services"("shop_id");
 
 -- CreateIndex
+CREATE INDEX "services_shop_id_deleted_at_idx" ON "services"("shop_id", "deleted_at");
+
+-- CreateIndex
+CREATE INDEX "services_shop_id_branch_id_idx" ON "services"("shop_id", "branch_id");
+
+-- CreateIndex
+CREATE INDEX "services_branch_id_idx" ON "services"("branch_id");
+
+-- CreateIndex
+CREATE INDEX "services_created_by_idx" ON "services"("created_by");
+
+-- CreateIndex
 CREATE INDEX "combos_shop_id_idx" ON "combos"("shop_id");
+
+-- CreateIndex
+CREATE INDEX "combos_shop_id_deleted_at_idx" ON "combos"("shop_id", "deleted_at");
+
+-- CreateIndex
+CREATE INDEX "combos_shop_id_branch_id_idx" ON "combos"("shop_id", "branch_id");
+
+-- CreateIndex
+CREATE INDEX "combos_branch_id_idx" ON "combos"("branch_id");
+
+-- CreateIndex
+CREATE INDEX "combos_created_by_idx" ON "combos"("created_by");
 
 -- CreateIndex
 CREATE INDEX "combo_services_shop_id_idx" ON "combo_services"("shop_id");
@@ -233,6 +297,12 @@ CREATE INDEX "visit_photos_uploaded_by_idx" ON "visit_photos"("uploaded_by");
 ALTER TABLE "branches" ADD CONSTRAINT "branches_shop_id_fkey" FOREIGN KEY ("shop_id") REFERENCES "shops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "branches" ADD CONSTRAINT "branches_manager_id_fkey" FOREIGN KEY ("manager_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "branches" ADD CONSTRAINT "branches_deactivated_by_fkey" FOREIGN KEY ("deactivated_by") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_shop_id_fkey" FOREIGN KEY ("shop_id") REFERENCES "shops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -242,7 +312,19 @@ ALTER TABLE "users" ADD CONSTRAINT "users_branch_id_fkey" FOREIGN KEY ("branch_i
 ALTER TABLE "services" ADD CONSTRAINT "services_shop_id_fkey" FOREIGN KEY ("shop_id") REFERENCES "shops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "services" ADD CONSTRAINT "services_branch_id_fkey" FOREIGN KEY ("branch_id") REFERENCES "branches"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "services" ADD CONSTRAINT "services_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "combos" ADD CONSTRAINT "combos_shop_id_fkey" FOREIGN KEY ("shop_id") REFERENCES "shops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "combos" ADD CONSTRAINT "combos_branch_id_fkey" FOREIGN KEY ("branch_id") REFERENCES "branches"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "combos" ADD CONSTRAINT "combos_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "combo_services" ADD CONSTRAINT "combo_services_shop_id_fkey" FOREIGN KEY ("shop_id") REFERENCES "shops"("id") ON DELETE CASCADE ON UPDATE CASCADE;

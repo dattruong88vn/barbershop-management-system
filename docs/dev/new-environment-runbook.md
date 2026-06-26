@@ -2,6 +2,31 @@
 
 Checklist triển khai Barber Shop application và database vào một môi trường mới. Shared Data DB được dùng chung giữa các môi trường; không tạo hoặc sync lại Shared Data DB nếu môi trường mới chỉ là một consumer mới.
 
+## Current Demo Setup
+
+Trong giai đoạn chưa có khách hàng thật, có thể dùng Dev Barbershop DB để chạy demo:
+
+```txt
+Demo app -> Dev Barbershop DB -> Shared Data DB
+```
+
+Quy ước này chỉ dành cho demo và kiểm thử nội bộ:
+
+- Không nhập dữ liệu khách hàng thật, CCCD thật, hoặc dữ liệu nhân sự thật.
+- Không gọi môi trường demo là production trong tài liệu vận hành.
+- Không dùng chung dữ liệu demo với dữ liệu khách hàng trả phí.
+- Không chạy seed hoặc smoke test phá dữ liệu ngay trước buổi demo nếu dữ liệu demo đã được chuẩn bị thủ công.
+- R2 bucket dùng cho demo chỉ chứa dữ liệu giả hoặc dữ liệu đã được phép dùng để demo.
+
+Khi có khách hàng mua sản phẩm, phải tạo Production Barbershop DB riêng trước khi onboarding:
+
+```txt
+Production app -> Production Barbershop DB -> Shared Data DB
+```
+
+Production Barbershop DB có thể là Supabase project mới hoặc Supabase Pro project.
+Không dùng Dev Barbershop DB làm production khi đã có dữ liệu thật.
+
 ## 1. Chuẩn bị
 
 - Xác định tên môi trường và Supabase project Barbershop DB tương ứng.
@@ -54,6 +79,14 @@ Mỗi consumer nên có read-only role riêng để có thể rotate hoặc revo
 3. Xác nhận application khởi động không có lỗi thiếu bảng, cột hoặc Prisma Client.
 4. Không chạy Shared Data DB sync như một phần application build hoặc deploy.
 
+Với setup hai branch hiện tại:
+
+- `develop`: nhánh phát triển chính, deploy để kiểm thử nội bộ khi cần.
+- `main`: nhánh ổn định, có thể deploy làm demo cho khách xem trước khi có production DB riêng.
+
+Nếu `main` đang trỏ tới Dev Barbershop DB để demo, không nhập dữ liệu thật vào môi trường này.
+Khi chuyển sang production thật, đổi environment variables của production deploy sang Production Barbershop DB và R2 bucket production.
+
 ## 6. Xác minh sau deploy
 
 - Mở application và kiểm tra đăng nhập.
@@ -76,7 +109,21 @@ npm run reference:generate
 
 Sau đó deploy code và chạy smoke check liên quan. Foreign tables trong `reference_data` thuộc infrastructure, không để Prisma Migrate tạo hoặc xóa chúng.
 
-## 8. Khi cần tạo Shared Data DB mới
+## 8. Chuyển từ demo sang production thật
+
+Thực hiện checklist này trước khi khách hàng thật sử dụng hệ thống:
+
+1. Tạo Production Barbershop DB riêng.
+2. Tạo R2 private bucket riêng cho production.
+3. Cấu hình `DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `R2_PRIVATE_BUCKET_NAME` và R2 credentials cho production.
+4. Chạy `npx prisma migrate deploy` trên Production Barbershop DB.
+5. Chạy `npx prisma generate` và `npm run reference:generate` cùng revision code sẽ deploy.
+6. Kết nối Production Barbershop DB với Shared Data DB bằng FDW theo mục 4.
+7. Verify province/ward lookup, auth, tenant write, upload và signed URL.
+8. Tạo dữ liệu shop/branch/staff ban đầu cho khách hàng thật.
+9. Không copy dữ liệu demo sang production nếu dữ liệu chưa được duyệt hoặc làm sạch.
+
+## 9. Khi cần tạo Shared Data DB mới
 
 Chỉ dùng phần này khi thay thế hoặc tạo một Shared Data DB độc lập, không phải khi thêm Barbershop environment mới.
 

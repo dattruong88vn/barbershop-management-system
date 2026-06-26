@@ -5,13 +5,21 @@
 | Environment | Branch | Hosting | Database | Purpose |
 | --- | --- | --- | --- | --- |
 | Local | `develop`, `feature/*`, `fix/*`, `chore/*` | Local machine | Local PostgreSQL or Supabase local | Development |
-| Staging | `staging` | Vercel | Supabase free tier | Pre-release testing |
-| Production | `main` | Vercel | Supabase Pro | Real users and data |
+| Demo | `develop` or `main` | Vercel | Dev Barbershop DB + Shared Data DB | Customer demos and internal testing |
+| Production | `main` | Vercel | Production Barbershop DB + Shared Data DB | Real users and data |
+
+Current early-stage setup may use only two Supabase projects:
+
+- Dev Barbershop DB: app data for local/dev/demo usage.
+- Shared Data DB: core reference data such as province and ward data.
+
+Do not treat the Dev Barbershop DB as production. It can be used for demos only
+while there is no real customer data. When a customer buys the product, create or
+upgrade to a separate Production Barbershop DB before onboarding real users.
 
 ## Branches
 
 - `main`: production.
-- `staging`: pre-release testing.
 - `develop`: main development branch.
 - `feature/name`: feature work.
 - `fix/description`: bug fixes.
@@ -27,7 +35,7 @@
 ## Flow
 
 ```txt
-develop -> feature/* / fix/* / chore/* -> develop -> staging -> main
+develop -> feature/* / fix/* / chore/* -> develop -> main
 ```
 
 Before creating a new branch:
@@ -57,6 +65,6 @@ Types:
 
 ## Rules
 
-- Never commit directly to `main` or `staging`.
+- Never commit directly to `main`.
 - If asked to commit only, commit and stop.
 - If asked to push, commit, push, and create a PR into `develop`.
